@@ -32,8 +32,7 @@ export const CenterPanel = () => {
       "ホテル": "/hotel",
       "有料道路": "/toll-road",
       "燃料・エコ手当管理": "/fuel-eco-management",
-      "メディア管理": "/media-management",
-      "顧客車情報": "/customer-vehicle-info"
+      "メディア管理": "/media-management"
     };
 
     const route = routeMap[name];
@@ -61,8 +60,7 @@ export const CenterPanel = () => {
       title: "E",
       items: [
         { name: "燃料・エコ手当管理", icon: Settings },
-        { name: "メディア管理", icon: Database },
-        { name: "顧客車情報", icon: Users }
+        { name: "メディア管理", icon: Database }
       ]
     }
   ];

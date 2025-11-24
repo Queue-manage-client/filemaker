@@ -14,6 +14,7 @@ export default function AccountingSummaryPage() {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
 
+  
   React.useEffect(() => {
     document.title = '会計集計 - Dispatch Harmony Hub';
   }, []);

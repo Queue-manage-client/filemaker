@@ -18,6 +18,7 @@ export default function GroupLedgerPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<Partial<GroupMaster>>({});
 
+
   React.useEffect(() => {
     document.title = 'グループ台帳 - Dispatch Harmony Hub';
   }, []);

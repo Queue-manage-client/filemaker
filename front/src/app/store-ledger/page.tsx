@@ -127,12 +127,23 @@ export default function StoreLedger() {
   
   // 管理者モードがオフになった場合、管理者専用タブの編集モードを終了
   React.useEffect(() => {
-    if (!isAdminMode && isCurrentTabAdminOnly && isEditMode) {
+    if (!isAdminMode && adminOnlyTabs.includes(activeTab) && isEditMode) {
       setIsEditMode(false);
       setIsCreatingNewStore(false);
       setEditFormData(null);
     }
-  }, [isAdminMode, isCurrentTabAdminOnly, isEditMode]);
+  }, [isAdminMode, activeTab, isEditMode]);
+  
+  // 管理者モードがオフになった場合、管理者専用タブから自動的に別のタブに切り替え
+  React.useEffect(() => {
+    if (!isAdminMode && adminOnlyTabs.includes(activeTab)) {
+      // 管理者専用でない最初のタブを見つける
+      const nonAdminTab = storeLedgerTabs.find(tab => !adminOnlyTabs.includes(tab.id));
+      if (nonAdminTab && nonAdminTab.id !== activeTab) {
+        setActiveTab(nonAdminTab.id);
+      }
+    }
+  }, [isAdminMode, activeTab]);
 
   // 店舗一覧取得
   const { data: storeBasicInfoList } = useStoreBasicInfo();
@@ -2796,11 +2807,21 @@ export default function StoreLedger() {
                 <TabsList className="flex justify-start h-auto p-1 bg-transparent" style={{ minWidth: 'max-content', width: 'max-content' }}>
                   {storeLedgerTabs.map((tab) => {
                     const IconComponent = tabIcons[tab.id];
+                    const isTabAdminOnly = adminOnlyTabs.includes(tab.id);
+                    const isTabDisabled = isTabAdminOnly && !isAdminMode;
                     return (
                       <TabsTrigger
                         key={tab.id}
                         value={tab.id}
-                        className="flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap flex-shrink-0 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+                        disabled={isTabDisabled}
+                        className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap flex-shrink-0 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 ${
+                          isTabDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                        onClick={() => {
+                          if (isTabDisabled) {
+                            alert('このタブは管理者のみ閲覧可能です。管理者モードをオンにしてください。');
+                          }
+                        }}
                       >
                         <IconComponent className="w-4 h-4" />
                         {tab.label}
@@ -2812,15 +2833,40 @@ export default function StoreLedger() {
 
               {/* タブコンテンツエリア */}
               <div className="flex-1 overflow-hidden overflow-x-hidden min-h-0">
-                {storeLedgerTabs.map((tab) => (
-                  <TabsContent key={tab.id} value={tab.id} className="h-full m-0">
-                    <ScrollArea className="h-full w-full">
-                      <div className="p-6 overflow-x-hidden">
-                        {renderTabContent(tab.id)}
-                      </div>
-                    </ScrollArea>
-                  </TabsContent>
-                ))}
+                {storeLedgerTabs.map((tab) => {
+                  const isTabAdminOnly = adminOnlyTabs.includes(tab.id);
+                  const shouldShowContent = !isTabAdminOnly || isAdminMode;
+                  
+                  return (
+                    <TabsContent key={tab.id} value={tab.id} className="h-full m-0">
+                      <ScrollArea className="h-full w-full">
+                        <div className="p-6 overflow-x-hidden">
+                          {shouldShowContent ? (
+                            renderTabContent(tab.id)
+                          ) : (
+                            <div className="flex flex-col items-center justify-center h-full min-h-[400px]">
+                              <Settings className="w-16 h-16 text-yellow-500 mb-4" />
+                              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                                管理者権限が必要です
+                              </h3>
+                              <p className="text-gray-600 mb-4">
+                                このタブを表示するには、管理者モードをオンにしてください。
+                              </p>
+                              <Button
+                                variant="default"
+                                onClick={() => setIsAdminMode(true)}
+                                className="flex items-center gap-2"
+                              >
+                                <Settings className="w-4 h-4" />
+                                管理者モードをオンにする
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </ScrollArea>
+                    </TabsContent>
+                  );
+                })}
               </div>
             </Tabs>
           </div>

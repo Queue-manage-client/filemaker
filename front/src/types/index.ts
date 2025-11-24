@@ -22,7 +22,6 @@ export interface ErrorResponse {
 // 各カテゴリーの型定義をエクスポート
 export * from './accounting';
 export * from './customer';
-export * from './customer-vehicle';
 export * from './hostess';
 export * from './employee';
 export * from './area-division';
