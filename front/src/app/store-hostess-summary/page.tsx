@@ -7,6 +7,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeft, Users } from "lucide-react";
 
 export default function StoreHostessSummary() {
+  React.useEffect(() => {
+    document.title = '店舗別詳細ホステス - Dispatch Harmony Hub';
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">

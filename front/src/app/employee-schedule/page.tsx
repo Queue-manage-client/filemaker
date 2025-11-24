@@ -45,6 +45,10 @@ export default function EmployeeSchedule() {
   const [isEditAll, setIsEditAll] = useState(false);
 
   useEffect(() => {
+    document.title = '従業員スケジュール管理 - Dispatch Harmony Hub';
+  }, []);
+
+  useEffect(() => {
     setWeekDates(getCurrentWeekDates(currentWeekStart));
   }, [currentWeekStart]);
 

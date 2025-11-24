@@ -10,6 +10,10 @@ import { ArrowLeft, Unlock } from "lucide-react";
 export default function UnlockApprovalList() {
   const router = useRouter();
 
+  React.useEffect(() => {
+    document.title = 'ロック解除承認リスト - Dispatch Harmony Hub';
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       {/* 戻るボタン */}

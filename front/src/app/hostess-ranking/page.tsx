@@ -210,6 +210,11 @@ const RankingCard = ({
 
 export default function HostessRanking() {
   const router = useRouter();
+
+  React.useEffect(() => {
+    document.title = 'ホステスランキング - Dispatch Harmony Hub';
+  }, []);
+
   const [sortKeys, setSortKeys] = useState<[SortKey, SortKey, SortKey, SortKey]>([
     'monthlyEarnings',
     'nominationRevenue',

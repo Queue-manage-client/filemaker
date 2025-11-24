@@ -14,6 +14,10 @@ export default function SalesSlipPage() {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+
+  React.useEffect(() => {
+    document.title = '売上伝票 - Dispatch Harmony Hub';
+  }, []);
   
   // React Queryを使用してデータ取得
   const { data: salesSlips = [], isLoading, error } = useSalesSlips(

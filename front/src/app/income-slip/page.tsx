@@ -24,6 +24,10 @@ export default function IncomeSlip() {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [paymentMethodFilter, setPaymentMethodFilter] = useState<string>('all');
+
+  React.useEffect(() => {
+    document.title = '入金伝票 - Dispatch Harmony Hub';
+  }, []);
   
   // React Queryを使用してデータ取得
   const { data: incomeSlips = [], isLoading, error } = useIncomeSlips(

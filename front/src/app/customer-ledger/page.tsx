@@ -19,6 +19,11 @@ import { sampleCustomers } from '@/data/customerSampleData';
 
 export default function CustomerLedger() {
   const router = useRouter();
+
+  React.useEffect(() => {
+    document.title = '顧客台帳 - Dispatch Harmony Hub';
+  }, []);
+
   const [selectedCustomer, setSelectedCustomer] = useState<Customer>(sampleCustomers[0]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([
     { id: '1', type: 'BMW 7シリーズ', color: 'ブラック', number: '品川300あ1234' }

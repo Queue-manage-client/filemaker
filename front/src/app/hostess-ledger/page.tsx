@@ -12,6 +12,10 @@ import { HostessLedger } from '@/types/hostess';
 export default function HostessLedgerPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+
+  React.useEffect(() => {
+    document.title = 'ホステス台帳 - Dispatch Harmony Hub';
+  }, []);
   
   // React Queryを使用してデータ取得
   const { data: hostesses = [], isLoading, error } = useHostessLedger();

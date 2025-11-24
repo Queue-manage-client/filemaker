@@ -66,6 +66,10 @@ const salesData = timeSlots.map((t) => ({
 export default function RealtimePerformanceSummary() {
   const router = useRouter();
 
+  React.useEffect(() => {
+    document.title = 'リアルタイム実績集計 - Dispatch Harmony Hub';
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       {/* 戻るボタン */}

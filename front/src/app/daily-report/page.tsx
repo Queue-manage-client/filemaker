@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,10 @@ import { attendingStaffSampleList, attendingHostessSampleList } from "@/data/att
 export default function DailyReport() {
   const router = useRouter();
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  useEffect(() => {
+    document.title = '日報 - Dispatch Harmony Hub';
+  }, []);
 
   const handleMenuClick = () => {
     // メニュー機能の実装予定

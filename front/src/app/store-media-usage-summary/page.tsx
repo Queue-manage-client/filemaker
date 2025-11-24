@@ -10,6 +10,10 @@ import { ArrowLeft, BarChart3 } from "lucide-react";
 export default function StoreMediaUsageSummary() {
   const router = useRouter();
 
+  React.useEffect(() => {
+    document.title = '店舗別メディア利用集計 - Dispatch Harmony Hub';
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       {/* 戻るボタン */}

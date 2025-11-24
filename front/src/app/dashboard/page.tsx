@@ -18,6 +18,10 @@ export default function DashboardPage() {
     }
   }, [router])
 
+  useEffect(() => {
+    document.title = 'ダッシュボード - Dispatch Harmony Hub';
+  }, [])
+
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader />

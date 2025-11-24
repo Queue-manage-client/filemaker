@@ -7,6 +7,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeft, BarChart3 } from "lucide-react";
 
 export default function GraphSummary() {
+  React.useEffect(() => {
+    document.title = 'グラフ集計 - Dispatch Harmony Hub';
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">

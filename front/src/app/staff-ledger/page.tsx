@@ -20,6 +20,10 @@ import { useStaffLedger } from '@/hooks/use-staff';
 export default function StaffLedger() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+
+  React.useEffect(() => {
+    document.title = 'スタッフ台帳 - Dispatch Harmony Hub';
+  }, []);
   
   // React Queryを使用してデータ取得
   const { data: staffs = [], isLoading, error } = useStaffLedger();

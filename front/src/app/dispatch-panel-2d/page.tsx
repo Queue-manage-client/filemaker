@@ -41,6 +41,10 @@ import {
 export default function Original() {
   const router = useRouter();
 
+  React.useEffect(() => {
+    document.title = '配車パネル2D - Dispatch Harmony Hub';
+  }, []);
+
   return (
     <div className="w-[1920px] h-[1080px] relative overflow-hidden">
       {/* ヘッダー（100px以内） */}

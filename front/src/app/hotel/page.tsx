@@ -15,6 +15,10 @@ import type { HotelDivision } from '@/types/hotel-division';
 export default function HotelPage() {
   const router = useRouter();
 
+  React.useEffect(() => {
+    document.title = 'ホテル区分管理 - Dispatch Harmony Hub';
+  }, []);
+
   const formatPhoneNumber = (phone: string) => {
     // 電話番号をハイフン区切りで表示
     return phone.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');

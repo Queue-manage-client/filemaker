@@ -223,6 +223,9 @@ const dayNames = ['月', '火', '水', '木', '金', '土', '日'];
 const dayKeys: (keyof HostessScheduleData['weeklySchedule'])[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
 export default function HostessSchedule() {
+  React.useEffect(() => {
+    document.title = 'ホステススケジュール管理 - Dispatch Harmony Hub';
+  }, []);
   const router = useRouter();
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
   const [weekDates, setWeekDates] = useState<Date[]>([]);

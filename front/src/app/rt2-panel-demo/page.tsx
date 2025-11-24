@@ -13,6 +13,10 @@ export default function RT2PanelDemo() {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
+    document.title = 'RT Ⅱ パネル - Dispatch Harmony Hub';
+  }, []);
+
+  useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);

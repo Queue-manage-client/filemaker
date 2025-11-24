@@ -13,6 +13,10 @@ export default function AccountingSummaryPage() {
   const router = useRouter();
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
+
+  React.useEffect(() => {
+    document.title = '会計集計 - Dispatch Harmony Hub';
+  }, []);
   
   // React Queryを使用してデータ取得
   const { data: summaries = [], isLoading, error } = useAccountingSummary(

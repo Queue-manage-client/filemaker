@@ -16,6 +16,10 @@ export default function InterviewList() {
   const [interviews] = useState<InterviewRecord[]>(interviewSampleData);
   const [searchQuery, setSearchQuery] = useState('');
 
+  React.useEffect(() => {
+    document.title = '面接リスト - Dispatch Harmony Hub';
+  }, []);
+
   const filteredInterviews = interviews.filter(interview =>
     interview.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     interview.interviewer.toLowerCase().includes(searchQuery.toLowerCase()) ||

@@ -84,6 +84,9 @@ function formatTimeRange(start: string, end: string) {
 
 // --- Main Component ---
 export default function TimeBasedHostessAttendance() {
+  React.useEffect(() => {
+    document.title = '時間別ホステス出勤管理 - Dispatch Harmony Hub';
+  }, []);
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [width, setWidth] = useState(1200);

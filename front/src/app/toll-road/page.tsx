@@ -23,6 +23,10 @@ export default function TollRoadPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<string>('list');
 
+  React.useEffect(() => {
+    document.title = '有料道路料金管理 - Dispatch Harmony Hub';
+  }, []);
+
   // 高速道路名を取得
   const getExpresswayName = (expresswayId: string) => {
     return expressways.find(exp => exp.id === expresswayId)?.name || expresswayId;

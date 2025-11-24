@@ -86,10 +86,8 @@ func GetShopListHandler(c *gin.Context) {
 		return
 	}
 
-	// 個人情報(電話番号)は返却時にマスク
+	// パスワードは返却しない（セキュリティ）
 	for i := range rows {
-		rows[i].PhoneNumber = maskPhone(rows[i].PhoneNumber)
-		// パスワードは返却しない（セキュリティ）
 		rows[i].WebManagementPW = nil
 	}
 
@@ -155,8 +153,6 @@ func GetShopDetailHandler(c *gin.Context) {
 	}
 
 	shop := rows[0]
-	// 個人情報(電話番号)は返却時にマスク
-	shop.PhoneNumber = maskPhone(shop.PhoneNumber)
 	// パスワードは返却しない（セキュリティ）
 	shop.WebManagementPW = nil
 

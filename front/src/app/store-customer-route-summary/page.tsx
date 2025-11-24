@@ -10,6 +10,10 @@ import { ArrowLeft, BarChart3 } from "lucide-react";
 export default function StoreCustomerRouteSummary() {
   const router = useRouter();
 
+  React.useEffect(() => {
+    document.title = '店舗別実績ノルマ集計表 - Dispatch Harmony Hub';
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       {/* 戻るボタン */}

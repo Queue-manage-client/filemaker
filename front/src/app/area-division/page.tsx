@@ -14,6 +14,10 @@ import type { AreaDivision } from '@/types/area-division';
 export default function AreaDivision() {
   const router = useRouter();
 
+  React.useEffect(() => {
+    document.title = '地域区分管理 - Dispatch Harmony Hub';
+  }, []);
+
   const formatNumber = (num: number) => num.toLocaleString();
 
   return (

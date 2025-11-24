@@ -28,6 +28,10 @@ type RowData = {
 export default function CustomerPoints() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+
+  React.useEffect(() => {
+    document.title = '顧客ポイント - Dispatch Harmony Hub';
+  }, []);
   
   // React Queryを使用してデータ取得
   const { data: customerPoints = [], isLoading: isLoadingPoints, error: errorPoints } = useCustomerPoints();

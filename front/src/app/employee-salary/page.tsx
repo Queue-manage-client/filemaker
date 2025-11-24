@@ -40,6 +40,10 @@ export default function EmployeeSalary() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
+    document.title = '従業員週間出勤予定 - Dispatch Harmony Hub';
+  }, []);
+
+  useEffect(() => {
     setWeekDates(getCurrentWeekDates(currentWeekStart));
   }, [currentWeekStart]);
 

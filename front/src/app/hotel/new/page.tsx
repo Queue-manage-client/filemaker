@@ -6,6 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 export default function HotelNewPage() {
+  React.useEffect(() => {
+    document.title = 'ホテル項目の新規追加 - Dispatch Harmony Hub';
+  }, []);
+
   const [type, setType] = useState<'ラブホテル' | 'シティホテル'>('ラブホテル');
   const [firstTwoChars, setFirstTwoChars] = useState<string>('');
   const [hotelName, setHotelName] = useState<string>('');

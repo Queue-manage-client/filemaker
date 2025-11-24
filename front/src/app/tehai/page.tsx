@@ -26,6 +26,10 @@ import { COURSE_COLORS } from "@/types/reservation";
 export default function Tehai() {
   const router = useRouter();
 
+  React.useEffect(() => {
+    document.title = '手配表 - Dispatch Harmony Hub';
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-100 p-2 max-w-none">
       {/* 戻るボタン */}

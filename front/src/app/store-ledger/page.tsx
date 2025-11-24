@@ -9,9 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { ArrowLeft, Building, Plus, Settings, Users, FileText, DollarSign, 
          Calendar, MessageSquare, TrendingUp, Award, Minus, Gift, 
-         Percent, Eye, Camera, Cog, Edit, Save, X } from "lucide-react";
+         Percent, Eye, Camera, Cog, Edit, Save, X, Copy } from "lucide-react";
 
 import { 
   storeLedgerTabs, 
@@ -20,6 +21,8 @@ import {
   // Discount,
   // StoreOptions
 } from '@/types';
+
+import { BasicTag } from '@/types/basic-tag';
 
 import { useStoreLedger, useStoreBasicInfo } from '@/hooks/use-store-ledger';
 import { calculateCourseFeeShares } from '@/lib/utils';
@@ -51,11 +54,35 @@ const tabIcons: Record<StoreLedgerTab, React.ComponentType<{ className?: string 
 export default function StoreLedger() {
   const router = useRouter();
   
+  React.useEffect(() => {
+    document.title = '店舗台帳 - Dispatch Harmony Hub';
+  }, []);
+  
   // shopテーブルから店舗一覧を取得
   const { data: shops = [] } = useShopList();
-  const storeList = shops.map(shop => shop.store_name || '').filter(Boolean);
+  const [localStoreList, setLocalStoreList] = React.useState<string[]>([]);
+  
+  React.useEffect(() => {
+    const storeNames = shops.map(shop => shop.store_name || '').filter(Boolean);
+    setLocalStoreList(storeNames);
+  }, [shops]);
+  
+  const storeList = localStoreList;
   const initialStore = storeList[0] || '';
 
+  // 管理者スイッチの状態管理（デモ用）
+  const [isAdminMode, setIsAdminMode] = React.useState(false);
+  
+  // 編集モードの状態管理
+  const [isEditMode, setIsEditMode] = React.useState(false);
+  const [isCreatingNewStore, setIsCreatingNewStore] = React.useState(false);
+  
+  // 編集フォームデータの状態管理
+  const [editFormData, setEditFormData] = React.useState<BasicTag | null>(null);
+  
+  // basicTagのローカルコピーを管理（編集後に反映するため）
+  const [localBasicTag, setLocalBasicTag] = React.useState<BasicTag | null>(null);
+  
   // カスタムフックを使用してデータと操作を管理
   const {
     selectedStore,
@@ -81,85 +108,376 @@ export default function StoreLedger() {
     handleSaveCourseFee,
     handleCancelEdit,
   } = useStoreLedger(initialStore);
+  
+  // 管理者のみが編集可能なタブのリスト
+  const adminOnlyTabs: StoreLedgerTab[] = ['basic', 'gm-division', 'course-prices', 'special-prices', 'staff-composition', 'class-prices'];
+  
+  // 現在のタブが管理者のみ編集可能かどうかをチェック
+  const isCurrentTabAdminOnly = adminOnlyTabs.includes(activeTab);
+  
+  // 編集可能かどうかを判定（管理者スイッチがオンで、かつ管理者専用タブの場合は管理者モードが必要）
+  const canEdit = isCurrentTabAdminOnly ? isAdminMode : true;
+  
+  // basicTagが変更されたときにローカルコピーを更新
+  React.useEffect(() => {
+    if (basicTag && !isEditMode) {
+      setLocalBasicTag(basicTag);
+    }
+  }, [basicTag, isEditMode]);
+  
+  // 管理者モードがオフになった場合、管理者専用タブの編集モードを終了
+  React.useEffect(() => {
+    if (!isAdminMode && isCurrentTabAdminOnly && isEditMode) {
+      setIsEditMode(false);
+      setIsCreatingNewStore(false);
+      setEditFormData(null);
+    }
+  }, [isAdminMode, isCurrentTabAdminOnly, isEditMode]);
 
   // 店舗一覧取得
   const { data: storeBasicInfoList } = useStoreBasicInfo();
+
+  // 新規作成ボタンのハンドラー
+  const handleCreateNewStore = () => {
+    if (!isAdminMode) {
+      alert('新規作成は管理者のみ可能です。管理者モードをオンにしてください。');
+      return;
+    }
+    setIsCreatingNewStore(true);
+    setIsEditMode(true);
+    // 新規店舗のデフォルトデータを作成
+    const newStoreData: BasicTag = {
+      spid: 0,
+      dailyReportDisplay: true,
+      departmentNo: '',
+      accountingCategory: 'A',
+      nonSameDayWorkGroup: '',
+      storeName: '',
+      storeNameKana: '',
+      storeNameAbbr: '',
+      phoneNumber: '',
+      url: '',
+      email: '',
+      webLinkage: false,
+      webSendMode: '本',
+      webManageId: '',
+      webManagePassword: '',
+      webManageUrl: '',
+      hostessPageUrl: '',
+      webHostessListUrl: '',
+      hostessAttendanceManageUrl: '',
+      hostessManageUrl: '',
+      webSendUrls: {
+        hsprofile: '',
+        hsattend: '',
+        hsjob: '',
+        ctpoint: '',
+        hstattendweek: '',
+        hsstart: '',
+        hsranking: '',
+      },
+      webSendUrlsTemp: {
+        hsprofile: '',
+        hsattend: '',
+        hsjob: '',
+        ctpoint: '',
+        hstattendweek: '',
+        hsstart: '',
+        hsranking: '',
+      },
+      coursePricingMethod: '定額制',
+      nominationMethod: '店舗一律',
+      gmDivision: '無',
+      nominationFee: 0,
+      extensionFee: 0,
+      extensionUnit: 0,
+      basicTransportationFee: 0,
+      cancellationFee: 0,
+      memberCardIssuance: '無',
+      customerPointInitialValueFirstHalf: 0,
+      customerPointInitialValueSecondHalf: 0,
+      nominationPlusBackSystem: '無',
+      changeFee: 0,
+      cardCommissionRate: 0,
+      basicHostessReceivingRate: '',
+      extensionMethod: '固定割合制',
+      extensionHostessReceivingRate: '',
+      panelNominationFee: 0,
+      starUnitPrice: '',
+      starFeeExcludeFrNR: '無',
+      businessType: 'デリヘル',
+      memberNumberIssuanceManagement: '店舗',
+      storeSpecificMemberNumberIssuance: '',
+      groupNo: '',
+      groupCommonMemberNumberIssuance: '',
+      firstHalfStartTime: '',
+      firstHalfEndTime: '',
+      secondHalfStartTime: '',
+      secondHalfEndTime: '',
+    };
+    setEditFormData(newStoreData);
+    setSelectedStore('新規店舗');
+  };
+
+  // 編集ボタンのハンドラー
+  const handleEditStore = () => {
+    if (!canEdit) {
+      alert('このタブの編集は管理者のみ可能です。管理者モードをオンにしてください。');
+      return;
+    }
+    if (basicTag) {
+      setEditFormData({ ...basicTag });
+      setIsEditMode(true);
+    }
+  };
+
+  // 複製ボタンのハンドラー
+  const handleDuplicateStore = () => {
+    if (!canEdit) {
+      alert('複製は管理者のみ可能です。管理者モードをオンにしてください。');
+      return;
+    }
+    if (basicTag) {
+      // 既存の店舗データをコピー
+      const duplicatedData: BasicTag = {
+        ...basicTag,
+        storeName: `${basicTag.storeName}_コピー`,
+        spid: 0, // 新規作成なのでSPIDは0にリセット
+      };
+      setEditFormData(duplicatedData);
+      setIsCreatingNewStore(true);
+      setIsEditMode(true);
+      setSelectedStore(`${basicTag.storeName}_コピー`);
+    }
+  };
+
+  // 編集キャンセルハンドラー
+  const handleCancelEditStore = () => {
+    setIsEditMode(false);
+    setIsCreatingNewStore(false);
+    setEditFormData(null);
+    if (isCreatingNewStore && storeList.length > 0) {
+      setSelectedStore(storeList[0]);
+    }
+  };
+
+  // 保存ハンドラー
+  const handleSaveStore = () => {
+    if (!editFormData) return;
+    
+    // 新規作成の場合、店舗一覧に追加
+    if (isCreatingNewStore && editFormData.storeName) {
+      if (!storeList.includes(editFormData.storeName)) {
+        setLocalStoreList([...storeList, editFormData.storeName]);
+        setSelectedStore(editFormData.storeName);
+      }
+    }
+    
+    // ローカルbasicTagを更新（編集後に反映されるように）
+    setLocalBasicTag(editFormData);
+    
+    // 保存処理（フロントエンドのみ）
+    // 実際の実装では、データの保存処理を追加
+    setIsEditMode(false);
+    setIsCreatingNewStore(false);
+    setEditFormData(null);
+  };
+  
+  // 編集フォームデータの更新ハンドラー
+  const updateEditFormData = (updates: Partial<BasicTag>) => {
+    if (editFormData) {
+      setEditFormData({ ...editFormData, ...updates });
+    }
+  };
 
 
   const renderTabContent = (tabId: StoreLedgerTab) => {
 
     switch (tabId) {
       case 'basic':
-        if (!basicTag) {
+        if (!basicTag && !isCreatingNewStore && !localBasicTag) {
           return <div className="text-center text-gray-500 py-8">読み込み中...</div>;
         }
-        const basicTagData = basicTag;
+        // 編集モード時はeditFormData、それ以外はlocalBasicTag（編集反映済み）またはbasicTagを使用
+        const basicTagData = isEditMode && editFormData 
+          ? editFormData 
+          : localBasicTag || basicTag;
+        if (!basicTagData) {
+          return <div className="text-center text-gray-500 py-8">データがありません</div>;
+        }
         
         return (
           <div className="space-y-6">
             <h3 className="text-lg font-semibold mb-4">基本タグ</h3>
+            {!canEdit && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-yellow-800">
+                  ⚠️ このタブは管理者のみ編集可能です。管理者モードをオンにしてください。
+                </p>
+              </div>
+            )}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* 左半分：基本情報 */}
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">SPID(通し番号)</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.spid}</div>
+                    {isEditMode ? (
+                      <Input
+                        type="number"
+                        value={basicTagData.spid}
+                        onChange={(e) => updateEditFormData({ spid: parseInt(e.target.value) || 0 })}
+                        disabled={!canEdit}
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.spid}</div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">日報表示</label>
-                    <div className="p-2 bg-gray-50 rounded border">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        basicTagData.dailyReportDisplay 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {basicTagData.dailyReportDisplay ? '表示' : '非表示'}
-                      </span>
-                    </div>
+                    {isEditMode ? (
+                      <Select
+                        value={basicTagData.dailyReportDisplay ? 'true' : 'false'}
+                        onValueChange={(value) => updateEditFormData({ dailyReportDisplay: value === 'true' })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="true">表示</SelectItem>
+                          <SelectItem value="false">非表示</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          basicTagData.dailyReportDisplay 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {basicTagData.dailyReportDisplay ? '表示' : '非表示'}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">部門No</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.departmentNo}</div>
+                    {isEditMode ? (
+                      <Input
+                        value={basicTagData.departmentNo}
+                        onChange={(e) => updateEditFormData({ departmentNo: e.target.value })}
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.departmentNo}</div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">会計区分</label>
-                    <div className="p-2 bg-gray-50 rounded border">
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {basicTagData.accountingCategory}
-                      </span>
-                    </div>
+                    {isEditMode ? (
+                      <Select
+                        value={basicTagData.accountingCategory}
+                        onValueChange={(value) => updateEditFormData({ accountingCategory: value as 'A' | 'B' | 'C' | 'D' | 'E' })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="A">A</SelectItem>
+                          <SelectItem value="B">B</SelectItem>
+                          <SelectItem value="C">C</SelectItem>
+                          <SelectItem value="D">D</SelectItem>
+                          <SelectItem value="E">E</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">
+                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                          {basicTagData.accountingCategory}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">非同日出勤グループ</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.nonSameDayWorkGroup || '未設定'}</div>
+                    {isEditMode ? (
+                      <Input
+                        value={basicTagData.nonSameDayWorkGroup}
+                        onChange={(e) => updateEditFormData({ nonSameDayWorkGroup: e.target.value })}
+                        placeholder="未設定"
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.nonSameDayWorkGroup || '未設定'}</div>
+                    )}
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">店舗名</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.storeName}</div>
+                    {isEditMode ? (
+                      <Input
+                        value={basicTagData.storeName}
+                        onChange={(e) => updateEditFormData({ storeName: e.target.value })}
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.storeName}</div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">店舗名ふりがな</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.storeNameKana}</div>
+                    {isEditMode ? (
+                      <Input
+                        value={basicTagData.storeNameKana}
+                        onChange={(e) => updateEditFormData({ storeNameKana: e.target.value })}
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.storeNameKana}</div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">省略店舗名</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.storeNameAbbr}</div>
+                    {isEditMode ? (
+                      <Input
+                        value={basicTagData.storeNameAbbr}
+                        onChange={(e) => updateEditFormData({ storeNameAbbr: e.target.value })}
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.storeNameAbbr}</div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">電話番号</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.phoneNumber}</div>
+                    {isEditMode ? (
+                      <Input
+                        value={basicTagData.phoneNumber}
+                        onChange={(e) => updateEditFormData({ phoneNumber: e.target.value })}
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.phoneNumber}</div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">URL</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url}</div>
+                    {isEditMode ? (
+                      <Input
+                        value={basicTagData.url}
+                        onChange={(e) => updateEditFormData({ url: e.target.value })}
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.url}</div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Mail</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.email}</div>
+                    {isEditMode ? (
+                      <Input
+                        type="email"
+                        value={basicTagData.email}
+                        onChange={(e) => updateEditFormData({ email: e.target.value })}
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.email}</div>
+                    )}
                   </div>
                 </div>
 
@@ -169,344 +487,638 @@ export default function StoreLedger() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">コース料金方式</label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        <div className="flex gap-4">
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="coursePricingMethod" 
-                              value="定額制" 
-                              checked={basicTagData.coursePricingMethod === '定額制'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            定額制
-                          </label>
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="coursePricingMethod" 
-                              value="割合制" 
-                              checked={basicTagData.coursePricingMethod === '割合制'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            割合制
-                          </label>
+                      {isEditMode ? (
+                        <Select
+                          value={basicTagData.coursePricingMethod}
+                          onValueChange={(value) => updateEditFormData({ coursePricingMethod: value as '定額制' | '割合制' })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="定額制">定額制</SelectItem>
+                            <SelectItem value="割合制">割合制</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">
+                          <div className="flex gap-4">
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="coursePricingMethod" 
+                                value="定額制" 
+                                checked={basicTagData.coursePricingMethod === '定額制'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              定額制
+                            </label>
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="coursePricingMethod" 
+                                value="割合制" 
+                                checked={basicTagData.coursePricingMethod === '割合制'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              割合制
+                            </label>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">指名方式</label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        <div className="flex gap-4">
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="nominationMethod" 
-                              value="店舗一律" 
-                              checked={basicTagData.nominationMethod === '店舗一律'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            店舗一律
-                          </label>
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="nominationMethod" 
-                              value="ホステス別" 
-                              checked={basicTagData.nominationMethod === 'ホステス別'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            ホステス別
-                          </label>
+                      {isEditMode ? (
+                        <Select
+                          value={basicTagData.nominationMethod}
+                          onValueChange={(value) => updateEditFormData({ nominationMethod: value as '店舗一律' | 'ホステス別' })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="店舗一律">店舗一律</SelectItem>
+                            <SelectItem value="ホステス別">ホステス別</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">
+                          <div className="flex gap-4">
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="nominationMethod" 
+                                value="店舗一律" 
+                                checked={basicTagData.nominationMethod === '店舗一律'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              店舗一律
+                            </label>
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="nominationMethod" 
+                                value="ホステス別" 
+                                checked={basicTagData.nominationMethod === 'ホステス別'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              ホステス別
+                            </label>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">GM区分</label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        <div className="flex gap-4">
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="gmDivision" 
-                              value="有" 
-                              checked={basicTagData.gmDivision === '有'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            有
-                          </label>
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="gmDivision" 
-                              value="無" 
-                              checked={basicTagData.gmDivision === '無'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            無
-                          </label>
+                      {isEditMode ? (
+                        <Select
+                          value={basicTagData.gmDivision}
+                          onValueChange={(value) => updateEditFormData({ gmDivision: value as '有' | '無' })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="有">有</SelectItem>
+                            <SelectItem value="無">無</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">
+                          <div className="flex gap-4">
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="gmDivision" 
+                                value="有" 
+                                checked={basicTagData.gmDivision === '有'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              有
+                            </label>
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="gmDivision" 
+                                value="無" 
+                                checked={basicTagData.gmDivision === '無'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              無
+                            </label>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">指名料</label>
-                      <div className="p-2 bg-gray-50 rounded border">¥{basicTagData.nominationFee.toLocaleString()}</div>
+                      {isEditMode ? (
+                        <Input
+                          type="number"
+                          value={basicTagData.nominationFee}
+                          onChange={(e) => updateEditFormData({ nominationFee: parseInt(e.target.value) || 0 })}
+                        />
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">¥{basicTagData.nominationFee.toLocaleString()}</div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">延長料金／延長単位</label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        ¥{basicTagData.extensionFee.toLocaleString()}／{basicTagData.extensionUnit}分
-                      </div>
+                      {isEditMode ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input
+                            type="number"
+                            value={basicTagData.extensionFee}
+                            onChange={(e) => updateEditFormData({ extensionFee: parseInt(e.target.value) || 0 })}
+                            placeholder="延長料金"
+                          />
+                          <Input
+                            type="number"
+                            value={basicTagData.extensionUnit}
+                            onChange={(e) => updateEditFormData({ extensionUnit: parseInt(e.target.value) || 0 })}
+                            placeholder="延長単位(分)"
+                          />
+                        </div>
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">
+                          ¥{basicTagData.extensionFee.toLocaleString()}／{basicTagData.extensionUnit}分
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">基本交通費</label>
-                      <div className="p-2 bg-gray-50 rounded border">¥{basicTagData.basicTransportationFee.toLocaleString()}</div>
+                      {isEditMode ? (
+                        <Input
+                          type="number"
+                          value={basicTagData.basicTransportationFee}
+                          onChange={(e) => updateEditFormData({ basicTransportationFee: parseInt(e.target.value) || 0 })}
+                        />
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">¥{basicTagData.basicTransportationFee.toLocaleString()}</div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">キャンセル料</label>
-                      <div className="p-2 bg-gray-50 rounded border">¥{basicTagData.cancellationFee.toLocaleString()}</div>
+                      {isEditMode ? (
+                        <Input
+                          type="number"
+                          value={basicTagData.cancellationFee}
+                          onChange={(e) => updateEditFormData({ cancellationFee: parseInt(e.target.value) || 0 })}
+                        />
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">¥{basicTagData.cancellationFee.toLocaleString()}</div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">会員カード発行</label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        <div className="flex gap-4">
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="memberCardIssuance" 
-                              value="有" 
-                              checked={basicTagData.memberCardIssuance === '有'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            有
-                          </label>
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="memberCardIssuance" 
-                              value="無" 
-                              checked={basicTagData.memberCardIssuance === '無'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            無
-                          </label>
+                      {isEditMode ? (
+                        <Select
+                          value={basicTagData.memberCardIssuance}
+                          onValueChange={(value) => updateEditFormData({ memberCardIssuance: value as '有' | '無' })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="有">有</SelectItem>
+                            <SelectItem value="無">無</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">
+                          <div className="flex gap-4">
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="memberCardIssuance" 
+                                value="有" 
+                                checked={basicTagData.memberCardIssuance === '有'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              有
+                            </label>
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="memberCardIssuance" 
+                                value="無" 
+                                checked={basicTagData.memberCardIssuance === '無'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              無
+                            </label>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">顧客ポイント初期値前半</label>
-                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.customerPointInitialValueFirstHalf}</div>
+                      {isEditMode ? (
+                        <Input
+                          type="number"
+                          value={basicTagData.customerPointInitialValueFirstHalf}
+                          onChange={(e) => updateEditFormData({ customerPointInitialValueFirstHalf: parseInt(e.target.value) || 0 })}
+                        />
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">{basicTagData.customerPointInitialValueFirstHalf}</div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">顧客ポイント初期値後半(%)</label>
-                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.customerPointInitialValueSecondHalf}%</div>
+                      {isEditMode ? (
+                        <Input
+                          type="number"
+                          value={basicTagData.customerPointInitialValueSecondHalf}
+                          onChange={(e) => updateEditFormData({ customerPointInitialValueSecondHalf: parseInt(e.target.value) || 0 })}
+                        />
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">{basicTagData.customerPointInitialValueSecondHalf}%</div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">指名プラスバック制</label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        <div className="flex gap-4">
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="nominationPlusBackSystem" 
-                              value="有" 
-                              checked={basicTagData.nominationPlusBackSystem === '有'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            有
-                          </label>
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="nominationPlusBackSystem" 
-                              value="無" 
-                              checked={basicTagData.nominationPlusBackSystem === '無'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            無
-                          </label>
+                      {isEditMode ? (
+                        <Select
+                          value={basicTagData.nominationPlusBackSystem}
+                          onValueChange={(value) => updateEditFormData({ nominationPlusBackSystem: value as '有' | '無' })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="有">有</SelectItem>
+                            <SelectItem value="無">無</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">
+                          <div className="flex gap-4">
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="nominationPlusBackSystem" 
+                                value="有" 
+                                checked={basicTagData.nominationPlusBackSystem === '有'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              有
+                            </label>
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="nominationPlusBackSystem" 
+                                value="無" 
+                                checked={basicTagData.nominationPlusBackSystem === '無'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              無
+                            </label>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">チェンジ料</label>
-                      <div className="p-2 bg-gray-50 rounded border">¥{basicTagData.changeFee.toLocaleString()}</div>
+                      {isEditMode ? (
+                        <Input
+                          type="number"
+                          value={basicTagData.changeFee}
+                          onChange={(e) => updateEditFormData({ changeFee: parseInt(e.target.value) || 0 })}
+                        />
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">¥{basicTagData.changeFee.toLocaleString()}</div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">カード手数料率</label>
-                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.cardCommissionRate}%</div>
+                      {isEditMode ? (
+                        <Input
+                          type="number"
+                          step="0.1"
+                          value={basicTagData.cardCommissionRate}
+                          onChange={(e) => updateEditFormData({ cardCommissionRate: parseFloat(e.target.value) || 0 })}
+                        />
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">{basicTagData.cardCommissionRate}%</div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">基本ホステス受取率</label>
-                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.basicHostessReceivingRate || '未設定'}</div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.basicHostessReceivingRate}
+                          onChange={(e) => updateEditFormData({ basicHostessReceivingRate: e.target.value })}
+                          placeholder="未設定"
+                        />
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">{basicTagData.basicHostessReceivingRate || '未設定'}</div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">延長方式</label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        <div className="flex gap-4">
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="extensionMethod" 
-                              value="固定割合制" 
-                              checked={basicTagData.extensionMethod === '固定割合制'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            固定割合制
-                          </label>
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="extensionMethod" 
-                              value="ホステス別" 
-                              checked={basicTagData.extensionMethod === 'ホステス別'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            ホステス別
-                          </label>
+                      {isEditMode ? (
+                        <Select
+                          value={basicTagData.extensionMethod}
+                          onValueChange={(value) => updateEditFormData({ extensionMethod: value as '固定割合制' | 'ホステス別' })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="固定割合制">固定割合制</SelectItem>
+                            <SelectItem value="ホステス別">ホステス別</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">
+                          <div className="flex gap-4">
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="extensionMethod" 
+                                value="固定割合制" 
+                                checked={basicTagData.extensionMethod === '固定割合制'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              固定割合制
+                            </label>
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="extensionMethod" 
+                                value="ホステス別" 
+                                checked={basicTagData.extensionMethod === 'ホステス別'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              ホステス別
+                            </label>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">延長ホステス受取率</label>
-                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.extensionHostessReceivingRate || '未設定'}</div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.extensionHostessReceivingRate}
+                          onChange={(e) => updateEditFormData({ extensionHostessReceivingRate: e.target.value })}
+                          placeholder="未設定"
+                        />
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">{basicTagData.extensionHostessReceivingRate || '未設定'}</div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">パネル指名料</label>
-                      <div className="p-2 bg-gray-50 rounded border">¥{basicTagData.panelNominationFee.toLocaleString()}</div>
+                      {isEditMode ? (
+                        <Input
+                          type="number"
+                          value={basicTagData.panelNominationFee}
+                          onChange={(e) => updateEditFormData({ panelNominationFee: parseInt(e.target.value) || 0 })}
+                        />
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">¥{basicTagData.panelNominationFee.toLocaleString()}</div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">星単価</label>
-                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.starUnitPrice || '未設定'}</div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.starUnitPrice}
+                          onChange={(e) => updateEditFormData({ starUnitPrice: e.target.value })}
+                          placeholder="未設定"
+                        />
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">{basicTagData.starUnitPrice || '未設定'}</div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">星料FR_N_Rは除く</label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        <div className="flex gap-4">
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="starFeeExcludeFrNR" 
-                              value="有" 
-                              checked={basicTagData.starFeeExcludeFrNR === '有'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            有
-                          </label>
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="starFeeExcludeFrNR" 
-                              value="無" 
-                              checked={basicTagData.starFeeExcludeFrNR === '無'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            無
-                          </label>
+                      {isEditMode ? (
+                        <Select
+                          value={basicTagData.starFeeExcludeFrNR}
+                          onValueChange={(value) => updateEditFormData({ starFeeExcludeFrNR: value as '有' | '無' })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="有">有</SelectItem>
+                            <SelectItem value="無">無</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">
+                          <div className="flex gap-4">
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="starFeeExcludeFrNR" 
+                                value="有" 
+                                checked={basicTagData.starFeeExcludeFrNR === '有'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              有
+                            </label>
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="starFeeExcludeFrNR" 
+                                value="無" 
+                                checked={basicTagData.starFeeExcludeFrNR === '無'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              無
+                            </label>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">営業形態</label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        <div className="flex gap-4">
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="businessType" 
-                              value="デリヘル" 
-                              checked={basicTagData.businessType === 'デリヘル'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            デリヘル
-                          </label>
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="businessType" 
-                              value="ホテヘル" 
-                              checked={basicTagData.businessType === 'ホテヘル'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            ホテヘル
-                          </label>
+                      {isEditMode ? (
+                        <Select
+                          value={basicTagData.businessType}
+                          onValueChange={(value) => updateEditFormData({ businessType: value as 'デリヘル' | 'ホテヘル' })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="デリヘル">デリヘル</SelectItem>
+                            <SelectItem value="ホテヘル">ホテヘル</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">
+                          <div className="flex gap-4">
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="businessType" 
+                                value="デリヘル" 
+                                checked={basicTagData.businessType === 'デリヘル'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              デリヘル
+                            </label>
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="businessType" 
+                                value="ホテヘル" 
+                                checked={basicTagData.businessType === 'ホテヘル'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              ホテヘル
+                            </label>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">会員番号発行管理</label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        <div className="flex gap-4">
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="memberNumberIssuanceManagement" 
-                              value="店舗" 
-                              checked={basicTagData.memberNumberIssuanceManagement === '店舗'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            店舗
-                          </label>
-                          <label className="flex items-center">
-                            <input 
-                              type="radio" 
-                              name="memberNumberIssuanceManagement" 
-                              value="グループ" 
-                              checked={basicTagData.memberNumberIssuanceManagement === 'グループ'} 
-                              readOnly
-                              className="mr-2"
-                            />
-                            グループ
-                          </label>
+                      {isEditMode ? (
+                        <Select
+                          value={basicTagData.memberNumberIssuanceManagement}
+                          onValueChange={(value) => updateEditFormData({ memberNumberIssuanceManagement: value as '店舗' | 'グループ' })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="店舗">店舗</SelectItem>
+                            <SelectItem value="グループ">グループ</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">
+                          <div className="flex gap-4">
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="memberNumberIssuanceManagement" 
+                                value="店舗" 
+                                checked={basicTagData.memberNumberIssuanceManagement === '店舗'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              店舗
+                            </label>
+                            <label className="flex items-center">
+                              <input 
+                                type="radio" 
+                                name="memberNumberIssuanceManagement" 
+                                value="グループ" 
+                                checked={basicTagData.memberNumberIssuanceManagement === 'グループ'} 
+                                readOnly
+                                className="mr-2"
+                              />
+                              グループ
+                            </label>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                     {basicTagData.memberNumberIssuanceManagement === '店舗' && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">店舗別会員番号発番</label>
-                        <div className="p-2 bg-gray-50 rounded border">{basicTagData.storeSpecificMemberNumberIssuance}</div>
+                        {isEditMode ? (
+                          <Input
+                            value={basicTagData.storeSpecificMemberNumberIssuance}
+                            onChange={(e) => updateEditFormData({ storeSpecificMemberNumberIssuance: e.target.value })}
+                          />
+                        ) : (
+                          <div className="p-2 bg-gray-50 rounded border">{basicTagData.storeSpecificMemberNumberIssuance}</div>
+                        )}
                       </div>
                     )}
                     {basicTagData.memberNumberIssuanceManagement === 'グループ' && (
                       <>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">グループNo</label>
-                          <div className="p-2 bg-gray-50 rounded border">{basicTagData.groupNo || '未設定'}</div>
+                          {isEditMode ? (
+                            <Input
+                              value={basicTagData.groupNo}
+                              onChange={(e) => updateEditFormData({ groupNo: e.target.value })}
+                              placeholder="未設定"
+                            />
+                          ) : (
+                            <div className="p-2 bg-gray-50 rounded border">{basicTagData.groupNo || '未設定'}</div>
+                          )}
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">グループ共通会員番号発番</label>
-                          <div className="p-2 bg-gray-50 rounded border">{basicTagData.groupCommonMemberNumberIssuance || '未設定'}</div>
+                          {isEditMode ? (
+                            <Input
+                              value={basicTagData.groupCommonMemberNumberIssuance}
+                              onChange={(e) => updateEditFormData({ groupCommonMemberNumberIssuance: e.target.value })}
+                              placeholder="未設定"
+                            />
+                          ) : (
+                            <div className="p-2 bg-gray-50 rounded border">{basicTagData.groupCommonMemberNumberIssuance || '未設定'}</div>
+                          )}
                         </div>
                       </>
                     )}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">前半時間帯</label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        {basicTagData.firstHalfStartTime}以降{basicTagData.firstHalfEndTime}未満
-                      </div>
+                      {isEditMode ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input
+                            value={basicTagData.firstHalfStartTime}
+                            onChange={(e) => updateEditFormData({ firstHalfStartTime: e.target.value })}
+                            placeholder="開始時間"
+                          />
+                          <Input
+                            value={basicTagData.firstHalfEndTime}
+                            onChange={(e) => updateEditFormData({ firstHalfEndTime: e.target.value })}
+                            placeholder="終了時間"
+                          />
+                        </div>
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">
+                          {basicTagData.firstHalfStartTime}以降{basicTagData.firstHalfEndTime}未満
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">後半時間帯</label>
-                      <div className="p-2 bg-gray-50 rounded border">
-                        {basicTagData.secondHalfStartTime}以降{basicTagData.secondHalfEndTime}未満
-                      </div>
+                      {isEditMode ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input
+                            value={basicTagData.secondHalfStartTime}
+                            onChange={(e) => updateEditFormData({ secondHalfStartTime: e.target.value })}
+                            placeholder="開始時間"
+                          />
+                          <Input
+                            value={basicTagData.secondHalfEndTime}
+                            onChange={(e) => updateEditFormData({ secondHalfEndTime: e.target.value })}
+                            placeholder="終了時間"
+                          />
+                        </div>
+                      ) : (
+                        <div className="p-2 bg-gray-50 rounded border">
+                          {basicTagData.secondHalfStartTime}以降{basicTagData.secondHalfEndTime}未満
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -518,72 +1130,157 @@ export default function StoreLedger() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">web連携</label>
-                    <div className="p-2 bg-gray-50 rounded border">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        basicTagData.webLinkage 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {basicTagData.webLinkage ? '有効' : '無効'}
-                      </span>
-                    </div>
+                    {isEditMode ? (
+                      <Select
+                        value={basicTagData.webLinkage ? 'true' : 'false'}
+                        onValueChange={(value) => updateEditFormData({ webLinkage: value === 'true' })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="true">有効</SelectItem>
+                          <SelectItem value="false">無効</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          basicTagData.webLinkage 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {basicTagData.webLinkage ? '有効' : '無効'}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">web送信本仮切替sw</label>
-                    <div className="p-2 bg-gray-50 rounded border">
-                      <div className="flex gap-4">
-                        <label className="flex items-center">
-                          <input 
-                            type="radio" 
-                            name="webSendMode" 
-                            value="本" 
-                            checked={basicTagData.webSendMode === '本'} 
-                            readOnly
-                            className="mr-2"
-                          />
-                          本
-                        </label>
-                        <label className="flex items-center">
-                          <input 
-                            type="radio" 
-                            name="webSendMode" 
-                            value="仮" 
-                            checked={basicTagData.webSendMode === '仮'} 
-                            readOnly
-                            className="mr-2"
-                          />
-                          仮
-                        </label>
+                    {isEditMode ? (
+                      <Select
+                        value={basicTagData.webSendMode}
+                        onValueChange={(value) => updateEditFormData({ webSendMode: value as '本' | '仮' })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="本">本</SelectItem>
+                          <SelectItem value="仮">仮</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">
+                        <div className="flex gap-4">
+                          <label className="flex items-center">
+                            <input 
+                              type="radio" 
+                              name="webSendMode" 
+                              value="本" 
+                              checked={basicTagData.webSendMode === '本'} 
+                              readOnly
+                              className="mr-2"
+                            />
+                            本
+                          </label>
+                          <label className="flex items-center">
+                            <input 
+                              type="radio" 
+                              name="webSendMode" 
+                              value="仮" 
+                              checked={basicTagData.webSendMode === '仮'} 
+                              readOnly
+                              className="mr-2"
+                            />
+                            仮
+                          </label>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">web管理用ID</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.webManageId}</div>
+                    {isEditMode ? (
+                      <Input
+                        value={basicTagData.webManageId}
+                        onChange={(e) => updateEditFormData({ webManageId: e.target.value })}
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.webManageId}</div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">web管理用パス</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.webManagePassword}</div>
+                    {isEditMode ? (
+                      <Input
+                        type="password"
+                        value={basicTagData.webManagePassword}
+                        onChange={(e) => updateEditFormData({ webManagePassword: e.target.value })}
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.webManagePassword || '***'}</div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">web管理用URL</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.webManageUrl}</div>
+                    {isEditMode ? (
+                      <Input
+                        value={basicTagData.webManageUrl}
+                        onChange={(e) => updateEditFormData({ webManageUrl: e.target.value })}
+                        placeholder="/admin/manage"
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.webManageUrl}</div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">ホステスページURL</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.hostessPageUrl}</div>
+                    {isEditMode ? (
+                      <Input
+                        value={basicTagData.hostessPageUrl}
+                        onChange={(e) => updateEditFormData({ hostessPageUrl: e.target.value })}
+                        placeholder="/hostess"
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.hostessPageUrl}</div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">webホステス一覧URL</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.webHostessListUrl}</div>
+                    {isEditMode ? (
+                      <Input
+                        value={basicTagData.webHostessListUrl}
+                        onChange={(e) => updateEditFormData({ webHostessListUrl: e.target.value })}
+                        placeholder="/hostess/list"
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.webHostessListUrl}</div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">ホステス出勤管理ページURL</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.hostessAttendanceManageUrl}</div>
+                    {isEditMode ? (
+                      <Input
+                        value={basicTagData.hostessAttendanceManageUrl}
+                        onChange={(e) => updateEditFormData({ hostessAttendanceManageUrl: e.target.value })}
+                        placeholder="/hostess/attendance"
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.hostessAttendanceManageUrl}</div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">ホステス管理ページURL</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.hostessManageUrl}</div>
+                    {isEditMode ? (
+                      <Input
+                        value={basicTagData.hostessManageUrl}
+                        onChange={(e) => updateEditFormData({ hostessManageUrl: e.target.value })}
+                        placeholder="/hostess/manage"
+                      />
+                    ) : (
+                      <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.hostessManageUrl}</div>
+                    )}
                   </div>
                 </div>
 
@@ -593,45 +1290,115 @@ export default function StoreLedger() {
                   <div className="space-y-3">
                     <div>
                       <label className="block text-sm font-medium text-blue-700 mb-1">hsprofile</label>
-                      <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
-                        {basicTagData.url}{basicTagData.webSendUrls.hsprofile}
-                      </div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.webSendUrls.hsprofile}
+                          onChange={(e) => updateEditFormData({ 
+                            webSendUrls: { ...basicTagData.webSendUrls, hsprofile: e.target.value }
+                          })}
+                          className="text-sm font-mono"
+                        />
+                      ) : (
+                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
+                          {basicTagData.url}{basicTagData.webSendUrls.hsprofile}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-blue-700 mb-1">hsattend</label>
-                      <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
-                        {basicTagData.url}{basicTagData.webSendUrls.hsattend}
-                      </div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.webSendUrls.hsattend}
+                          onChange={(e) => updateEditFormData({ 
+                            webSendUrls: { ...basicTagData.webSendUrls, hsattend: e.target.value }
+                          })}
+                          className="text-sm font-mono"
+                        />
+                      ) : (
+                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
+                          {basicTagData.url}{basicTagData.webSendUrls.hsattend}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-blue-700 mb-1">hsjob</label>
-                      <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
-                        {basicTagData.url}{basicTagData.webSendUrls.hsjob}
-                      </div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.webSendUrls.hsjob}
+                          onChange={(e) => updateEditFormData({ 
+                            webSendUrls: { ...basicTagData.webSendUrls, hsjob: e.target.value }
+                          })}
+                          className="text-sm font-mono"
+                        />
+                      ) : (
+                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
+                          {basicTagData.url}{basicTagData.webSendUrls.hsjob}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-blue-700 mb-1">ctpoint</label>
-                      <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
-                        {basicTagData.url}{basicTagData.webSendUrls.ctpoint}
-                      </div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.webSendUrls.ctpoint}
+                          onChange={(e) => updateEditFormData({ 
+                            webSendUrls: { ...basicTagData.webSendUrls, ctpoint: e.target.value }
+                          })}
+                          className="text-sm font-mono"
+                        />
+                      ) : (
+                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
+                          {basicTagData.url}{basicTagData.webSendUrls.ctpoint}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-blue-700 mb-1">hstattendweek</label>
-                      <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
-                        {basicTagData.url}{basicTagData.webSendUrls.hstattendweek}
-                      </div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.webSendUrls.hstattendweek}
+                          onChange={(e) => updateEditFormData({ 
+                            webSendUrls: { ...basicTagData.webSendUrls, hstattendweek: e.target.value }
+                          })}
+                          className="text-sm font-mono"
+                        />
+                      ) : (
+                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
+                          {basicTagData.url}{basicTagData.webSendUrls.hstattendweek}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-blue-700 mb-1">web送信用URL_hsstart</label>
-                      <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
-                        {basicTagData.url}{basicTagData.webSendUrls.hsstart}
-                      </div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.webSendUrls.hsstart}
+                          onChange={(e) => updateEditFormData({ 
+                            webSendUrls: { ...basicTagData.webSendUrls, hsstart: e.target.value }
+                          })}
+                          className="text-sm font-mono"
+                        />
+                      ) : (
+                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
+                          {basicTagData.url}{basicTagData.webSendUrls.hsstart}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-blue-700 mb-1">web送信用URL_hsranking</label>
-                      <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
-                        {basicTagData.url}{basicTagData.webSendUrls.hsranking}
-                      </div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.webSendUrls.hsranking}
+                          onChange={(e) => updateEditFormData({ 
+                            webSendUrls: { ...basicTagData.webSendUrls, hsranking: e.target.value }
+                          })}
+                          className="text-sm font-mono"
+                        />
+                      ) : (
+                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
+                          {basicTagData.url}{basicTagData.webSendUrls.hsranking}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -642,45 +1409,115 @@ export default function StoreLedger() {
                   <div className="space-y-3">
                     <div>
                       <label className="block text-sm font-medium text-yellow-700 mb-1">hsprofile</label>
-                      <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
-                        {basicTagData.url}{basicTagData.webSendUrlsTemp.hsprofile}
-                      </div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.webSendUrlsTemp.hsprofile}
+                          onChange={(e) => updateEditFormData({ 
+                            webSendUrlsTemp: { ...basicTagData.webSendUrlsTemp, hsprofile: e.target.value }
+                          })}
+                          className="text-sm font-mono"
+                        />
+                      ) : (
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
+                          {basicTagData.url}{basicTagData.webSendUrlsTemp.hsprofile}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-yellow-700 mb-1">hsattend</label>
-                      <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
-                        {basicTagData.url}{basicTagData.webSendUrlsTemp.hsattend}
-                      </div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.webSendUrlsTemp.hsattend}
+                          onChange={(e) => updateEditFormData({ 
+                            webSendUrlsTemp: { ...basicTagData.webSendUrlsTemp, hsattend: e.target.value }
+                          })}
+                          className="text-sm font-mono"
+                        />
+                      ) : (
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
+                          {basicTagData.url}{basicTagData.webSendUrlsTemp.hsattend}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-yellow-700 mb-1">hsjob</label>
-                      <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
-                        {basicTagData.url}{basicTagData.webSendUrlsTemp.hsjob}
-                      </div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.webSendUrlsTemp.hsjob}
+                          onChange={(e) => updateEditFormData({ 
+                            webSendUrlsTemp: { ...basicTagData.webSendUrlsTemp, hsjob: e.target.value }
+                          })}
+                          className="text-sm font-mono"
+                        />
+                      ) : (
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
+                          {basicTagData.url}{basicTagData.webSendUrlsTemp.hsjob}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-yellow-700 mb-1">ctpoint</label>
-                      <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
-                        {basicTagData.url}{basicTagData.webSendUrlsTemp.ctpoint}
-                      </div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.webSendUrlsTemp.ctpoint}
+                          onChange={(e) => updateEditFormData({ 
+                            webSendUrlsTemp: { ...basicTagData.webSendUrlsTemp, ctpoint: e.target.value }
+                          })}
+                          className="text-sm font-mono"
+                        />
+                      ) : (
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
+                          {basicTagData.url}{basicTagData.webSendUrlsTemp.ctpoint}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-yellow-700 mb-1">hstattendweek</label>
-                      <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
-                        {basicTagData.url}{basicTagData.webSendUrlsTemp.hstattendweek}
-                      </div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.webSendUrlsTemp.hstattendweek}
+                          onChange={(e) => updateEditFormData({ 
+                            webSendUrlsTemp: { ...basicTagData.webSendUrlsTemp, hstattendweek: e.target.value }
+                          })}
+                          className="text-sm font-mono"
+                        />
+                      ) : (
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
+                          {basicTagData.url}{basicTagData.webSendUrlsTemp.hstattendweek}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-yellow-700 mb-1">web送信用URL_hsstart　仮</label>
-                      <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
-                        {basicTagData.url}{basicTagData.webSendUrlsTemp.hsstart}
-                      </div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.webSendUrlsTemp.hsstart}
+                          onChange={(e) => updateEditFormData({ 
+                            webSendUrlsTemp: { ...basicTagData.webSendUrlsTemp, hsstart: e.target.value }
+                          })}
+                          className="text-sm font-mono"
+                        />
+                      ) : (
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
+                          {basicTagData.url}{basicTagData.webSendUrlsTemp.hsstart}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-yellow-700 mb-1">web送信用URL_hsranking　仮</label>
-                      <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
-                        {basicTagData.url}{basicTagData.webSendUrlsTemp.hsranking}
-                      </div>
+                      {isEditMode ? (
+                        <Input
+                          value={basicTagData.webSendUrlsTemp.hsranking}
+                          onChange={(e) => updateEditFormData({ 
+                            webSendUrlsTemp: { ...basicTagData.webSendUrlsTemp, hsranking: e.target.value }
+                          })}
+                          className="text-sm font-mono"
+                        />
+                      ) : (
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
+                          {basicTagData.url}{basicTagData.webSendUrlsTemp.hsranking}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -693,9 +1530,25 @@ export default function StoreLedger() {
         const gmData = gmDivisions;
         return (
           <div className="space-y-6">
+            {!canEdit && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-yellow-800">
+                  ⚠️ このタブは管理者のみ編集可能です。管理者モードをオンにしてください。
+                </p>
+              </div>
+            )}
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">GM区分</h3>
-              <Button size="sm" className="flex items-center gap-2">
+              <Button 
+                size="sm" 
+                className="flex items-center gap-2"
+                disabled={!canEdit}
+                onClick={() => {
+                  if (!canEdit) {
+                    alert('このタブの編集は管理者のみ可能です。管理者モードをオンにしてください。');
+                  }
+                }}
+              >
                 <Plus className="w-4 h-4" />
                 追加
               </Button>
@@ -759,6 +1612,12 @@ export default function StoreLedger() {
                             variant="destructive" 
                             size="sm" 
                             className="h-6 px-2 text-xs"
+                            disabled={!canEdit}
+                            onClick={() => {
+                              if (!canEdit) {
+                                alert('このタブの編集は管理者のみ可能です。管理者モードをオンにしてください。');
+                              }
+                            }}
                           >
                             <Minus className="w-3 h-3" />
                           </Button>
@@ -777,12 +1636,26 @@ export default function StoreLedger() {
 
         return (
           <div className="space-y-4">
+            {!canEdit && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-yellow-800">
+                  ⚠️ このタブは管理者のみ編集可能です。管理者モードをオンにしてください。
+                </p>
+              </div>
+            )}
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">コース料金</h3>
               <Button 
                 size="sm" 
                 className="flex items-center gap-2"
-                onClick={handleAddCourseFee}
+                onClick={() => {
+                  if (!canEdit) {
+                    alert('このタブの編集は管理者のみ可能です。管理者モードをオンにしてください。');
+                    return;
+                  }
+                  handleAddCourseFee();
+                }}
+                disabled={!canEdit}
               >
                 <Plus className="w-4 h-4" />
                 追加
@@ -1097,7 +1970,14 @@ export default function StoreLedger() {
                                     variant="outline" 
                                     size="sm"
                                     className="h-6 px-2 text-xs"
-                                    onClick={() => handleEditCourseFee(course.id)}
+                                    onClick={() => {
+                                      if (!canEdit) {
+                                        alert('このタブの編集は管理者のみ可能です。管理者モードをオンにしてください。');
+                                        return;
+                                      }
+                                      handleEditCourseFee(course.id);
+                                    }}
+                                    disabled={!canEdit}
                                   >
                                     <Edit className="w-3 h-3" />
                                   </Button>
@@ -1106,10 +1986,15 @@ export default function StoreLedger() {
                                     size="sm"
                                     className="h-6 px-2 text-xs"
                                     onClick={() => {
+                                      if (!canEdit) {
+                                        alert('このタブの編集は管理者のみ可能です。管理者モードをオンにしてください。');
+                                        return;
+                                      }
                                       if (window.confirm(`${course.courseName}を削除しますか？`)) {
                                         handleDeleteCourseFee(course.id);
                                       }
                                     }}
+                                    disabled={!canEdit}
                                   >
                                     <Minus className="w-3 h-3" />
                                   </Button>
@@ -1232,7 +2117,14 @@ export default function StoreLedger() {
                                     variant="outline" 
                                     size="sm"
                                     className="h-6 px-2 text-xs"
-                                    onClick={() => handleEditCourseFee(course.id)}
+                                    onClick={() => {
+                                      if (!canEdit) {
+                                        alert('このタブの編集は管理者のみ可能です。管理者モードをオンにしてください。');
+                                        return;
+                                      }
+                                      handleEditCourseFee(course.id);
+                                    }}
+                                    disabled={!canEdit}
                                   >
                                     <Edit className="w-3 h-3" />
                                   </Button>
@@ -1241,10 +2133,15 @@ export default function StoreLedger() {
                                     size="sm"
                                     className="h-6 px-2 text-xs"
                                     onClick={() => {
+                                      if (!canEdit) {
+                                        alert('このタブの編集は管理者のみ可能です。管理者モードをオンにしてください。');
+                                        return;
+                                      }
                                       if (window.confirm(`${course.courseName}を削除しますか？`)) {
                                         handleDeleteCourseFee(course.id);
                                       }
                                     }}
+                                    disabled={!canEdit}
                                   >
                                     <Minus className="w-3 h-3" />
                                   </Button>
@@ -1272,9 +2169,25 @@ export default function StoreLedger() {
         const staffData = staffCompositions;
         return (
           <div className="space-y-6">
+            {!canEdit && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-yellow-800">
+                  ⚠️ このタブは管理者のみ編集可能です。管理者モードをオンにしてください。
+                </p>
+              </div>
+            )}
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">人事構成</h3>
-              <Button size="sm" className="flex items-center gap-2">
+              <Button 
+                size="sm" 
+                className="flex items-center gap-2"
+                disabled={!canEdit}
+                onClick={() => {
+                  if (!canEdit) {
+                    alert('このタブの編集は管理者のみ可能です。管理者モードをオンにしてください。');
+                  }
+                }}
+              >
                 <Plus className="w-4 h-4" />
                 追加
               </Button>
@@ -1687,8 +2600,8 @@ export default function StoreLedger() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="flex h-screen">
+    <div className="min-h-screen bg-gray-100 overflow-x-hidden">
+      <div className="flex h-screen overflow-hidden">
         {/* 左側：店舗一覧 */}
         <div className="w-[300px] bg-white border-r border-gray-200 flex flex-col">
           {/* ヘッダー */}
@@ -1704,9 +2617,20 @@ export default function StoreLedger() {
                 戻る
               </Button>
             </div>
-            <div className="flex items-center gap-3">
-              <Building className="w-6 h-6" />
-              <h1 className="text-xl font-bold">店舗台帳</h1>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Building className="w-6 h-6" />
+                <h1 className="text-xl font-bold">店舗台帳</h1>
+              </div>
+              <Button 
+                variant="default" 
+                size="sm"
+                onClick={handleCreateNewStore}
+                className="flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                新規作成
+              </Button>
             </div>
           </div>
 
@@ -1750,54 +2674,148 @@ export default function StoreLedger() {
         </div>
 
         {/* 右側：タブコンテンツ */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* 管理者スイッチ（デモ用） */}
+          <div className="bg-yellow-50 border-b border-yellow-200 px-4 py-2 flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Settings className="w-4 h-4 text-yellow-700" />
+                <span className="text-sm font-medium text-yellow-800">デモ用管理者モード</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-yellow-700">オフ</span>
+                <Switch
+                  checked={isAdminMode}
+                  onCheckedChange={setIsAdminMode}
+                />
+                <span className="text-sm text-yellow-700">オン</span>
+              </div>
+            </div>
+            {isCurrentTabAdminOnly && !isAdminMode && (
+              <div className="mt-2 text-xs text-yellow-700">
+                ⚠️ このタブは管理者のみ編集可能です。管理者モードをオンにしてください。
+              </div>
+            )}
+          </div>
+          
           {/* 選択店舗情報ヘッダー */}
-          <div className="bg-white border-b border-gray-200 p-4">
-            <div className="flex items-center gap-3">
-              <Building className="w-5 h-5 text-blue-600" />
-              <h2 className="text-lg font-semibold">{selectedStore}</h2>
-              {selectedStoreInfo && (
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                  selectedStoreInfo.isActive 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {selectedStoreInfo.isActive ? '営業中' : '休業中'}
-                </span>
-              )}
+          <div className="bg-white border-b border-gray-200 p-4 flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 flex-1">
+                <Building className="w-5 h-5 text-blue-600" />
+                {isEditMode && editFormData ? (
+                  <Input
+                    value={editFormData.storeName}
+                    onChange={(e) => {
+                      updateEditFormData({ storeName: e.target.value });
+                      // 新規作成時は店舗名を変更したら選択店舗も更新
+                      if (isCreatingNewStore) {
+                        setSelectedStore(e.target.value || '新規店舗');
+                      }
+                    }}
+                    className="text-lg font-semibold max-w-xs"
+                    placeholder="店舗名を入力"
+                  />
+                ) : (
+                  <>
+                    <h2 className="text-lg font-semibold">{isCreatingNewStore ? '新規店舗' : selectedStore}</h2>
+                    {selectedStoreInfo && !isCreatingNewStore && (
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        selectedStoreInfo.isActive 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {selectedStoreInfo.isActive ? '営業中' : '休業中'}
+                      </span>
+                    )}
+                  </>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {isEditMode ? (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleCancelEditStore}
+                      className="flex items-center gap-2"
+                    >
+                      <X className="w-4 h-4" />
+                      キャンセル
+                    </Button>
+                    <Button 
+                      variant="default" 
+                      size="sm"
+                      onClick={handleSaveStore}
+                      className="flex items-center gap-2"
+                    >
+                      <Save className="w-4 h-4" />
+                      保存
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleEditStore}
+                      className="flex items-center gap-2"
+                      disabled={!canEdit}
+                    >
+                      <Edit className="w-4 h-4" />
+                      編集
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleDuplicateStore}
+                      className="flex items-center gap-2"
+                      disabled={!basicTag || !canEdit}
+                    >
+                      <Copy className="w-4 h-4" />
+                      複製
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
           {/* タブコンテンツ */}
-          <div className="flex-1 bg-gray-50">
-            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as StoreLedgerTab)} className="h-full flex flex-col">
+          <div className="flex-1 bg-gray-50 min-w-0 min-h-0">
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as StoreLedgerTab)} className="h-full flex flex-col min-w-0 min-h-0">
               {/* タブリスト */}
-              <div className="bg-white border-b border-gray-200">
-                <ScrollArea className="w-full">
-                  <TabsList className="flex w-full justify-start h-auto p-1 bg-transparent">
-                    {storeLedgerTabs.map((tab) => {
-                      const IconComponent = tabIcons[tab.id];
-                      return (
-                        <TabsTrigger
-                          key={tab.id}
-                          value={tab.id}
-                          className="flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
-                        >
-                          <IconComponent className="w-4 h-4" />
-                          {tab.label}
-                        </TabsTrigger>
-                      );
-                    })}
-                  </TabsList>
-                </ScrollArea>
+              <div 
+                className="bg-white border-b border-gray-200 w-full min-w-0 flex-shrink-0"
+                style={{ 
+                  overflowX: 'auto', 
+                  overflowY: 'auto',
+                  WebkitOverflowScrolling: 'touch'
+                }}
+              >
+                <TabsList className="flex justify-start h-auto p-1 bg-transparent" style={{ minWidth: 'max-content', width: 'max-content' }}>
+                  {storeLedgerTabs.map((tab) => {
+                    const IconComponent = tabIcons[tab.id];
+                    return (
+                      <TabsTrigger
+                        key={tab.id}
+                        value={tab.id}
+                        className="flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap flex-shrink-0 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-b-2 data-[state=active]:border-blue-600"
+                      >
+                        <IconComponent className="w-4 h-4" />
+                        {tab.label}
+                      </TabsTrigger>
+                    );
+                  })}
+                </TabsList>
               </div>
 
               {/* タブコンテンツエリア */}
-              <div className="flex-1 overflow-hidden">
+              <div className="flex-1 overflow-hidden overflow-x-hidden min-h-0">
                 {storeLedgerTabs.map((tab) => (
                   <TabsContent key={tab.id} value={tab.id} className="h-full m-0">
-                    <ScrollArea className="h-full">
-                      <div className="p-6">
+                    <ScrollArea className="h-full w-full">
+                      <div className="p-6 overflow-x-hidden">
                         {renderTabContent(tab.id)}
                       </div>
                     </ScrollArea>

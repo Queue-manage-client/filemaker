@@ -10,6 +10,10 @@ import { ArrowLeft, Settings } from "lucide-react";
 export default function FuelEcoManagement() {
   const router = useRouter();
 
+  React.useEffect(() => {
+    document.title = '燃料・エコ手当管理 - Dispatch Harmony Hub';
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       {/* 戻るボタン */}

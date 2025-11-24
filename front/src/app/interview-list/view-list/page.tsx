@@ -18,6 +18,10 @@ export default function ViewList() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedInterviews, setSelectedInterviews] = useState<string[]>([]);
 
+  React.useEffect(() => {
+    document.title = '面接管理リスト - Dispatch Harmony Hub';
+  }, []);
+
   const filteredInterviews = interviews.filter(interview =>
     interview.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     interview.interviewer.toLowerCase().includes(searchQuery.toLowerCase()) ||

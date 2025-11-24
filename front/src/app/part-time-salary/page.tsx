@@ -10,6 +10,10 @@ import { ArrowLeft, DollarSign } from "lucide-react";
 export default function PartTimeSalary() {
   const router = useRouter();
 
+  React.useEffect(() => {
+    document.title = 'アルバイト給与月計 - Dispatch Harmony Hub';
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       {/* 戻るボタン */}

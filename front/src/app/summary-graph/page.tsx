@@ -166,6 +166,9 @@ const LocationTable = () => {
 };
 
 export default function SummaryGraph() {
+  React.useEffect(() => {
+    document.title = '集計・グラフ - Dispatch Harmony Hub';
+  }, []);
   const router = useRouter();
   const [selectedTable, setSelectedTable] = useState('場所');
 

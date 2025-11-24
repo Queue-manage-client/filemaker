@@ -14,6 +14,10 @@ import { HostessManagerListItem } from '@/types/hostess';
 export default function HostessManagerList() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+
+  React.useEffect(() => {
+    document.title = 'ホステスマネージャリスト - Dispatch Harmony Hub';
+  }, []);
   
   // React Queryを使用してデータ取得
   const { data: managers = [], isLoading, error } = useHostessManagers();

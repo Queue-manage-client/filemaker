@@ -7,6 +7,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeft, CalendarDays } from "lucide-react";
 
 export default function WeekdaySummary() {
+  React.useEffect(() => {
+    document.title = '曜日集計 - Dispatch Harmony Hub';
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">

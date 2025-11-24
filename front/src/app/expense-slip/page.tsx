@@ -24,6 +24,10 @@ export default function ExpenseSlip() {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+
+  React.useEffect(() => {
+    document.title = '出金伝票 - Dispatch Harmony Hub';
+  }, []);
   
   // React Queryを使用してデータ取得
   const { data: expenseSlips = [], isLoading, error } = useExpenseSlips(

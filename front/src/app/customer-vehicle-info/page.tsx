@@ -19,6 +19,10 @@ export default function CustomerVehicleInfo() {
   const [editingVehicle, setEditingVehicle] = useState<CustomerVehicle | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
+  React.useEffect(() => {
+    document.title = '顧客車情報 - Dispatch Harmony Hub';
+  }, []);
+
   // React Queryを使用してデータ取得
   const { data: vehicleData = [], isLoading, error } = useCustomerVehicles();
   const updateVehicle = useUpdateCustomerVehicle();

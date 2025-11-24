@@ -10,6 +10,10 @@ import { ArrowLeft, FileText } from "lucide-react";
 export default function ManagementList() {
   const router = useRouter();
 
+  React.useEffect(() => {
+    document.title = '管理用リスト - Dispatch Harmony Hub';
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       {/* 戻るボタン */}

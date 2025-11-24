@@ -48,6 +48,10 @@ type BasicSchedule = Record<Day, BasicDaySchedule>;
 
 export default function StaffDetailPage({ params }: StaffDetailPageProps) {
   const { id } = React.use(params);
+
+  React.useEffect(() => {
+    document.title = 'スタッフ詳細 - Dispatch Harmony Hub';
+  }, []);
   const { toast } = useToast();
 
   const [sfid, setSfid] = useState<string>('');

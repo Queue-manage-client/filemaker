@@ -12,6 +12,10 @@ import { useShopList } from '@/hooks/use-shop';
 export default function ShopLedger() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+
+  React.useEffect(() => {
+    document.title = '店舗台帳 - Dispatch Harmony Hub';
+  }, []);
   
   // React Queryを使用してデータ取得
   const { data: shops = [], isLoading, error } = useShopList();

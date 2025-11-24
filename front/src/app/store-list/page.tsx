@@ -12,6 +12,10 @@ import { StoreBasicInfo } from '@/types';
 export default function StoreList() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+
+  React.useEffect(() => {
+    document.title = '各店リスト - Dispatch Harmony Hub';
+  }, []);
   
   // React Queryを使用してデータ取得
   const { data: stores = [], isLoading, error } = useStoreList();
