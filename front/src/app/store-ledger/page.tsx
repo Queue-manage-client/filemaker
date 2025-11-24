@@ -163,78 +163,6 @@ export default function StoreLedger() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">web連携</label>
-                    <div className="p-2 bg-gray-50 rounded border">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        basicTagData.webLinkage 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {basicTagData.webLinkage ? '有効' : '無効'}
-                      </span>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">web送信本仮切替sw</label>
-                    <div className="p-2 bg-gray-50 rounded border">
-                      <div className="flex gap-4">
-                        <label className="flex items-center">
-                          <input 
-                            type="radio" 
-                            name="webSendMode" 
-                            value="本" 
-                            checked={basicTagData.webSendMode === '本'} 
-                            readOnly
-                            className="mr-2"
-                          />
-                          本
-                        </label>
-                        <label className="flex items-center">
-                          <input 
-                            type="radio" 
-                            name="webSendMode" 
-                            value="仮" 
-                            checked={basicTagData.webSendMode === '仮'} 
-                            readOnly
-                            className="mr-2"
-                          />
-                          仮
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">web管理用ID</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.webManageId}</div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">web管理用パス</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.webManagePassword}</div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">web管理用URL</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.webManageUrl}</div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">ホステスページURL</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.hostessPageUrl}</div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">webホステス一覧URL</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.webHostessListUrl}</div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">ホステス出勤管理ページURL</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.hostessAttendanceManageUrl}</div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">ホステス管理ページURL</label>
-                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.hostessManageUrl}</div>
-                  </div>
-                </div>
-
                 {/* 追加設定項目 */}
                 <div className="space-y-4">
                   <h4 className="text-lg font-semibold text-gray-800 border-b border-gray-300 pb-2">詳細設定</h4>
@@ -586,6 +514,79 @@ export default function StoreLedger() {
 
               {/* 右半分：URL表示エリア */}
               <div className="space-y-4">
+                {/* web連携関連項目 */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">web連携</label>
+                    <div className="p-2 bg-gray-50 rounded border">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        basicTagData.webLinkage 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {basicTagData.webLinkage ? '有効' : '無効'}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">web送信本仮切替sw</label>
+                    <div className="p-2 bg-gray-50 rounded border">
+                      <div className="flex gap-4">
+                        <label className="flex items-center">
+                          <input 
+                            type="radio" 
+                            name="webSendMode" 
+                            value="本" 
+                            checked={basicTagData.webSendMode === '本'} 
+                            readOnly
+                            className="mr-2"
+                          />
+                          本
+                        </label>
+                        <label className="flex items-center">
+                          <input 
+                            type="radio" 
+                            name="webSendMode" 
+                            value="仮" 
+                            checked={basicTagData.webSendMode === '仮'} 
+                            readOnly
+                            className="mr-2"
+                          />
+                          仮
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">web管理用ID</label>
+                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.webManageId}</div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">web管理用パス</label>
+                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.webManagePassword}</div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">web管理用URL</label>
+                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.webManageUrl}</div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">ホステスページURL</label>
+                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.hostessPageUrl}</div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">webホステス一覧URL</label>
+                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.webHostessListUrl}</div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">ホステス出勤管理ページURL</label>
+                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.hostessAttendanceManageUrl}</div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">ホステス管理ページURL</label>
+                    <div className="p-2 bg-gray-50 rounded border">{basicTagData.url + basicTagData.hostessManageUrl}</div>
+                  </div>
+                </div>
+
                 {/* 青枠：web送信用URL */}
                 <div className="border-2 border-blue-500 rounded-lg p-4 bg-blue-50">
                   <h4 className="text-lg font-semibold text-blue-800 mb-4">web送信用URL</h4>

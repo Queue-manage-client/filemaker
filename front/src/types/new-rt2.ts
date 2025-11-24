@@ -93,9 +93,13 @@ export interface OutDriverUndecided {
   timeTotal: number; // 時間計（分）
   destination: string; // 送り場所
   station: string; // 駅名
-  option1?: string; // オプション1
-  option2?: string; // オプション2
-  hasOptions: boolean[]; // オプション表示フラグ
+  in_driver?: string; // INドラ
+  out_driver?: string; // OUTドラ
+  hasOption1?: boolean; // オプション1（領収書）
+  hasOption2?: boolean; // オプション2（待合せ）
+  hasOption3?: boolean; // オプション3（着TEL）
+  hasOption4?: boolean; // オプション4（カード）
+  hasOption5?: boolean; // オプション5（オプション）
 }
 
 // 終了リスト

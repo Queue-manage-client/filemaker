@@ -59,62 +59,62 @@ shop (店舗テーブル)
 
 staff (スタッフテーブル)　マイグレーション済み
 
-| カラム名                 | データ型         | 説明                |
-| -------------------- | ------------ | ----------------- |
+| カラム名             | データ型     | 説明                      |
+| -------------------- | ------------ | ------------------------- |
 | id                   | UUID(PK)     | スタッフの一意なID        |
 | sfid                 | INT          | スタッフID(要件定義書より)|
-| first_name           | VARCHAR(255) | 名前                     |
-| last_name            | VARCHAR(255) | 苗字                     |
-| first_name_furigana  | VARCHAR(255) | 名前ふりがな             |
-| last_name_furigana   | VARCHAR(255) | 苗字ふりがな             |
-| area_division        | VARCHAR(255) | 地域区分                 |
-| group                | VARCHAR(255) | グループ                 |
-| status               | BOOLEAN      | 在職または退職           |
-| bath_towel           | INT          | バスタオル持ち出し基礎数 |
-| equipment            | INT          | 備品持ち出し基礎数       |
-| joining_date         | TIMESTAMPTZ  | 就労日                   |
-| resignation_date     | TIMESTAMPTZ  | 退職日                   |
-| position             | VARCHAR(255) | 役職                     |
-| employment_type      | VARCHAR(255) | 雇用区分                 |
-| job_description      | VARCHAR(255) | 職務                     |
-| mobile_email_address | VARCHAR(255) | 携帯メールアドレス       |
-| pc_email_address     | VARCHAR(255) | PCメールアドレス         |
-| phone_number         | VARCHAR(20)  | 電話番号                 |
-| vehicle              | UUID(FK)     | 車情報(staff_car.id)     |
-| remarks              | VARCHAR(255) | 備考                     |
-| mon_start            | TIME         | 月曜出勤時間             |
-| mon_end              | TIME         | 月曜退勤時間             |
-| tue_start            | TIME         | 火曜出勤時間             |
-| tue_end              | TIME         | 火曜退勤時間             |
-| wed_start            | TIME         | 水曜出勤時間             |
-| wed_end              | TIME         | 水曜退勤時間             |
-| thu_start            | TIME         | 木曜出勤時間             |
-| thu_end              | TIME         | 木曜退勤時間             |
-| fri_start            | TIME         | 金曜出勤時間             |
-| fri_end              | TIME         | 金曜退勤時間             |
-| sat_start            | TIME         | 土曜出勤時間             |
-| sat_end              | TIME         | 土曜退勤時間             |
-| sun_start            | TIME         | 日曜出勤時間             |
-| sun_end              | TIME         | 日曜退勤時間             |
-| created_at           | TIMESTAMPTZ  | 作成日時                 |
-| updated_at           | TIMESTAMPTZ  | 更新日時                 |
+| first_name           | VARCHAR(255) | 名前                      |
+| last_name            | VARCHAR(255) | 苗字                      |
+| first_name_furigana  | VARCHAR(255) | 名前ふりがな              |
+| last_name_furigana   | VARCHAR(255) | 苗字ふりがな              |
+| area_division        | VARCHAR(255) | 地域区分                  |
+| group                | VARCHAR(255) | グループ                  |
+| status               | BOOLEAN      | 在職または退職            |
+| bath_towel           | INT          | バスタオル持ち出し基礎数  |
+| equipment            | INT          | 備品持ち出し基礎数        |
+| joining_date         | TIMESTAMPTZ  | 就労日                    |
+| resignation_date     | TIMESTAMPTZ  | 退職日                    |
+| position             | VARCHAR(255) | 役職                      |
+| employment_type      | VARCHAR(255) | 雇用区分                  |
+| job_description      | VARCHAR(255) | 職務                      |
+| mobile_email_address | VARCHAR(255) | 携帯メールアドレス        |
+| pc_email_address     | VARCHAR(255) | PCメールアドレス          |
+| phone_number         | VARCHAR(20)  | 電話番号                  |
+| vehicle              | UUID(FK)     | 車情報(staff_car.id)      |
+| remarks              | VARCHAR(255) | 備考                      |
+| mon_start            | TIME         | 月曜出勤時間              |
+| mon_end              | TIME         | 月曜退勤時間              |
+| tue_start            | TIME         | 火曜出勤時間              |
+| tue_end              | TIME         | 火曜退勤時間              |
+| wed_start            | TIME         | 水曜出勤時間              |
+| wed_end              | TIME         | 水曜退勤時間              |
+| thu_start            | TIME         | 木曜出勤時間              |
+| thu_end              | TIME         | 木曜退勤時間              |
+| fri_start            | TIME         | 金曜出勤時間              |
+| fri_end              | TIME         | 金曜退勤時間              |
+| sat_start            | TIME         | 土曜出勤時間              |
+| sat_end              | TIME         | 土曜退勤時間              |
+| sun_start            | TIME         | 日曜出勤時間              |
+| sun_end              | TIME         | 日曜退勤時間              |
+| created_at           | TIMESTAMPTZ  | 作成日時                  |
+| updated_at           | TIMESTAMPTZ  | 更新日時                  |
 
 
 
 staff_car (スタッフ車テーブル)　マイグレーション済み
 
-| カラム名       | データ型         | 説明          |
-| ---------- | ------------ | ----------- |
+| カラム名   | データ型 | 説明                     |
+| ---------- | ------------ | -------------------- |
 | id         | UUID(PK)     | スタッフ車の一意なID |
-| car_type   | VARCHAR(100) | 車種          |
-| color      | VARCHAR(255) | 色           |
-| capacity   | INT          | 定員          |
-| area       | VARCHAR(255) | 車ナンバー地域     |
+| car_type   | VARCHAR(100) | 車種                 |
+| color      | VARCHAR(255) | 色                   |
+| capacity   | INT          | 定員                 |
+| area       | VARCHAR(255) | 車ナンバー地域       |
 | character  | VARCHAR(255) | 車ナンバーひらがな   |
-| number     | INT          | 車ナンバー       |
-| is_etc     | BOOLEAN      | ETC有無       |
-| created_at | TIMESTAMPTZ  | 作成日時        |
-| updated_at | TIMESTAMPTZ  | 更新日時        |
+| number     | INT          | 車ナンバー           |
+| is_etc     | BOOLEAN      | ETC有無              |
+| created_at | TIMESTAMPTZ  | 作成日時             |
+| updated_at | TIMESTAMPTZ  | 更新日時             |
 
 
 
