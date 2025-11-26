@@ -39,8 +39,9 @@ export default function RT2Panel() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
-      {/* 戻るボタン */}
-      <div className="mb-4">
+      {/* ヘッダー行 */}
+      <div className="mb-4 relative flex items-center justify-between">
+        {/* 戻るボタン */}
         <Button 
           variant="outline" 
           onClick={() => router.push('/dashboard')}
@@ -49,6 +50,37 @@ export default function RT2Panel() {
           <ArrowLeft className="w-4 h-4" />
           ダッシュボードに戻る
         </Button>
+        
+        {/* ナビゲーションヘッダー（中央配置） */}
+        <div className="flex gap-2 absolute left-1/2 transform -translate-x-1/2">
+          <button
+            onClick={() => router.push('/customer-ledger')}
+            className="px-3 py-1.5 bg-green-500 border-2 border-green-700 text-green-900 text-sm font-semibold rounded hover:bg-green-600 transition-colors"
+          >
+            新規顧客検索
+          </button>
+          <button
+            onClick={() => router.push('/dispatch-panel-2d')}
+            className="px-3 py-1.5 bg-amber-200 border-2 border-amber-700 text-amber-900 text-sm font-semibold rounded hover:bg-amber-300 transition-colors"
+          >
+            配車パネル
+          </button>
+          <button
+            onClick={() => router.push('/tehai')}
+            className="px-3 py-1.5 bg-purple-200 border-2 border-purple-700 text-purple-900 text-sm font-semibold rounded hover:bg-purple-300 transition-colors"
+          >
+            手配表
+          </button>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="px-3 py-1.5 bg-gray-200 border-2 border-gray-700 text-gray-900 text-sm font-semibold rounded hover:bg-gray-300 transition-colors"
+          >
+            Menu
+          </button>
+        </div>
+        
+        {/* 右側のスペーサー（バランス用） */}
+        <div className="w-[200px]"></div>
       </div>
       
       {/* ヘッダー */}
