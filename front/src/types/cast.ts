@@ -22,4 +22,6 @@ export interface TodayCastData {
   webStatus: string;
   mode: string;
   ranking: string;
+  concurrent?: string; // 併用
+  deliverCount?: string; // 送場所実績の数値
 }
