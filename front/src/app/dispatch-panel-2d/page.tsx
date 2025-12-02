@@ -47,25 +47,93 @@ export default function Original() {
 
   return (
     <div className="w-[1920px] h-[1080px] relative overflow-hidden">
-      {/* ヘッダー（100px以内） */}
-      <div className="absolute left-4 top-4 right-4 z-10">
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <h1 className="text-xl font-bold">配車パネル2D</h1>
-              </div>
-              <Button 
-                variant="outline" 
-                onClick={() => router.push('/dashboard')}
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                ダッシュボードに戻る
-              </Button>
-            </div>
-          </CardHeader>
-        </Card>
+      {/* ヘッダー */}
+      <div className="absolute left-0 top-0 right-0 z-10 h-[70px] bg-white border-b border-zinc-300">
+        <div className="flex items-center h-full px-2">
+          {/* ダッシュボードに戻る - 左端 */}
+          <Button
+            variant="outline"
+            onClick={() => router.push('/dashboard')}
+            className="h-8 px-3 text-xs flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+
+          {/* 中央配置のボタン群 */}
+          <div className="flex-1 flex items-center justify-center gap-2">
+            {/* 配車パネル2Dタイトル */}
+            <h1 className="text-lg font-bold mr-2">配車パネル2D</h1>
+
+            {/* 日付移動 */}
+            <Button
+              variant="outline"
+              className="h-8 px-3 text-xs border-black"
+              onClick={() => {}}
+            >
+              日付移動
+            </Button>
+
+            {/* ドライバ精算 */}
+            <Button
+              className="h-8 px-4 text-xs bg-lime-400 hover:bg-lime-500 text-black border border-black"
+              onClick={() => {}}
+            >
+              ドライバ精算
+            </Button>
+
+            {/* 新顧客検索 */}
+            <Button
+              variant="outline"
+              className="h-8 px-4 text-xs border-black"
+              onClick={() => {}}
+            >
+              新顧客検索
+            </Button>
+
+            {/* RT IIパネル */}
+            <Button
+              className="h-8 px-4 text-xs bg-purple-400 hover:bg-purple-500 text-black border border-black"
+              onClick={() => {}}
+            >
+              RT IIパネル
+            </Button>
+
+            {/* RTパネル */}
+            <Button
+              className="h-8 px-4 text-xs bg-orange-400 hover:bg-orange-500 text-black border border-black"
+              onClick={() => {}}
+            >
+              RTパネル
+            </Button>
+
+            {/* 手配表 */}
+            <Button
+              variant="outline"
+              className="h-8 px-4 text-xs border-black"
+              onClick={() => {}}
+            >
+              手配表
+            </Button>
+
+            {/* Menu */}
+            <Button
+              variant="outline"
+              className="h-8 px-4 text-xs border-black"
+              onClick={() => {}}
+            >
+              Menu
+            </Button>
+
+            {/* チャット表示 */}
+            <Button
+              className="h-8 px-4 text-xs bg-cyan-300 hover:bg-cyan-400 text-black border border-black"
+              onClick={() => {}}
+            >
+              チャット表示
+            </Button>
+          </div>
+        </div>
       </div>
   
     {/* スタッフ予定リスト */}
@@ -211,7 +279,19 @@ export default function Original() {
   {/* OUTドラ未定予約リスト */}
   <div className="w-40 h-5 left-[958px] top-[145px] absolute bg-lime-200" />
   <div className="w-40 left-[961px] top-[147px] absolute text-center justify-end text-black text-xs font-normal font-['Inter']">OUTドラ未定・接客中リスト</div>
-  
+
+  {/* ヘッダー行 */}
+  <div className="w-10 left-[726px] top-[165px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">開始</div>
+  <div className="w-[26px] left-[766px] top-[165px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">HP</div>
+  <div className="w-[70px] left-[792px] top-[165px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">ホステス名</div>
+  <div className="w-10 left-[862px] top-[165px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">時間計</div>
+  <div className="w-10 left-[902px] top-[165px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">開始</div>
+  <div className="w-10 left-[942px] top-[165px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">終了</div>
+  <div className="w-28 left-[982px] top-[165px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">場所</div>
+  <div className="w-14 left-[1094px] top-[165px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">駅</div>
+  <div className="w-5 left-[1094px] top-[165px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">確</div>
+  <div className="w-10 left-[1170px] top-[165px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">INドラ</div>
+  <div className="w-10 left-[1210px] top-[165px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">OUTドラ</div>
   <div className="w-10 h-4 left-[1300px] top-[148px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">オプション</div>
   <div className="w-10 h-4 left-[1284px] top-[155px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">カード</div>
   <div className="w-10 h-4 left-[1270px] top-[155px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">着TEL</div>
@@ -251,7 +331,7 @@ export default function Original() {
         <div className="w-9 left-[486px] top-[2px] absolute justify-end text-black text-xs font-normal font-['Inter']">{item.out_driver}</div>
       )}
       <div className="w-10 h-5 left-[216px] top-0 absolute border border-indigo-200/60" />
-      <div className="w-9 left-[218px] top-[2px] absolute text-center justify-end text-black text-xs font-normal font-['Inter']">{item.arrivalTime}</div>
+      <div className="w-9 left-[218px] top-[2px] absolute text-center justify-end text-red-800 text-xs font-normal font-['Inter']">{item.arrivalTime}</div>
       <div className="w-10 h-5 left-[176px] top-0 absolute border border-rose-300/60" />
       <div className="w-9 left-[178px] top-[2px] absolute text-center justify-end text-black text-xs font-normal font-['Inter']">{item.pickupTime}</div>
       <div className="w-10 h-5 left-[136px] top-0 absolute border border-indigo-200/60" />
