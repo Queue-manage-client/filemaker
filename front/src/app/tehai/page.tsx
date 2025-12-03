@@ -2,489 +2,430 @@
 
 import React from 'react';
 
-import { useRouter } from 'next/navigation';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, FileText, Eye, Mail, User } from "lucide-react";
-import { tehaiSampleData } from "@/data/tehaiSampleData";
-import { TEHAI_STATUS_LABELS, TEHAI_STATUS_VARIANTS } from "@/types/tehai";
-import { staffAttendanceSampleData } from "@/data/staffAttendanceSampleData";
-import { WORK_TYPE_LABELS, EMPLOYMENT_TYPE_LABELS, ATTENDANCE_STATUS_LABELS, ATTENDANCE_STATUS_VARIANTS } from "@/types/staff-attendance";
-import { rosterPeriods } from "@/types/department-roster";
-import { partTimeAttendanceSampleData } from "@/data/partTimeAttendanceSampleData";
-//import { PART_TIME_MIN_ROWS } from "@/data/partTimeAttendanceSampleData";
-import { PART_TIME_REQUEST_TYPE_LABELS, PART_TIME_JOB_TYPE_LABELS, PART_TIME_REQUEST_TYPE_VARIANTS, PART_TIME_JOB_TYPE_VARIANTS } from "@/types/part-time-attendance";
-import { leaveAndDeductionSampleData } from "@/data/leaveAndDeductionSampleData";
-//import { LEAVE_DEDUCTION_MAX_ROWS } from "@/data/leaveAndDeductionSampleData";
-//import { LEAVE_DEDUCTION_TYPE_LABELS, LEAVE_DEDUCTION_TYPE_VARIANTS } from "@/types/leave-and-deduction";
-import { reservationSampleData } from "@/data/reservationSampleData";
-import { COURSE_COLORS } from "@/types/reservation";
+const reservationData = [
+  { time: '19:00', customer: 'タケダ', duration: '90分', type: '本指', course: '2時間', store: 'マイドリームス店' },
+  { time: '20:00', customer: 'スズキ', duration: '2H', type: 'LADY', course: '2H', store: 'ファインガーデン' },
+];
 
-export default function Tehai() {
-  const router = useRouter();
-
+export default function TehaiPage() {
   React.useEffect(() => {
     document.title = '手配表 - Dispatch Harmony Hub';
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-2 max-w-none">
-      {/* 戻るボタン */}
-      <div className="mb-4">
-        <Button 
-          variant="outline" 
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
+    <div className="w-[2000px] h-[1080px] relative bg-white flex flex-col text-xs">
+      {/* ヘッダー部分 */}
+      <div className="w-full h-[100px] bg-gray-200 border-b border-gray-400 flex items-center">
+        <div className="flex gap-1 px-2">
+          <button className="px-3 py-1 bg-lime-400 text-black text-sm font-bold border border-gray-600">所属/稼働/状況</button>
+          <button className="px-3 py-1 bg-gray-300 text-black text-sm border border-gray-600">外部業者/状況</button>
+          <button className="px-3 py-1 bg-fuchsia-400 text-black text-sm font-bold border border-gray-600">配車確認（様相関係/担当）</button>
+        </div>
+        <div className="ml-auto flex gap-2 px-4">
+          <span className="text-sm font-bold">2024/01/15 (月)</span>
+          <span className="text-sm font-bold text-blue-600">19:30:45</span>
+        </div>
       </div>
 
-      {/* ヘッダー */}
-      <Card className="mb-4">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <FileText className="w-6 h-6" />
-            <h1 className="text-2xl font-bold">手配表</h1>
+      {/* メインコンテンツ */}
+      <div className="flex flex-1">
+        {/* 左1列目: 所属事務所変更 */}
+        <div className="h-full border-r border-gray-400 w-[280px] bg-white flex flex-col">
+          <div className="border-b border-gray-400 py-1 px-2">
+            <a href="#" className="text-blue-600 underline font-bold text-sm">所属事務所変更</a>
           </div>
-        </CardHeader>
-      </Card>
-
-      {/* メインコンテンツ - フレックスレイアウト */}
-      <div className="flex flex-row gap-6 h-[calc(100vh-180px)] overflow-x-auto">
-        {/* 統合エリア（手配表一覧） */}
-        <Card className="h-full flex-shrink-0">
-          <CardHeader className="pb-3">
-            <h2 className="text-lg font-semibold">手配表一覧</h2>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-auto h-[calc(100%-80px)]">
-              <Table className="text-xs">
-                <TableHeader>
-                  <TableRow className="h-10">
-                    <TableHead className="w-[80px] p-2 text-xs">デ ホ 併 温</TableHead>
-                    <TableHead className="w-[15px] p-2 text-xs"></TableHead>
-                    <TableHead className="w-[35px] p-2 text-xs"></TableHead>
-                    <TableHead className="w-[45px] p-2 text-xs"></TableHead>
-                    <TableHead className="w-[70px] p-2 text-xs"></TableHead>
-                    <TableHead className="w-[60px] p-2 text-xs"></TableHead>
-                    <TableHead className="w-[30px] p-2 text-xs">理由</TableHead>
-                    <TableHead className="w-[90px] p-2 text-xs">迎えドライバ</TableHead>
-                    <TableHead className="w-[15px] p-2 text-xs"></TableHead>
-                    <TableHead className="w-[55px] p-2 text-xs">場所</TableHead>
-                    <TableHead className="w-[20px] p-2 text-xs">終了</TableHead>
-                    <TableHead className="w-[20px] p-2 text-xs">帰宅</TableHead>
-                    <TableHead className="w-[100px] p-2 text-xs">送り場所</TableHead>
-                    <TableHead className="w-[60px] p-2 text-xs">担当者</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {tehaiSampleData.map((data) => (
-                    <TableRow key={data.id} className="h-9">
-                      <TableCell className="p-2">
-                        <div className="flex gap-1">
-                          <Checkbox className="w-3 h-3" />
-                          <Checkbox className="w-3 h-3" />
-                          <Checkbox className="w-3 h-3" />
-                          <Checkbox className="w-3 h-3" />
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-xs p-2">{data.no}</TableCell>
-                      <TableCell className="text-xs p-2">{data.storeName}</TableCell>
-                      <TableCell className="text-xs p-2">{data.icName}</TableCell>
-                      <TableCell className="text-xs p-2">{data.hostessName}</TableCell>
-                      <TableCell className="p-2">
-                        <Badge 
-                          variant={TEHAI_STATUS_VARIANTS[data.status]} 
-                          className={`text-xs px-2 py-1 h-6 ${data.status === 'finished' ? 'bg-green-500' : ''}`}
-                        >
-                          {TEHAI_STATUS_LABELS[data.status]}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="p-2">
-                        <Button variant="ghost" size="sm" className="p-1 h-6 w-6">
-                          <Eye className="w-3 h-3" />
-                        </Button>
-                      </TableCell>
-                      <TableCell className="text-xs p-2">{data.pickupDriver}</TableCell>
-                      <TableCell className="text-xs p-2">{data.pickupTime}</TableCell>
-                      <TableCell className="text-xs p-2">{data.pickupLocation}</TableCell>
-                      <TableCell className="text-xs p-2">{data.arrivalTime}</TableCell>
-                      <TableCell className="text-xs p-2">{data.finishTime}</TableCell>
-                      <TableCell className="text-xs p-2">{data.dropoffLocation}</TableCell>
-                      <TableCell className="text-xs p-2">{data.manager}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+          <div className="flex-1 overflow-auto">
+            <div className="flex items-center border-b border-gray-300 text-[12px] bg-white">
+              <div className="w-4 text-center border-r border-gray-300"><input type="checkbox" className="w-3 h-3" /></div>
+              <div className="w-4 text-center border-r border-gray-300"><input type="checkbox" className="w-3 h-3" /></div>
+              <div className="w-4 text-center border-r border-gray-300"><input type="checkbox" className="w-3 h-3" /></div>
+              <div className="w-4 text-center border-r border-gray-300"><input type="checkbox" className="w-3 h-3" /></div>
+              <div className="w-6 text-center border-r border-gray-300">46</div>
+              <div className="w-10 text-center border-r border-gray-300">京都</div>
+              <div className="w-8 text-center border-r border-gray-300 bg-white">G</div>
+              <div className="flex-1 border-r border-gray-300 text-blue-600">かりん</div>
+              <div className="w-4 text-center border-r border-gray-300 font-bold">2</div>
+              <div className="w-8 text-center border-r border-gray-300 bg-gray-200">終了</div>
+              <div className="w-4 text-center"></div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* エリア3 - スタッフ出勤管理 */}
-        <Card className="h-full flex-shrink-0">
-          <CardHeader className="pb-3">
-            <h2 className="text-lg font-semibold">スタッフ出勤管理</h2>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-auto h-[calc(100%-80px)]">
-              <Table className="text-xs">
-                <TableHeader>
-                  <TableRow className="h-10">
-                    <TableHead className="w-[15px] p-2 text-xs"></TableHead>
-                    <TableHead className="w-[30x] p-2 text-xs">出/休</TableHead>
-                    <TableHead className="w-[95px] p-2 text-xs">区分</TableHead>
-                    <TableHead className="w-[90px] p-2 text-xs">氏名</TableHead>
-                    <TableHead className="w-[15px] p-2 text-xs"></TableHead>
-                    <TableHead className="w-[20px] p-2 text-xs">出勤</TableHead>
-                    <TableHead className="w-[20px] p-2 text-xs">退社</TableHead>
-                    <TableHead className="w-[60px] p-2 text-xs">状態</TableHead>
-                    <TableHead className="w-[40px] p-2 text-xs">検温</TableHead>
-                    <TableHead className="w-[40px] p-2 text-xs">連絡</TableHead>
-                    <TableHead className="w-[35px] p-2 text-xs"></TableHead>
-                    <TableHead className="w-[35px] p-2 text-xs"></TableHead>
-                    <TableHead className="w-[20px] p-2 text-xs"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {staffAttendanceSampleData.map((data) => (
-                    <TableRow key={data.id} className="h-9">
-                      <TableCell className="text-xs p-2">{data.serialNumber}</TableCell>
-                      <TableCell className="p-2">
-                        <Badge 
-                          variant={data.workType === 'work' ? 'default' : 'outline'} 
-                          className="text-xs px-2 py-1 h-6"
-                        >
-                          {WORK_TYPE_LABELS[data.workType]}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="p-2">
-                        <Badge 
-                          variant={data.employmentType === 'employee' ? 'secondary' : 'outline'} 
-                          className="text-xs px-2 py-1 h-6"
-                        >
-                          {EMPLOYMENT_TYPE_LABELS[data.employmentType]}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-xs p-2">{data.name}</TableCell>
-                      <TableCell className="text-xs p-2">{data.number}</TableCell>
-                      <TableCell className="text-xs p-2">{data.startTime}</TableCell>
-                      <TableCell className="text-xs p-2">{data.endTime}</TableCell>
-                      <TableCell className="p-2">
-                        {data.currentStatus && (
-                          <Badge 
-                            variant={ATTENDANCE_STATUS_VARIANTS[data.currentStatus]} 
-                            className="text-xs px-2 py-1 h-6"
-                          >
-                            {ATTENDANCE_STATUS_LABELS[data.currentStatus]}
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="p-2">
-                        <Checkbox 
-                          className="w-3 h-3" 
-                          checked={data.temperatureCheck}
-                        />
-                      </TableCell>
-                      <TableCell className="p-2">
-                        <Checkbox 
-                          className="w-3 h-3" 
-                          checked={data.contactCheck}
-                        />
-                      </TableCell>
-                      <TableCell className="p-2">
-                        <Button variant="ghost" size="sm" className="p-1 h-6 w-6">
-                          <Mail className="w-3 h-3" />
-                        </Button>
-                      </TableCell>
-                      <TableCell className="p-2">
-                        <Button variant="ghost" size="sm" className="p-1 h-6 w-6">
-                          <User className="w-3 h-3" />
-                        </Button>
-                      </TableCell>
-                      <TableCell className="p-2">
-                        <Checkbox 
-                          className="w-3 h-3" 
-                          checked={data.catchStart}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 右エリア - 前半・後半・出勤希望アルバイト */}
-        <div className="flex flex-row gap-4 justify-start flex-shrink-0">
-          {/* 前半エリア（前半カード + 有給使用者及び給料引き者カード） */}
-          <div className="flex flex-col gap-4 h-[1100px] w-[220px]">
-            {/* 前半カード */}
-            <Card className="flex-1 h-[960px]">
-              <CardHeader className="pb-3">
-                <h2 className="text-lg font-semibold">前半</h2>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="overflow-auto h-[calc(100%-80px)]">
-                  {rosterPeriods[0].departments.map((department) => (
-                    <div key={department.id} className="mb-4 last:mb-0">
-                      <div className="bg-gray-100 px-3 py-2">
-                        <h3 className="text-sm font-semibold text-center">
-                          {department.name}
-                        </h3>
-                      </div>
-                      <Table className="text-xs">
-                        <TableBody>
-                          {Array.from({ length: department.capacity }, (_, index) => (
-                            <TableRow 
-                              key={`${department.id}-${index}`} 
-                              className={`h-8 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                            >
-                              <TableCell className="w-[30px] p-2 text-xs text-gray-400">
-                                {index + 1}
-                              </TableCell>
-                              <TableCell className="p-2">
-                                <input
-                                  type="text"
-                                  className="w-full text-xs border-0 bg-transparent focus:outline-none focus:ring-0"
-                                  placeholder="名前を入力..."
-                                />
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* 有給使用者及び給料引き者カード */}
-            <Card className="h-[200px]">
-              <CardHeader className="pb-3">
-                <h2 className="text-sm font-semibold">有給使用者及び給料引き者</h2>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="overflow-auto h-[calc(100%-60px)]">
-                  <Table className="text-xs">
-                    <TableBody>
-                      {leaveAndDeductionSampleData.map((data, index) => (
-                        <TableRow 
-                          key={data.id}
-                          className={`h-8 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                        >
-                          <TableCell className="w-[30px] p-2 text-xs text-gray-400">
-                            {index + 1}
-                          </TableCell>
-                          <TableCell className="p-2 text-xs">
-                            {data.name}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
           </div>
+        </div>
 
-          {/* 後半カード */}
-          <Card className="w-[220px] h-[1020px]">
-            <CardHeader className="pb-3">
-              <h2 className="text-lg font-semibold">後半</h2>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-auto h-[calc(100%-80px)]">
-                {rosterPeriods[1].departments.map((department) => (
-                  <div key={department.id} className="mb-4 last:mb-0">
-                    <div className="bg-gray-100 px-3 py-2">
-                      <h3 className="text-sm font-semibold text-center">
-                        {department.name}
-                      </h3>
-                    </div>
-                    <Table className="text-xs">
-                      <TableBody>
-                        {Array.from({ length: department.capacity }, (_, index) => (
-                          <TableRow 
-                            key={`${department.id}-${index}`} 
-                            className={`h-8 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                          >
-                            <TableCell className="w-[30px] p-2 text-xs text-gray-400">
-                              {index + 1}
-                            </TableCell>
-                            <TableCell className="p-2">
-                              <input
-                                type="text"
-                                className="w-full text-xs border-0 bg-transparent focus:outline-none focus:ring-0"
-                                placeholder="名前を入力..."
-                              />
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                ))}
+        {/* 左2列目: 所属事務所 */}
+        <div className="h-full border-r border-gray-400 w-[461px] bg-white flex flex-col">
+          <div className="border-b border-gray-400 px-2 bg-gray-100">
+            <span className="border border-gray-600 px-2 py-0.5 text-sm">所属事務所:</span>
+          </div>
+          <div className="flex-1 overflow-auto">
+            <div className="flex items-center border-b border-gray-300 text-[12px] bg-white">
+              <div className="w-5 text-center border-r border-gray-300 bg-lime-400 font-bold">1</div>
+              <div className="w-20 border-r border-gray-300">南 和食6</div>
+              <div className="w-10 text-center border-r border-gray-300">17:00</div>
+              <div className="flex-1 border-r border-gray-300">京都駅八条口</div>
+              <div className="w-10 text-center border-r border-gray-300">22:00</div>
+              <div className="w-10 text-center border-r border-gray-300"></div>
+              <div className="w-20 border-r border-gray-300">鳥丸今出川</div>
+              <div className="w-10 text-center">南</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 左3列目: 出勤管理テーブル */}
+        <div className="h-full border-r border-gray-400 w-[446px] bg-white flex flex-col">
+          <div className="flex-1 overflow-auto">
+            <div className="flex items-center border-b border-gray-300 text-[12px] bg-white">
+              <div className="w-4 text-center border-r border-gray-300 bg-blue-600 text-white font-bold">1</div>
+              <div className="w-10 text-center border-r border-gray-300 bg-lime-400">出勤</div>
+              <div className="w-10 text-center border-r border-gray-300 bg-lime-400">社員</div>
+              <div className="w-24 border-r border-gray-300">吉田 峯雅10</div>
+              <div className="w-12 text-center border-r border-gray-300 text-blue-600 font-bold">17:00</div>
+              <div className="w-12 text-center border-r border-gray-300">4:00</div>
+              <div className="w-6 text-center border-r border-gray-300 bg-lime-400 text-[9px]">出勤</div>
+              <div className="w-12 flex items-center justify-center gap-1 border-r border-gray-300">
+                <input type="checkbox" className="w-3 h-3" defaultChecked />
+                <input type="checkbox" className="w-3 h-3" defaultChecked />
               </div>
-            </CardContent>
-          </Card>
-          
-          {/* 出勤希望アルバイト + 予約エリア */}
-          <div className="flex flex-col gap-4 flex-shrink-0 items-start">
-            {/* 出勤希望アルバイトカード */}
-            <Card className="h-[780px] self-start">
-              <CardHeader className="pb-3">
-                <h2 className="text-lg font-semibold">出勤希望アルバイト</h2>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="overflow-auto h-[700px]">
-                  <Table className="text-xs">
-                    <TableHeader className="sticky top-0 bg-white z-10">
-                      <TableRow className="h-10">
-                        <TableHead className="w-[15px] p-2 text-xs"></TableHead>
-                        <TableHead className="w-[90px] p-2 text-xs">名前</TableHead>
-                        <TableHead className="w-[60px] p-2 text-xs">区分</TableHead>
-                        <TableHead className="w-[20px] p-2 text-xs">出勤</TableHead>
-                        <TableHead className="w-[20px] p-2 text-xs">退社</TableHead>
-                        <TableHead className="w-[90px] p-2 text-xs">職務</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {partTimeAttendanceSampleData.map((data, index) => (
-                        <TableRow 
-                          key={data.id}
-                          className={`h-9 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                        >
-                          <TableCell className="text-xs p-2">
-                            {data.serialNumber}
-                          </TableCell>
-                          <TableCell className="text-xs p-2">
-                            {data.name}
-                          </TableCell>
-                          <TableCell className="p-2">
-                            <Badge 
-                              variant={PART_TIME_REQUEST_TYPE_VARIANTS[data.requestType]} 
-                              className="text-xs px-2 py-1 h-6"
-                            >
-                              {PART_TIME_REQUEST_TYPE_LABELS[data.requestType]}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-xs p-2">
-                            {data.startTime}
-                          </TableCell>
-                          <TableCell className="text-xs p-2">
-                            {data.endTime}
-                          </TableCell>
-                          <TableCell className="p-2">
-                            <Badge 
-                              variant={PART_TIME_JOB_TYPE_VARIANTS[data.jobType]} 
-                              className="text-xs px-2 py-1 h-6"
-                            >
-                              {PART_TIME_JOB_TYPE_LABELS[data.jobType]}
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* 予約カード */}
-            <Card className="h-[420px] w-[600px] self-start">
-              <CardHeader className="pb-3">
-                <h2 className="text-lg font-semibold">予約</h2>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="overflow-auto h-[calc(100%-60px)]">
-                  <Table className="text-xs">
-                    <TableHeader className="sticky top-0 bg-white z-10">
-                      <TableRow className="h-10">
-                        <TableHead className="w-[60px] p-2 text-xs">予約番号</TableHead>
-                        <TableHead className="w-[90px] p-2 text-xs">顧客名</TableHead>
-                        <TableHead className="w-[90px] p-2 text-xs">ホステス名</TableHead>
-                        <TableHead className="w-[45px] p-2 text-xs">開始</TableHead>
-                        <TableHead className="w-[45px] p-2 text-xs">コース</TableHead>
-                        <TableHead className="w-[45px] p-2 text-xs">終了</TableHead>
-                        <TableHead className="w-[60px] p-2 text-xs">場所</TableHead>
-                        <TableHead className="w-[100px] p-2 text-xs">ホテル名</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {reservationSampleData.map((data, index) => (
-                        <TableRow
-                          key={data.id}
-                          className={`h-9 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                        >
-                          <TableCell className="text-xs p-2 font-mono">
-                            {data.reservationNumber}
-                          </TableCell>
-                          <TableCell className="text-xs p-2">
-                            {data.customerName}
-                          </TableCell>
-                          <TableCell className="text-xs p-2">
-                            {data.hostessName}
-                          </TableCell>
-                          <TableCell className="text-xs p-2">
-                            {data.startTime}
-                          </TableCell>
-                          <TableCell className="p-2">
-                            <span className={`inline-flex items-center px-2 py-1 text-[10px] font-semibold rounded ${COURSE_COLORS[data.courseCode] ?? 'bg-gray-200 text-gray-700'}`}>
-                              {data.courseCode}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-xs p-2">
-                            {data.endTime}
-                          </TableCell>
-                          <TableCell className="text-xs p-2">
-                            {data.location}
-                          </TableCell>
-                          <TableCell className="text-xs p-2">
-                            {data.hotelName}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
+              <div className="w-24 flex items-center gap-0.5">
+                <div className="w-5 h-5 bg-lime-400 flex items-center justify-center text-[9px]">✉</div>
+                <div className="w-5 h-5 bg-gray-200 flex items-center justify-center text-[9px]">✕</div>
+                <div className="w-5 h-5 bg-pink-300 flex items-center justify-center text-[9px]">👤</div>
+                <div className="w-5 h-5 border border-gray-400 bg-white"></div>
+              </div>
+              <div className="w-3 border-l border-gray-300"></div>
+            </div>
           </div>
+        </div>
 
-          {/* スタッフ予定リストカード */}
-          <Card className="h-[780px] w-[220px] flex-shrink-0">
-            <CardHeader className="pb-3">
-              <h2 className="text-lg font-semibold">スタッフ予定リスト</h2>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-auto h-[700px]">
-                <Table className="text-xs">
-                  <TableBody>
-                    {Array.from({ length: 12 }, (_, index) => (
-                      <TableRow
-                        key={index}
-                        className={`h-8 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                      >
-                        <TableCell className="p-2">
-                          <input
-                            type="text"
-                            className="w-full text-xs border-0 bg-transparent focus:outline-none focus:ring-0"
-                          />
-                        </TableCell>
-                      </TableRow>
+        {/* 右コラム */}
+        <div className="h-full border-r border-gray-400 flex-1 flex flex-col">
+          <div className="flex h-[56%]">
+            {/* ポジションブロック - 写真通りの完全な内容 */}
+            <div className="flex-[226] h-full border-r border-gray-400 bg-white flex flex-col text-[12px]">
+              <div className="text-center text-blue-600 font-bold border-b border-gray-400 py-1">ポジション</div>
+              <div className="text-center border-b border-gray-400 py-0.5">
+                <span className="text-pink-500">（配車3区目は責任者）</span>
+                <span className="ml-2">後半</span>
+              </div>
+              <div className="flex flex-1">
+                {/* 前半列 */}
+                <div className="w-1/2 flex flex-col border-r border-gray-400">
+                  <div className="text-center border-b border-gray-400 bg-gray-100 py-0.5">前半</div>
+                  <div className="flex-1 flex flex-col px-1 py-1">
+                    <div className="text-center font-bold mb-1">配車</div>
+                    <div className="border border-gray-800 mb-2">
+                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
+                        <span>?63 山岡 嘉和?</span>
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-center mb-1">京都フロント</div>
+                    <div className="border border-gray-800 mb-2">
+                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-center mb-1">人妻フロント</div>
+                    <div className="border border-gray-800 mb-2">
+                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
+                        <span>?15 森川 隆登</span>
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-center mb-1">FIRSTフロント</div>
+                    <div className="border border-gray-800 mb-2">
+                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
+                        <span>?77 植田 武</span>
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-center mb-1">南ICフロント</div>
+                    <div className="border border-gray-800 mb-2">
+                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
+                        <span>?54 片山 竜次</span>
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* 後半列 */}
+                <div className="w-1/2 flex flex-col">
+                  <div className="text-center border-b border-gray-400 bg-gray-100 py-0.5">会計</div>
+                  <div className="flex-1 flex flex-col px-1 py-1">
+                    <div className="border border-gray-800 mb-2 mt-6">
+                      <div className="flex items-center justify-between h-5 bg-white px-0.5">
+                        <span>?25 松平 篤</span>
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-center font-bold mb-1">配車</div>
+                    <div className="border border-gray-800 mb-2">
+                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
+                        <span>?77 坪平 中尾11</span>
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-center mb-1">京都フロント</div>
+                    <div className="border border-gray-800 mb-2">
+                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
+                        <span>?08 杉本 淳</span>
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-center mb-1">人妻フロント</div>
+                    <div className="border border-gray-800 mb-2">
+                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
+                        <span>678 中村 南斗</span>
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-center mb-1">FIRSTフロント</div>
+                    <div className="border border-gray-800 mb-2">
+                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-center mb-1">南ICフロント</div>
+                    <div className="border border-gray-800 mb-2">
+                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
+                        <span>? 汐崎 哲也3</span>
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* 下部セクション */}
+              <div className="border-t border-gray-400">
+                <div className="flex">
+                  <div className="w-1/2 border-r border-gray-400 px-1 py-1">
+                    <div className="text-center text-[10px] mb-1">有給使用者及び給引き者</div>
+                    <div className="border border-gray-800">
+                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-1/2 px-1 py-1">
+                    <div className="text-center text-[10px] mb-1">南IC会計</div>
+                    <div className="border border-gray-800">
+                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
+                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] leading-none">×</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 予約情報（ピンク） */}
+            <div className="flex-[263] h-full border-r border-gray-400 bg-white flex flex-col">
+              <div className="bg-fuchsia-400 text-black text-center py-1 text-xs font-bold">
+                本日予約一覧
+              </div>
+              <div className="flex-1 overflow-auto">
+                <table className="w-full text-xs">
+                  <thead className="bg-fuchsia-200">
+                    <tr>
+                      <th className="py-1 border-b border-gray-400 border-r border-gray-400">時間</th>
+                      <th className="py-1 border-b border-gray-400 border-r border-gray-400">顧客</th>
+                      <th className="py-1 border-b border-gray-400 border-r border-gray-400">時間</th>
+                      <th className="py-1 border-b border-gray-400">種別</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reservationData.map((res, index) => (
+                      <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}>
+                        <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.time}</td>
+                        <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.customer}</td>
+                        <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.duration}</td>
+                        <td className="py-1 text-center border-b border-gray-400">
+                          <span className="bg-fuchsia-400 text-black px-1">{res.type}</span>
+                        </td>
+                      </tr>
                     ))}
-                  </TableBody>
-                </Table>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* メモ・特記事項（黄色） */}
+            <div className="flex-[262] h-full bg-yellow-100 flex flex-col">
+              <div className="bg-yellow-400 text-black text-center py-1 text-xs font-bold">
+                連絡事項/メモ
+              </div>
+              <div className="flex-1 p-2 overflow-auto">
+                <div className="bg-white border border-gray-400 p-2 mb-2 text-xs">
+                  <div className="font-bold text-black mb-1">本日の注意事項</div>
+                  <p>・20時以降は混雑が予想されます</p>
+                  <p>・新人研修中のスタッフ2名</p>
+                </div>
+                <div className="bg-white border border-gray-400 p-2 text-xs">
+                  <div className="font-bold text-black mb-1">システム連絡</div>
+                  <p>・システム定期メンテナンス予定</p>
+                  <p>・明日AM2:00〜AM4:00</p>
+                </div>
+              </div>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* 下部44% */}
+          <div className="flex h-[44%] border-t border-gray-400">
+            {/* 左86%エリア */}
+            <div className="w-[86%] h-full flex flex-col">
+              {/* 上部34%: 直近予定 */}
+              <div className="h-[34%] border-b border-gray-400 bg-white">
+                <div className="bg-lime-400 text-black text-center py-1 text-xs font-bold">
+                  直近予定
+                </div>
+                <div className="p-2 text-xs">
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <span className="font-bold text-lime-600">19:30</span>
+                      <span className="ml-2">田中様 来店予定</span>
+                    </div>
+                    <div className="flex-1">
+                      <span className="font-bold text-blue-600">20:00</span>
+                      <span className="ml-2">鈴木様 予約確認</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 下部66%: 2列 */}
+              <div className="flex h-[66%]">
+                {/* 左50%: 予約詳細 */}
+                <div className="w-[50%] h-full border-r border-gray-400 bg-white flex flex-col">
+                  <div className="bg-cyan-400 text-black text-center py-1 text-xs font-bold">
+                    予約詳細
+                  </div>
+                  <div className="flex-1 p-2 overflow-auto text-xs">
+                    <table className="w-full border border-gray-400">
+                      <thead className="bg-cyan-200">
+                        <tr>
+                          <th className="py-1 border-b border-gray-400 border-r border-gray-400">時間</th>
+                          <th className="py-1 border-b border-gray-400 border-r border-gray-400">顧客</th>
+                          <th className="py-1 border-b border-gray-400 border-r border-gray-400">コース</th>
+                          <th className="py-1 border-b border-gray-400">店舗</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {reservationData.map((res, index) => (
+                          <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}>
+                            <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.time}</td>
+                            <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.customer}</td>
+                            <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.course}</td>
+                            <td className="py-1 text-center border-b border-gray-400 text-xs">{res.store}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* 右50%: ポイント管理 */}
+                <div className="w-[50%] h-full bg-white flex flex-col">
+                  <div className="bg-fuchsia-400 text-black text-center py-1 text-xs font-bold">
+                    ポイント管理
+                  </div>
+                  <div className="flex-1 p-2 overflow-auto text-xs">
+                    <div className="border border-gray-400 p-2 mb-2 bg-fuchsia-50">
+                      <div className="flex justify-between mb-1">
+                        <span className="font-bold">田中様</span>
+                        <span className="text-fuchsia-600 font-bold">1,250pt</span>
+                      </div>
+                      <div className="text-gray-600">前回来店: 2024/01/10</div>
+                    </div>
+                    <div className="border border-gray-400 p-2 bg-fuchsia-50">
+                      <div className="flex justify-between mb-1">
+                        <span className="font-bold">鈴木様</span>
+                        <span className="text-fuchsia-600 font-bold">3,500pt</span>
+                      </div>
+                      <div className="text-gray-600">前回来店: 2024/01/12</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 右14%: サイドメニュー */}
+            <div className="w-[14%] h-full bg-gray-200 flex flex-col border-l border-gray-400">
+              <div className="bg-gray-400 text-black text-center py-1 text-xs font-bold">
+                クイック
+              </div>
+              <div className="flex-1 p-1 overflow-auto">
+                <button className="w-full mb-1 px-1 py-2 bg-red-400 text-black text-xs border border-gray-600">緊急連絡</button>
+                <button className="w-full mb-1 px-1 py-2 bg-cyan-300 text-black text-xs border border-gray-600">レポート</button>
+                <button className="w-full mb-1 px-1 py-2 bg-lime-400 text-black text-xs border border-gray-600">集計</button>
+                <button className="w-full mb-1 px-1 py-2 bg-gray-300 text-black text-xs border border-gray-600">設定</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
