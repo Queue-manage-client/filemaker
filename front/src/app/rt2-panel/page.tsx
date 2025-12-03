@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, ChevronLeft } from "lucide-react";
 // import type { TodayCastData } from '@/types'; // 将来の実装で使用予定
 import { sampleCastData } from '@/data/castSampleData';
@@ -38,71 +38,74 @@ export default function RT2Panel() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      {/* ヘッダー行 */}
-      <div className="mb-4 relative flex items-center justify-between">
-        {/* 戻るボタン */}
-        <Button 
-          variant="outline" 
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
-        
-        {/* ナビゲーションヘッダー（中央配置） */}
-        <div className="flex gap-2 absolute left-1/2 transform -translate-x-1/2">
-          <button
-            onClick={() => router.push('/customer-ledger')}
-            className="px-3 py-1.5 bg-green-500 border-2 border-green-700 text-green-900 text-sm font-semibold rounded hover:bg-green-600 transition-colors"
-          >
-            新規顧客検索
-          </button>
-          <button
-            onClick={() => router.push('/dispatch-panel-2d')}
-            className="px-3 py-1.5 bg-amber-200 border-2 border-amber-700 text-amber-900 text-sm font-semibold rounded hover:bg-amber-300 transition-colors"
-          >
-            配車パネル
-          </button>
-          <button
-            onClick={() => router.push('/tehai')}
-            className="px-3 py-1.5 bg-purple-200 border-2 border-purple-700 text-purple-900 text-sm font-semibold rounded hover:bg-purple-300 transition-colors"
-          >
-            手配表
-          </button>
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="px-3 py-1.5 bg-gray-200 border-2 border-gray-700 text-gray-900 text-sm font-semibold rounded hover:bg-gray-300 transition-colors"
-          >
-            Menu
-          </button>
-        </div>
-        
-        {/* 右側のスペーサー（バランス用） */}
-        <div className="w-[200px]"></div>
-      </div>
-      
+    <div className="min-h-screen bg-gray-100">
       {/* ヘッダー */}
-      <Card className="mb-4">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h1 className="text-xl font-bold">RT Ⅱ パネル</h1>
-            </div>
-            
-          </div>
-          
-          <div className="flex items-center justify-between mt-2">
-          <div className="text-lg font-mono bg-gray-500 text-white px-3 py-1 rounded">
+      <div className="h-[50px] bg-white border-b border-zinc-300">
+        <div className="flex items-center h-full px-2">
+          {/* ダッシュボードに戻る - 左端 */}
+          <Button
+            variant="outline"
+            onClick={() => router.push('/dashboard')}
+            className="h-8 px-3 text-xs flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+
+          {/* 中央配置のボタン群 */}
+          <div className="flex-1 flex items-center justify-center gap-2">
+            {/* RT Ⅱ パネルタイトル */}
+            <h1 className="text-lg font-bold mr-2">RT Ⅱ パネル</h1>
+
+            {/* 日付表示 */}
+            <div className="text-sm font-mono bg-gray-500 text-white px-2 py-1 rounded">
               {formatDate(currentTime, 'yyyy/MM/dd(EEE)')}
             </div>
-            <div className="text-lg font-mono bg-gray-500 text-white px-3 py-1 rounded">
+
+            {/* 時刻表示 */}
+            <div className="text-sm font-mono bg-gray-500 text-white px-2 py-1 rounded">
               {formatTime(currentTime)}
             </div>
+
+            {/* 新顧客検索 */}
+            <Button
+              variant="outline"
+              className="h-8 px-4 text-xs border-black"
+              onClick={() => router.push('/customer-ledger')}
+            >
+              新顧客検索
+            </Button>
+
+            {/* 配車パネル */}
+            <Button
+              className="h-8 px-4 text-xs bg-amber-200 hover:bg-amber-300 text-black border border-black"
+              onClick={() => router.push('/dispatch-panel-2d')}
+            >
+              配車パネル
+            </Button>
+
+            {/* 手配表 */}
+            <Button
+              className="h-8 px-4 text-xs bg-purple-400 hover:bg-purple-500 text-black border border-black"
+              onClick={() => router.push('/tehai')}
+            >
+              手配表
+            </Button>
+
+            {/* Menu */}
+            <Button
+              variant="outline"
+              className="h-8 px-4 text-xs border-black"
+              onClick={() => router.push('/dashboard')}
+            >
+              Menu
+            </Button>
           </div>
-        </CardHeader>
-      </Card>
+        </div>
+      </div>
+
+      {/* メインコンテンツ */}
+      <div className="p-4">
 
       {/* メインテーブル */}
       <Card>
@@ -436,6 +439,7 @@ export default function RT2Panel() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

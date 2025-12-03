@@ -2,6 +2,21 @@
 
 import React from 'react';
 
+const attendanceData = [
+  { id: 1, lastName: '松尾', firstName: '久御', status: '希望', startTime: '9:00', endTime: '23:00', type: 'ドライバ', selected: false },
+  { id: 2, lastName: '土居4', firstName: '近江', status: '希望', startTime: '9:00', endTime: '4:00', type: 'ドライバ', selected: false },
+  { id: 3, lastName: '運村', firstName: '4 堺', status: '希望', startTime: '9:00', endTime: '4:00', type: 'ドライバ', selected: true },
+  { id: 4, lastName: '中蔵', firstName: '5 回阪', status: '希望', startTime: '12:00', endTime: '20:00', type: 'ドライバ', selected: false },
+  { id: 5, lastName: '八塚', firstName: '4佐根', status: '希望', startTime: '18:00', endTime: '4:00', type: 'ドライバ', selected: true },
+  { id: 6, lastName: '伊垣', firstName: '4 伏', status: '希望', startTime: '10:00', endTime: '20:00', type: 'ドライバ', selected: false },
+  { id: 7, lastName: '須賀', firstName: '5上', status: '希望', startTime: '18:00', endTime: '4:00', type: 'ドライバ', selected: true },
+  { id: 8, lastName: '水畑', firstName: '7 山', status: '希望', startTime: '18:00', endTime: '23:00', type: 'ドライバ', selected: false },
+  { id: 9, lastName: '大芦', firstName: '翔太', status: '希望', startTime: '11:00', endTime: '20:00', type: '内勤', selected: false },
+  { id: 10, lastName: '大谷', firstName: '大翔', status: '出勤', startTime: '12:00', endTime: '17:30', type: '内勤', selected: false },
+  { id: 11, lastName: '岸本', firstName: '礼人', status: '', startTime: '', endTime: '', type: 'スタッフ', selected: false },
+  { id: 12, lastName: '横田', firstName: '武', status: '希望', startTime: '8:00', endTime: '16:00', type: 'スタッフ', selected: false },
+];
+
 const reservationData = [
   { time: '19:00', customer: 'タケダ', duration: '90分', type: '本指', course: '2時間', store: 'マイドリームス店' },
   { time: '20:00', customer: 'スズキ', duration: '2H', type: 'LADY', course: '2H', store: 'ファインガーデン' },
@@ -100,11 +115,10 @@ export default function TehaiPage() {
         <div className="h-full border-r border-gray-400 flex-1 flex flex-col">
           <div className="flex h-[56%]">
             {/* ポジションブロック - 写真通りの完全な内容 */}
-            <div className="flex-[226] h-full border-r border-gray-400 bg-white flex flex-col text-[12px]">
+            <div className="w-1/3 h-full border-r border-gray-400 bg-white flex flex-col text-[12px]">
               <div className="text-center text-blue-600 font-bold border-b border-gray-400 py-1">ポジション</div>
               <div className="text-center border-b border-gray-400 py-0.5">
                 <span className="text-pink-500">（配車3区目は責任者）</span>
-                <span className="ml-2">後半</span>
               </div>
               <div className="flex flex-1">
                 {/* 前半列 */}
@@ -179,9 +193,10 @@ export default function TehaiPage() {
                 </div>
                 {/* 後半列 */}
                 <div className="w-1/2 flex flex-col">
-                  <div className="text-center border-b border-gray-400 bg-gray-100 py-0.5">会計</div>
+                  <div className="text-center border-b border-gray-400 bg-gray-100 py-0.5">後半</div>
                   <div className="flex-1 flex flex-col px-1 py-1">
-                    <div className="border border-gray-800 mb-2 mt-6">
+                    <div className="text-center font-bold mb-1">会計</div>
+                    <div className="border border-gray-800 mb-2">
                       <div className="flex items-center justify-between h-5 bg-white px-0.5">
                         <span>?25 松平 篤</span>
                         <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
@@ -283,30 +298,36 @@ export default function TehaiPage() {
               </div>
             </div>
 
-            {/* 予約情報（ピンク） */}
-            <div className="flex-[263] h-full border-r border-gray-400 bg-white flex flex-col">
-              <div className="bg-fuchsia-400 text-black text-center py-1 text-xs font-bold">
-                本日予約一覧
+            {/* 出勤希望アルバイト（シアン） */}
+            <div className="w-1/3 h-full border-r border-gray-400 bg-cyan-300 flex flex-col">
+              <div className="flex gap-2 justify-center items-center py-1 border-b border-gray-400">
+                <button className="px-4 py-1 bg-blue-100 border border-gray-800 text-black text-xs font-bold">
+                  ⬇ 一括戻す ⬇
+                </button>
+                <button className="px-4 py-1 bg-blue-100 border border-gray-800 text-black text-xs font-bold">
+                  ⬇ 一括移動 ⬇
+                </button>
               </div>
-              <div className="flex-1 overflow-auto">
-                <table className="w-full text-xs">
-                  <thead className="bg-fuchsia-200">
-                    <tr>
-                      <th className="py-1 border-b border-gray-400 border-r border-gray-400">時間</th>
-                      <th className="py-1 border-b border-gray-400 border-r border-gray-400">顧客</th>
-                      <th className="py-1 border-b border-gray-400 border-r border-gray-400">時間</th>
-                      <th className="py-1 border-b border-gray-400">種別</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {reservationData.map((res, index) => (
-                      <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}>
-                        <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.time}</td>
-                        <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.customer}</td>
-                        <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.duration}</td>
-                        <td className="py-1 text-center border-b border-gray-400">
-                          <span className="bg-fuchsia-400 text-black px-1">{res.type}</span>
-                        </td>
+              <div className="flex items-center justify-between bg-cyan-300 text-black py-1 text-xs border-b border-gray-800">
+                <div className="flex-1 text-center font-normal">出勤希望アルバイト</div>
+                <div className="flex gap-6 pr-3">
+                  <span className="font-normal">出勤</span>
+                  <span className="font-normal">退社</span>
+                  <span className="font-normal">配務</span>
+                </div>
+              </div>
+              <div className="flex-1 overflow-auto bg-cyan-300">
+                <table className="w-full text-xs border-collapse">
+                  <tbody className="text-[10px]">
+                    {attendanceData.map((data) => (
+                      <tr key={data.id} className={data.selected ? 'bg-blue-400' : 'bg-white'}>
+                        <td className="text-center border-b border-r border-gray-400">{data.id}</td>
+                        <td className="border-b border-r border-gray-400">{data.lastName}</td>
+                        <td className="border-b border-r border-gray-400">{data.firstName}</td>
+                        <td className="text-center border-b border-r border-gray-400">{data.status}</td>
+                        <td className="text-center border-b border-r border-gray-400">{data.startTime}</td>
+                        <td className="text-center border-b border-r border-gray-400">{data.endTime}</td>
+                        <td className="border-b border-gray-400">{data.type}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -314,22 +335,26 @@ export default function TehaiPage() {
               </div>
             </div>
 
-            {/* メモ・特記事項（黄色） */}
-            <div className="flex-[262] h-full bg-yellow-100 flex flex-col">
-              <div className="bg-yellow-400 text-black text-center py-1 text-xs font-bold">
-                連絡事項/メモ
+            {/* スタッフ予定リスト（黄色） */}
+            <div className="w-1/3 h-full bg-white flex flex-col">
+              <div className="bg-yellow-300 text-black text-center py-1 text-xs font-bold">
+                ▲スタッフ予定リスト
               </div>
-              <div className="flex-1 p-2 overflow-auto">
-                <div className="bg-white border border-gray-400 p-2 mb-2 text-xs">
-                  <div className="font-bold text-black mb-1">本日の注意事項</div>
-                  <p>・20時以降は混雑が予想されます</p>
-                  <p>・新人研修中のスタッフ2名</p>
-                </div>
-                <div className="bg-white border border-gray-400 p-2 text-xs">
-                  <div className="font-bold text-black mb-1">システム連絡</div>
-                  <p>・システム定期メンテナンス予定</p>
-                  <p>・明日AM2:00〜AM4:00</p>
-                </div>
+              <div className="flex-1 overflow-auto text-[11px] relative" style={{
+                background: 'repeating-linear-gradient(to bottom, #d4f1d4 0px, #d4f1d4 24px, white 24px, white 48px)',
+                lineHeight: '12px'
+              }}>
+                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>古田→ラビット話す(割引等)ドメイン変更比、☆前月推迁 南店話す</div>
+                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>(次回営業→投入金シメセット→セット)</div>
+                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>南☆ よく回る、スタッフの人数出す、空、応時間で手緒列案、シメ確認作不</div>
+                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>(南店長、副座05月 2000迄;5決時)</div>
+                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>6月度日程発教み</div>
+                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>システムの方が会計予定</div>
+                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>南→石古遠室不に対象達室大名&gt;前</div>
+                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>ドライバ一早畑打ちし半館下さい♪次時</div>
+                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>出罰-訓時05H 17:00迄二次時</div>
+                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>中林-訓時05H 17:00止前ぷ次時</div>
+                <div style={{ height: '120px' }}></div>
               </div>
             </div>
           </div>
