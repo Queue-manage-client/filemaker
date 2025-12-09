@@ -18,8 +18,42 @@ const attendanceData = [
 ];
 
 const reservationData = [
-  { time: '19:00', customer: 'タケダ', duration: '90分', type: '本指', course: '2時間', store: 'マイドリームス店' },
-  { time: '20:00', customer: 'スズキ', duration: '2H', type: 'LADY', course: '2H', store: 'ファインガーデン' },
+  { 
+    id: '63691', 
+    name1: 'ダテ', 
+    name2: 'うるる', 
+    startTime: '1:10', 
+    type1: 'RH', 
+    type2: 'GIRL', 
+    endTime: '2:30', 
+    location: '南心', 
+    store: 'マイスクラブ(芸川',
+    color: 'pink'
+  },
+  { 
+    id: '28139', 
+    name1: 'タナカ', 
+    name2: 'ミノア', 
+    startTime: '1:30', 
+    type1: 'S', 
+    type2: 'LADY', 
+    endTime: '3:30', 
+    location: '南心', 
+    store: 'ファインガーデン',
+    color: 'pink'
+  },
+  { 
+    id: '61610', 
+    name1: 'ナガイ', 
+    name2: '知里', 
+    startTime: '2:00', 
+    type1: '確S', 
+    type2: 'Stand', 
+    endTime: '4:00', 
+    location: '南心', 
+    store: '',
+    color: 'blue'
+  },
 ];
 
 export default function TehaiPage() {
@@ -71,6 +105,17 @@ export default function TehaiPage() {
           <div className="border-b border-gray-400 px-2 bg-gray-100">
             <span className="border border-gray-600 px-2 py-0.5 text-sm">所属事務所:</span>
           </div>
+          {/* ヘッダー行 */}
+          <div className="flex items-center border-b border-gray-400 text-[11px] bg-gray-100 font-bold">
+            <div className="w-5 text-center border-r border-gray-300"></div>
+            <div className="w-16 text-center border-r border-gray-300 px-1">現地 迎えドライバ</div>
+            <div className="w-10 text-center border-r border-gray-300"></div>
+            <div className="flex-1 text-center border-r border-gray-300 px-1">出発支場所</div>
+            <div className="w-10 text-center border-r border-gray-300">終了</div>
+            <div className="w-10 text-center border-r border-gray-300">帰宅</div>
+            <div className="text-center border-r border-gray-300 px-1">送り場所</div>
+            <div className="text-center px-1">担当者</div>
+          </div>
           <div className="flex-1 overflow-auto">
             <div className="flex items-center border-b border-gray-300 text-[12px] bg-white">
               <div className="w-5 text-center border-r border-gray-300 bg-lime-400 font-bold">1</div>
@@ -112,7 +157,7 @@ export default function TehaiPage() {
         </div>
 
         {/* 右コラム */}
-        <div className="h-full border-r border-gray-400 flex-1 grid grid-rows-[56%_15%_29%]" style={{ gridTemplateColumns: '33.33% 33.33% calc(33.33% - 160px) 160px' }}>
+        <div className="h-full border-r border-gray-400 flex-1 grid grid-rows-[55%_23%_22%]" style={{ gridTemplateColumns: '33.33% 33.33% calc(33.33% - 160px) 160px' }}>
             {/* ポジションブロック - 写真通りの完全な内容 */}
             <div className="row-span-2 border-r border-gray-400 bg-white flex flex-col text-[12px]">
               <div className="text-center text-blue-600 font-bold border-b border-gray-400 py-1">ポジション</div>
@@ -356,22 +401,31 @@ export default function TehaiPage() {
                 <div style={{ height: '120px' }}></div>
               </div>
             </div>
-          {/* 2行目 - 2列目: 直近予定 */}
+          {/* 2行目 - 2列目: 予約 */}
           <div className="col-span-2 border-t border-gray-400 border-r border-gray-400 bg-white flex flex-col">
-            <div className="bg-lime-400 text-black text-center py-1 text-xs font-bold">
-              直近予定
+            <div className="bg-gray-300 text-black text-center py-0.5 text-xs border-b border-gray-400">
+              予約
             </div>
-            <div className="flex-1 p-2 text-xs overflow-auto">
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <span className="font-bold text-lime-600">19:30</span>
-                  <span className="ml-2">田中様 来店予定</span>
+            <div className="flex-1 overflow-auto">
+              {reservationData.map((res, index) => (
+                <div 
+                  key={index} 
+                  className={`flex items-center text-xs border-b border-gray-300 ${
+                    res.color === 'pink' ? 'bg-pink-200' : 'bg-blue-200'
+                  }`}
+                  style={{ height: '24px' }}
+                >
+                  <div className="w-[38px] text-center">{res.id}</div>
+                  <div className="w-[42px] text-left">{res.name1}</div>
+                  <div className="w-[42px] text-left">{res.name2}</div>
+                  <div className="w-[28px] text-center">{res.startTime}</div>
+                  <div className="w-[28px] text-center">{res.type1}</div>
+                  <div className="w-[38px] text-center">{res.type2}</div>
+                  <div className="w-[28px] text-center">{res.endTime}</div>
+                  <div className="w-[32px] text-center">{res.location}</div>
+                  <div className="flex-1 text-left pl-1">{res.store}</div>
                 </div>
-                <div className="flex-1">
-                  <span className="font-bold text-blue-600">20:00</span>
-                  <span className="ml-2">鈴木様 予約確認</span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
@@ -388,39 +442,58 @@ export default function TehaiPage() {
             </div>
           </div>
 
-          {/* 3行目 - 1列目: 予約詳細の左側ブロック */}
-          <div className="border-t border-gray-400 border-r border-gray-400 bg-white flex flex-col">
-            <div className="bg-orange-300 text-black text-center py-1 text-xs font-bold">
-              未定ブロック
+          {/* 3行目 - 未定ブロックと予約詳細のコンテナ（均等配分） */}
+          <div className="col-span-3 border-t border-gray-400 flex">
+            {/* 面接予定ブロック */}
+            <div className="w-1/2 border-r border-gray-400 bg-white flex flex-col">
+              <div className="bg-gradient-to-b from-blue-400 to-blue-500 text-white text-center py-2 text-base font-bold border-b-2 border-blue-600 shadow-md">
+                面接予定
+              </div>
+              {/* 面接情報 */}
+              <div className="bg-white px-3 py-2 border-b border-gray-300">
+                <div className="text-xs flex items-center gap-2">
+                  <span className="font-bold text-sm">15:30</span>
+                  <span className="font-semibold">入店</span>
+                  <span>セブンイレブン新町一条店</span>
+                  <span className="font-semibold">ホステス</span>
+                  <span className="ml-auto font-semibold">南 和宣6</span>
+                </div>
+              </div>
+              {/* ピンクブロック1 */}
+              <div className="bg-pink-200 mx-2 mt-3 mb-2" style={{ height: '100px' }}>
+              </div>
+              {/* ピンクブロック2 */}
+              <div className="bg-pink-200 mx-2 mb-3" style={{ height: '100px' }}>
+              </div>
             </div>
-          </div>
 
-          {/* 3行目 - 2列目: 予約詳細 */}
-          <div className="col-span-2 border-t border-gray-400 border-r border-gray-400 bg-white flex flex-col">
-            <div className="bg-cyan-400 text-black text-center py-1 text-xs font-bold">
-              予約詳細
-            </div>
-            <div className="flex-1 p-2 overflow-auto text-xs">
-              <table className="w-full border border-gray-400">
-                <thead className="bg-cyan-200">
-                  <tr>
-                    <th className="py-1 border-b border-gray-400 border-r border-gray-400">時間</th>
-                    <th className="py-1 border-b border-gray-400 border-r border-gray-400">顧客</th>
-                    <th className="py-1 border-b border-gray-400 border-r border-gray-400">コース</th>
-                    <th className="py-1 border-b border-gray-400">店舗</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reservationData.map((res, index) => (
-                    <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}>
-                      <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.time}</td>
-                      <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.customer}</td>
-                      <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.course}</td>
-                      <td className="py-1 text-center border-b border-gray-400 text-xs">{res.store}</td>
+            {/* 予約詳細 */}
+            <div className="w-1/2 border-r border-gray-400 bg-white flex flex-col">
+              <div className="bg-cyan-400 text-black text-center py-1 text-xs font-bold">
+                予約詳細
+              </div>
+              <div className="flex-1 p-2 overflow-auto text-xs">
+                <table className="w-full border border-gray-400">
+                  <thead className="bg-cyan-200">
+                    <tr>
+                      <th className="py-1 border-b border-gray-400 border-r border-gray-400">時間</th>
+                      <th className="py-1 border-b border-gray-400 border-r border-gray-400">顧客</th>
+                      <th className="py-1 border-b border-gray-400 border-r border-gray-400">コース</th>
+                      <th className="py-1 border-b border-gray-400">店舗</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {reservationData.map((res, index) => (
+                      <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}>
+                        <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.startTime}</td>
+                        <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.name1}</td>
+                        <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.type2}</td>
+                        <td className="py-1 text-center border-b border-gray-400 text-xs">{res.store}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
