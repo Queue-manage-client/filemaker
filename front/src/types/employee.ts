@@ -145,6 +145,8 @@ export interface EmployeeWeeklyShift {
   weekStartDate: string; // 週開始日（YYYY-MM-DD）
   weekEndDate: string; // 週終了日（YYYY-MM-DD）
   lastUpdated: string; // 最終更新日時
+  status?: 'draft' | 'confirmed' | 'published'; // ステータス
+  remarks?: string; // 備考
 }
 
 // シフトタイプの設定
