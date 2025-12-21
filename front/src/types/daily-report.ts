@@ -21,6 +21,8 @@ export interface DailyReportHeaderProps {
   onDeleteClick?: () => void;
   onSearchClick?: () => void;
   onOwnerClick?: () => void;
+  /** Item 73: カレンダーによる日付選択 */
+  onDateChange?: (date: Date) => void;
 }
 
 

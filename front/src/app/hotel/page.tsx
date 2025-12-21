@@ -316,6 +316,8 @@ export default function HotelPage() {
                   <TableHead>電話番号</TableHead>
                   <TableHead>独り入室</TableHead>
                   <TableHead>金額</TableHead>
+                  <TableHead>駅コード</TableHead>
+                  <TableHead>交通費</TableHead>
                   <TableHead>郵便番号</TableHead>
                   <TableHead>住所</TableHead>
                   <TableHead>画像</TableHead>
@@ -359,6 +361,12 @@ export default function HotelPage() {
                     </TableCell>
                     <TableCell className="text-right font-mono">
                       {typeof item.amount === 'number' ? `¥${item.amount.toLocaleString()}` : '-'}
+                    </TableCell>
+                    <TableCell className="text-sm font-mono text-center">
+                      {item.stationCode || '-'}
+                    </TableCell>
+                    <TableCell className="text-right font-mono">
+                      {typeof item.transportationFee === 'number' ? `¥${item.transportationFee.toLocaleString()}` : '-'}
                     </TableCell>
                     <TableCell className="flex items-center gap-1">
                       <MapPin className="w-3 h-3 text-muted-foreground" />

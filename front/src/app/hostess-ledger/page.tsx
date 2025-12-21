@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Users, Search, Plus, Download } from "lucide-react";
 import { useHostessLedger } from '@/hooks/use-hostess';
-import { HostessLedger } from '@/types/hostess';
+import { HostessLedger, WORK_STYLE_LABELS, WorkStyleType } from '@/types/hostess';
 
 export default function HostessLedgerPage() {
   const router = useRouter();
@@ -169,38 +169,66 @@ export default function HostessLedgerPage() {
               <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr className="bg-gray-200">
-                    <th className="border border-gray-300 px-4 py-3 text-left">ホステス番号</th>
-                    <th className="border border-gray-300 px-4 py-3 text-left">氏名</th>
-                    <th className="border border-gray-300 px-4 py-3 text-left">源氏名</th>
-                    <th className="border border-gray-300 px-4 py-3 text-left">カテゴリー</th>
-                    <th className="border border-gray-300 px-4 py-3 text-left">ステータス</th>
-                    <th className="border border-gray-300 px-4 py-3 text-left">登録日</th>
-                    <th className="border border-gray-300 px-4 py-3 text-left">最終勤務日</th>
-                    <th className="border border-gray-300 px-4 py-3 text-right">総勤務日数</th>
-                    <th className="border border-gray-300 px-4 py-3 text-right">総収入</th>
-                    <th className="border border-gray-300 px-4 py-3 text-left">操作</th>
+                    <th className="border border-gray-300 px-3 py-2 text-left text-xs">ホステス番号</th>
+                    <th className="border border-gray-300 px-3 py-2 text-left text-xs">氏名</th>
+                    <th className="border border-gray-300 px-3 py-2 text-left text-xs">源氏名</th>
+                    <th className="border border-gray-300 px-3 py-2 text-left text-xs">カテゴリー</th>
+                    <th className="border border-gray-300 px-3 py-2 text-left text-xs">勤務形態</th>
+                    <th className="border border-gray-300 px-3 py-2 text-center text-xs">出稼ぎ</th>
+                    <th className="border border-gray-300 px-3 py-2 text-left text-xs">ステータス</th>
+                    <th className="border border-gray-300 px-3 py-2 text-left text-xs">登録日</th>
+                    <th className="border border-gray-300 px-3 py-2 text-left text-xs">最終勤務日</th>
+                    <th className="border border-gray-300 px-3 py-2 text-right text-xs">総勤務日数</th>
+                    <th className="border border-gray-300 px-3 py-2 text-right text-xs">総収入</th>
+                    <th className="border border-gray-300 px-3 py-2 text-left text-xs">操作</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredHostesses.map((hostess) => (
                     <tr key={hostess.id} className="hover:bg-gray-50">
-                      <td className="border border-gray-300 px-4 py-3 font-mono">{hostess.hostessNumber}</td>
-                      <td className="border border-gray-300 px-4 py-3 font-semibold">{hostess.name}</td>
-                      <td className="border border-gray-300 px-4 py-3">{hostess.stageName}</td>
-                      <td className="border border-gray-300 px-4 py-3">{hostess.category}</td>
-                      <td className="border border-gray-300 px-4 py-3">
-                        <span className={`px-2 py-1 rounded text-xs ${getStatusColor(hostess.status)}`}>
+                      <td className="border border-gray-300 px-3 py-2 font-mono text-xs">{hostess.hostessNumber}</td>
+                      <td className="border border-gray-300 px-3 py-2 font-semibold text-xs">{hostess.name}</td>
+                      <td className="border border-gray-300 px-3 py-2 text-xs">{hostess.stageName}</td>
+                      <td className="border border-gray-300 px-3 py-2 text-xs">{hostess.category}</td>
+                      <td className="border border-gray-300 px-3 py-2 text-xs">
+                        {hostess.workStyle && (
+                          <span className={`px-2 py-0.5 rounded text-xs ${
+                            hostess.workStyle === 'regular' ? 'bg-blue-100 text-blue-800' :
+                            hostess.workStyle === 'semi-regular' ? 'bg-cyan-100 text-cyan-800' :
+                            hostess.workStyle === 'last-minute' ? 'bg-orange-100 text-orange-800' :
+                            hostess.workStyle === 'newbie' ? 'bg-green-100 text-green-800' :
+                            hostess.workStyle === 'emergency' ? 'bg-red-100 text-red-800' :
+                            hostess.workStyle === 'irregular' ? 'bg-purple-100 text-purple-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {WORK_STYLE_LABELS[hostess.workStyle]}
+                          </span>
+                        )}
+                      </td>
+                      <td className="border border-gray-300 px-3 py-2 text-center text-xs">
+                        {hostess.isOutsideWork && (
+                          <span className="px-2 py-0.5 rounded text-xs bg-yellow-100 text-yellow-800" title={
+                            hostess.outsideWorkInfo
+                              ? `交通費: ¥${hostess.outsideWorkInfo.transportationAllowance?.toLocaleString() || '-'}, 寮費: ¥${hostess.outsideWorkInfo.dormitoryFee?.toLocaleString() || '-'}`
+                              : ''
+                          }>
+                            出稼
+                          </span>
+                        )}
+                      </td>
+                      <td className="border border-gray-300 px-3 py-2">
+                        <span className={`px-2 py-0.5 rounded text-xs ${getStatusColor(hostess.status)}`}>
                           {getStatusLabel(hostess.status)}
                         </span>
                       </td>
-                      <td className="border border-gray-300 px-4 py-3">{formatDate(hostess.registrationDate)}</td>
-                      <td className="border border-gray-300 px-4 py-3">{formatDate(hostess.lastWorkDate)}</td>
-                      <td className="border border-gray-300 px-4 py-3 text-right">{hostess.totalWorkDays}日</td>
-                      <td className="border border-gray-300 px-4 py-3 text-right font-semibold">
+                      <td className="border border-gray-300 px-3 py-2 text-xs">{formatDate(hostess.registrationDate)}</td>
+                      <td className="border border-gray-300 px-3 py-2 text-xs">{formatDate(hostess.lastWorkDate)}</td>
+                      <td className="border border-gray-300 px-3 py-2 text-right text-xs">{hostess.totalWorkDays}日</td>
+                      <td className="border border-gray-300 px-3 py-2 text-right font-semibold text-xs">
                         ¥{hostess.totalEarnings.toLocaleString()}
                       </td>
-                      <td className="border border-gray-300 px-4 py-3">
-                        <Button variant="outline" size="sm">
+                      <td className="border border-gray-300 px-3 py-2">
+                        <Button variant="outline" size="sm" className="h-6 text-xs">
                           詳細
                         </Button>
                       </td>

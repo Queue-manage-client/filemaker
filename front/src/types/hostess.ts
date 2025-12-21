@@ -1,5 +1,18 @@
 // ホステス関連の型定義
 
+// 勤務形態 (Item 46)
+export type WorkStyleType = 'regular' | 'semi-regular' | 'last-minute' | 'newbie' | 'emergency' | 'irregular' | 'retired';
+
+export const WORK_STYLE_LABELS: Record<WorkStyleType, string> = {
+  regular: 'レギュラー',
+  'semi-regular': '準レギュラー',
+  'last-minute': '直前',
+  newbie: '新人',
+  emergency: '緊急',
+  irregular: '不定期',
+  retired: '退店',
+};
+
 // ホステス台帳データ
 export interface HostessLedger {
   id: string;
@@ -26,6 +39,13 @@ export interface HostessLedger {
   lastWorkDate?: string; // 最終勤務日
   status: 'active' | 'inactive' | 'suspended' | 'retired'; // ステータス
   category: '内子系' | '内妻系' | 'VIP' | 'Lady' | 'Girls' | 'SUP' | '新人'; // カテゴリー
+  workStyle?: WorkStyleType; // 勤務形態 (Item 46)
+  isOutsideWork?: boolean; // 出稼ぎ (Item 45)
+  outsideWorkInfo?: { // 出稼ぎ情報 (Item 47)
+    transportationAllowance?: number; // 交通費支給
+    dormitoryFee?: number; // 寮費
+    notes?: string; // 備考
+  };
   totalWorkDays: number; // 総勤務日数
   totalEarnings: number; // 総収入
   averageRating: number; // 平均評価

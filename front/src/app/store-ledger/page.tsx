@@ -1310,7 +1310,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
+                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono text-center break-all">
                           {basicTagData.url}{basicTagData.webSendUrls.hsprofile}
                         </div>
                       )}
@@ -1326,7 +1326,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
+                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono text-center break-all">
                           {basicTagData.url}{basicTagData.webSendUrls.hsattend}
                         </div>
                       )}
@@ -1342,7 +1342,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
+                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono text-center break-all">
                           {basicTagData.url}{basicTagData.webSendUrls.hsjob}
                         </div>
                       )}
@@ -1358,7 +1358,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
+                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono text-center break-all">
                           {basicTagData.url}{basicTagData.webSendUrls.ctpoint}
                         </div>
                       )}
@@ -1374,7 +1374,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
+                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono text-center break-all">
                           {basicTagData.url}{basicTagData.webSendUrls.hstattendweek}
                         </div>
                       )}
@@ -1390,7 +1390,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
+                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono text-center break-all">
                           {basicTagData.url}{basicTagData.webSendUrls.hsstart}
                         </div>
                       )}
@@ -1406,7 +1406,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono">
+                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono text-center break-all">
                           {basicTagData.url}{basicTagData.webSendUrls.hsranking}
                         </div>
                       )}
@@ -1429,7 +1429,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono text-center break-all">
                           {basicTagData.url}{basicTagData.webSendUrlsTemp.hsprofile}
                         </div>
                       )}
@@ -1445,7 +1445,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono text-center break-all">
                           {basicTagData.url}{basicTagData.webSendUrlsTemp.hsattend}
                         </div>
                       )}
@@ -1461,7 +1461,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono text-center break-all">
                           {basicTagData.url}{basicTagData.webSendUrlsTemp.hsjob}
                         </div>
                       )}
@@ -1477,7 +1477,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono text-center break-all">
                           {basicTagData.url}{basicTagData.webSendUrlsTemp.ctpoint}
                         </div>
                       )}
@@ -1493,7 +1493,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono text-center break-all">
                           {basicTagData.url}{basicTagData.webSendUrlsTemp.hstattendweek}
                         </div>
                       )}
@@ -1509,7 +1509,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono text-center break-all">
                           {basicTagData.url}{basicTagData.webSendUrlsTemp.hsstart}
                         </div>
                       )}
@@ -1525,7 +1525,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono">
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono text-center break-all">
                           {basicTagData.url}{basicTagData.webSendUrlsTemp.hsranking}
                         </div>
                       )}
@@ -2667,10 +2667,10 @@ export default function StoreLedger() {
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <Building className="w-4 h-4" />
-                          <div>
-                            <div className="font-medium">{storeName}</div>
-                            <div className="text-xs text-gray-500">
+                          <Building className="w-4 h-4 flex-shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium truncate" title={storeName}>{storeName}</div>
+                            <div className="text-xs text-gray-500 truncate">
                               {storeBasicInfoList?.find(s => s.storeName === storeName)?.storeCode || ''}
                             </div>
                           </div>

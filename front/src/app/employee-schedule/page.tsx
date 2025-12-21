@@ -345,26 +345,26 @@ export default function EmployeeSchedule() {
               <table className="w-full text-xs border-collapse">
                 <thead>
                   <tr className="bg-gray-200">
-                    <th className="border border-gray-300 px-2 py-2 w-8 sticky left-0 bg-gray-200">No</th>
-                    <th className="border border-gray-300 px-2 py-2 w-20 sticky left-8 bg-gray-200">従業員No</th>
-                    <th className="border border-gray-300 px-2 py-2 w-24 sticky left-28 bg-gray-200">氏名</th>
-                    <th className="border border-gray-300 px-2 py-2 w-20 sticky left-52 bg-gray-200">部署</th>
-                    <th className="border border-gray-300 px-2 py-2 w-20 sticky left-72 bg-gray-200">役職</th>
+                    <th className="border border-gray-600 px-2 py-2 w-8 sticky left-0 bg-gray-200">No</th>
+                    <th className="border border-gray-600 px-2 py-2 w-20 sticky left-8 bg-gray-200">従業員No</th>
+                    <th className="border border-gray-600 px-2 py-2 w-24 sticky left-28 bg-gray-200">氏名</th>
+                    <th className="border border-gray-600 px-2 py-2 w-20 sticky left-52 bg-gray-200">部署</th>
+                    <th className="border border-gray-600 px-2 py-2 w-20 sticky left-72 bg-gray-200">役職</th>
                     {dayNames.map((dayName, index) => (
-                      <th key={index} className="border border-gray-300 px-2 py-2 w-32">
+                      <th key={index} className="border border-gray-600 px-2 py-2 w-32">
                         <div className="text-center">
                           <div>{weekDates[index] && `${formatDate(weekDates[index])} ${dayName}`}</div>
                           <div className="text-xs text-gray-500">時間 / 備考</div>
                         </div>
                       </th>
                     ))}
-                    <th className="border border-gray-300 px-2 py-2 w-24">週間統計</th>
+                    <th className="border border-gray-600 px-2 py-2 w-24">週間統計</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredShifts.map((shift, index) => (
                     <tr key={shift.id} className="hover:bg-gray-50">
-                      <td className="border border-gray-300 px-2 py-2 text-center sticky left-0 bg-white">
+                      <td className="border border-gray-600 px-2 py-2 text-center sticky left-0 bg-white">
                         <div className="flex items-center justify-center gap-2">
                           <span>{index + 1}</span>
                           {(editingRowId === shift.id || isEditAll) ? (
@@ -374,22 +374,22 @@ export default function EmployeeSchedule() {
                           ) : null}
                         </div>
                       </td>
-                      <td className="border border-gray-300 px-2 py-2 text-center sticky left-8 bg-white">
+                      <td className="border border-gray-600 px-2 py-2 text-center sticky left-8 bg-white">
                         {shift.employeeNumber}
                       </td>
-                      <td className="border border-gray-300 px-2 py-2 sticky left-28 bg-white">
+                      <td className="border border-gray-600 px-2 py-2 sticky left-28 bg-white">
                         <div className="font-semibold">{shift.name}</div>
                       </td>
-                      <td className="border border-gray-300 px-2 py-2 sticky left-52 bg-white">
+                      <td className="border border-gray-600 px-2 py-2 sticky left-52 bg-white">
                         {shift.department}
                       </td>
-                      <td className="border border-gray-300 px-2 py-2 sticky left-72 bg-white">
+                      <td className="border border-gray-600 px-2 py-2 sticky left-72 bg-white">
                         {shift.position}
                       </td>
                       {(['monday','tuesday','wednesday','thursday','friday','saturday','sunday'] as const).map((dayKey, dayIndex) => {
                         const daySchedule = shift.weeklySchedule[dayKey];
                         return (
-                          <td key={dayIndex} className="border border-gray-300 px-1 py-1 align-top">
+                          <td key={dayIndex} className="border border-gray-600 px-1 py-1 align-top">
                             {daySchedule.isWorkDay ? (
                               (editingRowId === shift.id || isEditAll) ? (
                                 <div className="space-y-1 text-left">
@@ -472,7 +472,7 @@ export default function EmployeeSchedule() {
                           </td>
                         );
                       })}
-                      <td className="border border-gray-300 px-2 py-2 text-center">
+                      <td className="border border-gray-600 px-2 py-2 text-center">
                         <div className="space-y-1">
                           <div className="text-xs">
                             <div>勤務日: {shift.weeklyStats.totalWorkDays}日</div>
@@ -498,7 +498,7 @@ export default function EmployeeSchedule() {
             <span>出勤</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-gray-100 border border-gray-300"></div>
+            <div className="w-4 h-4 rounded bg-gray-100 border border-gray-600"></div>
             <span>休み</span>
           </div>
         </div>

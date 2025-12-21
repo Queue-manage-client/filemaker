@@ -7,7 +7,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Search, Calendar, Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ArrowLeft, Search, Calendar, Plus, Clock, MapPin, FileText } from "lucide-react";
 import { timeBasedHostessAttendanceSampleData } from '@/data/timeBasedHostessAttendanceSampleData';
 import type { HostessAttendanceTask, AttendanceDataItem } from '@/types/time-based-hostess-attendance';
 
@@ -98,10 +99,13 @@ export default function TimeBasedHostessAttendance() {
     convertToGanttTasks(timeBasedHostessAttendanceSampleData)
   );
   
-  const [active, setActive] = useState<{ 
-    id: string; 
-    mode: "drag" | "resize-left" | "resize-right" 
+  const [active, setActive] = useState<{
+    id: string;
+    mode: "drag" | "resize-left" | "resize-right"
   } | null>(null);
+
+  // クリック時の詳細表示用
+  const [selectedTask, setSelectedTask] = useState<HostessAttendanceTask | null>(null);
 
   // 検索フィルター
   const filteredTasks = tasks.filter(task =>
@@ -210,13 +214,13 @@ export default function TimeBasedHostessAttendance() {
     return `${year}/${month}/${day}`;
   };
 
-  // 時間区分の定義
+  // 時間区分の定義（目標時間を追加）
   const timeSlots = [
-    { label: '9時〜13時', start: 9, end: 13 },
-    { label: '13時〜17時', start: 13, end: 17 },
-    { label: '17時〜21時', start: 17, end: 21 },
-    { label: '21時〜1時', start: 21, end: 25 }, // 翌日1時 = 25時として扱う
-    { label: '1時〜4時', start: 1, end: 4 },
+    { label: '9時〜13時', start: 9, end: 13, targetMinutes: 480 },
+    { label: '13時〜17時', start: 13, end: 17, targetMinutes: 720 },
+    { label: '17時〜21時', start: 17, end: 21, targetMinutes: 960 },
+    { label: '21時〜1時', start: 21, end: 25, targetMinutes: 1200 }, // 翌日1時 = 25時として扱う
+    { label: '1時〜4時', start: 1, end: 4, targetMinutes: 360 },
   ];
 
   // 時間区分別の統計計算
@@ -276,11 +280,15 @@ export default function TimeBasedHostessAttendance() {
       //const hours = Math.floor(totalMinutes / 60);
       //const minutes = totalMinutes % 60;
       
+      const difference = totalMinutes - slot.targetMinutes;
       return {
         label: slot.label,
         totalMinutes,
         hostessCount,
-        displayTime: `${totalMinutes}分`
+        displayTime: `${totalMinutes}分`,
+        targetMinutes: slot.targetMinutes,
+        difference,
+        differenceDisplay: difference >= 0 ? `+${difference}分` : `${difference}分`,
       };
     });
   };
@@ -288,12 +296,16 @@ export default function TimeBasedHostessAttendance() {
   const timeSlotStats = calculateTimeSlotStats();
 
   // 総計統計の計算
+  const totalTargetMinutes = timeSlotStats.reduce((sum, stat) => sum + stat.targetMinutes, 0);
   const totalStats = {
     totalMinutes: timeSlotStats.reduce((sum, stat) => sum + stat.totalMinutes, 0),
     totalHostessCount: timeSlotStats.reduce((sum, stat) => sum + stat.hostessCount, 0),
+    totalTargetMinutes,
+    totalDifference: timeSlotStats.reduce((sum, stat) => sum + stat.totalMinutes, 0) - totalTargetMinutes,
   };
 
   const totalDisplayTime = `${totalStats.totalMinutes}分`;
+  const totalDifferenceDisplay = totalStats.totalDifference >= 0 ? `+${totalStats.totalDifference}分` : `${totalStats.totalDifference}分`;
 
   // 各区分に割合を追加
   const timeSlotStatsWithPercentage = timeSlotStats.map(stat => ({
@@ -446,7 +458,7 @@ export default function TimeBasedHostessAttendance() {
                           <div key={task.id} className="absolute" style={{ left: 0, top }}>
                             {/* 勤務時間バー */}
                             <div
-                              className={`rounded-md shadow-md cursor-move transition-all ${isActive ? "ring-2 ring-offset-1 ring-blue-400" : ""}`}
+                              className={`rounded-md shadow-md cursor-pointer transition-all hover:brightness-110 ${isActive ? "ring-2 ring-offset-1 ring-blue-400" : ""}`}
                               style={{
                                 position: "absolute",
                                 left,
@@ -460,8 +472,9 @@ export default function TimeBasedHostessAttendance() {
                                 color: "white",
                                 userSelect: "none",
                               }}
+                              onClick={() => setSelectedTask(task)}
                               onPointerDown={(e) => beginPointer(e, task, "drag")}
-                              title={`${task.hostessName}: ${formatTimeRange(task.start, task.end)}`}
+                              title={`${task.hostessName}: ${formatTimeRange(task.start, task.end)} - クリックで詳細表示`}
                             >
                               <div className="text-xs truncate flex-1">
                                 {formatTimeRange(task.start, task.end)}
@@ -506,44 +519,123 @@ export default function TimeBasedHostessAttendance() {
             
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {timeSlotStatsWithPercentage.map((stat, index) => (
-                <div 
+                <div
                   key={index}
-                  className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200"
+                  className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3 border border-blue-200"
                 >
-                  <div className="text-sm font-medium text-blue-800 mb-1">
+                  <div className="text-xs font-medium text-blue-800 mb-1">
                     {stat.label}
                   </div>
                   <div className="text-sm font-semibold text-blue-800">
                     {stat.hostessCount}人
                   </div>
-                  <div className="text-lg font-bold text-blue-900 mb-1">
-                    {stat.displayTime} <span className="text-sm text-blue-700">({stat.percentage}%)</span>
+                  <div className="text-base font-bold text-blue-900">
+                    実績: {stat.displayTime}
                   </div>
-                  <div className="text-lg font-bold text-blue-900 mb-1">
-                    {stat.displayTime} <span className="text-sm text-blue-700">({stat.percentage}%)</span>
+                  <div className="text-xs text-blue-600">
+                    目標: {stat.targetMinutes}分
+                  </div>
+                  <div className={`text-sm font-bold ${stat.difference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    差分: {stat.differenceDisplay}
                   </div>
                 </div>
               ))}
               
               {/* 総計カード */}
-              <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-                <div className="text-sm font-medium text-green-800 mb-1">
+              <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-3 border border-green-200">
+                <div className="text-xs font-medium text-green-800 mb-1">
                   総計
                 </div>
                 <div className="text-sm font-semibold text-green-800">
                   {totalStats.totalHostessCount}人
                 </div>
-                <div className="text-lg font-bold text-green-900 mb-1">
-                  {totalDisplayTime} <span className="text-sm text-green-700">(100%)</span>
+                <div className="text-base font-bold text-green-900">
+                  実績: {totalDisplayTime}
                 </div>
-                <div className="text-lg font-bold text-green-900 mb-1">
-                  {totalDisplayTime} <span className="text-sm text-green-700">(100%)</span>
+                <div className="text-xs text-green-600">
+                  目標: {totalStats.totalTargetMinutes}分
+                </div>
+                <div className={`text-sm font-bold ${totalStats.totalDifference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  差分: {totalDifferenceDisplay}
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* 詳細表示ダイアログ */}
+      <Dialog open={!!selectedTask} onOpenChange={(open) => !open && setSelectedTask(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-blue-600" />
+              勤務詳細
+            </DialogTitle>
+          </DialogHeader>
+          {selectedTask && (
+            <div className="space-y-4">
+              {/* ホステス情報 */}
+              <div className="bg-blue-50 rounded-lg p-4">
+                <div className="text-lg font-bold text-blue-900">{selectedTask.hostessName}</div>
+                <div className="text-sm text-blue-700">ID: {selectedTask.hostessId}</div>
+              </div>
+
+              {/* 勤務時間 */}
+              <div className="flex items-start gap-3">
+                <Clock className="w-5 h-5 text-gray-500 mt-0.5" />
+                <div>
+                  <div className="text-sm font-medium text-gray-700">勤務時間</div>
+                  <div className="text-base font-semibold">{formatTimeRange(selectedTask.start, selectedTask.end)}</div>
+                  <div className="text-xs text-gray-500">
+                    {(() => {
+                      const startDate = new Date(selectedTask.start);
+                      const endDate = new Date(selectedTask.end);
+                      const diffMs = endDate.getTime() - startDate.getTime();
+                      const diffMins = Math.floor(diffMs / (1000 * 60));
+                      const hours = Math.floor(diffMins / 60);
+                      const mins = diffMins % 60;
+                      return `合計: ${hours}時間${mins > 0 ? `${mins}分` : ''}`;
+                    })()}
+                  </div>
+                </div>
+              </div>
+
+              {/* 場所 */}
+              {selectedTask.location && (
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <div className="text-sm font-medium text-gray-700">場所</div>
+                    <div className="text-base">{selectedTask.location}</div>
+                  </div>
+                </div>
+              )}
+
+              {/* 備考 */}
+              {selectedTask.notes && (
+                <div className="flex items-start gap-3">
+                  <FileText className="w-5 h-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <div className="text-sm font-medium text-gray-700">備考</div>
+                    <div className="text-base whitespace-pre-wrap">{selectedTask.notes}</div>
+                  </div>
+                </div>
+              )}
+
+              {/* アクションボタン */}
+              <div className="flex gap-2 pt-4 border-t">
+                <Button variant="outline" className="flex-1" onClick={() => setSelectedTask(null)}>
+                  閉じる
+                </Button>
+                <Button className="flex-1">
+                  編集
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

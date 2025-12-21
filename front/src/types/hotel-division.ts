@@ -15,4 +15,10 @@ export interface HotelDivision {
   postalCode: string; // 郵便番号（7桁ハイフン無し）
   address: string;
   hotelImage: HotelImage;
+  stationCode?: string; // 駅コード (Item 63)
+  transportationFee?: number; // 交通費 (Item 59-62)
+  usageLocation?: { // 利用場所 (Item 64)
+    postalCode?: string;
+    address?: string;
+  };
 }

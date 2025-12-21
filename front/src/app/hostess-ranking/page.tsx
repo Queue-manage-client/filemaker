@@ -51,11 +51,20 @@ const RankingCard = ({
     return hostessRankingData.filter(item => item.storeId === selectedStore);
   }, [selectedStore, hostessRankingData]);
 
-  // データをソート
+  // データをソート（本指名数対応 Item 36）
   const sortedData = useMemo(() => {
     return [...filteredData].sort((a, b) => {
-      const aValue = a[sortKey] || 0;
-      const bValue = b[sortKey] || 0;
+      let aValue: number;
+      let bValue: number;
+
+      // 本指名数は通常指名 + パネル指名の合計
+      if (sortKey === 'totalNominationCount') {
+        aValue = (a.regularNominationCount || 0) + (a.panelNominationCount || 0);
+        bValue = (b.regularNominationCount || 0) + (b.panelNominationCount || 0);
+      } else {
+        aValue = a[sortKey] || 0;
+        bValue = b[sortKey] || 0;
+      }
       return bValue - aValue;
     });
   }, [filteredData, sortKey]);
@@ -119,7 +128,10 @@ const RankingCard = ({
       <CardContent className="flex-1 overflow-y-auto">
         <div className="space-y-2">
           {sortedData.map((hostess, index) => {
-            const displayValue = hostess[sortKey];
+            // 本指名数の場合は計算値を使用
+            const displayValue = sortKey === 'totalNominationCount'
+              ? (hostess.regularNominationCount || 0) + (hostess.panelNominationCount || 0)
+              : hostess[sortKey];
             const isPercentage = sortKey === 'repeatCustomerRate' || sortKey === 'extensionRate';
             const isCurrency = sortKey === 'monthlyEarnings' || sortKey === 'nominationRevenue' || sortKey === 'averageCustomerSpending';
             
@@ -219,7 +231,7 @@ export default function HostessRanking() {
     'monthlyEarnings',
     'nominationRevenue',
     'totalCustomers',
-    'regularNominationCount'
+    'totalNominationCount' // Item 36: 本指名数をデフォルトに
   ]);
 
   // 月次推移用コントロール
@@ -227,6 +239,26 @@ export default function HostessRanking() {
   const [transitionStore, setTransitionStore] = useState<string>('all');
   const [transitionMonths, setTransitionMonths] = useState<number>(6);
   const [transitionTopN, setTransitionTopN] = useState<number>(5);
+
+  // 期間選択（Items 33, 35）
+  const currentDate = new Date();
+  const [selectedYear, setSelectedYear] = useState<number>(currentDate.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState<number>(currentDate.getMonth() + 1);
+  const [periodType, setPeriodType] = useState<'month' | 'range'>('month');
+  const [rangeStartMonth, setRangeStartMonth] = useState<number>(currentDate.getMonth() + 1);
+  const [rangeEndMonth, setRangeEndMonth] = useState<number>(currentDate.getMonth() + 1);
+
+  // 年のオプション生成（過去3年から現在まで）
+  const yearOptions = useMemo(() => {
+    const years = [];
+    for (let y = currentDate.getFullYear(); y >= currentDate.getFullYear() - 3; y--) {
+      years.push(y);
+    }
+    return years;
+  }, []);
+
+  // 月のオプション生成
+  const monthOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
   // React Queryを使用してデータ取得（フォールバックとしてサンプルデータを使用）
   const { data: hostessRankingData = sampleHostessRanking, isLoading, error } = useHostessRanking('monthly');
@@ -265,7 +297,7 @@ export default function HostessRanking() {
       {/* ヘッダー */}
       <Card className="mb-4">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
               <TrendingUp className="w-6 h-6" />
               <div>
@@ -274,6 +306,71 @@ export default function HostessRanking() {
                   指名料金区分や様々な条件で集計し、ランキングを作成します
                 </p>
               </div>
+            </div>
+
+            {/* 期間選択 (Items 33, 35) */}
+            <div className="flex items-center gap-4 bg-gray-50 p-3 rounded-lg">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">表示期間:</span>
+                <Select value={periodType} onValueChange={(v) => setPeriodType(v as 'month' | 'range')}>
+                  <SelectTrigger className="w-[120px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="month">1ヶ月単位</SelectItem>
+                    <SelectItem value="range">期間指定</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {periodType === 'month' ? (
+                <div className="flex items-center gap-2">
+                  <Select value={String(selectedYear)} onValueChange={(v) => setSelectedYear(Number(v))}>
+                    <SelectTrigger className="w-[100px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {yearOptions.map(y => (
+                        <SelectItem key={y} value={String(y)}>{y}年</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={String(selectedMonth)} onValueChange={(v) => setSelectedMonth(Number(v))}>
+                    <SelectTrigger className="w-[80px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {monthOptions.map(m => (
+                        <SelectItem key={m} value={String(m)}>{m}月</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Select value={String(rangeStartMonth)} onValueChange={(v) => setRangeStartMonth(Number(v))}>
+                    <SelectTrigger className="w-[80px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {monthOptions.map(m => (
+                        <SelectItem key={m} value={String(m)}>{m}月</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <span className="text-sm">〜</span>
+                  <Select value={String(rangeEndMonth)} onValueChange={(v) => setRangeEndMonth(Number(v))}>
+                    <SelectTrigger className="w-[80px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {monthOptions.map(m => (
+                        <SelectItem key={m} value={String(m)}>{m}月</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
           </div>
         </CardHeader>

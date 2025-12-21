@@ -1,12 +1,13 @@
 // ホステスランキング関連の型定義
 
 // ソート基準の型定義
-export type SortKey = 
+export type SortKey =
   | 'monthlyEarnings'
   | 'totalCustomers'
   | 'regularNominationCount'
   | 'panelNominationCount'
   | 'freeNominationCount'
+  | 'totalNominationCount' // 本指名数（Item 36）
   | 'nominationRevenue'
   | 'averageCustomerSpending'
   | 'repeatCustomerRate'
@@ -26,6 +27,7 @@ export const SORT_OPTIONS: SortOption[] = [
   { value: 'monthlyEarnings', label: '月間収入' },
   { value: 'nominationRevenue', label: '指名売上' },
   { value: 'totalCustomers', label: '総客数' },
+  { value: 'totalNominationCount', label: '本指名数' }, // Item 36
   { value: 'regularNominationCount', label: '通常指名数' },
   { value: 'panelNominationCount', label: 'パネル指名数' },
   { value: 'freeNominationCount', label: 'フリー指名数' },

@@ -49,6 +49,7 @@ export * from './dispatch';
 export type InterviewType = 'driver' | 'staff' | 'hostess';
 export type InterviewResult = 'hired' | 'cancelled' | 'pending' | 'rejected';
 export type EmploymentStatus = '' | 'retired';
+export type InterviewProgress = 'application' | 'scheduled' | 'completed' | 'followup' | 'onboarding'; // 進捗 (Item 37)
 
 export interface InterviewRecord {
   id: string;
@@ -61,6 +62,7 @@ export interface InterviewRecord {
   media: string; // 媒体（募集元）
   interviewer: string; // 面接者
   result: InterviewResult;
+  progress?: InterviewProgress; // 進捗 (Item 37)
   assignedStore: string; // 所属店舗
   storeName: string; // 店内名
   employmentStatus: EmploymentStatus; // 在職
@@ -72,6 +74,15 @@ export interface InterviewRecord {
   createdAt: string;
   updatedAt: string;
 }
+
+// 進捗ラベル
+export const INTERVIEW_PROGRESS_LABELS: Record<InterviewProgress, string> = {
+  application: '応募',
+  scheduled: '面接予定',
+  completed: '面接完了',
+  followup: 'フォロー中',
+  onboarding: '入店準備',
+};
 
 // 店舗リスト
 export const STORE_LIST = [

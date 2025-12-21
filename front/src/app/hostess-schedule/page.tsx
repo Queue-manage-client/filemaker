@@ -3,12 +3,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Edit, Check } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import type { HostessScheduleData, DailyWorkSchedule } from '@/types/hostess';
 // WorkType は将来の実装で使用予定
 
@@ -230,7 +227,6 @@ export default function HostessSchedule() {
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
   const [weekDates, setWeekDates] = useState<Date[]>([]);
   const [schedules, setSchedules] = useState<HostessScheduleData[]>(sampleHostessSchedules);
-  const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [filterAssignedStaff, setFilterAssignedStaff] = useState<string>('');
   const [filterWorkType, setFilterWorkType] = useState<HostessScheduleData['workType'] | ''>('');
   const [filterStoreId, setFilterStoreId] = useState<string>('');
@@ -251,44 +247,6 @@ export default function HostessSchedule() {
     return `${month}/${day}`;
   };
 
-  // const getWorkTypeLabel = (workType: WorkType) => {
-  //   const labels: Record<WorkType, string> = {
-  //     'full_time': '正社員',
-  //     'part_time': 'パート',
-  //     'contract': '契約',
-  //     'dispatch': '派遣',
-  //     'temp': '臨時'
-  //   };
-  //   return labels[workType];
-  // };
-
-  const getStoreBgClass = (storeName?: string) => {
-    switch (storeName) {
-      case '銀座店':
-        return 'bg-rose-50';
-      case '新宿店':
-        return 'bg-indigo-50';
-      case '渋谷店':
-        return 'bg-emerald-50';
-      case '池袋店':
-        return 'bg-amber-50';
-      case '赤坂店':
-        return 'bg-sky-50';
-      case '恵比寿店':
-        return 'bg-purple-50';
-      default:
-        return 'bg-white';
-    }
-  };
-
-  const getStatusColor = (status: HostessScheduleData['status']) => {
-    switch (status) {
-      case 'confirmed': return 'bg-blue-100 text-blue-800';
-      case 'published': return 'bg-green-100 text-green-800';
-      case 'draft': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   const assignedStaffOptions = useMemo(() => {
     const set = new Set<string>();
@@ -314,10 +272,6 @@ export default function HostessSchedule() {
       return true;
     });
   }, [schedules, filterAssignedStaff, filterWorkType, filterStoreId]);
-
-  const updateScheduleFields = (scheduleId: string, fields: Partial<HostessScheduleData>) => {
-    setSchedules(prev => prev.map(s => s.id === scheduleId ? { ...s, ...fields } : s));
-  };
 
   const updateScheduleCell = (scheduleId: string, day: keyof HostessScheduleData['weeklySchedule'], updates: Partial<DailyWorkSchedule>) => {
     setSchedules(prev => prev.map(schedule => {
@@ -384,324 +338,226 @@ export default function HostessSchedule() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* 戻るボタン */}
+      {/* ヘッダー - rt2-panel スタイル */}
+      <div className="h-[50px] bg-white border-b border-zinc-300">
+        <div className="flex items-center h-full px-2">
+          {/* ダッシュボードに戻る - 左端 */}
+          <Button
+            variant="outline"
+            onClick={() => router.push('/dashboard')}
+            className="h-8 px-3 text-sm flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+
+          {/* 中央配置のボタン群 */}
+          <div className="flex-1 flex items-center justify-center gap-2">
+            {/* タイトル */}
+            <h1 className="text-lg font-bold mr-2">ホステススケジュール管理</h1>
+
+            {/* 週間ナビゲーション */}
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="h-8 px-2"
+              onClick={() => navigateWeek('prev')}
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <div className="text-sm font-mono bg-gray-500 text-white px-2 py-1 rounded">
+              {weekDates.length > 0 && `${formatDate(weekDates[0])} - ${formatDate(weekDates[6])}`}
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="h-8 px-2"
+              onClick={() => navigateWeek('next')}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+
+            {/* アクションボタン */}
+            <Button 
+              className="h-8 px-4 text-sm bg-green-200 hover:bg-green-300 text-black border border-black"
+              onClick={addNewSchedule}
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              新規追加
+            </Button>
+            <Button className="h-8 px-4 text-sm bg-blue-200 hover:bg-blue-300 text-black border border-black">
+              一括保存
+            </Button>
+            <Button className="h-8 px-4 text-sm bg-purple-200 hover:bg-purple-300 text-black border border-black">
+              印刷
+            </Button>
+
+            {/* フィルター選択 */}
+            <div className="flex items-center gap-2 ml-4">
+              <span className="text-sm text-gray-600">担当者:</span>
+              <Select value={filterAssignedStaff || '__all__'} onValueChange={(v) => setFilterAssignedStaff(v === '__all__' ? '' : v)}>
+                <SelectTrigger className="h-8 w-[100px] text-sm">
+                  <SelectValue placeholder="全て" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">全て</SelectItem>
+                  {assignedStaffOptions.map(name => (
+                    <SelectItem key={name} value={name}>{name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <span className="text-sm text-gray-600">勤務形態:</span>
+              <Select value={filterWorkType || '__all__'} onValueChange={(v) => setFilterWorkType(v === '__all__' ? '' : (v as HostessScheduleData['workType']))}>
+                <SelectTrigger className="h-8 w-[100px] text-sm">
+                  <SelectValue placeholder="全て" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">全て</SelectItem>
+                  <SelectItem value="full_time">正社員</SelectItem>
+                  <SelectItem value="part_time">パート</SelectItem>
+                  <SelectItem value="contract">契約</SelectItem>
+                  <SelectItem value="dispatch">派遣</SelectItem>
+                  <SelectItem value="temp">臨時</SelectItem>
+                </SelectContent>
+              </Select>
+              <span className="text-sm text-gray-600">店舗:</span>
+              <Select value={filterStoreId || '__all__'} onValueChange={(v) => setFilterStoreId(v === '__all__' ? '' : v)}>
+                <SelectTrigger className="h-8 w-[100px] text-sm">
+                  <SelectValue placeholder="全て" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">全て</SelectItem>
+                  {storeOptions.map(opt => (
+                    <SelectItem key={opt.id} value={opt.id}>{opt.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="h-8 text-sm" 
+                onClick={() => { setFilterAssignedStaff(''); setFilterWorkType(''); setFilterStoreId(''); }}
+              >
+                リセット
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* メインコンテンツ */}
       <div className="p-4">
-        <Button 
-          variant="outline" 
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
-      </div>
-
-      {/* ヘッダー */}
-      <div className="px-4 mb-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <h1 className="text-xl font-bold">ホステススケジュール管理</h1>
-              
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={addNewSchedule}
-                  className="bg-green-100 hover:bg-green-200"
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  新規追加
-                </Button>
-                <Button variant="outline" size="sm" className="bg-blue-100">
-                  一括保存
-                </Button>
-                <Button variant="outline" size="sm" className="bg-purple-100">
-                  印刷
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => navigateWeek('prev')}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <span className="text-sm font-semibold">
-                  {weekDates.length > 0 && `${formatDate(weekDates[0])} - ${formatDate(weekDates[6])}`}
-                </span>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => navigateWeek('next')}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
-      </div>
-
-      {/* フィルター行 */}
-      <div className="px-4 mb-3">
-        <Card>
-          <CardContent className="py-3">
-            <div className="flex flex-wrap items-center gap-3 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="text-gray-600">担当者</span>
-                <Select value={filterAssignedStaff || '__all__'} onValueChange={(v) => setFilterAssignedStaff(v === '__all__' ? '' : v)}>
-                  <SelectTrigger className="h-7 w-40">
-                    <SelectValue placeholder="全て" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__all__">全て</SelectItem>
-                    {assignedStaffOptions.map(name => (
-                      <SelectItem key={name} value={name}>{name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-gray-600">勤務形態</span>
-                <Select value={filterWorkType || '__all__'} onValueChange={(v) => setFilterWorkType(v === '__all__' ? '' : (v as HostessScheduleData['workType']))}>
-                  <SelectTrigger className="h-7 w-40">
-                    <SelectValue placeholder="全て" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__all__">全て</SelectItem>
-                    <SelectItem value="full_time">正社員</SelectItem>
-                    <SelectItem value="part_time">パート</SelectItem>
-                    <SelectItem value="contract">契約</SelectItem>
-                    <SelectItem value="dispatch">派遣</SelectItem>
-                    <SelectItem value="temp">臨時</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-gray-600">店舗</span>
-                <Select value={filterStoreId || '__all__'} onValueChange={(v) => setFilterStoreId(v === '__all__' ? '' : v)}>
-                  <SelectTrigger className="h-7 w-40">
-                    <SelectValue placeholder="全て" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__all__">全て</SelectItem>
-                    {storeOptions.map(opt => (
-                      <SelectItem key={opt.id} value={opt.id}>{opt.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="ml-auto">
-                <Button variant="outline" size="sm" className="h-7" onClick={() => { setFilterAssignedStaff(''); setFilterWorkType(''); setFilterStoreId(''); }}>リセット</Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* メインスケジュールテーブル */}
-      <div className="px-4">
         <Card>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
-              <table className="w-full text-xs border-collapse">
+              <table className="w-full text-sm table-fixed">
+                <colgroup>
+                  <col style={{width: '40px'}} />
+                  <col style={{width: '90px'}} />
+                  <col style={{width: '120px'}} />
+                  <col style={{width: '80px'}} />
+                  {dayNames.map((_, i) => (
+                    <col key={i} style={{width: '160px'}} />
+                  ))}
+                  <col style={{width: '100px'}} />
+                  <col style={{width: '180px'}} />
+                </colgroup>
                 <thead>
-                  <tr className="bg-gray-200">
-                    <th className="border border-gray-300 px-2 py-2 w-8 sticky left-0 bg-gray-200">No</th>
-                    <th className="border border-gray-300 px-2 py-2 w-20 sticky left-8 bg-gray-200">勤務形態</th>
-                    <th className="border border-gray-300 px-2 py-2 w-24 sticky left-28 bg-gray-200">名前</th>
-                    <th className="border border-gray-300 px-2 py-2 w-20 sticky left-52 bg-gray-200">担当者</th>
+                  <tr className="bg-white">
+                    <th className="border border-gray-600 px-1 py-1 text-center text-sm sticky left-0 bg-white">No</th>
+                    <th className="border border-gray-600 px-1 py-1 text-center text-sm sticky left-[30px] bg-white">勤務形態</th>
+                    <th className="border border-gray-600 px-1 py-1 text-center text-sm sticky left-[100px] bg-white">名前</th>
+                    <th className="border border-gray-600 px-1 py-1 text-center text-sm sticky left-[200px] bg-white">担当者</th>
                     {dayNames.map((dayName, index) => (
-                      <th key={index} className="border border-gray-300 px-2 py-2 w-32">
-                        <div className="text-center">
-                          <div>{weekDates[index] && formatDate(weekDates[index])} {dayName}</div>
-                          <div className="text-xs text-gray-500">時間 / 備考</div>
-                        </div>
+                      <th key={index} className="border border-gray-600 px-1 py-1 text-center text-sm">
+                        <div>{weekDates[index] && formatDate(weekDates[index])} {dayName}</div>
                       </th>
                     ))}
-                    <th className="border border-gray-300 px-2 py-2 w-24">週間統計</th>
-                    <th className="border border-gray-300 px-2 py-2 w-20">ステータス</th>
-                    <th className="border border-gray-300 px-2 py-2 w-80">備考</th>
+                    <th className="border border-gray-600 px-1 py-1 text-center text-sm">週間統計</th>
+                    <th className="border border-gray-600 px-1 py-1 text-center text-sm">備考</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredSchedules.map((schedule, index) => (
-                    <tr key={schedule.id} className="hover:bg-gray-50">
-                      <td className="border border-gray-300 px-2 py-2 text-center sticky left-0 bg-white">
-                        <div className="flex items-center justify-center gap-2">
-                          <span>{index + 1}</span>
-                          {editingRowId === schedule.id ? (
-                            <Button size="sm" variant="ghost" className="h-5 px-1" onClick={() => setEditingRowId(null)}>
-                              <Check className="w-3 h-3" />
-                            </Button>
-                          ) : null}
-                        </div>
+                    <tr 
+                      key={schedule.id} 
+                      className="hover:opacity-80"
+                      style={{ backgroundColor: schedule.store?.name === '銀座店' ? '#fff1f2' : 
+                               schedule.store?.name === '新宿店' ? '#eef2ff' :
+                               schedule.store?.name === '渋谷店' ? '#ecfdf5' :
+                               schedule.store?.name === '池袋店' ? '#fffbeb' :
+                               schedule.store?.name === '赤坂店' ? '#f0f9ff' :
+                               schedule.store?.name === '恵比寿店' ? '#faf5ff' : '#fef3c7' }}
+                    >
+                      <td className="border border-gray-600 px-1 py-1 text-center sticky left-0" style={{ backgroundColor: 'inherit' }}>
+                        <span className="text-sm">{index + 1}</span>
                       </td>
-                      <td className="border border-gray-300 px-2 py-2 sticky left-8 bg-white">
-                        <Select value={schedule.workType} onValueChange={(v) => editingRowId === schedule.id ? updateScheduleFields(schedule.id, { workType: v as HostessScheduleData['workType'] }) : undefined}>
-                          <SelectTrigger className="border-0 p-0 h-auto text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="full_time">正社員</SelectItem>
-                            <SelectItem value="part_time">パート</SelectItem>
-                            <SelectItem value="contract">契約</SelectItem>
-                            <SelectItem value="dispatch">派遣</SelectItem>
-                            <SelectItem value="temp">臨時</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      <td className="border border-gray-600 px-1 py-1 sticky left-[30px]" style={{ backgroundColor: 'inherit' }}>
+                        <span className="text-sm">
+                          {schedule.workType === 'full_time' ? '正社員' :
+                           schedule.workType === 'part_time' ? 'パート' :
+                           schedule.workType === 'contract' ? '契約' :
+                           schedule.workType === 'dispatch' ? '派遣' : '臨時'}
+                        </span>
                       </td>
-                      <td className={`border border-gray-300 px-2 py-2 sticky left-28 ${getStoreBgClass(schedule.store?.name)}`}>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            value={`${schedule.name}${schedule.isNewcomer ? " (新)" : ""}`}
-                            className="border-0 p-0 h-auto text-xs bg-transparent"
-                            placeholder="名前"
-                            readOnly
-                          />
-                          {editingRowId === schedule.id ? (
-                            <label className="flex items-center gap-1 text-[10px] text-gray-700">
-                              <Checkbox
-                                checked={!!schedule.isNewcomer}
-                                onCheckedChange={(c) => updateScheduleFields(schedule.id, { isNewcomer: Boolean(c) })}
-                              />
-                              新人
-                            </label>
-                          ) : null}
-                        </div>
+                      <td className="border border-gray-600 px-1 py-1 sticky left-[100px]" style={{ backgroundColor: 'inherit' }}>
+                        <span className="text-sm font-bold">{schedule.name}{schedule.isNewcomer ? " (新)" : ""}</span>
                       </td>
-                      <td className="border border-gray-300 px-2 py-2 sticky left-52 bg-white">
-                        <Input
-                          value={schedule.assignedStaff}
-                          className="border-0 p-0 h-auto text-xs"
-                          placeholder="担当者"
-                          readOnly
-                        />
+                      <td className="border border-gray-600 px-1 py-1 sticky left-[200px]" style={{ backgroundColor: 'inherit' }}>
+                        <span className="text-sm">{schedule.assignedStaff}</span>
                       </td>
                       {dayKeys.map((dayKey, dayIndex) => {
                         const daySchedule = schedule.weeklySchedule[dayKey];
-                        // const isEditing = editingCell?.scheduleId === schedule.id && editingCell?.day === dayKey;
-                        
+
                         return (
-                          <td key={dayIndex} className="border border-gray-300 px-1 py-1 align-top">
-                            {daySchedule.isWorkDay ? (
-                              editingRowId === schedule.id ? (
-                                <div className="space-y-1 text-left">
-                                  <div className="flex items-center gap-1">
-                                    <Input
-                                      type="time"
-                                      value={daySchedule.startTime}
-                                      className="h-6 text-xs px-1"
-                                      onChange={(e) => updateScheduleCell(schedule.id, dayKey, { startTime: e.target.value })}
-                                    />
-                                    <span className="text-[10px] text-gray-500">-</span>
-                                    <Input
-                                      type="time"
-                                      value={daySchedule.endTime}
-                                      className="h-6 text-xs px-1"
-                                      onChange={(e) => updateScheduleCell(schedule.id, dayKey, { endTime: e.target.value })}
-                                    />
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                    <Input
-                                      type="number"
-                                      value={daySchedule.workHours ?? 0}
-                                      className="h-6 text-xs px-1 w-16"
-                                      onChange={(e) => updateScheduleCell(schedule.id, dayKey, { workHours: Number(e.target.value) })}
-                                    />
-                                    <span className="text-[10px] text-gray-500">h</span>
-                                  </div>
-                                  <Textarea
-                                    value={daySchedule.notes ?? ''}
-                                    className="text-xs min-h-[48px]"
-                                    placeholder="メモ"
-                                    onChange={(e) => updateScheduleCell(schedule.id, dayKey, { notes: e.target.value })}
-                                  />
-                                </div>
-                              ) : (
-                                <div className="space-y-1">
-                                  <div className="bg-blue-50 p-1 rounded text-center">
-                                    <div className="font-semibold text-blue-800">
-                                      {daySchedule.startTime} - {daySchedule.endTime}
-                                    </div>
-                                    <div className="text-xs text-blue-600">
-                                      {daySchedule.workHours}h
-                                    </div>
-                                    {daySchedule.notes && (
-                                      <div className="text-xs text-gray-600 mt-1">
-                                        {daySchedule.notes}
-                                      </div>
-                                    )}
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      className="h-4 w-4 p-0 mt-1"
-                                      onClick={() => setEditingRowId(schedule.id)}
-                                    >
-                                      <Edit className="w-3 h-3" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              )
-                            ) : (
-                              <div className="text-center">
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="h-6 w-full text-xs"
-                                  onClick={() => {
-                                    updateScheduleCell(schedule.id, dayKey, {
-                                      isWorkDay: true,
-                                      startTime: "19:00",
-                                      endTime: "02:00",
-                                      workHours: 6
-                                    });
-                                  }}
-                                >
-                                  + 追加
-                                </Button>
-                                {daySchedule.notes && (
-                                  <div className="text-xs text-gray-500 mt-1">
-                                    {daySchedule.notes}
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                          <td key={dayIndex} className="border border-gray-600 px-0.5 py-1 align-top">
+                            <div className="flex items-center gap-0.5">
+                              <input
+                                type="time"
+                                value={daySchedule.startTime || ''}
+                                onChange={(e) => {
+                                  updateScheduleCell(schedule.id, dayKey, {
+                                    startTime: e.target.value,
+                                    isWorkDay: e.target.value !== ''
+                                  });
+                                }}
+                                className="w-[72px] h-7 text-sm border border-gray-400 rounded-sm px-0.5"
+                              />
+                              <span className="text-sm">〜</span>
+                              <input
+                                type="time"
+                                value={daySchedule.endTime || ''}
+                                onChange={(e) => {
+                                  updateScheduleCell(schedule.id, dayKey, {
+                                    endTime: e.target.value,
+                                    isWorkDay: daySchedule.startTime !== '' || e.target.value !== ''
+                                  });
+                                }}
+                                className="w-[72px] h-7 text-sm border border-gray-400 rounded-sm px-0.5"
+                              />
+                            </div>
                           </td>
                         );
                       })}
-                      <td className="border border-gray-300 px-2 py-2 text-center">
-                        <div className="space-y-1">
-                          <div className="text-xs">
-                            <div>勤務日: {schedule.weeklyStats.totalWorkDays}日</div>
-                            <div>時間: {schedule.weeklyStats.totalWorkHours}h</div>
-                            <div>平均: {schedule.weeklyStats.averageDailyHours.toFixed(1)}h/日</div>
-                            <div className="text-green-600 font-semibold">
-                              ¥{schedule.weeklyStats.expectedEarnings.toLocaleString()}
-                            </div>
-                          </div>
+                      <td className="border border-gray-600 px-1 py-1 text-center">
+                        <div className="space-y-0">
+                          <div className="text-sm">勤務日: {schedule.weeklyStats.totalWorkDays}日</div>
+                          <div className="text-sm">時間: {schedule.weeklyStats.totalWorkHours}h</div>
                         </div>
                       </td>
-                      <td className="border border-gray-300 px-2 py-2 text-center">
-                        <span className={`px-2 py-1 rounded text-xs ${getStatusColor(schedule.status)}`}>
-                          {schedule.status === 'confirmed' ? '確定' : schedule.status === 'published' ? '公開' : '下書き'}
-                        </span>
-                      </td>
-                      <td className="border border-gray-300 px-2 py-2 align-top">
-                        <Textarea
+                      <td className="border border-gray-600 px-1 py-1 align-top">
+                        <input
+                          type="text"
                           value={schedule.remarks ?? ''}
-                          readOnly={editingRowId !== schedule.id}
-                          onChange={(e) => updateScheduleFields(schedule.id, { remarks: e.target.value })}
+                          onChange={(e) => {
+                            setSchedules(prev => prev.map(s =>
+                              s.id === schedule.id ? { ...s, remarks: e.target.value } : s
+                            ));
+                          }}
+                          className="w-full h-7 text-sm border border-gray-400 rounded-sm px-0.5"
                           placeholder="備考"
-                          className="border-0 text-xs min-h-[96px] w-full"
                         />
                       </td>
                     </tr>
@@ -713,20 +569,32 @@ export default function HostessSchedule() {
         </Card>
       </div>
 
-      {/* フッター */}
-      <div className="p-4 mt-4">
-        <div className="flex items-center gap-4 text-xs text-gray-600">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-blue-100 border border-blue-300 rounded"></div>
-            <span>勤務予定</span>
+      {/* フッター - 凡例 */}
+      <div className="mt-2 px-2">
+        <div className="flex items-center gap-4 text-sm text-gray-600">
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3" style={{backgroundColor: '#fff1f2'}}></div>
+            <span>銀座店</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded"></div>
-            <span>休み</span>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3" style={{backgroundColor: '#eef2ff'}}></div>
+            <span>新宿店</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
-            <span>確定済み</span>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3" style={{backgroundColor: '#ecfdf5'}}></div>
+            <span>渋谷店</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3" style={{backgroundColor: '#fffbeb'}}></div>
+            <span>池袋店</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3" style={{backgroundColor: '#f0f9ff'}}></div>
+            <span>赤坂店</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3" style={{backgroundColor: '#faf5ff'}}></div>
+            <span>恵比寿店</span>
           </div>
         </div>
       </div>

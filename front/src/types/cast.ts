@@ -24,4 +24,12 @@ export interface TodayCastData {
   ranking: string;
   concurrent?: string; // 併用
   deliverCount?: string; // 送場所実績の数値
+  isAttendanceConfirmed?: boolean; // 出勤確認済みフラグ
+  category?: 'VIP' | 'Lady' | 'Girls' | 'SUP' | '新人'; // カテゴリー
+  storeColor?: string; // 店舗の背景色
+  isNewbie?: boolean; // 新人フラグ
+  weeklyRemarks?: string; // 週間備考
+  workStyle?: string; // 勤務形態
+  manager?: string; // 担当者
+  store?: string; // 所属店舗
 }

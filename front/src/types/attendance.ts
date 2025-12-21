@@ -97,4 +97,20 @@ export interface AttendingHostess {
   todaySales: number;
   /** 備考 */
   notes?: string;
+  /** 送り場所 (Item 72) */
+  sendLocation?: string;
+  /** 交通費 (Item 72) */
+  transportationFee?: number;
+  /** 雑費 (Item 72) */
+  miscExpenses?: number;
+  /** 預り金 (Item 72) */
+  hostessDeposit?: number;
+  /** 支払額 (Item 72) */
+  paymentAmount?: number;
+  /** 支払済み (Item 72) */
+  isPaid?: boolean;
+  /** 精算済み (Item 71) */
+  isSettled?: boolean;
+  /** 送信済み (Item 71) */
+  isSent?: boolean;
 }

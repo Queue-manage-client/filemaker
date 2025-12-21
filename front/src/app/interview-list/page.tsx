@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Search, Plus, Download } from "lucide-react";
-import type { InterviewRecord } from '@/types';
-import { INTERVIEW_TYPE_LABELS, INTERVIEW_RESULT_LABELS, EMPLOYMENT_STATUS_LABELS } from '@/types';
+import type { InterviewRecord, InterviewProgress } from '@/types';
+import { INTERVIEW_TYPE_LABELS, INTERVIEW_RESULT_LABELS, EMPLOYMENT_STATUS_LABELS, INTERVIEW_PROGRESS_LABELS } from '@/types';
 import { interviewSampleData } from '@/data/interviewSampleData';
 
 export default function InterviewList() {
@@ -150,6 +150,7 @@ export default function InterviewList() {
                     <th className="border border-gray-300 px-2 py-2 w-20">媒体</th>
                     <th className="border border-gray-300 px-2 py-2 w-20">面接者</th>
                     <th className="border border-gray-300 px-2 py-2 w-16">結果</th>
+                    <th className="border border-gray-300 px-2 py-2 w-20">進捗</th>
                     <th className="border border-gray-300 px-2 py-2 w-20">所属店舗</th>
                     <th className="border border-gray-300 px-2 py-2 w-20">店内名</th>
                     <th className="border border-gray-300 px-2 py-2 w-12">在職</th>
@@ -209,6 +210,19 @@ export default function InterviewList() {
                         }`}>
                           {INTERVIEW_RESULT_LABELS[interview.result]}
                         </span>
+                      </td>
+                      <td className="border border-gray-300 px-2 py-2 text-center">
+                        {interview.progress && (
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            interview.progress === 'application' ? 'bg-blue-100 text-blue-800' :
+                            interview.progress === 'scheduled' ? 'bg-purple-100 text-purple-800' :
+                            interview.progress === 'completed' ? 'bg-green-100 text-green-800' :
+                            interview.progress === 'followup' ? 'bg-orange-100 text-orange-800' :
+                            'bg-cyan-100 text-cyan-800'
+                          }`}>
+                            {INTERVIEW_PROGRESS_LABELS[interview.progress]}
+                          </span>
+                        )}
                       </td>
                       <td className="border border-gray-300 px-2 py-2">
                         {interview.assignedStore}

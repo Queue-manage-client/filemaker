@@ -125,8 +125,20 @@ function AttendingStaffItem({ data }: AttendingStaffItemProps) {
 
 /**
  * 出勤ホステスの1行分のコンポーネント
+ * Item 71: 未精算で赤色・未送信で白色・精算と送信完了で灰色
  */
 function AttendingHostessItem({ data }: AttendingHostessItemProps) {
+  // Item 71: ステータスに応じた行の背景色
+  const getRowBgColor = () => {
+    if (data.isSettled && data.isSent) {
+      return 'bg-gray-200'; // 精算と送信完了で灰色
+    }
+    if (!data.isSettled) {
+      return 'bg-red-100'; // 未精算で赤色
+    }
+    return 'bg-white'; // 未送信で白色
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case '出勤中':
@@ -141,33 +153,61 @@ function AttendingHostessItem({ data }: AttendingHostessItemProps) {
   };
 
   return (
-    <div className="grid grid-cols-7 gap-2 text-sm py-2 border-b border-gray-200 hover:bg-gray-50">
+    <div className={`grid grid-cols-12 gap-1 text-xs py-1 border-b border-gray-200 hover:brightness-95 ${getRowBgColor()}`}>
       {/* ホステス名 */}
-      <div className="font-medium text-gray-900">{data.hostessName}</div>
-      
+      <div className="font-medium text-gray-900 truncate">{data.hostessName}</div>
+
       {/* 出勤時刻 */}
       <div className="text-center font-mono">{data.startTime}</div>
-      
+
       {/* 退勤予定時刻 */}
       <div className="text-center font-mono">{data.endTime || '-'}</div>
-      
+
       {/* ステータス */}
       <div className="text-center">
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(data.status)}`}>
+        <span className={`px-1 py-0.5 rounded text-xs font-medium ${getStatusColor(data.status)}`}>
           {data.status}
         </span>
       </div>
-      
+
       {/* 勤務店舗 */}
-      <div className="text-center text-gray-700">{data.store}</div>
-      
-      {/* 今日の売上 */}
+      <div className="text-center text-gray-700 truncate">{data.store}</div>
+
+      {/* 送り場所 (Item 72) */}
+      <div className="text-gray-700 truncate">{data.sendLocation || '-'}</div>
+
+      {/* 交通費 (Item 72) */}
       <div className="text-right font-mono text-gray-700">
-        ¥{data.todaySales.toLocaleString()}
+        {data.transportationFee ? `¥${data.transportationFee.toLocaleString()}` : '-'}
       </div>
-      
+
+      {/* 雑費 (Item 72) */}
+      <div className="text-right font-mono text-gray-700">
+        {data.miscExpenses ? `¥${data.miscExpenses.toLocaleString()}` : '-'}
+      </div>
+
+      {/* 預り (Item 72) */}
+      <div className="text-right font-mono text-gray-700">
+        {data.hostessDeposit ? `¥${data.hostessDeposit.toLocaleString()}` : '-'}
+      </div>
+
+      {/* 支払額 (Item 72) */}
+      <div className="text-right font-mono font-semibold text-gray-900">
+        {data.paymentAmount ? `¥${data.paymentAmount.toLocaleString()}` : '-'}
+      </div>
+
+      {/* 支払済み☑ (Item 72) */}
+      <div className="text-center">
+        <input
+          type="checkbox"
+          checked={data.isPaid || false}
+          onChange={() => {}}
+          className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 rounded"
+        />
+      </div>
+
       {/* 備考 */}
-      <div className="text-sm text-gray-500 truncate">{data.notes || '-'}</div>
+      <div className="text-gray-500 truncate">{data.notes || '-'}</div>
     </div>
   );
 }
@@ -241,20 +281,31 @@ export default function AttendanceTab({ staffList, hostessList }: AttendanceTabP
             </div>
           </div>
         ) : (
-          <div className="space-y-2">
-            {/* ホステス用ヘッダー行 */}
-            <div className="grid grid-cols-7 gap-2 text-sm font-semibold text-gray-700 pb-2 border-b-2 border-gray-300">
+          <div className="space-y-1">
+            {/* ホステス用ヘッダー行 (Item 72: 新項目追加) */}
+            <div className="grid grid-cols-12 gap-1 text-xs font-semibold text-gray-700 pb-1 border-b-2 border-gray-300">
               <div className="text-left">ホステス名</div>
-              <div className="text-center">出勤時刻</div>
+              <div className="text-center">出勤</div>
               <div className="text-center">退勤予定</div>
               <div className="text-center">ステータス</div>
-              <div className="text-center">勤務店舗</div>
-              <div className="text-right">今日の売上</div>
+              <div className="text-center">店舗</div>
+              <div className="text-left">送り場所</div>
+              <div className="text-right">交通費</div>
+              <div className="text-right">雑費</div>
+              <div className="text-right">預り</div>
+              <div className="text-right">支払額</div>
+              <div className="text-center">済</div>
               <div className="text-center">備考</div>
             </div>
-            
+            {/* 凡例 (Item 71) */}
+            <div className="flex gap-4 text-xs text-gray-500 pb-1">
+              <span className="flex items-center gap-1"><span className="w-3 h-3 bg-red-100 rounded"></span>未精算</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 bg-white border rounded"></span>未送信</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 bg-gray-200 rounded"></span>完了</span>
+            </div>
+
             {/* スクロール可能なデータ領域 */}
-            <div className="h-[500px] overflow-y-scroll">
+            <div className="h-[400px] overflow-y-scroll">
               <div className="space-y-0">
                 {hostessList.map((hostess) => (
                   <AttendingHostessItem key={hostess.id} data={hostess} />

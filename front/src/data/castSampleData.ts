@@ -26,7 +26,15 @@ export const sampleCastData: TodayCastData[] = [
     mode: "自動",
     ranking: "1",
     concurrent: "ジンジョ",
-    deliverCount: "3"
+    deliverCount: "3",
+    isAttendanceConfirmed: true,
+    category: "VIP",
+    storeColor: "#fef3c7",
+    isNewbie: false,
+    weeklyRemarks: "週末出勤増やしたい",
+    workStyle: "レギュラー",
+    manager: "田中",
+    store: "銀座店"
   },
   {
     id: "002",
@@ -52,7 +60,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "手動",
     ranking: "3",
     concurrent: "",
-    deliverCount: "2"
+    deliverCount: "2",
+    storeColor: "#dbeafe",
+    isNewbie: false,
+    weeklyRemarks: "",
+    workStyle: "準レギュラー",
+    manager: "山田",
+    store: "新宿店"
   },
   {
     id: "003",
@@ -78,7 +92,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "自動",
     ranking: "2",
     concurrent: "ダンジョ",
-    deliverCount: "1"
+    deliverCount: "1",
+    storeColor: "#fce7f3",
+    isNewbie: false,
+    weeklyRemarks: "VIP対応経験豊富",
+    workStyle: "レギュラー",
+    manager: "佐藤",
+    store: "恵比寿店"
   },
   {
     id: "004",
@@ -104,7 +124,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "自動",
     ranking: "8",
     concurrent: "",
-    deliverCount: "4"
+    deliverCount: "4",
+    storeColor: "#dcfce7",
+    isNewbie: true,
+    weeklyRemarks: "研修期間中",
+    workStyle: "新人",
+    manager: "鈴木",
+    store: "品川店"
   },
   {
     id: "005",
@@ -130,7 +156,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "自動",
     ranking: "4",
     concurrent: "ジンジョ",
-    deliverCount: "5"
+    deliverCount: "5",
+    storeColor: "#fef3c7",
+    isNewbie: false,
+    weeklyRemarks: "長距離案件優先",
+    workStyle: "レギュラー",
+    manager: "田中",
+    store: "銀座店"
   },
   {
     id: "006",
@@ -156,7 +188,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "手動",
     ranking: "6",
     concurrent: "",
-    deliverCount: "2"
+    deliverCount: "2",
+    storeColor: "#dbeafe",
+    isNewbie: false,
+    weeklyRemarks: "",
+    workStyle: "準レギュラー",
+    manager: "山田",
+    store: "新宿店"
   },
   {
     id: "007",
@@ -182,7 +220,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "自動",
     ranking: "7",
     concurrent: "",
-    deliverCount: "1"
+    deliverCount: "1",
+    storeColor: "#fce7f3",
+    isNewbie: false,
+    weeklyRemarks: "",
+    workStyle: "直前",
+    manager: "佐藤",
+    store: "恵比寿店"
   },
   {
     id: "008",
@@ -208,7 +252,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "自動",
     ranking: "5",
     concurrent: "",
-    deliverCount: "3"
+    deliverCount: "3",
+    storeColor: "#e9d5ff",
+    isNewbie: false,
+    weeklyRemarks: "新規エリア開拓中",
+    workStyle: "レギュラー",
+    manager: "高橋",
+    store: "横浜店"
   },
   {
     id: "009",
@@ -234,7 +284,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "自動",
     ranking: "9",
     concurrent: "",
-    deliverCount: "4"
+    deliverCount: "4",
+    storeColor: "#fef9c3",
+    isNewbie: false,
+    weeklyRemarks: "長時間対応可能",
+    workStyle: "不定期",
+    manager: "伊藤",
+    store: "千葉店"
   },
   {
     id: "010",
@@ -260,7 +316,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "手動",
     ranking: "11",
     concurrent: "",
-    deliverCount: "2"
+    deliverCount: "2",
+    storeColor: "#fed7aa",
+    isNewbie: false,
+    weeklyRemarks: "",
+    workStyle: "緊急",
+    manager: "渡辺",
+    store: "大宮店"
   },
   {
     id: "011",
@@ -286,7 +348,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "手動",
     ranking: "15",
     concurrent: "",
-    deliverCount: "1"
+    deliverCount: "1",
+    storeColor: "#bbf7d0",
+    isNewbie: true,
+    weeklyRemarks: "研修中のため軽い案件のみ",
+    workStyle: "新人",
+    manager: "小林",
+    store: "立川店"
   },
   {
     id: "012",
@@ -312,7 +380,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "自動",
     ranking: "10",
     concurrent: "",
-    deliverCount: "3"
+    deliverCount: "3",
+    storeColor: "#fce7f3",
+    isNewbie: false,
+    weeklyRemarks: "指名多数で人気キャスト",
+    workStyle: "レギュラー",
+    manager: "佐藤",
+    store: "吉祥寺店"
   },
   {
     id: "013",
@@ -338,7 +412,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "自動",
     ranking: "12",
     concurrent: "",
-    deliverCount: "5"
+    deliverCount: "5",
+    storeColor: "#e9d5ff",
+    isNewbie: false,
+    weeklyRemarks: "深夜シフト専門",
+    workStyle: "レギュラー",
+    manager: "高橋",
+    store: "川崎店"
   },
   {
     id: "014",
@@ -364,7 +444,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "手動",
     ranking: "13",
     concurrent: "",
-    deliverCount: "2"
+    deliverCount: "2",
+    storeColor: "#dbeafe",
+    isNewbie: false,
+    weeklyRemarks: "",
+    workStyle: "準レギュラー",
+    manager: "山田",
+    store: "秋葉原店"
   },
   {
     id: "015",
@@ -390,7 +476,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "自動",
     ranking: "14",
     concurrent: "",
-    deliverCount: "3"
+    deliverCount: "3",
+    storeColor: "#dbeafe",
+    isNewbie: false,
+    weeklyRemarks: "夜間帯専門",
+    workStyle: "不定期",
+    manager: "山田",
+    store: "池袋店"
   },
   {
     id: "016",
@@ -416,7 +508,13 @@ export const sampleCastData: TodayCastData[] = [
     mode: "自動",
     ranking: "1",
     concurrent: "ジンジョ",
-    deliverCount: "3"
+    deliverCount: "3",
+    storeColor: "#fef3c7",
+    isNewbie: false,
+    weeklyRemarks: "新規顧客対応中心",
+    workStyle: "レギュラー",
+    manager: "田中",
+    store: "銀座店"
   },
   {
     id: "017",

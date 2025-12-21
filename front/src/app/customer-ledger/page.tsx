@@ -6,16 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, User2, MapPin, Plus, Trash2, ArrowLeft, Users, Search, Download, Pen } from "lucide-react";
-import { Customer, STORE_MAPPING } from '@/types';
-import type { Vehicle, UsageHistory, PreferenceForm, ReceiptForm, PetOption, WorkAreaOption } from '@/types/customer-ledger';
-import { sampleCustomers } from '@/data/customerSampleData';
-
-// 型は分離済み
+import { FileText, User2, ArrowLeft, Pen } from "lucide-react";
+import type { UsageHistory } from '@/types/customer-ledger';
 
 export default function CustomerLedger() {
   const router = useRouter();
@@ -24,41 +17,17 @@ export default function CustomerLedger() {
     document.title = '顧客台帳 - Dispatch Harmony Hub';
   }, []);
 
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer>(sampleCustomers[0]);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([
-    { id: '1', type: 'BMW 7シリーズ', color: 'ブラック', number: '品川300あ1234' }
-  ]);
-  
-  const [kanaFilter, setKanaFilter] = useState<string>('all');
-  const [preferenceForm, setPreferenceForm] = useState<PreferenceForm>({
-    rank: 'A',
-    favoriteType: '',
-    speakingStyle: '',
-    dislikedType: ''
-  });
-  const [petSelections, setPetSelections] = useState<Record<PetOption, boolean>>({
-    dog: false,
-    cat: false,
-    none: false,
-    other: false
-  });
-  const [workArea, setWorkArea] = useState<WorkAreaOption>('local');
-  const [receiptForm, setReceiptForm] = useState<ReceiptForm>({
-    recipient: '',
-    note: ''
-  });
-  
   const [usageHistory] = useState<UsageHistory[]>([
     {
       id: '1',
       receptionNumber: 'R-2025-001',
       date: '2025-01-26',
       storeName: '本店',
-      staffName: '佐藤美智子',
-      category: 'ガールズ',
-      rank: 'VIP',
-      startTime: '19:00',
-      endTime: '23:30',
+      staffName: 'あみ',
+      category: 'レディ',
+      rank: 'A',
+      startTime: '20:00',
+      endTime: '24:00',
       amount: 45000,
       status: 'completed'
     },
@@ -67,11 +36,11 @@ export default function CustomerLedger() {
       receptionNumber: 'R-2025-002',
       date: '2025-01-25',
       storeName: '銀座支店',
-      staffName: 'あ',
-      category: 'プレミアム',
-      rank: 'S',
-      startTime: '20:00',
-      endTime: '01:00',
+      staffName: 'あい',
+      category: 'ガールズ',
+      rank: 'A',
+      startTime: '16:00',
+      endTime: '17:30',
       amount: 68000,
       status: 'completed'
     },
@@ -80,7 +49,7 @@ export default function CustomerLedger() {
       receptionNumber: 'R-2025-003',
       date: '2025-01-24',
       storeName: '本店',
-      staffName: '山田愛子',
+      staffName: 'あいみ',
       category: 'ガールズ',
       rank: 'A',
       startTime: '18:30',
@@ -93,9 +62,9 @@ export default function CustomerLedger() {
       receptionNumber: 'R-2025-004',
       date: '2025-01-23',
       storeName: '新宿支店',
-      staffName: '鈴木麻美',
-      category: 'スタンダード',
-      rank: 'B',
+      staffName: 'あきな',
+      category: 'ガールズ',
+      rank: 'A',
       startTime: '19:30',
       endTime: '22:45',
       amount: 32000,
@@ -106,107 +75,60 @@ export default function CustomerLedger() {
       receptionNumber: 'R-2025-005',
       date: '2025-01-22',
       storeName: 'VIPルーム',
-      staffName: '高橋美香',
-      category: 'プレミアム',
-      rank: 'VIP',
+      staffName: 'あすか',
+      category: 'ガールズ',
+      rank: 'A',
       startTime: '20:30',
       endTime: '02:15',
       amount: 95000,
       status: 'completed'
+    },
+    {
+      id: '6',
+      receptionNumber: 'R-2025-006',
+      date: '2025-01-21',
+      storeName: '本店',
+      staffName: 'あすな',
+      category: 'ガールズ',
+      rank: 'A',
+      startTime: '19:00',
+      endTime: '23:00',
+      amount: 40000,
+      status: 'completed'
+    },
+    {
+      id: '7',
+      receptionNumber: 'R-2025-007',
+      date: '2025-01-20',
+      storeName: '本店',
+      staffName: 'あまね',
+      category: 'ガールズ',
+      rank: 'A',
+      startTime: '18:00',
+      endTime: '22:00',
+      amount: 35000,
+      status: 'completed'
+    },
+    {
+      id: '8',
+      receptionNumber: 'R-2025-008',
+      date: '2025-01-19',
+      storeName: '本店',
+      staffName: 'あんじゅ',
+      category: 'ガールズ',
+      rank: 'A',
+      startTime: '20:00',
+      endTime: '01:00',
+      amount: 50000,
+      status: 'completed'
     }
   ]);
 
-  const handleCustomerChange = (updatedFields: Partial<Customer>) => {
-    setSelectedCustomer(prev => ({
-      ...prev,
-      ...updatedFields
-    }));
-  };
-
-  const addVehicle = () => {
-    const newVehicle: Vehicle = {
-      id: Date.now().toString(),
-      type: '',
-      color: '',
-      number: ''
-    };
-    setVehicles(prev => [...prev, newVehicle]);
-  };
-
-  const removeVehicle = (id: string) => {
-    setVehicles(prev => prev.filter(v => v.id !== id));
-  };
-
-  const updateVehicle = (id: string, field: keyof Omit<Vehicle, 'id'>, value: string) => {
-    setVehicles(prev => prev.map(v => 
-      v.id === id ? { ...v, [field]: value } : v
-    ));
-  };
-
   // フィルタリングされた履歴
-  const filteredHistory = usageHistory.filter(history => {
-    if (kanaFilter === 'all') return true;
-    return history.staffName.charAt(0) === kanaFilter;
-  });
-
-  // 五十音グリッド配置（指定の並び）
-  const rawKanaRows = [
-    'あかさたなはまやらわ',
-    'いきしちにひみ　り　',
-    'うくすつぬふぬゆるを',
-    'えけせてねへめ　れ　',
-    'おこそとのほもよろん'
-  ];
-
-  const kanaGridRows: string[][] = rawKanaRows.map(row =>
-    Array.from(row).map(char => (char === '　' ? '' : char))
-  );
-
-  const petOptions: { key: PetOption; label: string }[] = [
-    { key: 'dog', label: '犬' },
-    { key: 'cat', label: '猫' },
-    { key: 'none', label: 'なし' },
-    { key: 'other', label: 'その他' }
-  ];
-
-  const handlePreferenceChange = (field: keyof PreferenceForm, value: string) => {
-    setPreferenceForm(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const togglePetSelection = (option: PetOption) => {
-    setPetSelections(prev => {
-      const next = { ...prev };
-      if (option === 'none') {
-        // 「なし」を選択したら他を解除
-        next.none = !prev.none;
-        if (next.none) {
-          next.dog = false;
-          next.cat = false;
-          next.other = false;
-        }
-      } else {
-        const newValue = !prev[option];
-        next[option] = newValue;
-        if (newValue && prev.none) {
-          next.none = false;
-        }
-      }
-      return next;
-    });
-  };
-
-  const handleReceiptChange = (field: keyof ReceiptForm, value: string) => {
-    setReceiptForm(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+  const filteredHistory = usageHistory;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-gray-100 p-4 [&_input]:border-black [&_textarea]:border-black">
       {/* ヘッダー */}
       <Card className="mb-4">
         <CardContent className="p-4">
@@ -523,651 +445,315 @@ export default function CustomerLedger() {
             </TabsList>
             
             {/* 基本情報タブ */}
-            <TabsContent value="basic-info" className="mt-0 p-6 border border-gray-400 border-t-0 text-sm">
-              <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.3fr_1fr]">
-                
-                {/* 左カラム - 基本情報入力エリア */}
-                <div className="space-y-8">
-                  
-                  {/* 電話番号（複数欄） */}
-                  <Card>
-                    <CardContent className="p-6 space-y-4">
-                      <div className="flex gap-2">
-                        <div className="flex-1">
-                          <Input id="phone-other" placeholder="050-1234-5678" />
-                        </div>
-                        <div className="flex items-end">
-                          <Button variant="outline" className="flex items-center gap-1">
-                            同一電話番号登録G1
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <div className="flex-1">
-                          <Input id="phone-other" placeholder="050-1234-5678" />
-                        </div>
-                        <div className="flex items-end">
-                          <Button variant="outline" className="flex items-center gap-1">
-                            同一電話番号登録G2
-                          </Button>
-                        </div>
-                      </div>
-                      <div>
-                        <Input id="phone-other" placeholder="050-1234-5678" />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* メールアドレス */}
-                  <Card>
-                    <CardContent className="p-6 space-y-4">
-                      <div>
-                        <Label htmlFor="email-webmail">Webメール</Label>
-                        <Input id="email-webmail" type="email" placeholder="example@gmail.com" />
-                      </div>
-                      <div>
-                        <Label htmlFor="email-mobile">携帯メール</Label>
-                        <Input id="email-mobile" type="email" placeholder="example@docomo.ne.jp" />
-                      </div>
-                      <div>
-                        <Label htmlFor="email-pc">PCメール</Label>
-                        <Input id="email-pc" type="email" placeholder="example@example.com" />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* 連絡方法 */}
-                  <Card>
-                    <CardContent className="p-6 space-y-4">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="contact-phone" />
-                        <Label htmlFor="contact-phone">電話</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="contact-email" />
-                        <Label htmlFor="contact-email">メール</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="contact-none" />
-                        <Label htmlFor="contact-none">なし</Label>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-6 space-y-4">
-                      <div className="flex flex-col gap-3">
-                        <div className="flex items-center space-x-2">
-                          <Checkbox id="newsletter" />
-                          <Label htmlFor="newsletter">メルマガ有無</Label>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <span className="text-sm font-medium text-gray-700">地元 / 出張</span>
-                          <div className="flex items-center gap-3">
-                            <label className="flex items-center gap-1">
-                              <input
-                                type="radio"
-                                name="work-area"
-                                value="local"
-                                checked={workArea === 'local'}
-                                onChange={() => setWorkArea('local')}
-                                className="h-4 w-4"
-                              />
-                              <span>地元</span>
-                            </label>
-                            <label className="flex items-center gap-1">
-                              <input
-                                type="radio"
-                                name="work-area"
-                                value="business_trip"
-                                checked={workArea === 'business_trip'}
-                                onChange={() => setWorkArea('business_trip')}
-                                className="h-4 w-4"
-                              />
-                              <span>出張</span>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* 住所 */}
-                  <Card>
-                    <CardContent className="p-6 space-y-4">
-                      <div className="flex gap-2">
-                        <div className="flex-1">
-                          <Label htmlFor="zipcode">郵便番号</Label>
-                          <Input id="zipcode" placeholder="100-0001" />
-                        </div>
-                        <div className="flex items-end">
-                          <Button variant="outline" className="flex items-center gap-1">
-                            <MapPin className="w-4 h-4" />
-                            住所検索
-                          </Button>
-                        </div>
-                      </div>
-                      <div>
-                        <Label htmlFor="prefecture">都道府県</Label>
-                        <Input id="prefecture" placeholder="東京都" />
-                      </div>
-                      <div>
-                        <Label htmlFor="city">市区町村</Label>
-                        <Input id="city" placeholder="千代田区" />
-                      </div>
-                      <div>
-                        <Label htmlFor="street">町丁番地</Label>
-                        <Input id="street" placeholder="千代田1-1-1" />
-                      </div>
-                      <div>
-                        <Label htmlFor="building">建物名他</Label>
-                        <Input id="building" placeholder="千代田ビル10F" />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* 地区区分 */}
-                  <Card>
-                    <CardContent className="p-6 space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="region">地域</Label>
-                          <Input id="region" placeholder="京都" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="area-code">コード</Label>
-                          <Input id="area-code" placeholder="21" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="place-name">地名</Label>
-                          <Input id="place-name" placeholder="地名を入力" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* 交通費・利用場所 */}
-                  <Card>
-                    <CardContent className="p-6 space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="transportation-fee">交通費</Label>
-                          <Input id="transportation-fee" type="number" placeholder="0" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="main-usage">主な利用場所</Label>
-                          <Input id="main-usage" placeholder="主な利用場所を入力" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="latitude">北緯</Label>
-                          <Input id="latitude" type="number" step="0.0001" placeholder="35.6762" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="longitude">東経</Label>
-                          <Input id="longitude" type="number" step="0.0001" placeholder="139.6503" />
-                        </div>
-                      </div>
-                      <Textarea 
-                        id="hotel-notes" 
-                        placeholder="ホテルに関する備考を入力してください"
-                        className="min-h-[100px]"
-                      />
-                    </CardContent>
-                  </Card>
-
-                  {/* 車両情報 */}
-                  <Card>
-                    <CardContent className="p-6 space-y-4">
-                      <div className="flex justify-end">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={addVehicle}
-                          className="flex items-center gap-1"
-                        >
-                          <Plus className="w-4 h-4" />
-                          車両追加
-                        </Button>
-                      </div>
-                      {/* 車両リスト */}
-                      <div className="space-y-3">
-                        {vehicles.map((vehicle, index) => (
-                          <div key={vehicle.id} className="border rounded-lg p-4 bg-gray-50">
-                            <div className="flex items-center justify-between mb-3">
-                              <h4 className="font-medium text-sm text-gray-700">車両 {index + 1}</h4>
-                              {vehicles.length > 1 && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeVehicle(vehicle.id)}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              )}
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                              <div>
-                                <Label htmlFor={`vehicle-type-${vehicle.id}`} className="text-xs">車種</Label>
-                                <Input 
-                                  id={`vehicle-type-${vehicle.id}`}
-                                  value={vehicle.type}
-                                  onChange={(e) => updateVehicle(vehicle.id, 'type', e.target.value)}
-                                  placeholder="例：BMW 7シリーズ"
-                                  className="text-sm"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor={`vehicle-color-${vehicle.id}`} className="text-xs">車色</Label>
-                                <Input 
-                                  id={`vehicle-color-${vehicle.id}`}
-                                  value={vehicle.color}
-                                  onChange={(e) => updateVehicle(vehicle.id, 'color', e.target.value)}
-                                  placeholder="例：ブラック"
-                                  className="text-sm"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor={`vehicle-number-${vehicle.id}`} className="text-xs">ナンバー</Label>
-                                <Input 
-                                  id={`vehicle-number-${vehicle.id}`}
-                                  value={vehicle.number}
-                                  onChange={(e) => updateVehicle(vehicle.id, 'number', e.target.value)}
-                                  placeholder="例：品川300あ1234"
-                                  className="text-sm"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      
-                      {/* 本日の車（単独項目） */}
-                      <div className="border-t pt-4 mt-4">
-                        <div>
-                          <Label htmlFor="todays-vehicle">本日の車</Label>
-                          <Input id="todays-vehicle" placeholder="本日使用する車両" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* クレジットカード */}
-                  <Card>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <Label htmlFor="card-number">カード番号</Label>
-                        <Input id="card-number" placeholder="**** **** **** ****" />
-                      </div>
-                      <div>
-                        <Label htmlFor="card-holder">名義人</Label>
-                        <Input id="card-holder" placeholder="カード名義人" />
-                      </div>
-                      <div>
-                        <Label htmlFor="card-expiry">有効期限</Label>
-                        <Input id="card-expiry" placeholder="MM/YY" />
-                      </div>
-                      <div>
-                        <Label htmlFor="card-company">カード会社</Label>
-                        <Input id="card-company" placeholder="例：VISA" />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* 備考欄 */}
-                  <Card>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <Label htmlFor="old-notes">旧備考</Label>
-                        <Textarea 
-                          id="old-notes" 
-                          placeholder="旧備考"
-                          className="min-h-[100px]"
-                          readOnly
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-
+            <TabsContent value="basic-info" className="mt-0 border border-black border-t-0 text-xs">
+              {/* 上部ヘッダー行 */}
+              <div className="flex border-b border-black">
+                {/* 左セクション - 電話番号 */}
+                <div className="flex items-center border-r border-black">
+                  <span className="bg-purple-200 px-2 py-1 text-xs border-r border-black">電話番号</span>
+                  <Input className="w-32 h-7 text-xs rounded-none border-0" defaultValue="000-1486-0491" />
+                  <Button variant="outline" size="sm" className="h-7 text-xs rounded-none border-l border-black">同一電話番号登録</Button>
                 </div>
+                {/* 中央セクション - ランク・好み */}
+                <div className="flex items-center border-r border-black">
+                  <span className="bg-purple-200 px-2 py-1 text-xs border-r border-black">ランク</span>
+                  <Input className="w-8 h-7 text-xs rounded-none border-0" defaultValue="A" />
+                  <span className="bg-purple-200 px-2 py-1 text-xs border-l border-r border-black">好みタイプ</span>
+                  <Input className="w-24 h-7 text-xs rounded-none border-0" />
+                  <span className="bg-purple-200 px-2 py-1 text-xs border-l border-r border-black">巨乳</span>
+                  <input type="checkbox" className="mx-2" />
+                </div>
+                {/* 右セクション - 出勤予定日 */}
+                <div className="flex items-center flex-1 justify-end">
+                  <span className="bg-purple-200 px-2 py-1 text-xs border-l border-r border-black">出勤予定日:</span>
+                  <span className="px-2 py-1 text-xs">2025年08月27日</span>
+                  <Button variant="outline" size="sm" className="h-7 text-xs rounded-none">再表示</Button>
+                </div>
+              </div>
 
-                {/* 中央カラム - 好み情報 */}
-                <div className="space-y-6">
-                  <div className="flex flex-wrap gap-3">
-                    <Button size="sm" variant="outline">顧客の統計</Button>
-                    <Button size="sm" variant="outline">全履歴表示</Button>
-                    <Button size="sm" variant="outline">ポイント履歴</Button>
-                    <Button size="sm" variant="outline">初期ポイント入力</Button>
+              {/* 2行目 */}
+              <div className="flex border-b border-black">
+                <div className="flex items-center border-r border-black">
+                  <Input className="w-32 h-7 text-xs rounded-none border-0" />
+                  <Button variant="outline" size="sm" className="h-7 text-xs rounded-none border-l border-black">同一電話番号登録</Button>
+                </div>
+                <div className="flex items-center border-r border-black">
+                  <span className="bg-purple-200 px-2 py-1 text-xs border-r border-black">ペット</span>
+                  <label className="flex items-center px-2 text-xs"><input type="checkbox" className="mr-1" />犬</label>
+                  <label className="flex items-center px-2 text-xs"><input type="checkbox" className="mr-1" />なし</label>
+                  <span className="bg-purple-200 px-2 py-1 text-xs border-l border-r border-black">話し方</span>
+                  <Input className="w-16 h-7 text-xs rounded-none border-0" />
+                  <span className="bg-purple-200 px-2 py-1 text-xs border-l border-r border-black">嫌いタイプ</span>
+                  <Input className="w-16 h-7 text-xs rounded-none border-0" />
+                </div>
+                <div className="flex-1 flex items-center justify-end">
+                  <span className="text-red-600 text-xs px-2">※2017年以降の履歴になります。</span>
+                </div>
+              </div>
+
+              {/* 3行目 */}
+              <div className="flex border-b border-black">
+                <div className="flex items-center border-r border-black">
+                  <span className="bg-purple-200 px-2 py-1 text-xs border-r border-black">Webmail</span>
+                  <Input className="w-32 h-7 text-xs rounded-none border-0" />
+                  <label className="flex items-center px-2 text-xs"><input type="checkbox" className="mr-1" />Web登録</label>
+                </div>
+                <div className="flex items-center border-r border-black">
+                  <label className="flex items-center px-2 text-xs"><input type="checkbox" className="mr-1" />焼</label>
+                  <label className="flex items-center px-2 text-xs"><input type="checkbox" className="mr-1" />塩</label>
+                  <label className="flex items-center px-2 text-xs"><input type="checkbox" className="mr-1" />巨乳</label>
+                  <label className="flex items-center px-2 text-xs"><input type="checkbox" className="mr-1" />やらかい</label>
+                  <span className="bg-purple-200 px-2 py-1 text-xs border-l border-r border-black">ロション</span>
+                  <Input className="w-16 h-7 text-xs rounded-none border-0" />
+                </div>
+                <div className="flex items-center border-r border-black px-2">
+                  <span className="text-xs">□塩度対象：京都デリヘル俱楽部</span>
+                </div>
+                <div className="flex items-center flex-1">
+                  <Button variant="outline" size="sm" className="h-7 text-xs rounded-none mx-1">全履歴表示</Button>
+                  <Button variant="outline" size="sm" className="h-7 text-xs rounded-none mx-1">ポイント履歴</Button>
+                  <Button variant="outline" size="sm" className="h-7 text-xs rounded-none mx-1">初期ポイント入力</Button>
+                </div>
+              </div>
+
+              {/* メイン3カラム */}
+              <div className="flex">
+                {/* 左カラム */}
+                <div className="w-1/4 border-r border-black">
+                  {/* 携帯メール */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs w-20 border-r border-black">携帯メール</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
                   </div>
-                  <Card>
-                    <CardContent className="p-6 space-y-6">
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="notes">備考</Label>
-                          <Textarea 
-                            id="notes" 
-                            placeholder="備考を入力してください"
-                            className="min-h-[100px]"
-                          />
-                        </div>
-                      </div>
-                      {/* ランク */}
-                      <div className="space-y-2">
-                        <div className="text-sm font-medium text-gray-700">ランク (A〜C)</div>
-                        <div className="flex gap-3">
-                          {(['A', 'B', 'C'] as PreferenceForm['rank'][]).map(rankOption => (
-                            <Button
-                              key={rankOption}
-                              type="button"
-                              variant={preferenceForm.rank === rankOption ? 'default' : 'outline'}
-                              className="flex-1"
-                              onClick={() => handlePreferenceChange('rank', rankOption)}
-                            >                                {rankOption}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* 好みタイプ */}
-                      <div className="space-y-2">
-                        <Label htmlFor="favoriteType" className="text-sm font-medium text-gray-700">
-                          好みタイプ
-                        </Label>
-                        <Input
-                          id="favoriteType"
-                          value={preferenceForm.favoriteType}
-                          onChange={e => handlePreferenceChange('favoriteType', e.target.value)}
-                          placeholder="例：明るい、面倒見が良い"
-                        />
-                      </div>
-
-                      {/* 話し方 */}
-                      <div className="space-y-2">
-                        <Label htmlFor="speakingStyle" className="text-sm font-medium text-gray-700">
-                          話し方
-                        </Label>
-                        <Input
-                          id="speakingStyle"
-                          value={preferenceForm.speakingStyle}
-                          onChange={e => handlePreferenceChange('speakingStyle', e.target.value)}
-                          placeholder="例：落ち着いたトーンで、ゆっくりと話す"
-                        />
-                      </div>
-
-                      {/* 嫌いタイプ */}
-                      <div className="space-y-2">
-                        <Label htmlFor="dislikedType" className="text-sm font-medium text-gray-700">
-                          嫌いタイプ
-                        </Label>
-                        <Input
-                          id="dislikedType"
-                          value={preferenceForm.dislikedType}
-                          onChange={e => handlePreferenceChange('dislikedType', e.target.value)}
-                          placeholder="例：押しが強い、無口"
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* ペット */}
-                  <Card>
-                    <CardContent className="p-6 space-y-4">
-                      <div className="text-sm font-medium text-gray-700">ペット</div>
-                      <div className="grid grid-cols-2 gap-3">
-                        {petOptions.map(option => (
-                          <label key={option.key} className="flex items-center gap-2 text-sm text-gray-700">
-                            <Checkbox
-                              checked={petSelections[option.key]}
-                              onCheckedChange={() => togglePetSelection(option.key)}
-                            />
-                            <span>{option.label}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                  {/* 領収書情報 */}
-                  <Card>
-                    <CardContent className="p-6 space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                          <Label htmlFor="receipt-recipient" className="text-sm font-medium text-gray-700">
-                            領収書宛先
-                          </Label>
-                          <Input
-                            id="receipt-recipient"
-                            value={receiptForm.recipient}
-                            onChange={e => handleReceiptChange('recipient', e.target.value)}
-                            placeholder="例：株式会社〇〇 御中"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="receipt-note" className="text-sm font-medium text-gray-700">
-                            領収書但書
-                          </Label>
-                          <Input
-                            id="receipt-note"
-                            value={receiptForm.note}
-                            onChange={e => handleReceiptChange('note', e.target.value)}
-                            placeholder="例：お品代"
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  {/* ドライバ・NG情報 */}
-                  <Card>
-                    <CardContent className="p-6 space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="first-driver" className="text-sm font-medium text-gray-700">
-                          Fisstドライバ名
-                        </Label>
-                        <Textarea
-                          id="first-driver"
-                          placeholder="Fisstドライバ名を入力してください"
-                          className="min-h-[80px]"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="shop-ng" className="text-sm font-medium text-gray-700">
-                          店NG
-                        </Label>
-                        <Textarea
-                          id="shop-ng"
-                          placeholder="店NGの情報を入力してください"
-                          className="min-h-[80px]"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <div className="text-sm font-medium text-gray-700">ホステス・顧客 NG / 連絡</div>
-                        <ul className="list-disc list-inside space-y-1 text-gray-700">
-                          <li>ホステス → 顧客NG</li>
-                          <li>顧客 → ホステスNG</li>
-                          <li>アドレス交換</li>
-                          <li>内容判明し次第実装</li>
-                        </ul>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  {/* PCメール */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs w-20 border-r border-black">PCメール</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
+                  </div>
+                  {/* 連絡方法 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs w-20 border-r border-black">連絡方法</span>
+                    <div className="flex items-center flex-1 px-1">
+                      <label className="flex items-center text-xs mr-2"><input type="checkbox" className="mr-1" />電話</label>
+                      <label className="flex items-center text-xs mr-2"><input type="checkbox" className="mr-1" />メール</label>
+                      <label className="flex items-center text-xs mr-2"><input type="checkbox" className="mr-1" />なし</label>
+                      <label className="flex items-center text-xs mr-2"><input type="checkbox" className="mr-1" />メルマガ</label>
+                      <label className="flex items-center text-xs"><input type="checkbox" className="mr-1" />有</label>
+                    </div>
+                  </div>
+                  {/* 郵便番号 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs w-20 border-r border-black">郵便番号</span>
+                    <Input className="w-24 h-7 text-xs rounded-none border-0" />
+                    <Button variant="outline" size="sm" className="h-7 text-xs rounded-none border-l border-black">住所ルーペ</Button>
+                  </div>
+                  {/* 市区町村 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-green-200 px-2 py-1 text-xs w-20 border-r border-black">市区町村</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
+                  </div>
+                  {/* 町丁番地 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-pink-200 px-2 py-1 text-xs w-20 border-r border-black">町丁番地</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" defaultValue="寺戸" />
+                  </div>
+                  {/* 番地 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-yellow-200 px-2 py-1 text-xs w-20 border-r border-black">番地</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
+                  </div>
+                  {/* 建物名称 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs w-20 border-r border-black">建物名称</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" defaultValue="寺室" />
+                  </div>
+                  {/* 京都市外住所 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs w-20 border-r border-black">京都市外住所</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
+                  </div>
+                  {/* 住所ふりがな */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs w-20 border-r border-black">住所ふりがな</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
+                  </div>
+                  {/* 町ふりがな */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs w-20 border-r border-black">町ふりがな</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
+                  </div>
+                  {/* 住所備考 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs w-20 border-r border-black">住所備考</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
+                  </div>
+                  {/* 地域区分 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs border-r border-black">地域区分</span>
+                    <Input className="w-12 h-7 text-xs rounded-none border-0" defaultValue="滋賀" />
+                    <Input className="w-8 h-7 text-xs rounded-none border-l border-black" defaultValue="21" />
+                    <Input className="flex-1 h-7 text-xs rounded-none border-l border-black" defaultValue="東側" />
+                  </div>
+                  {/* 青いボタン群 */}
+                  <div className="flex border-b border-black">
+                    <Button className="flex-1 h-7 text-xs rounded-none bg-blue-500 text-white">交通費</Button>
+                    <Button className="flex-1 h-7 text-xs rounded-none bg-green-500 text-white border-l border-black">派遣場所</Button>
+                  </div>
+                  {/* 交通費・利用場所 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs border-r border-black">交通費</span>
+                    <Input className="w-16 h-7 text-xs rounded-none border-0" />
+                    <span className="bg-purple-200 px-2 py-1 text-xs border-l border-r border-black">主な利用場所</span>
+                    <Input className="w-20 h-7 text-xs rounded-none border-0" />
+                    <span className="bg-purple-200 px-2 py-1 text-xs border-l border-r border-black">シティホテル</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
+                  </div>
+                  {/* 北緯・東経 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs border-r border-black">北緯</span>
+                    <Input className="w-20 h-7 text-xs rounded-none border-0" />
+                    <span className="bg-purple-200 px-2 py-1 text-xs border-l border-r border-black">東経</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
+                  </div>
+                  {/* ホテル備考 */}
+                  <div className="border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs block border-b border-black">ホテル備考</span>
+                    <Textarea className="w-full h-20 text-xs rounded-none border-0 bg-yellow-100" />
+                  </div>
+                  {/* 車両情報 */}
+                  <div className="flex items-center border-b border-black text-xs">
+                    <span className="bg-purple-200 px-1 py-1 border-r border-black">車種</span>
+                    <Input className="w-16 h-7 text-xs rounded-none border-0" />
+                    <span className="bg-purple-200 px-1 py-1 border-l border-r border-black">車色</span>
+                    <Input className="w-12 h-7 text-xs rounded-none border-0" />
+                    <span className="bg-purple-200 px-1 py-1 border-l border-r border-black">地域</span>
+                    <Input className="w-10 h-7 text-xs rounded-none border-0" />
+                    <span className="bg-purple-200 px-1 py-1 border-l border-r border-black">分類</span>
+                    <Input className="w-8 h-7 text-xs rounded-none border-0" />
+                    <span className="bg-purple-200 px-1 py-1 border-l border-r border-black">平仮名</span>
+                    <Input className="w-8 h-7 text-xs rounded-none border-0" />
+                    <span className="bg-purple-200 px-1 py-1 border-l border-r border-black">ナンバー</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
+                  </div>
+                  {/* 本日の車 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-pink-300 px-2 py-1 text-xs w-20 border-r border-black">本日の車</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
+                  </div>
+                  {/* クレジットカード・メディア */}
+                  <div className="flex items-center">
+                    <span className="bg-purple-200 px-2 py-1 text-xs border-r border-black">クレジットカード</span>
+                    <Input className="w-8 h-7 text-xs rounded-none border-0" />
+                    <span className="bg-purple-200 px-2 py-1 text-xs border-l border-r border-black">メディア</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
+                  </div>
                 </div>
 
-                {/* 右カラム - 利用履歴リスト */}
-                <div className="space-y-6">
-                  <Card>
-                    {/* カタカナフィルター */}
-                    <div className="px-6 py-4 border-b bg-gray-50">
-                      <div className="space-y-3">
-                        <Label className="text-sm font-medium text-gray-700">担当者名で検索（五十音）</Label>
-                        <RadioGroup 
-                          value={kanaFilter} 
-                          onValueChange={setKanaFilter}
-                          className="space-y-3"
-                        >
-                          {/* すべて */}
-                          <div className="pb-2 border-b">
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="all" id="all" />
-                              <Label htmlFor="all" className="text-sm cursor-pointer font-medium">すべて</Label>
-                            </div>
-                          </div>
+                {/* 中央カラム */}
+                <div className="w-1/4 border-r border-black">
+                  {/* 備考の統計 */}
+                  <div className="border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs block border-b border-black">備考の統計</span>
+                    <Textarea className="w-full h-32 text-xs rounded-none border-0" />
+                  </div>
+                  {/* 緑色のエリア */}
+                  <div className="border-b border-black bg-green-100 h-16"></div>
+                  {/* 編の信発先 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs w-20 border-r border-black">編の信発先</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
+                  </div>
+                  {/* 編の信住番 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs w-20 border-r border-black">編の信住番</span>
+                    <Input className="flex-1 h-7 text-xs rounded-none border-0" />
+                  </div>
+                  {/* 地元出張 */}
+                  <div className="flex items-center border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs w-20 border-r border-black">地元出張</span>
+                    <label className="flex items-center px-2 text-xs">
+                      <input type="radio" name="local-trip" className="mr-1" defaultChecked />地元
+                    </label>
+                  </div>
+                  {/* Firstドライバ名 */}
+                  <div className="border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs block border-b border-black">Firstドライバ名</span>
+                    <Textarea className="w-full h-12 text-xs rounded-none border-0" />
+                  </div>
+                  {/* 店NG */}
+                  <div className="border-b border-black">
+                    <span className="bg-purple-200 px-2 py-1 text-xs block border-b border-black">店NG</span>
+                    <Textarea className="w-full h-12 text-xs rounded-none border-0" />
+                  </div>
+                  {/* ホステス→顧客NG / 顧客→ホステスNG */}
+                  <div className="flex border-b border-black">
+                    <div className="flex-1 border-r border-black">
+                      <span className="bg-yellow-200 px-2 py-1 text-xs block border-b border-black">ホステス→顧客NG</span>
+                      <Textarea className="w-full h-12 text-xs rounded-none border-0" />
+                    </div>
+                    <div className="flex-1 border-r border-black">
+                      <span className="bg-yellow-200 px-2 py-1 text-xs block border-b border-black">顧客→ホステスNG</span>
+                      <Textarea className="w-full h-12 text-xs rounded-none border-0" />
+                    </div>
+                    <div className="flex-1">
+                      <span className="bg-yellow-200 px-2 py-1 text-xs block border-b border-black">アドレス交換</span>
+                      <Textarea className="w-full h-12 text-xs rounded-none border-0" />
+                    </div>
+                  </div>
+                  {/* 旧備考 */}
+                  <div>
+                    <span className="bg-purple-200 px-2 py-1 text-xs block border-b border-black">旧備考</span>
+                    <Textarea className="w-full h-20 text-xs rounded-none border-0 bg-yellow-100" />
+                    <div className="text-blue-600 text-xs p-1">巨乳好きの50分だが1時間精算おロ。なんせ礼儀が無いオバメ。 Bランク</div>
+                  </div>
+                </div>
 
-                          {/* 五十音表（回転配置） */}
-                          <div className="space-y-2 overflow-x-auto">
-                            {kanaGridRows.map((row, rowIndex) => (
-                              <div key={`row-${rowIndex}`} className="flex items-center gap-2">
-                                {row.map((kana, colIndex) => (
-                                  kana ? (
-                                    <div key={`kana-${rowIndex}-${colIndex}`} className="flex items-center space-x-1">
-                                      <RadioGroupItem value={kana} id={`kana-${rowIndex}-${colIndex}`} className="scale-90" />
-                                      <Label htmlFor={`kana-${rowIndex}-${colIndex}`} className="text-sm cursor-pointer">
-                                        {kana}
-                                      </Label>
-                                    </div>
-                                  ) : (
-                                    <div key={`blank-${rowIndex}-${colIndex}`} className="w-8 h-6" />
-                                  )
-                                ))}
-                              </div>
-                            ))}
-                          </div>
-                        </RadioGroup>
+                {/* 右カラム */}
+                <div className="flex-1">
+                  {/* 履歴ヘッダー */}
+                  <div className="flex items-center border-b border-black bg-gray-100 text-xs">
+                    <span className="px-2 py-1 border-r border-black">日付</span>
+                    <span className="px-2 py-1 border-r border-black">ホステス名</span>
+                    <span className="px-2 py-1 border-r border-black">コース</span>
+                    <span className="px-2 py-1 border-r border-black">場合</span>
+                    <span className="px-2 py-1 border-r border-black">延長</span>
+                    <span className="px-2 py-1 border-r border-black">時間</span>
+                    <span className="px-2 py-1 flex-1">派遣場所/氏名</span>
+                  </div>
+                  {/* 五十音グリッド */}
+                  <div className="flex border-b border-black">
+                    <div className="flex-1 p-1">
+                      <div className="grid grid-cols-10 gap-0 text-xs">
+                        {['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','','ゆ','','よ','ら','り','る','れ','ろ','わ','','を','','ん'].map((kana, i) => (
+                          kana ? (
+                            <button key={i} className="w-5 h-5 text-center hover:bg-gray-200 border border-gray-300">{kana}</button>
+                          ) : (
+                            <div key={i} className="w-5 h-5"></div>
+                          )
+                        ))}
                       </div>
                     </div>
-                    
-                    <CardContent className="p-0">
-                      <div className="min-h-[800px] overflow-y-auto">
-                        {/* テーブルヘッダー */}
-                        <div className="bg-gray-50 px-4 py-3 border-b">
-                          <div className="grid grid-cols-12 gap-2 text-xs font-medium text-gray-700">
-                            <div className="col-span-2">受付番号</div>
-                            <div className="col-span-1">日付</div>
-                            <div className="col-span-1">店舗</div>
-                            <div className="col-span-2">担当者</div>
-                            <div className="col-span-1">区分</div>
-                            <div className="col-span-1">ランク</div>
-                            <div className="col-span-2">時間</div>
-                            <div className="col-span-1">金額</div>
-                            <div className="col-span-1">状態</div>
-                          </div>
-                        </div>
-                        
-                        {/* テーブルボディ */}
-                        <div>
-                          {filteredHistory.length > 0 ? (
-                            filteredHistory.map((history) => (
-                            <div 
-                              key={history.id} 
-                              className="px-4 py-3 border-b hover:bg-gray-50"
-                            >
-                              <div className="grid grid-cols-12 gap-2 items-center text-sm">
-                                {/* 受付番号 */}
-                                <div className="col-span-2 font-semibold text-gray-900">
-                                  {history.receptionNumber}
-                                </div>
-                                
-                                {/* 日付 */}
-                                <div className="col-span-1 text-gray-600">
-                                  {history.date.slice(5)} {/* MM-DD表示 */}
-                                </div>
-                                
-                                {/* 店舗名 */}
-                                <div className="col-span-1 text-gray-900 truncate">
-                                  {history.storeName}
-                                </div>
-                                
-                                {/* 担当者名 */}
-                                <div className="col-span-2 text-gray-900 truncate">
-                                  {history.staffName}
-                                </div>
-                                
-                                {/* 区分 */}
-                                <div className="col-span-1 text-gray-700 text-xs">
-                                  {history.category}
-                                </div>
-                                
-                                {/* ランク */}
-                                <div className="col-span-1">
-                                  <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                    history.rank === 'VIP' ? 'bg-yellow-100 text-yellow-800' :
-                                    history.rank === 'S' ? 'bg-purple-100 text-purple-800' :
-                                    history.rank === 'A' ? 'bg-green-100 text-green-800' :
-                                    'bg-gray-100 text-gray-800'
-                                  }`}>
-                                    {history.rank}
-                                  </span>
-                                </div>
-                                
-                                {/* 時間 */}
-                                <div className="col-span-2 text-gray-700">
-                                  <div className="text-xs">
-                                    {history.startTime}
-                                    {history.endTime && ` ～ ${history.endTime}`}
-                                    {history.status === 'absent' && (
-                                      <div className="text-red-600">（欠席）</div>
-                                    )}
-                                  </div>
-                                </div>
-                                
-                                {/* 金額 */}
-                                <div className="col-span-1 text-right font-semibold">
-                                  {history.status === 'completed' ? (
-                                    <span className="text-gray-900 text-xs">
-                                      ¥{(history.amount / 1000).toFixed(0)}k
-                                    </span>
-                                  ) : (
-                                    <span className="text-red-600 text-xs">¥0</span>
-                                  )}
-                                </div>
-                                
-                                {/* 状態 */}
-                                <div className="col-span-1">
-                                  <div className={`w-3 h-3 rounded-full ${
-                                    history.status === 'completed'
-                                      ? 'bg-blue-500'
-                                      : 'bg-red-500'
-                                  }`}></div>
-                                </div>
-                              </div>
-                            </div>
-                            ))
-                          ) : (
-                            <div className="px-4 py-12 text-center text-gray-500">
-                              <div className="space-y-2">
-                                <div className="text-lg">該当する履歴がありません</div>
-                                <div className="text-sm">
-                                  {kanaFilter !== 'all' && `「${kanaFilter}」で始まる担当者の履歴はありません`}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                    <Button variant="outline" size="sm" className="h-7 text-xs rounded-none m-1">クリア</Button>
+                  </div>
+                  {/* 履歴テーブル */}
+                  <div className="overflow-y-auto" style={{ maxHeight: '400px' }}>
+                    {filteredHistory.map((history, index) => (
+                      <div
+                        key={history.id}
+                        className={`flex items-center border-b border-black text-xs ${
+                          history.status === 'absent' ? 'bg-red-400' :
+                          index % 2 === 0 ? 'bg-white' : 'bg-pink-100'
+                        }`}
+                      >
+                        <span className="px-2 py-1 border-r border-black w-16">{history.staffName}</span>
+                        <span className="px-2 py-1 border-r border-black w-12">{history.category}</span>
+                        <span className="px-2 py-1 border-r border-black w-8">{history.rank}</span>
+                        <span className="px-2 py-1 border-r border-black w-12">終了</span>
+                        <span className="px-2 py-1 flex-1">{history.startTime} {history.endTime}</span>
                       </div>
-                      
-                      {/* フッター情報 */}
-                      <div className="border-t px-6 py-4 bg-gray-50">
-                        <div className="flex justify-between text-sm">
-                          <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                              <span className="text-gray-600">終了</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                              <span className="text-gray-600">当日欠</span>
-                            </div>
-                          </div>
-                          <div className="font-semibold">
-                            {kanaFilter === 'all' ? (
-                              `総履歴: ${usageHistory.length}件`
-                            ) : (
-                              `表示: ${filteredHistory.length}件 / 総履歴: ${usageHistory.length}件`
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                    ))}
+                  </div>
                 </div>
-
               </div>
             </TabsContent>
             

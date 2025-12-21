@@ -1,7 +1,11 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from 'lucide-react';
 
+// 出勤希望アルバイトデータ
 const attendanceData = [
   { id: 1, lastName: '松尾', firstName: '久御', status: '希望', startTime: '9:00', endTime: '23:00', type: 'ドライバ', selected: false },
   { id: 2, lastName: '土居4', firstName: '近江', status: '希望', startTime: '9:00', endTime: '4:00', type: 'ドライバ', selected: false },
@@ -15,8 +19,15 @@ const attendanceData = [
   { id: 10, lastName: '大谷', firstName: '大翔', status: '出勤', startTime: '12:00', endTime: '17:30', type: '内勤', selected: false },
   { id: 11, lastName: '岸本', firstName: '礼人', status: '', startTime: '', endTime: '', type: 'スタッフ', selected: false },
   { id: 12, lastName: '横田', firstName: '武', status: '希望', startTime: '8:00', endTime: '16:00', type: 'スタッフ', selected: false },
+  { id: 13, lastName: '田中', firstName: '健太', status: '希望', startTime: '10:00', endTime: '18:00', type: 'ドライバ', selected: false },
+  { id: 14, lastName: '佐藤', firstName: '裕二', status: '出勤', startTime: '13:00', endTime: '21:00', type: 'ドライバ', selected: false },
+  { id: 15, lastName: '鈴木', firstName: '慎吾', status: '希望', startTime: '9:00', endTime: '17:00', type: '内勤', selected: true },
+  { id: 16, lastName: '高橋', firstName: '誠', status: '希望', startTime: '14:00', endTime: '22:00', type: 'ドライバ', selected: false },
+  { id: 17, lastName: '渡辺', firstName: '勇気', status: '希望', startTime: '18:00', endTime: '2:00', type: 'ドライバ', selected: false },
+  { id: 18, lastName: '伊藤', firstName: '大介', status: '出勤', startTime: '11:00', endTime: '19:00', type: 'スタッフ', selected: true },
 ];
 
+// 予約データ
 const reservationData = [
   { 
     id: '63691', 
@@ -54,25 +65,199 @@ const reservationData = [
     store: '',
     color: 'blue'
   },
+  { 
+    id: '45237', 
+    name1: 'ヤマダ', 
+    name2: 'さくら', 
+    startTime: '19:00', 
+    type1: 'S', 
+    type2: 'GIRL', 
+    endTime: '21:00', 
+    location: '京都', 
+    store: 'クラブエレガンス',
+    color: 'pink'
+  },
+  { 
+    id: '72851', 
+    name1: 'サイトウ', 
+    name2: '美咲', 
+    startTime: '20:30', 
+    type1: 'RH', 
+    type2: 'LADY', 
+    endTime: '22:30', 
+    location: '南心', 
+    store: 'ラウンジ桜',
+    color: 'blue'
+  },
+  { 
+    id: '89214', 
+    name1: 'イトウ', 
+    name2: 'あやの', 
+    startTime: '22:00', 
+    type1: '確S', 
+    type2: 'Stand', 
+    endTime: '0:00', 
+    location: '京都', 
+    store: 'ナイトクラブMIX',
+    color: 'pink'
+  },
+];
+
+// 所属事務所変更データ
+const officeChangeData = [
+  { id: 1, checkboxes: [false, false, false, false], number: 46, area: '京都', type: 'G', name: 'かりん', count: 2, status: '終了' },
+  { id: 2, checkboxes: [false, false, false, false], number: 23, area: '大阪', type: 'L', name: 'みゆき', count: 1, status: '待機' },
+  { id: 3, checkboxes: [false, false, false, false], number: 38, area: '南心', type: 'G', name: 'あかり', count: 3, status: '移動中' },
+  { id: 4, checkboxes: [false, false, false, false], number: 15, area: '京都', type: 'L', name: 'さくら', count: 1, status: '終了' },
+];
+
+// 所属事務所データ
+const officeAssignmentData = [
+  { id: 1, driverArea: '南 和食6', startTime: '17:00', departure: '京都駅八条口', endTime: '22:00', returnTime: '23:30', destination: '鳥丸今出川', staff: '南' },
+  { id: 2, driverArea: '北 洋食3', startTime: '18:30', departure: '四条河原町', endTime: '23:00', returnTime: '0:30', destination: '烏丸御池', staff: '北村' },
+  { id: 3, driverArea: '東 和食2', startTime: '19:00', departure: '祇園四条', endTime: '1:00', returnTime: '2:00', destination: '三条京阪', staff: '東山' },
+];
+
+// 出勤管理データ
+const attendanceManagementData = [
+  { id: 1, status: '出勤', type: '社員', name: '吉田 峯雅10', startTime: '17:00', endTime: '4:00', statusLabel: '出勤', checkboxes: [true, true], icons: ['✉', '✕', '👤', ''] },
+  { id: 2, status: '希望', type: 'アルバイト', name: '田中 一郎', startTime: '18:00', endTime: '2:00', statusLabel: '希望', checkboxes: [true, false], icons: ['✉', '', '👤', '✕'] },
+  { id: 3, status: '出勤', type: '社員', name: '佐藤 次郎', startTime: '19:00', endTime: '3:00', statusLabel: '出勤', checkboxes: [true, true], icons: ['✉', '✕', '', ''] },
+];
+
+// ポジションデータ（前半）
+const positionFirstHalfData = [
+  { id: 1, position: '配車', members: [{ name: '?63 山岡 嘉和?', hasAction: true }, { name: '', hasAction: true }] },
+  { id: 2, position: '京都フロント', members: [{ name: '', hasAction: true }] },
+  { id: 3, position: '人妻フロント', members: [{ name: '?15 森川 隆登', hasAction: true }, { name: '', hasAction: true }] },
+  { id: 4, position: 'FIRSTフロント', members: [{ name: '?77 植田 武', hasAction: true }, { name: '', hasAction: true }] },
+  { id: 5, position: '南ICフロント', members: [{ name: '?54 片山 竜次', hasAction: true }, { name: '', hasAction: true }] },
+];
+
+// ポジションデータ（後半）
+const positionSecondHalfData = [
+  { id: 1, position: '会計', members: [{ name: '?25 松平 篤', hasAction: true }] },
+  { id: 2, position: '配車', members: [{ name: '?77 坪平 中尾11', hasAction: true }, { name: '', hasAction: true }] },
+  { id: 3, position: '京都フロント', members: [{ name: '?08 杉本 淳', hasAction: true }, { name: '', hasAction: true }] },
+  { id: 4, position: '人妻フロント', members: [{ name: '678 中村 南斗', hasAction: true }, { name: '', hasAction: true }] },
+  { id: 5, position: 'FIRSTフロント', members: [{ name: '', hasAction: true }] },
+  { id: 6, position: '南ICフロント', members: [{ name: '? 汐崎 哲也3', hasAction: true }, { name: '', hasAction: true }] },
+];
+
+// スタッフ予定リストデータ
+const staffScheduleData = [
+  '古田→ラビット話す(割引等)ドメイン変更比、☆前月推迁 南店話す',
+  '(次回営業→投入金シメセット→セット)',
+  '南☆ よく回る、スタッフの人数出す、空、応時間で手緒列案、シメ確認作不',
+  '(南店長、副座05月 2000迄;5決時)',
+  '6月度日程発教み',
+  'システムの方が会計予定',
+  '南→石古遠室不に対象達室大名>前',
+  'ドライバ一早畑打ちし半館下さい♪次時',
+  '出罰-訓時05H 17:00迄二次時',
+  '中林-訓時05H 17:00止前ぷ次時',
+];
+
+// 面接予定データ
+const interviewScheduleData = [
+  { id: 1, time: '15:30', type: '入店', location: 'セブンイレブン新町一条店', position: 'ホステス', staff: '南 和宣6' },
+  { id: 2, time: '17:00', type: '面接', location: '京都駅八条口', position: 'ドライバ', staff: '北村 太郎' },
 ];
 
 export default function TehaiPage() {
+  const router = useRouter();
+
   React.useEffect(() => {
     document.title = '手配表 - Dispatch Harmony Hub';
   }, []);
 
   return (
     <div className="w-[2000px] h-[1080px] relative bg-white flex flex-col text-xs">
-      {/* ヘッダー部分 */}
-      <div className="w-full h-[100px] bg-gray-200 border-b border-gray-400 flex items-center">
-        <div className="flex gap-1 px-2">
-          <button className="px-3 py-1 bg-lime-400 text-black text-sm font-bold border border-gray-600">所属/稼働/状況</button>
-          <button className="px-3 py-1 bg-gray-300 text-black text-sm border border-gray-600">外部業者/状況</button>
-          <button className="px-3 py-1 bg-fuchsia-400 text-black text-sm font-bold border border-gray-600">配車確認（様相関係/担当）</button>
-        </div>
-        <div className="ml-auto flex gap-2 px-4">
-          <span className="text-sm font-bold">2024/01/15 (月)</span>
-          <span className="text-sm font-bold text-blue-600">19:30:45</span>
+      {/* ヘッダー - 配車パネルと同じスタイル */}
+      <div className="w-full h-[50px] bg-white border-b border-zinc-300">
+        <div className="flex items-center h-full px-2">
+          {/* ダッシュボードに戻る - 左端 */}
+          <Button
+            variant="outline"
+            onClick={() => router.push('/dashboard')}
+            className="h-8 px-3 text-xs flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+
+          {/* 中央配置のボタン群 */}
+          <div className="flex-1 flex items-center justify-center gap-2">
+            {/* 手配表タイトル */}
+            <h1 className="text-lg font-bold mr-2">手配表</h1>
+
+            {/* 日付移動 */}
+            <Button
+              variant="outline"
+              className="h-8 px-3 text-xs border-black"
+              onClick={() => {}}
+            >
+              日付移動
+            </Button>
+
+            {/* ドライバ精算 */}
+            <Button
+              className="h-8 px-4 text-xs bg-lime-400 hover:bg-lime-500 text-black border border-black"
+              onClick={() => {}}
+            >
+              ドライバ精算
+            </Button>
+
+            {/* 新顧客検索 */}
+            <Button
+              variant="outline"
+              className="h-8 px-4 text-xs border-black"
+              onClick={() => router.push('/customer-ledger')}
+            >
+              新顧客検索
+            </Button>
+
+            {/* RT IIパネル */}
+            <Button
+              className="h-8 px-4 text-xs bg-purple-400 hover:bg-purple-500 text-black border border-black"
+              onClick={() => router.push('/rt2-panel')}
+            >
+              RT IIパネル
+            </Button>
+
+            {/* RTパネル */}
+            <Button
+              className="h-8 px-4 text-xs bg-orange-400 hover:bg-orange-500 text-black border border-black"
+              onClick={() => {}}
+            >
+              RTパネル
+            </Button>
+
+            {/* 配車パネル */}
+            <Button
+              className="h-8 px-4 text-xs bg-amber-200 hover:bg-amber-300 text-black border border-black"
+              onClick={() => router.push('/dispatch-panel-2d')}
+            >
+              配車パネル
+            </Button>
+
+            {/* Menu */}
+            <Button
+              variant="outline"
+              className="h-8 px-4 text-xs border-black"
+              onClick={() => {}}
+            >
+              Menu
+            </Button>
+
+            {/* チャット表示 */}
+            <Button
+              className="h-8 px-4 text-xs bg-cyan-300 hover:bg-cyan-400 text-black border border-black"
+              onClick={() => {}}
+            >
+              チャット表示
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -84,19 +269,22 @@ export default function TehaiPage() {
             <a href="#" className="text-blue-600 underline font-bold text-sm">所属事務所変更</a>
           </div>
           <div className="flex-1 overflow-auto">
-            <div className="flex items-center border-b border-gray-300 text-[12px] bg-white">
-              <div className="w-4 text-center border-r border-gray-300"><input type="checkbox" className="w-3 h-3" /></div>
-              <div className="w-4 text-center border-r border-gray-300"><input type="checkbox" className="w-3 h-3" /></div>
-              <div className="w-4 text-center border-r border-gray-300"><input type="checkbox" className="w-3 h-3" /></div>
-              <div className="w-4 text-center border-r border-gray-300"><input type="checkbox" className="w-3 h-3" /></div>
-              <div className="w-6 text-center border-r border-gray-300">46</div>
-              <div className="w-10 text-center border-r border-gray-300">京都</div>
-              <div className="w-8 text-center border-r border-gray-300 bg-white">G</div>
-              <div className="flex-1 border-r border-gray-300 text-blue-600">かりん</div>
-              <div className="w-4 text-center border-r border-gray-300 font-bold">2</div>
-              <div className="w-8 text-center border-r border-gray-300 bg-gray-200">終了</div>
-              <div className="w-4 text-center"></div>
-            </div>
+            {officeChangeData.map((data) => (
+              <div key={data.id} className="flex items-center border-b border-gray-300 text-[12px] bg-white">
+                {data.checkboxes.map((checked, idx) => (
+                  <div key={idx} className="w-4 text-center border-r border-gray-300">
+                    <input type="checkbox" className="w-3 h-3" defaultChecked={checked} />
+                  </div>
+                ))}
+                <div className="w-6 text-center border-r border-gray-300">{data.number}</div>
+                <div className="w-10 text-center border-r border-gray-300">{data.area}</div>
+                <div className="w-8 text-center border-r border-gray-300 bg-white">{data.type}</div>
+                <div className="flex-1 border-r border-gray-300 text-blue-600">{data.name}</div>
+                <div className="w-4 text-center border-r border-gray-300 font-bold">{data.count}</div>
+                <div className="w-8 text-center border-r border-gray-300 bg-gray-200">{data.status}</div>
+                <div className="w-4 text-center"></div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -117,42 +305,53 @@ export default function TehaiPage() {
             <div className="text-center px-1">担当者</div>
           </div>
           <div className="flex-1 overflow-auto">
-            <div className="flex items-center border-b border-gray-300 text-[12px] bg-white">
-              <div className="w-5 text-center border-r border-gray-300 bg-lime-400 font-bold">1</div>
-              <div className="w-16 border-r border-gray-300 px-1">南 和食6</div>
-              <div className="w-10 text-center border-r border-gray-300">17:00</div>
-              <div className="flex-1 border-r border-gray-300 px-1">京都駅八条口</div>
-              <div className="w-10 text-center border-r border-gray-300">22:00</div>
-              <div className="w-10 text-center border-r border-gray-300">23:30</div>
-              <div className="border-r border-gray-300 px-1">鳥丸今出川</div>
-              <div className="text-center px-1">南</div>
-            </div>
+            {officeAssignmentData.map((data) => (
+              <div key={data.id} className="flex items-center border-b border-gray-300 text-[12px] bg-white">
+                <div className="w-5 text-center border-r border-gray-300 bg-lime-400 font-bold">{data.id}</div>
+                <div className="w-16 border-r border-gray-300 px-1">{data.driverArea}</div>
+                <div className="w-10 text-center border-r border-gray-300">{data.startTime}</div>
+                <div className="flex-1 border-r border-gray-300 px-1">{data.departure}</div>
+                <div className="w-10 text-center border-r border-gray-300">{data.endTime}</div>
+                <div className="w-10 text-center border-r border-gray-300">{data.returnTime}</div>
+                <div className="border-r border-gray-300 px-1">{data.destination}</div>
+                <div className="text-center px-1">{data.staff}</div>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* 左3列目: 出勤管理テーブル */}
         <div className="h-full border-r border-gray-400 w-[446px] bg-white flex flex-col">
           <div className="flex-1 overflow-auto">
-            <div className="flex items-center border-b border-gray-300 text-[12px] bg-white">
-              <div className="w-4 text-center border-r border-gray-300 bg-blue-600 text-white font-bold">1</div>
-              <div className="w-10 text-center border-r border-gray-300 bg-lime-400">出勤</div>
-              <div className="w-10 text-center border-r border-gray-300 bg-lime-400">社員</div>
-              <div className="w-24 border-r border-gray-300">吉田 峯雅10</div>
-              <div className="w-12 text-center border-r border-gray-300 text-blue-600 font-bold">17:00</div>
-              <div className="w-12 text-center border-r border-gray-300">4:00</div>
-              <div className="w-6 text-center border-r border-gray-300 bg-lime-400 text-[9px]">出勤</div>
-              <div className="w-12 flex items-center justify-center gap-1 border-r border-gray-300">
-                <input type="checkbox" className="w-3 h-3" defaultChecked />
-                <input type="checkbox" className="w-3 h-3" defaultChecked />
+            {attendanceManagementData.map((data) => (
+              <div key={data.id} className="flex items-center border-b border-gray-300 text-[12px] bg-white">
+                <div className="w-4 text-center border-r border-gray-300 bg-blue-600 text-white font-bold">{data.id}</div>
+                <div className="w-10 text-center border-r border-gray-300 bg-lime-400">{data.status}</div>
+                <div className="w-10 text-center border-r border-gray-300 bg-lime-400">{data.type}</div>
+                <div className="w-24 border-r border-gray-300">{data.name}</div>
+                <div className="w-12 text-center border-r border-gray-300 text-blue-600 font-bold">{data.startTime}</div>
+                <div className="w-12 text-center border-r border-gray-300">{data.endTime}</div>
+                <div className="w-6 text-center border-r border-gray-300 bg-lime-400 text-[9px]">{data.statusLabel}</div>
+                <div className="w-12 flex items-center justify-center gap-1 border-r border-gray-300">
+                  {data.checkboxes.map((checked, idx) => (
+                    <input key={idx} type="checkbox" className="w-3 h-3" defaultChecked={checked} />
+                  ))}
+                </div>
+                <div className="w-24 flex items-center gap-0.5">
+                  {data.icons.map((icon, idx) => (
+                    <div key={idx} className={`w-5 h-5 flex items-center justify-center text-[9px] ${
+                      icon === '✉' ? 'bg-lime-400' : 
+                      icon === '✕' ? 'bg-gray-200' : 
+                      icon === '👤' ? 'bg-pink-300' : 
+                      'border border-gray-400 bg-white'
+                    }`}>
+                      {icon}
+                    </div>
+                  ))}
+                </div>
+                <div className="w-3 border-l border-gray-300"></div>
               </div>
-              <div className="w-24 flex items-center gap-0.5">
-                <div className="w-5 h-5 bg-lime-400 flex items-center justify-center text-[9px]">✉</div>
-                <div className="w-5 h-5 bg-gray-200 flex items-center justify-center text-[9px]">✕</div>
-                <div className="w-5 h-5 bg-pink-300 flex items-center justify-center text-[9px]">👤</div>
-                <div className="w-5 h-5 border border-gray-400 bg-white"></div>
-              </div>
-              <div className="w-3 border-l border-gray-300"></div>
-            </div>
+            ))}
           </div>
         </div>
 
@@ -169,149 +368,60 @@ export default function TehaiPage() {
                 <div className="w-1/2 flex flex-col border-r border-gray-400">
                   <div className="text-center border-b border-gray-400 bg-gray-100 py-0.5">前半</div>
                   <div className="flex-1 flex flex-col px-1 py-1">
-                    <div className="text-center font-bold mb-1">配車</div>
-                    <div className="border border-gray-800 mb-2">
-                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
-                        <span>?63 山岡 嘉和?</span>
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
+                    {positionFirstHalfData.map((position) => (
+                      <div key={position.id} className="mb-2">
+                        <div className={`text-center mb-1 ${position.position === '配車' ? 'font-bold' : ''}`}>
+                          {position.position}
+                        </div>
+                        <div className="border border-gray-800">
+                          {position.members.map((member, idx) => (
+                            <div 
+                              key={idx} 
+                              className={`flex items-center justify-between h-5 px-0.5 ${
+                                member.name ? 'bg-white' : 'bg-gray-200'
+                              } ${idx < position.members.length - 1 ? 'border-b border-gray-300' : ''}`}
+                            >
+                              {member.name && <span>{member.name}</span>}
+                              {member.hasAction && (
+                                <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center ml-auto">
+                                  <span className="text-white text-[10px] leading-none">×</span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       </div>
-                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-center mb-1">京都フロント</div>
-                    <div className="border border-gray-800 mb-2">
-                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-center mb-1">人妻フロント</div>
-                    <div className="border border-gray-800 mb-2">
-                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
-                        <span>?15 森川 隆登</span>
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-center mb-1">FIRSTフロント</div>
-                    <div className="border border-gray-800 mb-2">
-                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
-                        <span>?77 植田 武</span>
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-center mb-1">南ICフロント</div>
-                    <div className="border border-gray-800 mb-2">
-                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
-                        <span>?54 片山 竜次</span>
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
                 {/* 後半列 */}
                 <div className="w-1/2 flex flex-col">
                   <div className="text-center border-b border-gray-400 bg-gray-100 py-0.5">後半</div>
                   <div className="flex-1 flex flex-col px-1 py-1">
-                    <div className="text-center font-bold mb-1">会計</div>
-                    <div className="border border-gray-800 mb-2">
-                      <div className="flex items-center justify-between h-5 bg-white px-0.5">
-                        <span>?25 松平 篤</span>
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
+                    {positionSecondHalfData.map((position) => (
+                      <div key={position.id} className="mb-2">
+                        <div className={`text-center mb-1 ${position.position === '会計' || position.position === '配車' ? 'font-bold' : ''}`}>
+                          {position.position}
+                        </div>
+                        <div className="border border-gray-800">
+                          {position.members.map((member, idx) => (
+                            <div 
+                              key={idx} 
+                              className={`flex items-center justify-between h-5 px-0.5 ${
+                                member.name ? 'bg-white' : 'bg-gray-200'
+                              } ${idx < position.members.length - 1 ? 'border-b border-gray-300' : ''}`}
+                            >
+                              {member.name && <span>{member.name}</span>}
+                              {member.hasAction && (
+                                <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center ml-auto">
+                                  <span className="text-white text-[10px] leading-none">×</span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    </div>
-                    <div className="text-center font-bold mb-1">配車</div>
-                    <div className="border border-gray-800 mb-2">
-                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
-                        <span>?77 坪平 中尾11</span>
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-center mb-1">京都フロント</div>
-                    <div className="border border-gray-800 mb-2">
-                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
-                        <span>?08 杉本 淳</span>
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-center mb-1">人妻フロント</div>
-                    <div className="border border-gray-800 mb-2">
-                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
-                        <span>678 中村 南斗</span>
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-center mb-1">FIRSTフロント</div>
-                    <div className="border border-gray-800 mb-2">
-                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-center mb-1">南ICフロント</div>
-                    <div className="border border-gray-800 mb-2">
-                      <div className="flex items-center justify-between h-5 bg-white border-b border-gray-300 px-0.5">
-                        <span>? 汐崎 哲也3</span>
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
-                        <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -388,16 +498,11 @@ export default function TehaiPage() {
                 background: 'repeating-linear-gradient(to bottom, #d4f1d4 0px, #d4f1d4 24px, white 24px, white 48px)',
                 lineHeight: '12px'
               }}>
-                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>古田→ラビット話す(割引等)ドメイン変更比、☆前月推迁 南店話す</div>
-                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>(次回営業→投入金シメセット→セット)</div>
-                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>南☆ よく回る、スタッフの人数出す、空、応時間で手緒列案、シメ確認作不</div>
-                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>(南店長、副座05月 2000迄;5決時)</div>
-                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>6月度日程発教み</div>
-                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>システムの方が会計予定</div>
-                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>南→石古遠室不に対象達室大名&gt;前</div>
-                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>ドライバ一早畑打ちし半館下さい♪次時</div>
-                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>出罰-訓時05H 17:00迄二次時</div>
-                <div className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>中林-訓時05H 17:00止前ぷ次時</div>
+                {staffScheduleData.map((text, idx) => (
+                  <div key={idx} className="px-2 overflow-hidden whitespace-nowrap" style={{ height: '12px' }}>
+                    {text}
+                  </div>
+                ))}
                 <div style={{ height: '120px' }}></div>
               </div>
             </div>
@@ -450,15 +555,17 @@ export default function TehaiPage() {
                 面接予定
               </div>
               {/* 面接情報 */}
-              <div className="bg-white px-3 py-2 border-b border-gray-300">
-                <div className="text-xs flex items-center gap-2">
-                  <span className="font-bold text-sm">15:30</span>
-                  <span className="font-semibold">入店</span>
-                  <span>セブンイレブン新町一条店</span>
-                  <span className="font-semibold">ホステス</span>
-                  <span className="ml-auto font-semibold">南 和宣6</span>
+              {interviewScheduleData.map((interview) => (
+                <div key={interview.id} className="bg-white px-3 py-2 border-b border-gray-300">
+                  <div className="text-xs flex items-center gap-2">
+                    <span className="font-bold text-sm">{interview.time}</span>
+                    <span className="font-semibold">{interview.type}</span>
+                    <span>{interview.location}</span>
+                    <span className="font-semibold">{interview.position}</span>
+                    <span className="ml-auto font-semibold">{interview.staff}</span>
+                  </div>
                 </div>
-              </div>
+              ))}
               {/* ピンクブロック1 */}
               <div className="bg-pink-200 mx-2 mt-3 mb-2" style={{ height: '100px' }}>
               </div>
