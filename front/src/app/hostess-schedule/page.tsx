@@ -357,25 +357,27 @@ export default function HostessSchedule() {
             <h1 className="text-lg font-bold mr-2">ホステススケジュール管理</h1>
 
             {/* 週間ナビゲーション */}
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="h-8 px-2"
-              onClick={() => navigateWeek('prev')}
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <div className="text-sm font-mono bg-gray-500 text-white px-2 py-1 rounded">
-              {weekDates.length > 0 && `${formatDate(weekDates[0])} - ${formatDate(weekDates[6])}`}
+            <div className="flex items-center">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => navigateWeek('prev')}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <div className="text-sm font-mono bg-gray-500 text-white px-2 py-1">
+                {weekDates.length > 0 && `${formatDate(weekDates[0])} - ${formatDate(weekDates[6])}`}
+              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => navigateWeek('next')}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="h-8 px-2"
-              onClick={() => navigateWeek('next')}
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
 
             {/* アクションボタン */}
             <Button 
