@@ -172,7 +172,7 @@ export default function TehaiPage() {
   }, []);
 
   return (
-    <div className="w-[2000px] h-[1080px] relative bg-white flex flex-col text-xs">
+    <div className="w-[1920px] h-[1080px] relative bg-white flex flex-col text-xs">
       {/* ヘッダー - 配車パネルと同じスタイル */}
       <div className="w-full h-[50px] bg-white border-b border-zinc-300">
         <div className="flex items-center h-full px-2">

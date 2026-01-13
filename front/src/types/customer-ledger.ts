@@ -14,7 +14,6 @@ export interface UsageHistory {
   storeName: string;
   staffName: string;
   category: string;
-  rank: string;
   startTime: string;
   endTime: string;
   amount: number;
@@ -22,7 +21,6 @@ export interface UsageHistory {
 }
 
 export interface PreferenceForm {
-  rank: 'A' | 'B' | 'C';
   favoriteType: string;
   speakingStyle: string;
   dislikedType: string;

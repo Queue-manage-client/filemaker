@@ -30,7 +30,6 @@ export default function CustomerLedger() {
   
   const [kanaFilter, setKanaFilter] = useState<string>('all');
   const [preferenceForm, setPreferenceForm] = useState<PreferenceForm>({
-    rank: 'A',
     favoriteType: '',
     speakingStyle: '',
     dislikedType: ''
@@ -55,7 +54,6 @@ export default function CustomerLedger() {
       storeName: '本店',
       staffName: '佐藤美智子',
       category: 'ガールズ',
-      rank: 'VIP',
       startTime: '19:00',
       endTime: '23:30',
       amount: 45000,
@@ -68,7 +66,6 @@ export default function CustomerLedger() {
       storeName: '銀座支店',
       staffName: 'あ',
       category: 'プレミアム',
-      rank: 'S',
       startTime: '20:00',
       endTime: '01:00',
       amount: 68000,
@@ -81,7 +78,6 @@ export default function CustomerLedger() {
       storeName: '本店',
       staffName: '山田愛子',
       category: 'ガールズ',
-      rank: 'A',
       startTime: '18:30',
       endTime: '',
       amount: 0,
@@ -94,7 +90,6 @@ export default function CustomerLedger() {
       storeName: '新宿支店',
       staffName: '鈴木麻美',
       category: 'スタンダード',
-      rank: 'B',
       startTime: '19:30',
       endTime: '22:45',
       amount: 32000,
@@ -107,7 +102,6 @@ export default function CustomerLedger() {
       storeName: 'VIPルーム',
       staffName: '高橋美香',
       category: 'プレミアム',
-      rank: 'VIP',
       startTime: '20:30',
       endTime: '02:15',
       amount: 95000,
@@ -205,9 +199,9 @@ export default function CustomerLedger() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-2">
+    <div className="min-h-screen bg-gray-100 p-0.5">
       {/* ヘッダー */}
-      <div className="bg-white p-2 mb-0">
+      <div className="bg-white p-1 mb-0">
         <div>
           <div className="flex items-center justify-between">
             {/* 左側：ダッシュボードに戻るボタンとナビゲーションボタン */}
@@ -320,7 +314,7 @@ export default function CustomerLedger() {
       </div>
 
       {/* 顧客情報ヘッダー */}
-      <div className="bg-white p-2 mb-0">
+      <div className="bg-white p-1 mb-0">
         <div>
           {/* 第1行 */}
           <div className="flex items-stretch gap-0 mb-1">
@@ -452,24 +446,6 @@ export default function CustomerLedger() {
               <div className="flex-1 border border-gray-400 border-l-0 bg-white"></div>
             </div>
 
-            {/* VIP/Gold/Platinumチェックボックス */}
-            <div className="flex items-stretch">
-              <div className="px-2 py-1 text-xs flex items-center gap-2 border border-gray-400 border-l-0 bg-white">
-                <label className="flex items-center gap-1">
-                  <input type="checkbox" className="w-3 h-3" />
-                  VIP
-                </label>
-                <label className="flex items-center gap-1">
-                  <input type="checkbox" className="w-3 h-3" />
-                  Gold
-                </label>
-                <label className="flex items-center gap-1">
-                  <input type="checkbox" className="w-3 h-3" />
-                  Platinum
-                </label>
-              </div>
-            </div>
-
             {/* 記録番号 */}
             <div className="flex items-stretch">
               <div className="bg-purple-300 px-2 py-1 text-xs font-semibold flex items-center border border-gray-400 border-l-0">
@@ -522,14 +498,14 @@ export default function CustomerLedger() {
             </TabsList>
             
             {/* 基本情報タブ */}
-            <TabsContent value="basic-info" className="mt-0 p-4 border border-gray-400 border-t-0 text-sm">
+            <TabsContent value="basic-info" className="mt-0 p-2 border border-gray-400 border-t-0 text-xs">
               <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.3fr_1fr] gap-0">
                 
                 {/* 左カラム - 基本情報入力エリア */}
                 <div className="space-y-0">
                   
                   {/* 電話番号（複数欄） */}
-                  <div className="p-3 space-y-2">
+                  <div className="p-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold whitespace-nowrap">電話番号</Label>
                       <Input 
@@ -564,7 +540,7 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* メールアドレス */}
-                  <div className="p-3 space-y-2">
+                  <div className="p-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-16">Webmail</Label>
                       <Input className="flex-1 h-7 text-xs border-gray-500" type="email" placeholder="" />
@@ -584,7 +560,7 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* 連絡方法・メルマガ */}
-                  <div className="p-3 space-y-2">
+                  <div className="p-1 space-y-1">
                     <div className="flex items-center gap-4">
                       <span className="text-xs font-semibold">連絡方法</span>
                       <label className="flex items-center gap-1 text-xs">
@@ -607,7 +583,7 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* 住所 */}
-                  <div className="p-3 space-y-2">
+                  <div className="p-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-16">郵便番号</Label>
                       <Input className="w-24 h-7 text-xs border-gray-500" placeholder="" />
@@ -655,7 +631,7 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* 地区区分 */}
-                  <div className="p-3 space-y-2">
+                  <div className="p-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold">地域区分</Label>
                       <Input className="w-16 h-7 text-xs border-gray-500" placeholder="滋賀" />
@@ -665,7 +641,7 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* 新規住所・住所+連携履歴ボタン */}
-                  <div className="p-3 flex gap-2">
+                  <div className="p-1 flex gap-1">
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -683,7 +659,7 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* 交通費・利用場所 */}
-                  <div className="p-3 space-y-2">
+                  <div className="p-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-20">交通費</Label>
                       <Input className="w-20 h-7 text-xs border-gray-500" type="number" placeholder="0" />
@@ -706,7 +682,7 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* 車両情報 */}
-                  <div className="p-3 space-y-1">
+                  <div className="p-1 space-y-1">
                     {/* ヘッダー行 */}
                     <div className="flex items-center text-xs justify-end pr-4">
                       <span className="w-32 text-center">車種</span>
@@ -773,7 +749,7 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* クレジットカード */}
-                  <div className="p-3 space-y-1">
+                  <div className="p-1 space-y-1">
                     <div className="flex items-center gap-1">
                       <span className="text-xs font-semibold">クレジットカード</span>
                       <span className="w-4 h-4 bg-black rounded-full flex items-center justify-center text-white text-xs">●</span>
@@ -810,7 +786,7 @@ export default function CustomerLedger() {
                 {/* 中央カラム - 好み情報 */}
                 <div className="space-y-0">
                   {/* ペット */}
-                  <div className="p-3 space-y-2">
+                  <div className="p-1 space-y-1">
                     <div className="flex items-center gap-4">
                       <span className="text-xs font-semibold">ペット</span>
                       {petOptions.map(option => (
@@ -827,12 +803,12 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* 顧客の統計ボタン */}
-                  <div className="p-3">
+                  <div className="p-1">
                     <Button size="sm" variant="outline" className="h-7 text-xs">顧客の統計</Button>
                   </div>
 
                   {/* 履歴対象 */}
-                  <div className="p-3 space-y-2">
+                  <div className="p-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold">履歴対象:</span>
                       <span className="text-xs">京都デリヘル俱楽部</span>
@@ -843,7 +819,7 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* 好みタイプ・話し方・嫌いタイプ */}
-                  <div className="p-3 space-y-2">
+                  <div className="p-1 space-y-1">
                     <div className="flex items-center gap-4">
                       <Label className="text-xs font-semibold">好みタイプ</Label>
                       <Input
@@ -872,7 +848,7 @@ export default function CustomerLedger() {
                   </div>
                   
                   {/* プロフィール・移行 と 履歴テーブル を横並び */}
-                  <div className="p-3">
+                  <div className="p-1">
                     <div className="flex gap-4">
                       {/* 左側: プロフィール・移行・領収証・地元出張 */}
                       <div className="w-56 space-y-3">
@@ -935,11 +911,10 @@ export default function CustomerLedger() {
                       <div className="flex-1">
                         <div className="border border-gray-500">
                           {/* テーブルヘッダー */}
-                          <div className="bg-gray-100 grid grid-cols-7 text-xs border-b border-gray-500">
+                          <div className="bg-gray-100 grid grid-cols-6 text-xs border-b border-gray-500">
                             <div className="px-2 py-1 border-r border-gray-400">日付</div>
                             <div className="px-2 py-1 border-r border-gray-400">ホステス名</div>
                             <div className="px-2 py-1 border-r border-gray-400">コース名</div>
-                            <div className="px-2 py-1 border-r border-gray-400">指名</div>
                             <div className="px-2 py-1 border-r border-gray-400">時間</div>
                             <div className="px-2 py-1 border-r border-gray-400">延長</div>
                             <div className="px-2 py-1">派遣場所表示</div>
@@ -947,11 +922,10 @@ export default function CustomerLedger() {
                           {/* テーブルボディ */}
                           <div className="max-h-[300px] overflow-y-auto">
                             {filteredHistory.map((history) => (
-                              <div key={history.id} className="grid grid-cols-7 text-xs border-b border-gray-300 hover:bg-gray-50">
+                              <div key={history.id} className="grid grid-cols-6 text-xs border-b border-gray-300 hover:bg-gray-50">
                                 <div className="px-2 py-1 border-r border-gray-300">{history.date}</div>
                                 <div className="px-2 py-1 border-r border-gray-300">{history.staffName}</div>
                                 <div className="px-2 py-1 border-r border-gray-300">{history.category}</div>
-                                <div className="px-2 py-1 border-r border-gray-300">{history.rank}</div>
                                 <div className="px-2 py-1 border-r border-gray-300">{history.startTime}</div>
                                 <div className="px-2 py-1 border-r border-gray-300">{history.endTime}</div>
                                 <div className="px-2 py-1">{history.storeName}</div>
@@ -967,7 +941,7 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* Firstドライバ名・店NG */}
-                  <div className="p-3 space-y-2">
+                  <div className="p-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-24">Firstドライバ名</Label>
                       <Input className="flex-1 h-7 text-xs border-gray-500" placeholder="" />
@@ -979,7 +953,7 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* ホステス→顧客NG / 顧客→ホステスNG / アドレス交換 */}
-                  <div className="p-3">
+                  <div className="p-1">
                     <div className="flex gap-2">
                       {/* 左側：ホステス→顧客NG */}
                       <div className="flex-1">
@@ -1056,7 +1030,7 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* メディア名・旧備考 */}
-                  <div className="p-3 space-y-2">
+                  <div className="p-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold">メディア名</Label>
                       <Input className="flex-1 h-7 text-xs border-gray-500" placeholder="" />
@@ -1073,7 +1047,7 @@ export default function CustomerLedger() {
                 {/* 右カラム - ホステス選択エリア */}
                 <div className="space-y-0">
                   {/* 再表示・出勤予定日 */}
-                  <div className="p-3 space-y-2">
+                  <div className="p-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <Button size="sm" variant="outline" className="h-7 text-xs bg-pink-100 border-pink-400">
                         再表示
@@ -1092,14 +1066,14 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* ホステス選択ボタン */}
-                  <div className="p-3 flex justify-end">
+                  <div className="p-1 flex justify-end">
                     <Button size="sm" className="h-8 text-xs bg-red-600 text-white hover:bg-red-700">
                       ホステス選択
                     </Button>
                   </div>
 
                   {/* 五十音フィルター */}
-                  <div className="p-3 space-y-2">
+                  <div className="p-1 space-y-1">
                     <RadioGroup 
                       value={kanaFilter} 
                       onValueChange={setKanaFilter}
@@ -1161,32 +1135,32 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* ホステス一覧 */}
-                  <div className="p-3">
+                  <div className="p-1">
                     <div className="border border-gray-500 max-h-[300px] overflow-y-auto">
                       {/* サンプルホステスデータ */}
                       {[
-                        { id: '1184', area: '京都', name: 'あみ', type: 'レディ', rank: 'A', status: '終了', time1: '20:00', time2: '24:00', time3: '2:00' },
-                        { id: '----', area: '京都', name: '彩羽ー', type: 'ガールズ', rank: 'A', status: '終了', time1: '16:00', time2: '17:30', time3: '19:00', highlight: 'blue' },
-                        { id: '1184', area: '京都', name: 'あいめ', type: 'レディ', rank: 'A', status: '当日欠', time1: '16:00', time2: '24:00', time3: '2:00', highlight: 'red' },
-                        { id: '9191', area: '京都', name: 'あかり', type: 'ガールズ', rank: 'A', status: '当日欠', time1: '16:00', time2: '23:00', time3: '24:30', highlight: 'yellow' },
-                        { id: '1194', area: '京都', name: 'あんず', type: 'ガールズ', rank: 'A', status: '当日欠', time1: '9:00', time2: '15:00', time3: '17:00', highlight: 'yellow' },
-                        { id: '1030', area: '京都', name: 'あいみ', type: 'ガールズ', rank: 'A', status: '', time1: '', time2: '', time3: '' },
-                        { id: '1071', area: '京都', name: 'かきな', type: 'レディ', rank: 'A', status: '', time1: '', time2: '', time3: '' },
-                        { id: '1118', area: '京都', name: 'さち', type: 'レディ', rank: 'A', status: '', time1: '', time2: '', time3: '' },
-                        { id: '1074', area: '京都', name: 'たすか', type: 'ガールズ', rank: 'A', status: '', time1: '', time2: '', time3: '' },
-                        { id: '1119', area: '京都', name: 'なまね', type: 'ガールズ', rank: 'A', status: '', time1: '', time2: '', time3: '' },
-                        { id: '1110', area: '京都', name: 'はりさ', type: 'レディ', rank: 'A', status: '', time1: '', time2: '', time3: '' },
-                        { id: '1117', area: '京都', name: 'まんじゅ', type: 'ガールズ', rank: 'A', status: '', time1: '', time2: '', time3: '' },
-                        { id: '1038', area: '京都', name: 'やんな', type: 'レディ', rank: 'A', status: '', time1: '', time2: '', time3: '' },
+                        { id: '1184', area: '京都', name: 'あみ', type: 'レディ', status: '終了', time1: '20:00', time2: '24:00', time3: '2:00' },
+                        { id: '----', area: '京都', name: '彩羽ー', type: 'ガールズ', status: '終了', time1: '16:00', time2: '17:30', time3: '19:00', highlight: 'blue' },
+                        { id: '1184', area: '京都', name: 'あいめ', type: 'レディ', status: '当日欠', time1: '16:00', time2: '24:00', time3: '2:00', highlight: 'red' },
+                        { id: '9191', area: '京都', name: 'あかり', type: 'ガールズ', status: '当日欠', time1: '16:00', time2: '23:00', time3: '24:30', highlight: 'yellow' },
+                        { id: '1194', area: '京都', name: 'あんず', type: 'ガールズ', status: '当日欠', time1: '9:00', time2: '15:00', time3: '17:00', highlight: 'yellow' },
+                        { id: '1030', area: '京都', name: 'あいみ', type: 'ガールズ', status: '', time1: '', time2: '', time3: '' },
+                        { id: '1071', area: '京都', name: 'かきな', type: 'レディ', status: '', time1: '', time2: '', time3: '' },
+                        { id: '1118', area: '京都', name: 'さち', type: 'レディ', status: '', time1: '', time2: '', time3: '' },
+                        { id: '1074', area: '京都', name: 'たすか', type: 'ガールズ', status: '', time1: '', time2: '', time3: '' },
+                        { id: '1119', area: '京都', name: 'なまね', type: 'ガールズ', status: '', time1: '', time2: '', time3: '' },
+                        { id: '1110', area: '京都', name: 'はりさ', type: 'レディ', status: '', time1: '', time2: '', time3: '' },
+                        { id: '1117', area: '京都', name: 'まんじゅ', type: 'ガールズ', status: '', time1: '', time2: '', time3: '' },
+                        { id: '1038', area: '京都', name: 'やんな', type: 'レディ', status: '', time1: '', time2: '', time3: '' },
                       ].filter((hostess) => {
                         if (kanaFilter === 'all') return true;
                         // ひらがなの最初の文字でフィルタリング
                         const firstChar = hostess.name.charAt(0);
                         return firstChar === kanaFilter;
                       }).map((hostess, index) => (
-                        <div 
-                          key={index} 
-                          className={`grid grid-cols-9 text-xs border-b border-gray-300 ${
+                        <div
+                          key={index}
+                          className={`grid grid-cols-8 text-xs border-b border-gray-300 ${
                             hostess.highlight === 'blue' ? 'bg-blue-100' :
                             hostess.highlight === 'red' ? 'bg-red-200 line-through' :
                             hostess.highlight === 'yellow' ? 'bg-yellow-200 line-through' :
@@ -1197,7 +1171,6 @@ export default function CustomerLedger() {
                           <div className="px-1 py-0.5 border-r border-gray-300">{hostess.area}</div>
                           <div className="px-1 py-0.5 border-r border-gray-300">{hostess.name}</div>
                           <div className="px-1 py-0.5 border-r border-gray-300">{hostess.type}</div>
-                          <div className="px-1 py-0.5 border-r border-gray-300">{hostess.rank}</div>
                           <div className="px-1 py-0.5 border-r border-gray-300">{hostess.status}</div>
                           <div className="px-1 py-0.5 border-r border-gray-300">{hostess.time1}</div>
                           <div className="px-1 py-0.5 border-r border-gray-300">{hostess.time2}</div>

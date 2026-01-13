@@ -516,7 +516,18 @@ export default function TimeBasedHostessAttendance() {
       <div className="p-4 mt-4">
         <Card>
           <CardContent className="p-4">
-            
+            {/* タイトル行 */}
+            <div className="mb-4 pb-2 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-gray-800 mb-2">時間区分別統計</h3>
+              <div className="grid grid-cols-5 gap-2 text-xs text-gray-600 font-medium">
+                <div>時間帯</div>
+                <div>人数計</div>
+                <div>実績(分)</div>
+                <div>目標時間(分)</div>
+                <div>目標との差</div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {timeSlotStatsWithPercentage.map((stat, index) => (
                 <div

@@ -3,7 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ArrowLeft, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { format } from "date-fns";
+import { ja } from "date-fns/locale";
 
 // 売上リストのサンプルデータ（写真に基づく）
 const salesListData = [
@@ -231,51 +235,76 @@ const creditCardData = [
 ];
 
 // スタッフサンプルデータ（写真に基づく）
+// settlementStatus: 'unsettled'=未精算(赤), 'unsent'=未送信(白), 'completed'=精算・送信完了(灰)
 const staffData = [
-  { id: 1, type: '社員', name: '吉田 琢雅10', status: '出勤', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, bath: [0,0,0], equip: [0,0,0], approval: false },
-  { id: 2, type: '社員', name: '松平', status: '退社', num: 11, salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, bath: [0,0,0], equip: [0,0,0], approval: false },
-  { id: 3, type: '社員', name: '沙崎 哲也9', status: '出勤', num: '', salary: 38070, collection: 61930, deposit: 26960, refund: 0, express: 78040, adjust: 0, net: 7, bath: [0,3,0], equip: [7,5,6], approval: false },
-  { id: 4, type: '社員', name: '南部', status: '退社', num: 11, salary: 10000, collection: 27000, deposit: 25970, refund: 0, express: 11030, adjust: 7, net: 0, bath: [0,3,0], equip: [7,5,6], approval: false },
-  { id: 5, type: '社員', name: '南部 吉郎11', status: '退社', num: '', salary: 74700, collection: 121000, deposit: 97510, refund: 0, express: 110290, adjust: 5, net: 110290, bath: [0,2,3], equip: [5,5,5], approval: true },
-  { id: 6, type: '社員', name: '森下 光哉1', status: '退社', num: '', salary: 68000, collection: 153000, deposit: 207630, refund: 0, express: 13370, adjust: 0, net: 2, bath: [3,2,3], equip: [5,5,5], approval: true },
-  { id: 7, type: '社員', name: '耕平 中尾11', status: '出勤', num: '', salary: 0, collection: 1880, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, bath: [0,0,0], equip: [0,0,0], approval: false },
-  { id: 8, type: '社員', name: '村上 竜5', status: '退社', num: '', salary: 99670, collection: 215330, deposit: 288450, refund: 0, express: 76550, adjust: 1, net: 1, bath: [1,8,0], equip: [5,5,5], approval: true },
-  { id: 9, type: '社員', name: '山岡 義弘7', status: '退社', num: 9.5, salary: 0, collection: 0, deposit: 207630, refund: 0, express: 0, adjust: 0, net: 0, bath: [0,0,0], equip: [0,0,0], approval: false },
-  { id: 10, type: '社員', name: '西川 陵登', status: '退社', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 2, net: 5, bath: [0,0,0], equip: [0,0,0], approval: true },
-  { id: 11, type: '社員', name: '片山 宏次', status: '退社', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, bath: [0,0,0], equip: [0,0,0], approval: false },
-  { id: 12, type: '社員', name: '中村 南斗', status: '10.5', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, bath: [0,0,0], equip: [0,0,0], approval: false },
-  { id: 13, type: '社員', name: '杉本 淳', status: '退社', num: 11, salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, bath: [0,0,0], equip: [0,0,0], approval: false },
-  { id: 14, type: '社員', name: '田淀 貫拓', status: '退社', num: 11, salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, bath: [0,0,0], equip: [0,0,0], approval: false },
-  { id: 15, type: 'アルバイト', name: '槙田 武', status: '', num: '', salary: 8, collection: 9360, deposit: 0, refund: 112, express: 9248, adjust: 0, net: 0, bath: [0,0,0], equip: [0,0,0], approval: false },
-  { id: 16, type: 'アルバイト', name: '大宮 翔太', status: '', num: '', salary: 9, collection: 10809, deposit: 0, refund: 129, express: 10671, adjust: 0, net: 0, bath: [0,0,0], equip: [0,0,0], approval: false },
-  { id: 17, type: 'アルバイト', name: '大谷 大輔', status: '退社', num: 5.5, salary: 6050, collection: 0, deposit: 0, refund: 74, express: 5978, adjust: 0, net: 0, bath: [0,0,0], equip: [0,0,0], approval: true },
-  { id: 18, type: '社員', name: '事務所DCP', status: '退社', num: 24, salary: 0, collection: 0, deposit: 0, refund: 20, express: 0, adjust: 0, net: 20, bath: [0,0,0], equip: [0,0,0], approval: false },
-  { id: 19, type: '社員', name: 'ホテヘル', status: '', num: '', salary: 200230, collection: 591770, deposit: 213440, refund: 0, express: 578560, adjust: 0, net: 0, bath: [0,30,34], equip: [0,0,0], approval: false },
-  { id: 20, type: '社員', name: 'スタジオ(3F)', status: '出勤', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, bath: [0,0,0], equip: [0,0,0], approval: false },
-  { id: 21, type: '社員', name: 'FGC', status: '出勤', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, bath: [0,0,0], equip: [0,0,0], approval: false },
-  { id: 22, type: 'アルバイト', name: '松尾 久亮山', status: '退社', num: 14, salary: 18376, collection: 41820, deposit: 146180, refund: 142280, express: 220, adjust: 27564, net: 3, bath: [3,5,7], equip: [5,0,0], approval: true },
-  { id: 23, type: 'アルバイト', name: '土居4', status: '', num: 16, salary: 21024, collection: 45790, deposit: 111210, refund: 106930, express: 790, adjust: 252, net: 28508, bath: [5,3,5], equip: [7,5,0], approval: true },
-  { id: 24, type: 'アルバイト', name: '津村4 堀川', status: '出勤', num: '', salary: 64400, collection: 188600, deposit: 227280, refund: 1280, express: 0, adjust: 24440, net: 0, bath: [4,5,5], equip: [5,13,0], approval: false },
-  { id: 25, type: 'アルバイト', name: '中薗 5 南泰', status: '退社', num: 7.5, salary: 9579, collection: 53180, deposit: 111820, refund: 166620, express: 114, adjust: 11085, net: 5, bath: [1,0,6], equip: [0,0,0], approval: false },
-  { id: 26, type: 'アルバイト', name: '八塚 4吐田野', status: '出勤', num: '', salary: 58740, collection: 123260, deposit: 76340, refund: 0, express: 0, adjust: 105660, net: 5, bath: [1,5,7], equip: [5,0,0], approval: false },
-  { id: 27, type: 'アルバイト', name: '伊坂 4 伏見', status: '退社', num: 7, salary: 8464, collection: 36260, deposit: 77740, refund: 70570, express: 101, adjust: 35067, net: 5, bath: [1,5,5], equip: [5,5,0], approval: true },
-  { id: 28, type: 'アルバイト', name: '須賀 5 上寮', status: '出勤', num: '', salary: 34110, collection: 72890, deposit: 91460, refund: 0, express: 0, adjust: 15540, net: 5, bath: [4,2,3], equip: [5,5,0], approval: false },
-  { id: 29, type: 'アルバイト', name: '水次郎 7 山科', status: '退社', num: 5.5, salary: 6568, collection: 40700, deposit: 76300, refund: 43410, express: 78, adjust: 67100, net: 1, bath: [0,0,1], equip: [0,0,0], approval: false },
+  { id: 1, type: '社員', name: '吉田 琢雅10', status: '出勤', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'unsettled' },
+  { id: 2, type: '社員', name: '松平', status: '退社', num: 11, salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'completed' },
+  { id: 3, type: '社員', name: '沙崎 哲也9', status: '出勤', num: '', salary: 38070, collection: 61930, deposit: 26960, refund: 0, express: 78040, adjust: 0, net: 7, settlementStatus: 'unsent' },
+  { id: 4, type: '社員', name: '南部', status: '退社', num: 11, salary: 10000, collection: 27000, deposit: 25970, refund: 0, express: 11030, adjust: 7, net: 0, settlementStatus: 'completed' },
+  { id: 5, type: '社員', name: '南部 吉郎11', status: '退社', num: '', salary: 74700, collection: 121000, deposit: 97510, refund: 0, express: 110290, adjust: 5, net: 110290, settlementStatus: 'completed' },
+  { id: 6, type: '社員', name: '森下 光哉1', status: '退社', num: '', salary: 68000, collection: 153000, deposit: 207630, refund: 0, express: 13370, adjust: 0, net: 2, settlementStatus: 'completed' },
+  { id: 7, type: '社員', name: '耕平 中尾11', status: '出勤', num: '', salary: 0, collection: 1880, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'unsettled' },
+  { id: 8, type: '社員', name: '村上 竜5', status: '退社', num: '', salary: 99670, collection: 215330, deposit: 288450, refund: 0, express: 76550, adjust: 1, net: 1, settlementStatus: 'completed' },
+  { id: 9, type: '社員', name: '山岡 義弘7', status: '退社', num: 9.5, salary: 0, collection: 0, deposit: 207630, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'unsent' },
+  { id: 10, type: '社員', name: '西川 陵登', status: '退社', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 2, net: 5, settlementStatus: 'completed' },
+  { id: 11, type: '社員', name: '片山 宏次', status: '退社', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'unsent' },
+  { id: 12, type: '社員', name: '中村 南斗', status: '10.5', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'unsettled' },
+  { id: 13, type: '社員', name: '杉本 淳', status: '退社', num: 11, salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'completed' },
+  { id: 14, type: '社員', name: '田淀 貫拓', status: '退社', num: 11, salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'completed' },
+  { id: 15, type: 'アルバイト', name: '槙田 武', status: '', num: '', salary: 8, collection: 9360, deposit: 0, refund: 112, express: 9248, adjust: 0, net: 0, settlementStatus: 'unsettled' },
+  { id: 16, type: 'アルバイト', name: '大宮 翔太', status: '', num: '', salary: 9, collection: 10809, deposit: 0, refund: 129, express: 10671, adjust: 0, net: 0, settlementStatus: 'unsent' },
+  { id: 17, type: 'アルバイト', name: '大谷 大輔', status: '退社', num: 5.5, salary: 6050, collection: 0, deposit: 0, refund: 74, express: 5978, adjust: 0, net: 0, settlementStatus: 'completed' },
+  { id: 18, type: '社員', name: '事務所DCP', status: '退社', num: 24, salary: 0, collection: 0, deposit: 0, refund: 20, express: 0, adjust: 0, net: 20, settlementStatus: 'unsent' },
+  { id: 19, type: '社員', name: 'ホテヘル', status: '', num: '', salary: 200230, collection: 591770, deposit: 213440, refund: 0, express: 578560, adjust: 0, net: 0, settlementStatus: 'unsettled' },
+  { id: 20, type: '社員', name: 'スタジオ(3F)', status: '出勤', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'unsettled' },
+  { id: 21, type: '社員', name: 'FGC', status: '出勤', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'unsettled' },
+  { id: 22, type: 'アルバイト', name: '松尾 久亮山', status: '退社', num: 14, salary: 18376, collection: 41820, deposit: 146180, refund: 142280, express: 220, adjust: 27564, net: 3, settlementStatus: 'completed' },
+  { id: 23, type: 'アルバイト', name: '土居4', status: '', num: 16, salary: 21024, collection: 45790, deposit: 111210, refund: 106930, express: 790, adjust: 252, net: 28508, settlementStatus: 'completed' },
+  { id: 24, type: 'アルバイト', name: '津村4 堀川', status: '出勤', num: '', salary: 64400, collection: 188600, deposit: 227280, refund: 1280, express: 0, adjust: 24440, net: 0, settlementStatus: 'unsent' },
+  { id: 25, type: 'アルバイト', name: '中薗 5 南泰', status: '退社', num: 7.5, salary: 9579, collection: 53180, deposit: 111820, refund: 166620, express: 114, adjust: 11085, net: 5, settlementStatus: 'unsent' },
+  { id: 26, type: 'アルバイト', name: '八塚 4吐田野', status: '出勤', num: '', salary: 58740, collection: 123260, deposit: 76340, refund: 0, express: 0, adjust: 105660, net: 5, settlementStatus: 'unsettled' },
+  { id: 27, type: 'アルバイト', name: '伊坂 4 伏見', status: '退社', num: 7, salary: 8464, collection: 36260, deposit: 77740, refund: 70570, express: 101, adjust: 35067, net: 5, settlementStatus: 'completed' },
+  { id: 28, type: 'アルバイト', name: '須賀 5 上寮', status: '出勤', num: '', salary: 34110, collection: 72890, deposit: 91460, refund: 0, express: 0, adjust: 15540, net: 5, settlementStatus: 'unsent' },
+  { id: 29, type: 'アルバイト', name: '水次郎 7 山科', status: '退社', num: 5.5, salary: 6568, collection: 40700, deposit: 76300, refund: 43410, express: 78, adjust: 67100, net: 1, settlementStatus: 'unsent' },
 ];
 
 // 出勤ホステスサンプルデータ
 const hostessDisplayData = staffData.map((s, i) => ({
   ...s,
   rowNum: i + 1,
+  // 追加項目
+  sendLocation: i % 3 === 0 ? '京都駅' : i % 3 === 1 ? '四条烏丸' : '河原町',
+  transportFee: Math.floor(Math.random() * 3000),
+  miscFee: Math.floor(Math.random() * 500),
+  deposit: Math.floor(Math.random() * 5000),
+  paymentAmount: Math.floor(Math.random() * 50000),
+  isPaid: i % 2 === 0,
+  bath: ['', '', ''],
+  equip: ['', '', ''],
+  approval: i % 3 === 0,
 }));
 
 export default function DailyReport() {
   const router = useRouter();
-  const [currentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   useEffect(() => {
     document.title = '日報 - Dispatch Harmony Hub';
   }, []);
+
+  // 日付を前後に移動
+  const goToPreviousDay = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() - 1);
+    setCurrentDate(newDate);
+  };
+
+  const goToNextDay = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + 1);
+    setCurrentDate(newDate);
+  };
 
   // 数値のフォーマット関数
   const formatNumber = (num: number | string) => {
@@ -285,7 +314,7 @@ export default function DailyReport() {
   };
 
   return (
-    <div className="w-[2000px] h-[1080px] relative bg-white font-['Inter'] flex flex-col text-sm">
+    <div className="w-[1920px] h-[1080px] relative bg-white font-['Inter'] flex flex-col text-xs">
       {/* ヘッダー - dispatch-panel-2dと同じスタイル */}
       <div className="w-full h-[50px] bg-white">
         <div className="flex items-center h-full px-2">
@@ -304,16 +333,50 @@ export default function DailyReport() {
             {/* 日報タイトル */}
             <h1 className="text-lg font-bold mr-2">日報</h1>
 
-            {/* 日付表示 */}
-            <span className="text-sm font-medium mr-4">{currentDate.toLocaleDateString('ja-JP')}</span>
-
-            {/* 日付移動 */}
+            {/* 日付移動ボタン（前日） */}
             <Button
               variant="outline"
-              className="h-8 px-3 text-xs border-[#323232]"
-              onClick={() => {}}
+              size="sm"
+              className="h-8 w-8 p-0 border-[#323232]"
+              onClick={goToPreviousDay}
             >
-              日付移動
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+
+            {/* カレンダーから日付選択 */}
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="h-8 px-3 text-xs border-[#323232] flex items-center gap-2"
+                >
+                  <CalendarIcon className="w-4 h-4" />
+                  {format(currentDate, 'yyyy年MM月dd日(E)', { locale: ja })}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="center">
+                <Calendar
+                  mode="single"
+                  selected={currentDate}
+                  onSelect={(date) => {
+                    if (date) {
+                      setCurrentDate(date);
+                      setCalendarOpen(false);
+                    }
+                  }}
+                  locale={ja}
+                />
+              </PopoverContent>
+            </Popover>
+
+            {/* 日付移動ボタン（翌日） */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0 border-[#323232] mr-2"
+              onClick={goToNextDay}
+            >
+              <ChevronRight className="w-4 h-4" />
             </Button>
 
             {/* 印刷 */}
@@ -353,7 +416,7 @@ export default function DailyReport() {
       </div>
 
       {/* メインコンテンツ - グリッドレイアウト */}
-      <div className="flex-1 grid mt-2" style={{ gridTemplateColumns: '19% 20% 15% 20% 26%' }}>
+      <div className="flex-1 grid mt-1" style={{ gridTemplateColumns: '18% 20% 14% 20% 28%' }}>
         {/* 左側セクション - 売上リスト */}
         <div className="h-full overflow-y-auto border-r border-[#323232] bg-white">
         {salesListData.map((store) => (
@@ -611,53 +674,56 @@ export default function DailyReport() {
         <div className="h-full overflow-hidden flex flex-col">
           <div className="bg-pink-200 h-5 flex items-center p-0.5 border-b border-[#323232]">
             <span className="text-xs font-bold">出勤ホステス</span>
+            <span className="text-xs ml-2">（未精算: 赤 / 未送信: 白 / 完了: 灰）</span>
           </div>
           {/* ホステスヘッダー */}
           <div className="flex text-xs bg-zinc-100 border-b border-[#323232] h-6">
             <div className="w-5 p-0.5 border-r border-[#323232] flex items-center justify-center">番</div>
+            <div className="w-16 p-0.5 border-r border-[#323232] flex items-center justify-center">送り場所</div>
+            <div className="w-14 p-0.5 border-r border-[#323232] flex items-center justify-center">交通費</div>
+            <div className="w-12 p-0.5 border-r border-[#323232] flex items-center justify-center">雑費</div>
+            <div className="w-14 p-0.5 border-r border-[#323232] flex items-center justify-center">預り</div>
+            <div className="w-16 p-0.5 border-r border-[#323232] flex items-center justify-center">支払額</div>
+            <div className="w-10 p-0.5 border-r border-[#323232] flex items-center justify-center text-center leading-tight">支払<br/>済</div>
             <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">回収額</div>
             <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center text-center leading-tight">ホステス<br/>報酬</div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center text-center leading-tight">ホステス<br/>送金</div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">遅刻</div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center text-center leading-tight">消引減給<br/>管理費</div>
             <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">調整</div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">バスタオル</div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">備品</div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center text-center leading-tight">割売取税<br/>カード</div>
-            <div className="w-10 p-0.5 flex items-center justify-center text-center leading-tight">管理者<br/>確認</div>
+            <div className="w-10 p-0.5 flex items-center justify-center text-center leading-tight">確認</div>
           </div>
           {/* ホステスリスト */}
           <div className="overflow-y-auto flex-1">
-            {hostessDisplayData.map((staff) => (
-              <div 
-                key={staff.id} 
-                className={`flex text-xs border-b border-[#323232] h-5 ${staff.rowNum % 2 === 0 ? 'bg-zinc-50' : 'bg-white'}`}
-              >
-                <div className="w-5 p-0.5 border-r border-[#323232] flex items-center justify-center bg-blue-100">{staff.rowNum}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.salary)}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.collection)}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.deposit)}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.refund)}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.express)}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.adjust)}</div>
-                {/* バスタオル (3つの小セル) */}
-                <div className="flex-1 flex border-r border-[#323232]">
-                  <div className="flex-1 flex items-center justify-center border-r border-[#323232] bg-blue-200">{staff.bath[0] || ''}</div>
-                  <div className="flex-1 flex items-center justify-center border-r border-[#323232] bg-red-200">{staff.bath[1] || ''}</div>
-                  <div className="flex-1 flex items-center justify-center">{staff.bath[2] || ''}</div>
+            {hostessDisplayData.map((staff) => {
+              // 色分け: 未精算=赤, 未送信=白, 完了=灰
+              let rowBgClass = 'bg-white'; // 未送信（デフォルト）
+              if (staff.settlementStatus === 'unsettled') {
+                rowBgClass = 'bg-red-200'; // 未精算
+              } else if (staff.settlementStatus === 'completed') {
+                rowBgClass = 'bg-gray-300'; // 精算・送信完了
+              }
+
+              return (
+                <div
+                  key={staff.id}
+                  className={`flex text-xs border-b border-[#323232] h-5 ${rowBgClass} cursor-pointer hover:brightness-95`}
+                >
+                  <div className="w-5 p-0.5 border-r border-[#323232] flex items-center justify-center bg-blue-100">{staff.rowNum}</div>
+                  <div className="w-16 p-0.5 border-r border-[#323232] flex items-center truncate">{staff.sendLocation}</div>
+                  <div className="w-14 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.transportFee)}</div>
+                  <div className="w-12 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.miscFee)}</div>
+                  <div className="w-14 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.deposit)}</div>
+                  <div className="w-16 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.paymentAmount)}</div>
+                  <div className="w-10 p-0.5 border-r border-[#323232] flex items-center justify-center">
+                    <input type="checkbox" className="w-3 h-3" checked={staff.isPaid} readOnly />
+                  </div>
+                  <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.collection)}</div>
+                  <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.salary)}</div>
+                  <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.adjust)}</div>
+                  <div className="w-10 p-0.5 flex items-center justify-center">
+                    <input type="checkbox" className="w-3 h-3" checked={staff.approval} readOnly />
+                  </div>
                 </div>
-                {/* 備品 */}
-                <div className="flex-1 flex border-r border-[#323232]">
-                  <div className="flex-1 flex items-center justify-center border-r border-[#323232] bg-blue-200">{staff.equip[0] || ''}</div>
-                  <div className="flex-1 flex items-center justify-center border-r border-[#323232] bg-red-200">{staff.equip[1] || ''}</div>
-                  <div className="flex-1 flex items-center justify-center">{staff.equip[2] || ''}</div>
-                </div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.net)}</div>
-                <div className="w-10 p-0.5 flex items-center justify-center">
-                  <input type="checkbox" className="w-3 h-3" checked={staff.approval} readOnly />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
