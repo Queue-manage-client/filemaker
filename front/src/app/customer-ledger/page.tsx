@@ -842,14 +842,12 @@ export default function CustomerLedger() {
                     </div>
                   </div>
 
-                  {/* ランク・好みタイプ・話し方・嫌いタイプ */}
+                  {/* 好みタイプ・話し方・嫌いタイプ */}
                   <div className="p-3 space-y-2">
                     <div className="flex items-center gap-4">
-                      <Label className="text-xs font-semibold">ランク</Label>
-                      <Input className="w-12 h-7 text-xs border-gray-500 text-center" value={preferenceForm.rank} onChange={() => {}} />
                       <Label className="text-xs font-semibold">好みタイプ</Label>
-                      <Input 
-                        className="flex-1 h-7 text-xs border-gray-500" 
+                      <Input
+                        className="flex-1 h-7 text-xs border-gray-500"
                         value={preferenceForm.favoriteType}
                         onChange={e => handlePreferenceChange('favoriteType', e.target.value)}
                         placeholder="巨乳"

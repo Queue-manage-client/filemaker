@@ -270,7 +270,8 @@ export function useStoreLedger(initialStore?: string) {
 
   // 選択された店舗の情報取得
   const { data: selectedStoreInfo } = useStoreBasicInfoByName(selectedStore);
-  const selectedStoreId = selectedStoreInfo?.id || '';
+  // selectedStoreIdをuseMemoでメモ化して不要な再計算を防ぐ
+  const selectedStoreId = useMemo(() => selectedStoreInfo?.id || '', [selectedStoreInfo]);
 
   // 各種データ取得
   const basicTagQuery = useBasicTagByStoreName(selectedStore);

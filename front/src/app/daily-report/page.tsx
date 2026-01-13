@@ -226,8 +226,8 @@ const withdrawalData = [
 
 // クレジットカードサンプルデータ
 const creditCardData = [
-  { store: '京都', course: '80分PK6', hostessName: 'るか', extensionFee: 0, billAmount: 30040, storeShare: 13040, hostessShare: 17000, hostessDeposit: 0, outDriverName: '村上' },
-  { store: '南ホテ', course: '100分PK6', hostessName: 'あやね', extensionFee: 0, billAmount: 19040, storeShare: 4480, hostessShare: 14550, hostessDeposit: 0, outDriverName: '' },
+  { store: '京都', course: '80分PK6', hostessName: 'るか', billAmount: 30040 },
+  { store: '南ホテ', course: '100分PK6', hostessName: 'あやね', billAmount: 19040 },
 ];
 
 // スタッフサンプルデータ（写真に基づく）
@@ -530,22 +530,16 @@ export default function DailyReport() {
             {/* ヘッダー */}
             <div className="flex text-xs bg-zinc-100 border-b border-[#323232] h-5">
               <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">店舗</div>
+              <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">コース</div>
               <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">ホステス名</div>
-              <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">延長料</div>
-              <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">請求金額</div>
-              <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">店舗取分</div>
-              <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">ホステス取分</div>
-              <div className="flex-1 p-0.5 flex items-center justify-center">OUTドラ名</div>
+              <div className="flex-1 p-0.5 flex items-center justify-center">請求金額</div>
             </div>
             {creditCardData.map((card, idx) => (
-              <div key={idx} className="flex text-xs border-b border-[#323232] h-5">
+              <div key={idx} className="flex text-xs border-b border-[#323232] h-5 cursor-pointer hover:bg-purple-50">
                 <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center truncate">{card.store}</div>
+                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center truncate">{card.course}</div>
                 <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center truncate">{card.hostessName}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(card.extensionFee)}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(card.billAmount)}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(card.storeShare)}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(card.hostessShare)}</div>
-                <div className="flex-1 p-0.5 flex items-center truncate">{card.outDriverName}</div>
+                <div className="flex-1 p-0.5 flex items-center justify-end">{formatNumber(card.billAmount)}</div>
               </div>
             ))}
           </div>

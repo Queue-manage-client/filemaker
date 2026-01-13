@@ -456,7 +456,7 @@ export default function HostessSchedule() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm table-fixed">
                 <colgroup>
-                  <col style={{width: '40px'}} />
+                  <col style={{width: '25px'}} />
                   <col style={{width: '90px'}} />
                   <col style={{width: '120px'}} />
                   <col style={{width: '80px'}} />
@@ -505,7 +505,7 @@ export default function HostessSchedule() {
                         </span>
                       </td>
                       <td className="border border-gray-600 px-1 py-1 sticky left-[100px]" style={{ backgroundColor: 'inherit' }}>
-                        <span className="text-sm font-bold">{schedule.name}{schedule.isNewcomer ? " (新)" : ""}</span>
+                        <span className="text-sm font-bold">{schedule.isNewcomer && <span className="text-red-500 mr-1">【新人】</span>}{schedule.name}</span>
                       </td>
                       <td className="border border-gray-600 px-1 py-1 sticky left-[200px]" style={{ backgroundColor: 'inherit' }}>
                         <span className="text-sm">{schedule.assignedStaff}</span>

@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
@@ -51,24 +50,26 @@ const tabIcons: Record<StoreLedgerTab, React.ComponentType<{ className?: string 
   'options': Cog
 };
 
+// 管理者のみが編集可能なタブのリスト（コンポーネント外で定義して再作成を防ぐ）
+const adminOnlyTabs: StoreLedgerTab[] = ['basic', 'gm-division', 'course-prices', 'special-prices', 'staff-composition', 'class-prices'];
+
 export default function StoreLedger() {
   const router = useRouter();
-  
+
   React.useEffect(() => {
     document.title = '店舗台帳 - Dispatch Harmony Hub';
   }, []);
   
   // shopテーブルから店舗一覧を取得
   const { data: shops = [] } = useShopList();
-  const [localStoreList, setLocalStoreList] = React.useState<string[]>([]);
-  
-  React.useEffect(() => {
-    const storeNames = shops.map(shop => shop.store_name || '').filter(Boolean);
-    setLocalStoreList(storeNames);
+
+  // storeListをuseMemoでメモ化して不要な再計算を防ぐ
+  const storeList = React.useMemo(() => {
+    return shops.map(shop => shop.store_name || '').filter(Boolean);
   }, [shops]);
-  
-  const storeList = localStoreList;
-  const initialStore = storeList[0] || '';
+
+  // initialStoreをメモ化して無限ループを防ぐ
+  const initialStore = React.useMemo(() => storeList[0] || '', [storeList]);
 
   // 管理者スイッチの状態管理（デモ用）
   const [isAdminMode, setIsAdminMode] = React.useState(false);
@@ -108,10 +109,7 @@ export default function StoreLedger() {
     handleSaveCourseFee,
     handleCancelEdit,
   } = useStoreLedger(initialStore);
-  
-  // 管理者のみが編集可能なタブのリスト
-  const adminOnlyTabs: StoreLedgerTab[] = ['basic', 'gm-division', 'course-prices', 'special-prices', 'staff-composition', 'class-prices'];
-  
+
   // 現在のタブが管理者のみ編集可能かどうかをチェック
   const isCurrentTabAdminOnly = adminOnlyTabs.includes(activeTab);
   
@@ -2646,12 +2644,12 @@ export default function StoreLedger() {
           </div>
 
           {/* 店舗一覧 */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="p-4 pb-2">
+          <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+            <div className="p-4 pb-2 flex-shrink-0">
               <h2 className="text-sm font-semibold text-gray-700">店舗一覧</h2>
             </div>
-            <div className="flex-1 px-4 pb-4">
-              <ScrollArea className="h-full">
+            <div className="flex-1 px-4 pb-4 overflow-hidden min-h-0">
+              <div className="h-full overflow-y-auto pr-2">
                 <div className="space-y-2 pr-2">
                   {storeList.length === 0 ? (
                     <div className="text-center text-gray-500 py-4">店舗データがありません</div>
@@ -2679,7 +2677,7 @@ export default function StoreLedger() {
                     ))
                   )}
                 </div>
-              </ScrollArea>
+              </div>
             </div>
           </div>
         </div>
@@ -2839,7 +2837,7 @@ export default function StoreLedger() {
                   
                   return (
                     <TabsContent key={tab.id} value={tab.id} className="h-full m-0">
-                      <ScrollArea className="h-full w-full">
+                      <div className="h-full w-full overflow-y-auto">
                         <div className="p-6 overflow-x-hidden">
                           {shouldShowContent ? (
                             renderTabContent(tab.id)
@@ -2863,7 +2861,7 @@ export default function StoreLedger() {
                             </div>
                           )}
                         </div>
-                      </ScrollArea>
+                      </div>
                     </TabsContent>
                   );
                 })}
