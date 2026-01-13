@@ -63,10 +63,15 @@ export default function StoreLedger() {
   // shopテーブルから店舗一覧を取得
   const { data: shops = [] } = useShopList();
 
+  // フロント側で追加した店舗名を保持（DB保存は別途実装が必要）
+  const [localStoreList, setLocalStoreList] = React.useState<string[]>([]);
+
   // storeListをuseMemoでメモ化して不要な再計算を防ぐ
   const storeList = React.useMemo(() => {
-    return shops.map(shop => shop.store_name || '').filter(Boolean);
-  }, [shops]);
+    const base = shops.map(shop => shop.store_name || '').filter(Boolean);
+    const merged = [...base, ...localStoreList].filter(Boolean);
+    return Array.from(new Set(merged));
+  }, [shops, localStoreList]);
 
   // initialStoreをメモ化して無限ループを防ぐ
   const initialStore = React.useMemo(() => storeList[0] || '', [storeList]);
