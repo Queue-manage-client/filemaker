@@ -21,9 +21,18 @@ export const LeftPanel = () => {
   const router = useRouter();
 
   const handleNavigation = (name: string) => {
+    // 配車パネル2Dはメイン画面に遷移し、サブ画面を別ウィンドウで開く
+    if (name === "配車パネル2D") {
+      const baseUrl = window.location.origin;
+      // サブ画面を別ウィンドウで開く
+      window.open(`${baseUrl}/dispatch-panel-2d-sub`, 'dispatch-panel-2d-sub', 'width=800,height=600');
+      // メイン画面に遷移
+      router.push('/dispatch-panel-2d');
+      return;
+    }
+
     const routeMap: { [key: string]: string } = {
       "RTⅡパネル": "/rt2-panel",
-      "配車パネル2D": "/dispatch-panel-2d",
       "ホステス出勤予定": "/hostess-schedule",
       "従業員出勤予定": "/employee-schedule",
       "手配表": "/tehai",

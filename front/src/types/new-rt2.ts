@@ -139,3 +139,17 @@ export interface WalkingDispatch {
   departureTime: string; // 出発時間（例：「00:00」）
 }
 
+// 送りホステス
+export interface SendHostess {
+  id: string;
+  hasPackage: boolean; // 荷物有無
+  area: string; // エリア（例：「南」）
+  hostessName: string; // ホステス名
+  driverName: string; // 送りドライバー名
+  endTime: string; // 終了時間
+  returnTime: string; // 帰宅時間
+  destination: string; // 送り場所
+  destinationMark?: string; // 送り場所マーク（例：「■」）
+  count: number; // 件数
+}
+
