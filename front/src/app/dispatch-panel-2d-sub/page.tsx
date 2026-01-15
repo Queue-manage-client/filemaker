@@ -157,7 +157,34 @@ function DriverCardBlock({ card }: { card: DriverCard }) {
 
 export default function DispatchPanel2DSubPage() {
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex flex-col h-screen w-full">
+      {/* ヘッダー */}
+      <div className="h-[28px] flex items-center justify-between px-1 flex-shrink-0" style={{ backgroundColor: '#0099cc' }}>
+        {/* 左側ボタン3つ */}
+        <div className="flex items-center gap-1">
+          <button className="h-[22px] px-3 text-[12px] text-black border border-zinc-400" style={{ backgroundColor: '#e8e8e8' }}>
+            MENU
+          </button>
+          <button className="h-[22px] px-3 text-[12px] text-black border border-zinc-400" style={{ backgroundColor: '#e8e8e8' }}>
+            出勤予定ホステス
+          </button>
+          <button className="h-[22px] px-3 text-[12px] text-black border border-zinc-400" style={{ backgroundColor: '#e8e8e8' }}>
+            再表示
+          </button>
+        </div>
+        {/* 右側ボタン2つ */}
+        <div className="flex items-center gap-1">
+          <button className="h-[22px] px-3 text-[12px] text-black border border-zinc-400" style={{ backgroundColor: '#e8e8e8' }}>
+            ステータスエリアを開く
+          </button>
+          <button className="h-[22px] px-3 text-[12px] text-black border border-zinc-400" style={{ backgroundColor: '#e8e8e8' }}>
+            ホステス送り確認
+          </button>
+        </div>
+      </div>
+
+      {/* メインコンテンツ */}
+      <div className="flex flex-1 w-full overflow-hidden">
       {/* 左ブロック 20% */}
       <div className="w-[20%] h-full bg-white overflow-y-auto">
         {/* ヘッダー + リスト（gridで列揃え） */}
@@ -519,6 +546,7 @@ export default function DispatchPanel2DSubPage() {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );
