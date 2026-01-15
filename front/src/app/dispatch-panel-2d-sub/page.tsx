@@ -88,23 +88,49 @@ function DriverCardBlock({ card }: { card: DriverCard }) {
         {card.dispatches.map((dispatch, idx) => (
           <div
             key={idx}
-            className="flex items-center h-[20px] border-b border-zinc-300"
-            style={{
-              backgroundColor: dispatch.bgColor === 'yellow' ? '#ffff99' :
-                dispatch.bgColor === 'lightblue' ? '#ccffff' : '#ffffff'
-            }}
+            className="grid items-center h-[20px] border-b border-zinc-300 bg-white"
+            style={{ gridTemplateColumns: '18px 12px 50px 32px 1fr 36px' }}
           >
-            <div className="text-[11px] w-[22px] px-0.5 text-black">{dispatch.type}</div>
-            {dispatch.prefix && (
-              <div className="text-[11px] w-[12px]" style={{ color: '#cc0000' }}>{dispatch.prefix}</div>
-            )}
-            <div className="text-[11px] flex-1 truncate text-black">{dispatch.name}</div>
-            <div className="text-[11px] w-[34px] text-center text-black">{dispatch.time}</div>
-            <div className="text-[11px] flex-1 truncate text-black">
-              {dispatch.locationMark && <span className="text-black">{dispatch.locationMark}</span>}
+            {/* 送 */}
+            <div
+              className="text-[11px] px-0.5 text-black h-full flex items-center"
+              style={{
+                backgroundColor: dispatch.bgColor === 'yellow' ? '#ffff99' :
+                  dispatch.bgColor === 'lightblue' ? '#ccffff' : '#ffffff'
+              }}
+            >
+              {dispatch.type}
+            </div>
+            {/* prefix */}
+            <div
+              className="text-[11px] h-full flex items-center"
+              style={{
+                backgroundColor: dispatch.bgColor === 'yellow' ? '#ffff99' :
+                  dispatch.bgColor === 'lightblue' ? '#ccffff' : '#ffffff',
+                color: '#cc0000'
+              }}
+            >
+              {dispatch.prefix || ''}
+            </div>
+            {/* 名前 */}
+            <div
+              className="text-[11px] truncate text-black h-full flex items-center overflow-hidden"
+              style={{
+                backgroundColor: dispatch.bgColor === 'yellow' ? '#ffff99' :
+                  dispatch.bgColor === 'lightblue' ? '#ccffff' : '#ffffff'
+              }}
+            >
+              {dispatch.name}
+            </div>
+            {/* 時刻 */}
+            <div className="text-[11px] text-center text-black">{dispatch.time}</div>
+            {/* 場所 */}
+            <div className="text-[11px] truncate text-black overflow-hidden">
+              {dispatch.locationMark && <span>{dispatch.locationMark}</span>}
               {dispatch.location}
             </div>
-            <div className="flex items-center gap-0.5 pr-0.5">
+            {/* アイコン */}
+            <div className="flex items-center gap-0.5 justify-end pr-0.5">
               <div
                 className="w-[16px] h-[16px] flex items-center justify-center"
                 style={{ backgroundColor: '#daa520' }}
