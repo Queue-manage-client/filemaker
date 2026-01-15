@@ -46,7 +46,8 @@ export default function Original() {
   }, []);
 
   return (
-    <div className="w-[1920px] h-[1080px] relative overflow-hidden [&_.text-[13px]]:text-[13px] [&_.text-[19px]]:text-[19px] [&_[class*='text-[8px]']]:text-[9px]">
+    <div className="w-full h-[1080px] overflow-x-auto overflow-y-hidden">
+      <div className="w-[2048px] h-[1080px] relative overflow-hidden [&_.overflow-y-auto]:[scrollbar-gutter:stable]">
       {/* ヘッダー */}
       <div className="absolute left-0 top-0 right-0 z-10 h-[50px] bg-white border-b border-zinc-300">
         <div className="flex items-center h-full px-2">
@@ -154,17 +155,17 @@ export default function Original() {
   </div>
 
   {/* INドラ未定予約リスト */}
-  <div className="w-10 h-4 left-[696px] top-[78px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">オプション</div>
-  <div className="w-10 h-4 left-[680px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">カード</div>
-  <div className="w-10 h-4 left-[664px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">着TEL</div>
-  <div className="w-10 h-4 left-[648px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">待合せ</div>
-  <div className="w-10 h-4 left-[632px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">領収書</div>
-  <div className="w-10 left-[606px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">時間計</div>
+  <div className="w-10 h-4 left-[686px] top-[78px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">オプション</div>
+  <div className="w-10 h-4 left-[670px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">カード</div>
+  <div className="w-10 h-4 left-[654px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">着TEL</div>
+  <div className="w-10 h-4 left-[638px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">待合せ</div>
+  <div className="w-10 h-4 left-[622px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">領収書</div>
+  <div className="w-10 left-[596px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">時間計</div>
   <div className="w-8 left-[425px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">迎え場所</div>
   <div className="w-[42px] left-[348px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">出勤</div>
   <div className="w-[70px] left-[488px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">ホステス名</div>
-  <div className="w-32 h-5 left-[499px] top-[75px] absolute bg-lime-200" />
-  <div className="w-32 left-[502px] top-[77px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">INドラ未定予約リスト</div>
+  <div className="w-[150px] h-5 left-[450px] top-[75px] absolute bg-lime-200" />
+  <div className="w-[150px] h-5 left-[450px] top-[77px] absolute flex items-center justify-center text-black text-[13px] font-normal font-['Inter'] whitespace-nowrap">INドラ未定予約リスト</div>
   <div className="w-[378px] h-[600px] left-[348px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {undecidedDriverReservationSampleData.map((reservation: UndecidedDriverReservation, index: number) => {
       const topPosition = index * 22;
@@ -277,8 +278,8 @@ export default function Original() {
   </div>
 
   {/* OUTドラ未定予約リスト */}
-  <div className="w-40 h-5 left-[958px] top-[75px] absolute bg-lime-200" />
-  <div className="w-40 left-[961px] top-[77px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">OUTドラ未定・接客中リスト</div>
+  <div className="w-[176px] h-5 left-[950px] top-[75px] absolute bg-lime-200" />
+  <div className="w-[176px] h-5 left-[950px] top-[77px] absolute flex items-center justify-center text-black text-[13px] font-normal font-['Inter'] whitespace-nowrap">OUTドラ未定・接客中リスト</div>
 
   {/* ヘッダー行 */}
   <div className="w-10 left-[726px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">開始</div>
@@ -287,80 +288,80 @@ export default function Original() {
   <div className="w-10 left-[862px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">時間計</div>
   <div className="w-10 left-[902px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">開始</div>
   <div className="w-10 left-[942px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">終了</div>
-  <div className="w-28 left-[982px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">場所</div>
-  <div className="w-14 left-[1094px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">駅</div>
-  <div className="w-5 left-[1094px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">確</div>
-  <div className="w-10 left-[1170px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">INドラ</div>
-  <div className="w-10 left-[1210px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">OUTドラ</div>
-  <div className="w-10 h-4 left-[1300px] top-[78px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">オプション</div>
-  <div className="w-10 h-4 left-[1284px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">カード</div>
-  <div className="w-10 h-4 left-[1270px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">着TEL</div>
-  <div className="w-10 h-4 left-[1252px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">待合せ</div>
-  <div className="w-10 h-4 left-[1236px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">領収書</div>
-  <div className="w-[604px] h-[880px] left-[726px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-32 left-[982px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">場所</div>
+  <div className="w-16 left-[1130px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">駅</div>
+  <div className="w-5 left-[1110px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">確</div>
+  <div className="w-10 left-[1194px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">INドラ</div>
+  <div className="w-10 left-[1234px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">OUTドラ</div>
+  <div className="w-10 h-4 left-[1324px] top-[78px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">オプション</div>
+  <div className="w-10 h-4 left-[1308px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">カード</div>
+  <div className="w-10 h-4 left-[1294px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">着TEL</div>
+  <div className="w-10 h-4 left-[1276px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">待合せ</div>
+  <div className="w-10 h-4 left-[1260px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">領収書</div>
+  <div className="w-[628px] h-[880px] left-[726px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {outDriverUndecidedSampleData.map((item: OutDriverUndecided, index: number) => (
-      <div key={item.id} className="w-[604px] h-5 left-0 absolute" style={{ top: `${index * 22}px` }}>
+      <div key={item.id} className="w-[628px] h-6 left-0 absolute" style={{ top: `${index * 24}px` }}>
       <Button
-        className="w-10 h-5 px-[3px] pt-0.5 pb-[3px] left-0 top-0 absolute bg-cyan-100 hover:bg-cyan-200 text-black text-[13px] font-normal font-['Inter'] p-0"
+        className="w-10 h-6 p-[1px] left-0 top-0 absolute bg-cyan-100 hover:bg-cyan-200 text-black text-[13px] font-normal font-['Inter']"
         onClick={() => {}}
       >
         開始
       </Button>
       <Button
-        className="w-[26px] h-5 left-[40px] top-0 absolute bg-rose-100 hover:bg-rose-200 text-black text-[13px] font-normal font-['Inter'] p-0"
+        className="w-[26px] h-6 p-[1px] left-[40px] top-0 absolute bg-rose-100 hover:bg-rose-200 text-black text-[13px] font-normal font-['Inter']"
         onClick={() => {}}
       >
         HP
       </Button>
-      <div className="w-[70px] h-5 left-[66px] top-0 absolute bg-yellow-200 border border-rose-300/60" />
-      <div className="w-[66px] left-[70px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.hostessName}</div>
-      <div className="w-28 h-5 left-[256px] top-0 absolute border border-rose-300/60" />
-      <div className="w-28 left-[258px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.destination}</div>
-      <div className="w-14 h-5 left-[388px] top-0 absolute border border-rose-300/60" />
-      <div className="w-12 h-3.5 left-[392px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.station}</div>
+      <div className="w-[70px] h-6 left-[66px] top-0 absolute bg-yellow-200 border border-rose-300/60" />
+      <div className="w-[66px] left-[70px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.hostessName}</div>
+      <div className="w-32 h-6 left-[256px] top-0 absolute border border-rose-300/60" />
+      <div className="w-32 left-[258px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.destination}</div>
+      <div className="w-16 h-6 left-[404px] top-0 absolute border border-rose-300/60" />
+      <div className="w-14 h-3.5 left-[408px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.station}</div>
       {item.in_driver && (
-        <div className="w-10 h-5 left-[444px] top-0 absolute bg-yellow-200 border border-rose-300/60" />
+        <div className="w-10 h-6 left-[468px] top-0 absolute bg-yellow-200 border border-rose-300/60" />
       )}
       {item.in_driver && (
-        <div className="w-9 left-[446px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.in_driver}</div>
+        <div className="w-9 left-[470px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.in_driver}</div>
       )}
       {item.out_driver && (
-        <div className="w-10 h-5 left-[484px] top-0 absolute bg-yellow-200 border border-indigo-200/60" />
+        <div className="w-10 h-6 left-[508px] top-0 absolute bg-yellow-200 border border-indigo-200/60" />
       )}
       {item.out_driver && (
-        <div className="w-9 left-[486px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.out_driver}</div>
+        <div className="w-9 left-[510px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.out_driver}</div>
       )}
-      <div className="w-10 h-5 left-[216px] top-0 absolute border border-indigo-200/60" />
-      <div className="w-9 left-[218px] top-[2px] absolute text-center justify-end text-red-800 text-[13px] font-normal font-['Inter']">{item.arrivalTime}</div>
-      <div className="w-10 h-5 left-[176px] top-0 absolute border border-rose-300/60" />
-      <div className="w-9 left-[178px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{item.pickupTime}</div>
-      <div className="w-10 h-5 left-[136px] top-0 absolute border border-indigo-200/60" />
-      <div className="w-3 left-[162px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">分</div>
-      <div className="w-5 left-[140px] top-[2px] absolute text-right justify-end text-black text-[13px] font-normal font-['Inter']">{item.timeTotal}</div>
+      <div className="w-10 h-6 left-[216px] top-0 absolute border border-indigo-200/60" />
+      <div className="w-9 left-[218px] top-[3px] absolute text-center justify-end text-red-800 text-[13px] font-normal font-['Inter']">{item.arrivalTime}</div>
+      <div className="w-10 h-6 left-[176px] top-0 absolute border border-rose-300/60" />
+      <div className="w-9 left-[178px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{item.pickupTime}</div>
+      <div className="w-10 h-6 left-[136px] top-0 absolute border border-indigo-200/60" />
+      <div className="w-3 left-[162px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">分</div>
+      <div className="w-5 left-[140px] top-[3px] absolute text-right justify-end text-black text-[13px] font-normal font-['Inter']">{item.timeTotal}</div>
       {item.hasOption5 && (
-        <div className="w-4 h-5 left-[588px] top-0 absolute border border-rose-300/60" />
+        <div className="w-4 h-6 left-[612px] top-0 absolute border border-rose-300/60" />
       )}
       {item.hasOption4 && (
-        <div className="w-4 h-5 left-[572px] top-0 absolute border border-indigo-200/60" />
+        <div className="w-4 h-6 left-[596px] top-0 absolute border border-indigo-200/60" />
       )}
       {item.hasOption3 && (
-        <div className="w-4 h-5 left-[556px] top-0 absolute border border-rose-300/60" />
+        <div className="w-4 h-6 left-[580px] top-0 absolute border border-rose-300/60" />
       )}
       {item.hasOption2 && (
-        <div className="w-4 h-5 left-[540px] top-0 absolute border border-indigo-200/60" />
+        <div className="w-4 h-6 left-[564px] top-0 absolute border border-indigo-200/60" />
       )}
       {item.hasOption1 && (
-        <div className="w-4 h-5 left-[524px] top-0 absolute border border-rose-300/60" />
+        <div className="w-4 h-6 left-[548px] top-0 absolute border border-rose-300/60" />
       )}
-      <div className="size-5 absolute bg-purple-300" style={{ left: '368px', top: '0px' }} />
+      <div className="size-5 absolute bg-purple-300" style={{ left: '384px', top: '0px' }} />
       </div>
     ))}
   </div>
 
   {/* 終了リスト */}
-  <div className="w-[332px] h-5 left-[1330px] top-[75px] absolute bg-fuchsia-300" />
-  <div className="w-[332px] left-[1330px] top-[77px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">終了リスト</div>
-  <div className="w-[332px] h-[65px] left-[1330px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-[332px] h-5 left-[1354px] top-[75px] absolute bg-fuchsia-300" />
+  <div className="w-[332px] left-[1354px] top-[77px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">終了リスト</div>
+  <div className="w-[332px] h-[65px] left-[1354px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {completedListSampleData.map((item: CompletedList, index: number) => {
     const topPosition = index * 22;
     return (
@@ -384,9 +385,9 @@ export default function Original() {
     })}
   </div>
   
-  <div className="w-[166px] h-5 left-[1496px] top-[517px] absolute bg-yellow-200" />
-  <div className="w-[166px] left-[1496px] top-[519px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">精算告知済　ドライバー</div>
-  <div className="w-[166px] h-[176px] left-[1496px] top-[537px] absolute outline outline-1 outline-offset-[-1px] outline-rose-300/60 overflow-y-auto">
+  <div className="w-[166px] h-5 left-[1520px] top-[517px] absolute bg-yellow-200" />
+  <div className="w-[166px] left-[1520px] top-[519px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">精算告知済　ドライバー</div>
+  <div className="w-[166px] h-[176px] left-[1520px] top-[537px] absolute outline outline-1 outline-offset-[-1px] outline-rose-300/60 overflow-y-auto">
     <div className="w-[166px] h-5 left-0 top-0 absolute bg-zinc-300" />
     <div className="w-[166px] h-5 left-0 top-[20px] absolute bg-zinc-300" />
     <div className="w-[166px] h-5 left-0 top-[40px] absolute bg-zinc-300" />
@@ -395,9 +396,9 @@ export default function Original() {
   </div>
 
 
-  <div className="w-[166px] h-5 left-[1330px] top-[713px] absolute bg-yellow-200" />
-  <div className="w-[166px] left-[1330px] top-[715px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">南IC待機　ドライバー</div>
-  <div className="w-[166px] h-44 left-[1330px] top-[733px] absolute outline outline-1 outline-offset-[-1px] outline-rose-300/60 overflow-y-auto">
+  <div className="w-[166px] h-5 left-[1354px] top-[713px] absolute bg-yellow-200" />
+  <div className="w-[166px] left-[1354px] top-[715px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">南IC待機　ドライバー</div>
+  <div className="w-[166px] h-44 left-[1354px] top-[733px] absolute outline outline-1 outline-offset-[-1px] outline-rose-300/60 overflow-y-auto">
     <div className="w-[166px] h-5 left-0 top-0 absolute bg-zinc-300" />
     <div className="w-[166px] h-5 left-0 top-[20px] absolute bg-zinc-300" />
     <div className="w-[166px] h-5 left-0 top-[40px] absolute bg-zinc-300" />
@@ -411,9 +412,9 @@ export default function Original() {
 
 
   {/* 南IC事務所　待機 */}
-  <div className="w-[166px] h-5 left-[1330px] top-[173px] absolute bg-cyan-100" />
-  <div className="w-[166px] left-[1330px] top-[175px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">南IC事務所　待機</div>
-  <div className="w-[166px] h-[520px] left-[1330px] top-[193px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-[166px] h-5 left-[1354px] top-[173px] absolute bg-cyan-100" />
+  <div className="w-[166px] left-[1354px] top-[175px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">南IC事務所　待機</div>
+  <div className="w-[166px] h-[520px] left-[1354px] top-[193px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {officeWaitingSampleData.map((item: OfficeWaiting, index: number) => {
       const topPosition = index * 22;
       return (
@@ -431,9 +432,9 @@ export default function Original() {
   </div>
   
   {/* FGCS　他撮影中 */}
-  <div className="w-[166px] h-5 left-[1496px] top-[173px] absolute bg-fuchsia-300" />
-  <div className="w-[166px] left-[1496px] top-[175px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">FGCS　他撮影中</div>
-  <div className="w-[166px] h-[64px] left-[1496px] top-[193px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-[166px] h-5 left-[1520px] top-[173px] absolute bg-fuchsia-300" />
+  <div className="w-[166px] left-[1520px] top-[175px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">FGCS　他撮影中</div>
+  <div className="w-[166px] h-[64px] left-[1520px] top-[193px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {shootingSampleData.map((item: Shooting, index: number) => {
       const topPosition = index * 22;
       return (
@@ -451,9 +452,9 @@ export default function Original() {
   </div>
 
   {/* 南IC徒歩派遣or仮置き */}
-  <div className="w-[166px] h-5 left-[1496px] top-[257px] absolute bg-cyan-100" />
-  <div className="w-[166px] h-5 left-[1496px] top-[259px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">南IC徒歩派遣or仮置き</div>
-  <div className="w-[166px] h-60 left-[1496px] top-[277px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-[166px] h-5 left-[1520px] top-[257px] absolute bg-cyan-100" />
+  <div className="w-[166px] h-5 left-[1520px] top-[259px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">南IC徒歩派遣or仮置き</div>
+  <div className="w-[166px] h-60 left-[1520px] top-[277px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {walkingDispatchSampleData.map((item: WalkingDispatch, index: number) => {
       const topPosition = index * 22;
       return (
@@ -477,11 +478,11 @@ export default function Original() {
 
   {/* 帰宅ホステス */}
   
-  <div className="w-[234px] h-5 left-[1662px] top-[568px] absolute bg-cyan-100" />
-  <div className="w-[234px] left-[1662px] top-[570px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">帰宅ホステス</div>
-  <div className="w-[234px] h-5 left-[1662px] top-[588px] absolute bg-yellow-200" />
-  <div className="w-[234px] left-[1662px] top-[590px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">自宅or寮　待機</div>
-  <div className="w-[234px] h-[105px] left-[1662px] top-[608px] absolute outline outline-1 outline-offset-[-1px] outline-rose-300/60 overflow-y-auto">
+  <div className="w-[234px] h-5 left-[1686px] top-[568px] absolute bg-cyan-100" />
+  <div className="w-[234px] left-[1686px] top-[570px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">帰宅ホステス</div>
+  <div className="w-[234px] h-5 left-[1686px] top-[588px] absolute bg-yellow-200" />
+  <div className="w-[234px] left-[1686px] top-[590px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">自宅or寮　待機</div>
+  <div className="w-[234px] h-[105px] left-[1686px] top-[608px] absolute outline outline-1 outline-offset-[-1px] outline-rose-300/60 overflow-y-auto">
     {returningHostessSampleData.map((item: ReturningHostess, index: number) => {
       const topPosition = index * 22;
       return (
@@ -495,15 +496,15 @@ export default function Original() {
   </div>
 
   {/* ホステス送り・帰宅 */}
-  <div className="w-[243px] h-5 left-[1662px] top-[75px] absolute bg-yellow-200" />
-  <div className="w-[243px] left-[1662px] top-[77px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">ホステス送り・帰宅</div>
-  <div className="w-5 left-[1662px] top-[96px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">荷物</div>
-  <div className="w-[42px] left-[1736px] top-[96px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">終了</div>
-  <div className="w-[42px] left-[1778px] top-[96px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">帰宅</div>
-  <div className="w-[19px] left-[1886px] top-[96px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">件数</div>
-  <div className="w-[54px] left-[1678px] top-[96px] absolute justify-end text-black text-center text-[8px] font-normal font-['Inter']">ホステス名</div>
-  <div className="w-[66px] left-[1818px] top-[96px] absolute justify-end text-black text-[8px] text-center font-normal font-['Inter']">送り場所</div>
-  <div className="w-[243px] h-[460px] left-[1662px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto overflow-y-hidden">
+  <div className="w-[243px] h-5 left-[1686px] top-[75px] absolute bg-yellow-200" />
+  <div className="w-[243px] left-[1686px] top-[77px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">ホステス送り・帰宅</div>
+  <div className="w-5 left-[1686px] top-[96px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">荷物</div>
+  <div className="w-[42px] left-[1760px] top-[96px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">終了</div>
+  <div className="w-[42px] left-[1802px] top-[96px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">帰宅</div>
+  <div className="w-[19px] left-[1910px] top-[96px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">件数</div>
+  <div className="w-[54px] left-[1702px] top-[96px] absolute justify-end text-black text-center text-[8px] font-normal font-['Inter']">ホステス名</div>
+  <div className="w-[66px] left-[1842px] top-[96px] absolute justify-end text-black text-[8px] text-center font-normal font-['Inter']">送り場所</div>
+  <div className="w-[243px] h-[460px] left-[1686px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto overflow-y-hidden">
     {hostessTransportSampleData.map((item: HostessTransport, index: number) => {
       const topPosition = index * 22;
       return (
@@ -528,9 +529,9 @@ export default function Original() {
   
   
   {/* 予定(打ち合わせ・撮影など) */}
-  <div className="w-[400px] h-5 left-[1496px] top-[713px] absolute bg-purple-300" />
-  <div className="w-[400px] left-[1496px] top-[715px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">予定(打ち合わせ・撮影など)</div>
-  <div className="w-[400px] h-[100px] left-[1496px] top-[733px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-[400px] h-5 left-[1520px] top-[713px] absolute bg-purple-300" />
+  <div className="w-[400px] left-[1520px] top-[715px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">予定(打ち合わせ・撮影など)</div>
+  <div className="w-[400px] h-[100px] left-[1520px] top-[733px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {scheduleItemSampleData.map((item: ScheduleItem, index: number) => {
       const topPosition = index * 34;
       return (
@@ -556,7 +557,7 @@ export default function Original() {
 
   {/* ドライバ配車パネル */}
   <Button
-    className="w-[166px] h-20 left-[1330px] top-[833px] absolute bg-rose-300/60 hover:bg-rose-400/60 text-black text-[13px] font-normal font-['Inter']"
+    className="w-[166px] h-20 left-[1354px] top-[833px] absolute bg-rose-300/60 hover:bg-rose-400/60 text-black text-[13px] font-normal font-['Inter']"
     onClick={() => {}}
   >
     ドライバ配車パネル
@@ -564,9 +565,9 @@ export default function Original() {
 
 
   {/* 面接予定 */}
-  <div className="w-[400px] h-5 left-[1496px] top-[833px] absolute bg-rose-300/60" />
-  <div className="w-[400px] left-[1496px] top-[835px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">面接予定</div>
-  <div className="w-[400px] h-[130px] left-[1496px] top-[853px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-[400px] h-5 left-[1520px] top-[833px] absolute bg-rose-300/60" />
+  <div className="w-[400px] left-[1520px] top-[835px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">面接予定</div>
+  <div className="w-[400px] h-[130px] left-[1520px] top-[853px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {driverDispatchPanelSampleData.map((item: DriverDispatchPanel, index: number) => {
       const topPosition = index * 22;
       return (
@@ -595,6 +596,7 @@ export default function Original() {
       );
     })}
   </div>
-</div>
+      </div>
+    </div>
   );
 }
