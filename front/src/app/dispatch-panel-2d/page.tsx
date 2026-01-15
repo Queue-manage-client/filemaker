@@ -47,7 +47,7 @@ export default function Original() {
 
   return (
     <div className="w-full h-[1080px] overflow-x-auto overflow-y-hidden">
-      <div className="w-[2048px] h-[1080px] relative overflow-hidden">
+      <div className="w-[1976px] h-[1080px] relative overflow-hidden">
       {/* ヘッダー */}
       <div className="absolute left-0 top-0 right-0 z-10 h-[50px] bg-white border-b border-zinc-300">
         <div className="flex items-center h-full px-2">
