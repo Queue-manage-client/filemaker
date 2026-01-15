@@ -336,7 +336,7 @@ export default function EmployeeSchedule() {
                                     isWorkDay: e.target.value !== ''
                                   });
                                 }}
-                                className="w-[72px] h-7 text-sm border border-gray-400 rounded-sm px-0.5"
+                                className="w-[72px] h-7 text-sm border border-gray-400 rounded-sm px-0.5 [&::-webkit-calendar-picker-indicator]:p-0 [&::-webkit-calendar-picker-indicator]:m-0"
                               />
                               <span className="text-sm">〜</span>
                               <input
@@ -348,7 +348,7 @@ export default function EmployeeSchedule() {
                                     isWorkDay: daySchedule.startTime !== '' || e.target.value !== ''
                                   });
                                 }}
-                                className="w-[72px] h-7 text-sm border border-gray-400 rounded-sm px-0.5"
+                                className="w-[72px] h-7 text-sm border border-gray-400 rounded-sm px-0.5 [&::-webkit-calendar-picker-indicator]:p-0 [&::-webkit-calendar-picker-indicator]:m-0"
                               />
                             </div>
                           </td>
