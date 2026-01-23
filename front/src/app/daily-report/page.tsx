@@ -408,70 +408,70 @@ export default function DailyReport() {
             <div className="text-xs bg-white">
               {/* 行1: 店売上現金計 / (空白) / 給料日計 */}
               <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 px-px py-0.5 flex items-center">店売上現金計</div>
-                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.storeCashSales)}</div>
-                <div className="flex-1 px-px py-0.5 flex items-center"></div>
-                <div className="flex-1 px-px py-0.5 flex items-center">給料日計</div>
-                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.payrollDaily)}</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">店売上現金計</div>
+                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.storeCashSales)}</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center"></div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">給料日計</div>
+                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.payrollDaily)}</div>
               </div>
               {/* 行2: 店売上カード計 / 領収証発行 / 派遣回数日計 */}
               <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 px-px py-0.5 flex items-center">店売上カード計</div>
-                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.storeCardSales)} {store.storeCardCount > 0 ? `${store.storeCardCount}件` : ''}</div>
-                <div className="flex-1 px-px py-0.5 flex items-center">領収証発行</div>
-                <div className="w-8 text-right px-px py-0.5 flex items-center justify-end">{store.receiptCount}件</div>
-                <div className="flex-1 px-px py-0.5 flex items-center">派遣回数日計</div>
-                <div className="w-8 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.dispatchDaily)}</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">店売上カード計</div>
+                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.storeCardSales)} {store.storeCardCount > 0 ? `${store.storeCardCount}件` : ''}</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">領収証発行</div>
+                <div className="w-8 text-right px-1 py-0.5 flex items-center justify-end">{store.receiptCount}件</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">派遣回数日計</div>
+                <div className="w-8 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.dispatchDaily)}</div>
               </div>
               {/* 行3: 店売上計 / 割引チケット利用 / 指名回数日計 */}
               <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 px-px py-0.5 flex items-center">店売上計</div>
-                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.storeTotalSales)}</div>
-                <div className="flex-1 px-px py-0.5 flex items-center">割引チケット</div>
-                <div className="w-8 text-right px-px py-0.5 flex items-center justify-end">{store.discountTicketCount}件</div>
-                <div className="flex-1 px-px py-0.5 flex items-center">指名回数日計</div>
-                <div className="w-8 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.nominationDaily)}</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">店売上計</div>
+                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.storeTotalSales)}</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">割引チケット</div>
+                <div className="w-8 text-right px-1 py-0.5 flex items-center justify-end">{store.discountTicketCount}件</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">指名回数日計</div>
+                <div className="w-8 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.nominationDaily)}</div>
               </div>
               {/* 行4: カード請求計 / 未回収売掛金額計 / HF指名回数日計 */}
               <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 px-px py-0.5 flex items-center">カード請求計</div>
-                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.cardBilling)}</div>
-                <div className="flex-1 px-px py-0.5 flex items-center">未回収売掛</div>
-                <div className="w-8 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.uncollectedAmount)}</div>
-                <div className="flex-1 px-px py-0.5 flex items-center">HF指名日計</div>
-                <div className="w-8 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.hfNominationDaily)}</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">カード請求計</div>
+                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.cardBilling)}</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">未回収売掛</div>
+                <div className="w-8 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.uncollectedAmount)}</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">HF指名日計</div>
+                <div className="w-8 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.hfNominationDaily)}</div>
               </div>
               {/* 行5: カード加算金額計 / (空白) / (空白) */}
               <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 px-px py-0.5 flex items-center">カード加算金額計</div>
-                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.cardAddFee)}</div>
-                <div className="flex-1 px-px py-0.5 flex items-center"></div>
-                <div className="flex-1 px-px py-0.5 flex items-center"></div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">カード加算金額計</div>
+                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.cardAddFee)}</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center"></div>
+                <div className="flex-1 px-1 py-0.5 flex items-center"></div>
               </div>
               {/* 行6: その他売上計 / 入金計 / 出金計 */}
               <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 px-px py-0.5 flex items-center">その他売上計</div>
-                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.otherSales)}</div>
-                <div className="flex-1 px-px py-0.5 flex items-center">入金計</div>
-                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.deposit)}</div>
-                <div className="flex-1 px-px py-0.5 flex items-center">出金計</div>
-                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.withdrawal)}</div>
+                <div className="flex-1 min-w-[90px] px-1 py-0.5 flex items-center">その他売上計</div>
+                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.otherSales)}</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">入金計</div>
+                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.deposit)}</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">出金計</div>
+                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.withdrawal)}</div>
               </div>
               {/* 行7: 現金収入計 / 報告金額 / 旧現金収入計 */}
               <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 px-px py-0.5 flex items-center">現金収入計</div>
-                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.cashRevenue)}</div>
-                <div className="flex-1 px-px py-0.5 flex items-center font-bold">報告金額</div>
-                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end font-bold">{formatNumber(store.reportedAmount)}</div>
-                <div className="flex-1 px-px py-0.5 flex items-center">旧現金収入計</div>
-                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.oldCashRevenue)}</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">現金収入計</div>
+                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.cashRevenue)}</div>
+                <div className="flex-1 px-1 py-0.5 flex items-center font-bold">報告金額</div>
+                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end font-bold">{formatNumber(store.reportedAmount)}</div>
+                <div className="flex-1 min-w-[90px] px-1 py-0.5 flex items-center">旧現金収入計</div>
+                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.oldCashRevenue)}</div>
               </div>
               {/* 行8: (空白) / (空白) / 旧報告金額 */}
               <div className="flex h-5 bg-cyan-50">
-                <div className="flex-[2] px-px py-0.5 flex items-center"></div>
-                <div className="flex-1 px-px py-0.5 flex items-center"></div>
-                <div className="flex-1 px-px py-0.5 flex items-center">旧報告金額</div>
-                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.oldReportedAmount)}</div>
+                <div className="flex-[2] px-1 py-0.5 flex items-center"></div>
+                <div className="flex-1 px-1 py-0.5 flex items-center"></div>
+                <div className="flex-1 px-1 py-0.5 flex items-center">旧報告金額</div>
+                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.oldReportedAmount)}</div>
               </div>
             </div>
           </div>
