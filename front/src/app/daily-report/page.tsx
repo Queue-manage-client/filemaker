@@ -397,10 +397,10 @@ export default function DailyReport() {
       <div className="flex-1 grid mt-1 overflow-hidden" style={{ gridTemplateColumns: '25% 27% 48%', gridTemplateRows: '1fr' }}>
         {/* 左側セクション - 売上リスト */}
         <div className="h-full overflow-y-scroll border-r border-[#323232] bg-white scrollbar-visible" style={{ scrollbarWidth: 'thin', scrollbarColor: '#888 #e5e5e5' }}>
-        {salesListData.map((store) => (
+        {salesListData.map((store, index) => (
           <div key={store.id} className="border-b border-[#323232]">
             {/* 店舗ヘッダー */}
-            <div className="bg-cyan-200 h-5 flex items-center px-0.5 border-b border-[#323232]">
+            <div className={`bg-cyan-200 h-5 flex items-center px-0.5 border-b border-[#323232] ${index === 0 ? 'border-t' : ''}`}>
               <span className="text-xs font-bold text-black">{store.id} {store.label} 売上リスト</span>
               <span className="text-xs font-bold ml-0.5 text-black">{store.storeName}</span>
             </div>
@@ -482,7 +482,7 @@ export default function DailyReport() {
         <div className="h-full border-r border-[#323232] overflow-y-auto">
           {/* 集計結果 */}
         <div className="text-xs">
-          <div className="flex h-5 border-b border-[#323232]">
+          <div className="flex h-5 border-t border-b border-[#323232]">
             <div className="flex-1 p-0.5 bg-zinc-200 border-r border-[#323232] flex items-center">現金収入計</div>
             <div className="w-20 text-right px-px py-0.5 border-r border-[#323232] flex items-center justify-end font-bold">860,655</div>
             <div className="flex-1 p-0.5 bg-zinc-200 border-r border-[#323232] flex items-center">ドライバ回収額計</div>
@@ -599,7 +599,7 @@ export default function DailyReport() {
         {/* 右側セクション - 出勤スタッフ/出勤ホステス（タブ切り替え） */}
         <div className="h-full overflow-y-scroll flex flex-col scrollbar-visible" style={{ scrollbarWidth: 'thin', scrollbarColor: '#888 #e5e5e5' }}>
           {/* タブヘッダー */}
-          <div className="flex border-b border-[#323232]">
+          <div className="flex border-t border-b border-[#323232]">
             <button
               onClick={() => setActiveTab('staff')}
               className={`flex-1 h-5 flex items-center justify-center text-xs font-bold border-r border-[#323232] ${
