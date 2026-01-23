@@ -32,12 +32,12 @@ export default function DashboardPage() {
           <div className="lg:col-span-1">
             <LeftPanel />
           </div>
-          
+
           {/* Center Panel - Gray Cards */}
           <div className="lg:col-span-1">
             <CenterPanel />
           </div>
-          
+
           {/* Right Panel - Light Pink Cards */}
           <div className="lg:col-span-1">
             <RightPanel />

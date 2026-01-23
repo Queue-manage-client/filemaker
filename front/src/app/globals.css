@@ -160,4 +160,22 @@ All colors MUST be HSL.
     scrollbar-width: thin;
     scrollbar-color: #a1a1aa transparent;
   }
+
+  /* Visible scrollbar */
+  .scrollbar-visible::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-visible::-webkit-scrollbar-track {
+    background: #e5e5e5;
+  }
+
+  .scrollbar-visible::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+  }
+
+  .scrollbar-visible::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
 }

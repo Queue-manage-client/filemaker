@@ -235,37 +235,16 @@ const creditCardData = [
 ];
 
 // スタッフサンプルデータ（写真に基づく）
-// settlementStatus: 'unsettled'=未精算(赤), 'unsent'=未送信(白), 'completed'=精算・送信完了(灰)
+// settlementStatus: 'unsettled'=未精算, 'unsent'=未送信, 'completed'=精算・送信完了
 const staffData = [
-  { id: 1, type: '社員', name: '吉田 琢雅10', status: '出勤', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'unsettled' },
-  { id: 2, type: '社員', name: '松平', status: '退社', num: 11, salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'completed' },
-  { id: 3, type: '社員', name: '沙崎 哲也9', status: '出勤', num: '', salary: 38070, collection: 61930, deposit: 26960, refund: 0, express: 78040, adjust: 0, net: 7, settlementStatus: 'unsent' },
-  { id: 4, type: '社員', name: '南部', status: '退社', num: 11, salary: 10000, collection: 27000, deposit: 25970, refund: 0, express: 11030, adjust: 7, net: 0, settlementStatus: 'completed' },
-  { id: 5, type: '社員', name: '南部 吉郎11', status: '退社', num: '', salary: 74700, collection: 121000, deposit: 97510, refund: 0, express: 110290, adjust: 5, net: 110290, settlementStatus: 'completed' },
-  { id: 6, type: '社員', name: '森下 光哉1', status: '退社', num: '', salary: 68000, collection: 153000, deposit: 207630, refund: 0, express: 13370, adjust: 0, net: 2, settlementStatus: 'completed' },
-  { id: 7, type: '社員', name: '耕平 中尾11', status: '出勤', num: '', salary: 0, collection: 1880, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'unsettled' },
-  { id: 8, type: '社員', name: '村上 竜5', status: '退社', num: '', salary: 99670, collection: 215330, deposit: 288450, refund: 0, express: 76550, adjust: 1, net: 1, settlementStatus: 'completed' },
-  { id: 9, type: '社員', name: '山岡 義弘7', status: '退社', num: 9.5, salary: 0, collection: 0, deposit: 207630, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'unsent' },
-  { id: 10, type: '社員', name: '西川 陵登', status: '退社', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 2, net: 5, settlementStatus: 'completed' },
-  { id: 11, type: '社員', name: '片山 宏次', status: '退社', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'unsent' },
-  { id: 12, type: '社員', name: '中村 南斗', status: '10.5', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'unsettled' },
-  { id: 13, type: '社員', name: '杉本 淳', status: '退社', num: 11, salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'completed' },
-  { id: 14, type: '社員', name: '田淀 貫拓', status: '退社', num: 11, salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'completed' },
-  { id: 15, type: 'アルバイト', name: '槙田 武', status: '', num: '', salary: 8, collection: 9360, deposit: 0, refund: 112, express: 9248, adjust: 0, net: 0, settlementStatus: 'unsettled' },
-  { id: 16, type: 'アルバイト', name: '大宮 翔太', status: '', num: '', salary: 9, collection: 10809, deposit: 0, refund: 129, express: 10671, adjust: 0, net: 0, settlementStatus: 'unsent' },
-  { id: 17, type: 'アルバイト', name: '大谷 大輔', status: '退社', num: 5.5, salary: 6050, collection: 0, deposit: 0, refund: 74, express: 5978, adjust: 0, net: 0, settlementStatus: 'completed' },
-  { id: 18, type: '社員', name: '事務所DCP', status: '退社', num: 24, salary: 0, collection: 0, deposit: 0, refund: 20, express: 0, adjust: 0, net: 20, settlementStatus: 'unsent' },
-  { id: 19, type: '社員', name: 'ホテヘル', status: '', num: '', salary: 200230, collection: 591770, deposit: 213440, refund: 0, express: 578560, adjust: 0, net: 0, settlementStatus: 'unsettled' },
-  { id: 20, type: '社員', name: 'スタジオ(3F)', status: '出勤', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'unsettled' },
-  { id: 21, type: '社員', name: 'FGC', status: '出勤', num: '', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, settlementStatus: 'unsettled' },
-  { id: 22, type: 'アルバイト', name: '松尾 久亮山', status: '退社', num: 14, salary: 18376, collection: 41820, deposit: 146180, refund: 142280, express: 220, adjust: 27564, net: 3, settlementStatus: 'completed' },
-  { id: 23, type: 'アルバイト', name: '土居4', status: '', num: 16, salary: 21024, collection: 45790, deposit: 111210, refund: 106930, express: 790, adjust: 252, net: 28508, settlementStatus: 'completed' },
-  { id: 24, type: 'アルバイト', name: '津村4 堀川', status: '出勤', num: '', salary: 64400, collection: 188600, deposit: 227280, refund: 1280, express: 0, adjust: 24440, net: 0, settlementStatus: 'unsent' },
-  { id: 25, type: 'アルバイト', name: '中薗 5 南泰', status: '退社', num: 7.5, salary: 9579, collection: 53180, deposit: 111820, refund: 166620, express: 114, adjust: 11085, net: 5, settlementStatus: 'unsent' },
-  { id: 26, type: 'アルバイト', name: '八塚 4吐田野', status: '出勤', num: '', salary: 58740, collection: 123260, deposit: 76340, refund: 0, express: 0, adjust: 105660, net: 5, settlementStatus: 'unsettled' },
-  { id: 27, type: 'アルバイト', name: '伊坂 4 伏見', status: '退社', num: 7, salary: 8464, collection: 36260, deposit: 77740, refund: 70570, express: 101, adjust: 35067, net: 5, settlementStatus: 'completed' },
-  { id: 28, type: 'アルバイト', name: '須賀 5 上寮', status: '出勤', num: '', salary: 34110, collection: 72890, deposit: 91460, refund: 0, express: 0, adjust: 15540, net: 5, settlementStatus: 'unsent' },
-  { id: 29, type: 'アルバイト', name: '水次郎 7 山科', status: '退社', num: 5.5, salary: 6568, collection: 40700, deposit: 76300, refund: 43410, express: 78, adjust: 67100, net: 1, settlementStatus: 'unsent' },
+  { id: 1, type: '社員', name: '吉田 琢雅10', status: '出勤', salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, bath1: 0, bath2: 3, bath3: 3, equip: 3, discountCard: 3, managerCheck: 0, settlementStatus: 'unsettled' },
+  { id: 2, type: '社員', name: '松平 篤', status: '退社', statusNum: 11, salary: 0, collection: 0, deposit: 0, refund: 0, express: 0, adjust: 0, net: 0, bath1: 0, bath2: 0, bath3: 0, equip: 0, discountCard: 0, managerCheck: 0, settlementStatus: 'completed' },
+  { id: 3, type: '社員', name: '汐崎 哲也9', status: '出勤', salary: 38070, collection: 61930, deposit: 26960, refund: 0, express: 0, adjust: 0, net: 73040, bath1: 0, bath2: 1, bath3: 1, equip: 3, discountCard: 4, managerCheck: 4, settlementStatus: 'unsent' },
+  { id: 4, type: '社員', name: '南 和貴6', status: '退社', statusNum: 11, salary: 10000, collection: 27000, deposit: 25970, refund: 0, express: 0, adjust: 0, net: 11030, bath1: 7, bath2: 0, bath3: 0, equip: 7, discountCard: 5, managerCheck: 1, settlementStatus: 'completed' },
+  { id: 5, type: '社員', name: '耕平 中尾11', status: '出勤', salary: 0, collection: 0, deposit: 1880, refund: 0, express: 0, adjust: 0, net: -1880, bath1: 3, bath2: 0, bath3: 0, equip: 3, discountCard: 3, managerCheck: 0, settlementStatus: 'unsettled' },
+  { id: 6, type: '社員', name: '村上 竜5', status: '退社', statusNum: 11, salary: 99670, collection: 215330, deposit: 238450, refund: 0, express: 0, adjust: 0, net: 76550, bath1: 1, bath2: 1, bath3: 0, equip: 8, discountCard: 0, managerCheck: 0, settlementStatus: 'completed' },
+  { id: 7, type: '社員', name: '南部 吉郎11', status: '退社', statusNum: 11, salary: 74700, collection: 121300, deposit: 85710, refund: 0, express: 0, adjust: 0, net: 110290, bath1: 3, bath2: 1, bath3: 0, equip: 2, discountCard: 3, managerCheck: 7, settlementStatus: 'completed' },
+  { id: 8, type: '社員', name: '森下 光哉1', status: '出勤', salary: 68000, collection: 153000, deposit: 207630, refund: 0, express: 0, adjust: 0, net: 13370, bath1: 0, bath2: 2, bath3: 2, equip: 0, discountCard: 0, managerCheck: 2, settlementStatus: 'unsent' },
 ];
 
 // 出勤ホステスサンプルデータ
@@ -276,11 +255,9 @@ const hostessDisplayData = staffData.map((s, i) => ({
   sendLocation: i % 3 === 0 ? '京都駅' : i % 3 === 1 ? '四条烏丸' : '河原町',
   transportFee: Math.floor(Math.random() * 3000),
   miscFee: Math.floor(Math.random() * 500),
-  deposit: Math.floor(Math.random() * 5000),
+  hostessDeposit: Math.floor(Math.random() * 5000),
   paymentAmount: Math.floor(Math.random() * 50000),
   isPaid: i % 2 === 0,
-  bath: ['', '', ''],
-  equip: ['', '', ''],
   approval: i % 3 === 0,
 }));
 
@@ -288,6 +265,7 @@ export default function DailyReport() {
   const router = useRouter();
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'staff' | 'hostess'>('staff');
 
   useEffect(() => {
     document.title = '日報 - Dispatch Harmony Hub';
@@ -416,9 +394,9 @@ export default function DailyReport() {
       </div>
 
       {/* メインコンテンツ - グリッドレイアウト */}
-      <div className="flex-1 grid mt-1" style={{ gridTemplateColumns: '18% 20% 14% 20% 28%' }}>
+      <div className="flex-1 grid mt-1 overflow-hidden" style={{ gridTemplateColumns: '25% 27% 48%', gridTemplateRows: '1fr' }}>
         {/* 左側セクション - 売上リスト */}
-        <div className="h-full overflow-y-auto border-r border-[#323232] bg-white">
+        <div className="h-full overflow-y-scroll border-r border-[#323232] bg-white scrollbar-visible" style={{ scrollbarWidth: 'thin', scrollbarColor: '#888 #e5e5e5' }}>
         {salesListData.map((store) => (
           <div key={store.id} className="border-b border-[#323232]">
             {/* 店舗ヘッダー */}
@@ -430,70 +408,70 @@ export default function DailyReport() {
             <div className="text-xs bg-white">
               {/* 行1: 店売上現金計 / (空白) / 給料日計 */}
               <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 p-0.5 flex items-center">店売上現金計</div>
-                <div className="flex-1 text-right p-0.5 flex items-center justify-end">{formatNumber(store.storeCashSales)}</div>
-                <div className="flex-1 p-0.5 flex items-center"></div>
-                <div className="flex-1 p-0.5 flex items-center">給料日計</div>
-                <div className="flex-1 text-right p-0.5 flex items-center justify-end">{formatNumber(store.payrollDaily)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">店売上現金計</div>
+                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.storeCashSales)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center"></div>
+                <div className="flex-1 px-px py-0.5 flex items-center">給料日計</div>
+                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.payrollDaily)}</div>
               </div>
               {/* 行2: 店売上カード計 / 領収証発行 / 派遣回数日計 */}
               <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 p-0.5 flex items-center">店売上カード計</div>
-                <div className="flex-1 text-right p-0.5 flex items-center justify-end">{formatNumber(store.storeCardSales)} {store.storeCardCount > 0 ? `${store.storeCardCount}件` : ''}</div>
-                <div className="flex-1 p-0.5 flex items-center">領収証発行</div>
-                <div className="w-8 text-right p-0.5 flex items-center justify-end">{store.receiptCount}件</div>
-                <div className="flex-1 p-0.5 flex items-center">派遣回数日計</div>
-                <div className="w-8 text-right p-0.5 flex items-center justify-end">{formatNumber(store.dispatchDaily)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">店売上カード計</div>
+                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.storeCardSales)} {store.storeCardCount > 0 ? `${store.storeCardCount}件` : ''}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">領収証発行</div>
+                <div className="w-8 text-right px-px py-0.5 flex items-center justify-end">{store.receiptCount}件</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">派遣回数日計</div>
+                <div className="w-8 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.dispatchDaily)}</div>
               </div>
               {/* 行3: 店売上計 / 割引チケット利用 / 指名回数日計 */}
               <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 p-0.5 flex items-center">店売上計</div>
-                <div className="flex-1 text-right p-0.5 flex items-center justify-end">{formatNumber(store.storeTotalSales)}</div>
-                <div className="flex-1 p-0.5 flex items-center">割引チケット</div>
-                <div className="w-8 text-right p-0.5 flex items-center justify-end">{store.discountTicketCount}件</div>
-                <div className="flex-1 p-0.5 flex items-center">指名回数日計</div>
-                <div className="w-8 text-right p-0.5 flex items-center justify-end">{formatNumber(store.nominationDaily)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">店売上計</div>
+                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.storeTotalSales)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">割引チケット</div>
+                <div className="w-8 text-right px-px py-0.5 flex items-center justify-end">{store.discountTicketCount}件</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">指名回数日計</div>
+                <div className="w-8 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.nominationDaily)}</div>
               </div>
               {/* 行4: カード請求計 / 未回収売掛金額計 / HF指名回数日計 */}
               <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 p-0.5 flex items-center">カード請求計</div>
-                <div className="flex-1 text-right p-0.5 flex items-center justify-end">{formatNumber(store.cardBilling)}</div>
-                <div className="flex-1 p-0.5 flex items-center">未回収売掛</div>
-                <div className="w-8 text-right p-0.5 flex items-center justify-end">{formatNumber(store.uncollectedAmount)}</div>
-                <div className="flex-1 p-0.5 flex items-center">HF指名日計</div>
-                <div className="w-8 text-right p-0.5 flex items-center justify-end">{formatNumber(store.hfNominationDaily)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">カード請求計</div>
+                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.cardBilling)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">未回収売掛</div>
+                <div className="w-8 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.uncollectedAmount)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">HF指名日計</div>
+                <div className="w-8 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.hfNominationDaily)}</div>
               </div>
               {/* 行5: カード加算金額計 / (空白) / (空白) */}
               <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 p-0.5 flex items-center">カード加算金額計</div>
-                <div className="flex-1 text-right p-0.5 flex items-center justify-end">{formatNumber(store.cardAddFee)}</div>
-                <div className="flex-1 p-0.5 flex items-center"></div>
-                <div className="flex-1 p-0.5 flex items-center"></div>
+                <div className="flex-1 px-px py-0.5 flex items-center">カード加算金額計</div>
+                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.cardAddFee)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center"></div>
+                <div className="flex-1 px-px py-0.5 flex items-center"></div>
               </div>
               {/* 行6: その他売上計 / 入金計 / 出金計 */}
               <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 p-0.5 flex items-center">その他売上計</div>
-                <div className="flex-1 text-right p-0.5 flex items-center justify-end">{formatNumber(store.otherSales)}</div>
-                <div className="flex-1 p-0.5 flex items-center">入金計</div>
-                <div className="flex-1 text-right p-0.5 flex items-center justify-end">{formatNumber(store.deposit)}</div>
-                <div className="flex-1 p-0.5 flex items-center">出金計</div>
-                <div className="flex-1 text-right p-0.5 flex items-center justify-end">{formatNumber(store.withdrawal)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">その他売上計</div>
+                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.otherSales)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">入金計</div>
+                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.deposit)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">出金計</div>
+                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.withdrawal)}</div>
               </div>
               {/* 行7: 現金収入計 / 報告金額 / 旧現金収入計 */}
               <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 p-0.5 flex items-center">現金収入計</div>
-                <div className="flex-1 text-right p-0.5 flex items-center justify-end">{formatNumber(store.cashRevenue)}</div>
-                <div className="flex-1 p-0.5 flex items-center font-bold">報告金額</div>
-                <div className="flex-1 text-right p-0.5 flex items-center justify-end font-bold">{formatNumber(store.reportedAmount)}</div>
-                <div className="flex-1 p-0.5 flex items-center">旧現金収入計</div>
-                <div className="flex-1 text-right p-0.5 flex items-center justify-end">{formatNumber(store.oldCashRevenue)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">現金収入計</div>
+                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.cashRevenue)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center font-bold">報告金額</div>
+                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end font-bold">{formatNumber(store.reportedAmount)}</div>
+                <div className="flex-1 px-px py-0.5 flex items-center">旧現金収入計</div>
+                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.oldCashRevenue)}</div>
               </div>
               {/* 行8: (空白) / (空白) / 旧報告金額 */}
               <div className="flex h-5 bg-cyan-50">
-                <div className="flex-[2] p-0.5 flex items-center"></div>
-                <div className="flex-1 p-0.5 flex items-center"></div>
-                <div className="flex-1 p-0.5 flex items-center">旧報告金額</div>
-                <div className="flex-1 text-right p-0.5 flex items-center justify-end">{formatNumber(store.oldReportedAmount)}</div>
+                <div className="flex-[2] px-px py-0.5 flex items-center"></div>
+                <div className="flex-1 px-px py-0.5 flex items-center"></div>
+                <div className="flex-1 px-px py-0.5 flex items-center">旧報告金額</div>
+                <div className="flex-1 text-right px-px py-0.5 flex items-center justify-end">{formatNumber(store.oldReportedAmount)}</div>
               </div>
             </div>
           </div>
@@ -506,61 +484,60 @@ export default function DailyReport() {
         <div className="text-xs">
           <div className="flex h-5 border-b border-[#323232]">
             <div className="flex-1 p-0.5 bg-zinc-200 border-r border-[#323232] flex items-center">現金収入計</div>
-            <div className="flex-1 text-right p-0.5 border-r border-[#323232] flex items-center justify-end font-bold">860,655</div>
+            <div className="w-20 text-right px-px py-0.5 border-r border-[#323232] flex items-center justify-end font-bold">860,655</div>
             <div className="flex-1 p-0.5 bg-zinc-200 border-r border-[#323232] flex items-center">ドライバ回収額計</div>
-            <div className="flex-1 text-right p-0.5 flex items-center justify-end font-bold">865,670</div>
+            <div className="w-20 text-right px-px py-0.5 flex items-center justify-end font-bold">865,670</div>
           </div>
           <div className="flex h-5 border-b border-[#323232]">
             <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center">店舗売上計カード</div>
-            <div className="flex-1 text-right p-0.5 border-r border-[#323232] flex items-center justify-end">49,280</div>
+            <div className="w-20 text-right px-px py-0.5 border-r border-[#323232] flex items-center justify-end">49,280</div>
             <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center">ホステス支払計</div>
-            <div className="flex-1 text-right p-0.5 flex items-center justify-end">1,724,940</div>
+            <div className="w-20 text-right px-px py-0.5 flex items-center justify-end">1,724,940</div>
           </div>
           <div className="flex h-5 border-b border-[#323232]">
             <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center">売上計</div>
-            <div className="flex-1 text-right p-0.5 border-r border-[#323232] flex items-center justify-end">909,600</div>
+            <div className="w-20 text-right px-px py-0.5 border-r border-[#323232] flex items-center justify-end">909,600</div>
             <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center">入金計</div>
-            <div className="flex-1 text-right p-0.5 flex items-center justify-end">402,455</div>
+            <div className="w-20 text-right px-px py-0.5 flex items-center justify-end">402,455</div>
           </div>
           <div className="flex h-5 border-b border-[#323232]">
             <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center">店舗売上計現金</div>
-            <div className="flex-1 text-right p-0.5 border-r border-[#323232] flex items-center justify-end">892,070</div>
+            <div className="w-20 text-right px-px py-0.5 border-r border-[#323232] flex items-center justify-end">892,070</div>
             <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center">出金計</div>
-            <div className="flex-1 text-right p-0.5 flex items-center justify-end">128,733</div>
+            <div className="w-20 text-right px-px py-0.5 flex items-center justify-end">128,733</div>
           </div>
           <div className="flex h-5 border-b border-[#323232]">
             <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center"></div>
-            <div className="flex-1 text-right p-0.5 border-r border-[#323232] flex items-center justify-end"></div>
+            <div className="w-20 text-right px-px py-0.5 border-r border-[#323232] flex items-center justify-end"></div>
             <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center">収支計</div>
-            <div className="flex-1 text-right p-0.5 flex items-center justify-end">273,722</div>
+            <div className="w-20 text-right px-px py-0.5 flex items-center justify-end">273,722</div>
           </div>
           <div className="flex h-5 border-b border-[#323232] bg-yellow-100">
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center"></div>
-            <div className="flex-1 text-right p-0.5 border-r border-[#323232] flex items-center justify-end"></div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center font-bold">現金残高</div>
-            <div className="flex-1 text-right p-0.5 flex items-center justify-end font-bold">16,664,454</div>
+            <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center"></div>
+            <div className="w-20 text-right px-px py-0.5 border-r border-[#323232] flex items-center justify-end"></div>
+            <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center font-bold">現金残高</div>
+            <div className="w-20 text-right px-px py-0.5 flex items-center justify-end font-bold">16,664,454</div>
           </div>
         </div>
 
         {/* 入金・出金エリア */}
-        <div className="flex border-b border-[#323232] h-[400px]">
+        <div className="flex border-b border-[#323232] h-[500px]">
           {/* 入金 */}
           <div className="w-1/2 border-r border-[#323232]">
             <div className="bg-red-300 h-5 flex items-center justify-center border-b border-[#323232]">
               <span className="text-xs font-bold">入金</span>
             </div>
-            <div className="overflow-y-auto h-[356px]">
+            <div className="overflow-y-auto h-[456px]">
               {depositData.map((item, idx) => (
                 <div key={idx} className="flex text-xs border-b border-[#323232] h-5">
-                  <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center truncate">{item.category}</div>
-                  <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center truncate">{item.name}</div>
-                  <div className="flex-1 text-right p-0.5 flex items-center justify-end">{item.amount > 0 ? formatNumber(item.amount) : ''}</div>
+                  <div className="flex-1 px-1 py-0.5 border-r border-[#323232] flex items-center truncate">{`${item.category} ${item.name}`}</div>
+                  <div className="w-16 flex-shrink-0 text-right px-1 py-0.5 flex items-end justify-end">{item.amount > 0 ? formatNumber(item.amount) : ''}</div>
                 </div>
               ))}
             </div>
             <div className="flex text-xs bg-zinc-200 border-t border-[#323232] h-5">
-              <div className="flex-1 p-0.5 font-bold flex items-center">入金計</div>
-              <div className="flex-1 text-right p-0.5 font-bold flex items-center justify-end">402,455</div>
+              <div className="flex-1 px-1 font-bold flex items-center">入金計</div>
+              <div className="w-16 flex-shrink-0 text-right px-1 py-0.5 flex items-end justify-end font-bold">402,455</div>
             </div>
           </div>
 
@@ -569,18 +546,17 @@ export default function DailyReport() {
             <div className="bg-blue-300 h-5 flex items-center justify-center border-b border-[#323232]">
               <span className="text-xs font-bold">出金</span>
             </div>
-            <div className="overflow-y-auto h-[356px]">
+            <div className="overflow-y-auto h-[456px]">
               {withdrawalData.map((item, idx) => (
                 <div key={idx} className="flex text-xs border-b border-[#323232] h-5">
-                  <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center truncate">{item.category}</div>
-                  <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center truncate">{item.name}</div>
-                  <div className="flex-1 text-right p-0.5 flex items-center justify-end">{item.amount > 0 ? formatNumber(item.amount) : ''}</div>
+                  <div className="flex-1 px-1 py-0.5 border-r border-[#323232] flex items-center truncate">{`${item.category} ${item.name}`}</div>
+                  <div className="w-16 flex-shrink-0 text-right px-1 py-0.5 flex items-end justify-end">{item.amount > 0 ? formatNumber(item.amount) : ''}</div>
                 </div>
               ))}
             </div>
             <div className="flex text-xs bg-zinc-200 border-t border-[#323232] h-5">
-              <div className="flex-1 p-0.5 font-bold flex items-center">出金計</div>
-              <div className="flex-1 text-right p-0.5 font-bold flex items-center justify-end">128,733</div>
+              <div className="flex-1 px-1 font-bold flex items-center">出金計</div>
+              <div className="w-16 flex-shrink-0 text-right px-1 py-0.5 flex items-end justify-end font-bold">128,733</div>
             </div>
           </div>
         </div>
@@ -592,139 +568,183 @@ export default function DailyReport() {
             </div>
             {/* ヘッダー */}
             <div className="flex text-xs bg-zinc-100 border-b border-[#323232] h-5">
-              <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">店舗</div>
-              <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">コース</div>
-              <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">ホステス名</div>
-              <div className="flex-1 p-0.5 flex items-center justify-center">請求金額</div>
+              <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">店舗</div>
+              <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">コース</div>
+              <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">ホステス名</div>
+              <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">請求金額</div>
+              <div className="w-10 px-px py-0.5 flex items-center justify-center"></div>
             </div>
             {creditCardData.map((card, idx) => (
               <div key={idx} className="flex text-xs border-b border-[#323232] h-5 cursor-pointer hover:bg-purple-50">
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center truncate">{card.store}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center truncate">{card.course}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center truncate">{card.hostessName}</div>
-                <div className="flex-1 p-0.5 flex items-center justify-end">{formatNumber(card.billAmount)}</div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center truncate">{card.store}</div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center truncate">{card.course}</div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center truncate">{card.hostessName}</div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(card.billAmount)}</div>
+                <div className="w-10 px-px py-0.5 flex items-center justify-center"></div>
+              </div>
+            ))}
+            {/* 空の行を追加 */}
+            {[...Array(5)].map((_, idx) => (
+              <div key={`empty-${idx}`} className="flex text-xs border-b border-[#323232] h-5">
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center"></div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center"></div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center"></div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center"></div>
+                <div className="w-10 px-px py-0.5 flex items-center"></div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* 中央右セクション - スタッフ */}
-        <div className="h-full border-r border-[#323232] flex flex-col">
-          <div className="bg-lime-200 h-5 flex items-center p-0.5 border-b border-[#323232]">
-            <span className="text-xs font-bold">スタッフ</span>
+        {/* 右側セクション - 出勤スタッフ/出勤ホステス（タブ切り替え） */}
+        <div className="h-full overflow-y-scroll flex flex-col scrollbar-visible" style={{ scrollbarWidth: 'thin', scrollbarColor: '#888 #e5e5e5' }}>
+          {/* タブヘッダー */}
+          <div className="flex border-b border-[#323232]">
+            <button
+              onClick={() => setActiveTab('staff')}
+              className={`flex-1 h-5 flex items-center justify-center text-xs font-bold border-r border-[#323232] ${
+                activeTab === 'staff' ? 'bg-purple-400 text-white' : 'bg-purple-200 text-black'
+              }`}
+            >
+              出勤スタッフ
+            </button>
+            <button
+              onClick={() => setActiveTab('hostess')}
+              className={`flex-1 h-5 flex items-center justify-center text-xs font-bold ${
+                activeTab === 'hostess' ? 'bg-cyan-400 text-white' : 'bg-cyan-200 text-black'
+              }`}
+            >
+              出勤ホステス
+            </button>
           </div>
-          {/* スタッフヘッダー */}
-          <div className="flex text-xs bg-zinc-100 border-b border-[#323232] h-5">
-            <div className="w-5 p-0.5 border-r border-[#323232] flex items-center justify-center"></div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">種別</div>
-            <div className="flex-[2] p-0.5 border-r border-[#323232] flex items-center justify-center">名前</div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">状態</div>
-            <div className="w-6 p-0.5 flex items-center justify-center">N</div>
-          </div>
-          {/* スタッフリスト */}
-          <div className="overflow-y-auto flex-1">
-            {staffData.map((staff) => (
-              <div 
-                key={staff.id} 
-                className={`flex text-xs border-b border-[#323232] h-5 ${staff.type === '社員' ? 'bg-blue-50' : 'bg-orange-50'}`}
-              >
-                <div className="w-5 p-0.5 border-r border-[#323232] flex items-center justify-center bg-blue-100">{staff.id}</div>
-                <div className={`flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center ${staff.type === '社員' ? 'bg-blue-200' : 'bg-orange-200'}`}>
-                  {staff.type}
-                </div>
-                <div className="flex-[2] p-0.5 border-r border-[#323232] flex items-center truncate">{staff.name}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">{staff.status}</div>
-                <div className="w-6 p-0.5 flex items-center justify-end">{staff.num || ''}</div>
+
+          {/* 出勤スタッフタブの内容 */}
+          {activeTab === 'staff' && (
+            <>
+              {/* スタッフヘッダー - 画像に基づく列構成 */}
+              <div className="flex text-xs bg-zinc-100 border-b border-[#323232] h-5">
+                <div className="w-7 px-px py-0.5 border-r border-[#323232] flex items-center justify-center"></div>
+                <div className="w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-center"></div>
+                <div className="flex-[2] px-px py-0.5 border-r border-[#323232] flex items-center justify-center"></div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">給与</div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">回収額</div>
+                <div className="flex-[1.3] px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">ホステス預</div>
+                <div className="flex-[1.3] px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">ホステス返金</div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">高速等</div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">調整額</div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">差引清算額</div>
+                <div className="w-20 px-px py-0.5 border-r border-[#323232] flex items-center justify-center bg-cyan-100 text-[10px]">バスタオル</div>
+                <div className="w-12 px-px py-0.5 border-r border-[#323232] flex items-center justify-center bg-green-100 text-[10px]">備品</div>
+                <div className="w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">割引利用カード</div>
+                <div className="w-16 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">管理者確認</div>
+                <div className="w-8 px-px py-0.5 flex items-center justify-center"></div>
               </div>
-            ))}
-          </div>
-        </div>
+              {/* スタッフリスト */}
+              <div className="overflow-y-auto flex-1">
+                {staffData.map((staff) => {
+                  // 行の背景色を決定
+                  let rowBgClass = staff.type === '社員' ? 'bg-blue-50' : 'bg-pink-50';
+                  if (staff.settlementStatus === 'completed') {
+                    rowBgClass = 'bg-gray-200';
+                  }
 
-        {/* 出勤スタッフセクション */}
-        <div className="h-full border-r border-[#323232] flex flex-col">
-          <div className="bg-cyan-200 h-5 flex items-center p-0.5 border-b border-[#323232]">
-            <span className="text-xs font-bold">出勤スタッフ</span>
-          </div>
-          {/* スタッフヘッダー */}
-          <div className="flex text-xs bg-zinc-100 border-b border-[#323232] h-5">
-            <div className="w-5 p-0.5 border-r border-[#323232] flex items-center justify-center">番</div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">回収額</div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">ホステス</div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">高速費</div>
-            <div className="flex-1 p-0.5 flex items-center justify-center">調整額</div>
-          </div>
-          {/* スタッフリスト */}
-          <div className="overflow-y-auto flex-1">
-            {staffData.map((staff) => (
-              <div 
-                key={staff.id} 
-                className={`flex text-xs border-b border-[#323232] h-5 ${staff.type === '社員' ? 'bg-blue-50' : 'bg-orange-50'}`}
-              >
-                <div className="w-5 p-0.5 border-r border-[#323232] flex items-center justify-center bg-blue-100">{staff.id}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.collection)}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.deposit)}</div>
-                <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.express)}</div>
-                <div className="flex-1 p-0.5 flex items-center justify-end">{formatNumber(staff.adjust)}</div>
+                  // 差引清算額の表示（マイナスは赤で▲表示）
+                  const netDisplay = staff.net < 0
+                    ? <span className="text-red-600">▲{Math.abs(staff.net).toLocaleString()}</span>
+                    : formatNumber(staff.net);
+
+                  return (
+                    <div
+                      key={staff.id}
+                      className={`flex text-xs border-b border-[#323232] h-5 ${rowBgClass}`}
+                    >
+                      <div className="w-7 px-px py-0.5 border-r border-[#323232] flex items-center justify-center bg-yellow-100">{staff.id}</div>
+                      <div className={`w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-center ${staff.type === '社員' ? 'bg-blue-200' : 'bg-pink-200'}`}>
+                        {staff.type}
+                      </div>
+                      <div className="flex-[2] px-px py-0.5 border-r border-[#323232] flex items-center truncate">
+                        {staff.name} {staff.status}{staff.statusNum ? ` ${staff.statusNum}` : ''}
+                      </div>
+                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.salary)}</div>
+                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.collection)}</div>
+                      <div className="flex-[1.3] px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.deposit)}</div>
+                      <div className="flex-[1.3] px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.refund)}</div>
+                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.express)}</div>
+                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.adjust)}</div>
+                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{netDisplay}</div>
+                      {/* バスタオル 3列 */}
+                      <div className="w-20 flex border-r border-[#323232] bg-cyan-50">
+                        <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">{staff.bath1 || ''}</div>
+                        <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">{staff.bath2 || ''}</div>
+                        <div className="flex-1 px-px py-0.5 flex items-center justify-center">{staff.bath3 || ''}</div>
+                      </div>
+                      <div className="w-12 px-px py-0.5 border-r border-[#323232] flex items-center justify-center bg-green-50">{staff.equip || ''}</div>
+                      <div className="w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">{staff.discountCard || ''}</div>
+                      <div className="w-16 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">{staff.managerCheck || ''}</div>
+                      <div className="w-8 px-px py-0.5 flex items-center justify-center">
+                        {staff.settlementStatus === 'completed' ? '済' : ''}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
-          </div>
-        </div>
+            </>
+          )}
 
-        {/* 右側セクション - 出勤ホステス */}
-        <div className="h-full overflow-hidden flex flex-col">
-          <div className="bg-pink-200 h-5 flex items-center p-0.5 border-b border-[#323232]">
-            <span className="text-xs font-bold">出勤ホステス</span>
-            <span className="text-xs ml-2">（未精算: 赤 / 未送信: 白 / 完了: 灰）</span>
-          </div>
-          {/* ホステスヘッダー */}
-          <div className="flex text-xs bg-zinc-100 border-b border-[#323232] h-6">
-            <div className="w-5 p-0.5 border-r border-[#323232] flex items-center justify-center">番</div>
-            <div className="w-16 p-0.5 border-r border-[#323232] flex items-center justify-center">送り場所</div>
-            <div className="w-14 p-0.5 border-r border-[#323232] flex items-center justify-center">交通費</div>
-            <div className="w-12 p-0.5 border-r border-[#323232] flex items-center justify-center">雑費</div>
-            <div className="w-14 p-0.5 border-r border-[#323232] flex items-center justify-center">預り</div>
-            <div className="w-16 p-0.5 border-r border-[#323232] flex items-center justify-center">支払額</div>
-            <div className="w-10 p-0.5 border-r border-[#323232] flex items-center justify-center text-center leading-tight">支払<br/>済</div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">回収額</div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center text-center leading-tight">ホステス<br/>報酬</div>
-            <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-center">調整</div>
-            <div className="w-10 p-0.5 flex items-center justify-center text-center leading-tight">確認</div>
-          </div>
-          {/* ホステスリスト */}
-          <div className="overflow-y-auto flex-1">
-            {hostessDisplayData.map((staff) => {
-              // 色分け: 未精算=赤, 未送信=白, 完了=灰
-              let rowBgClass = 'bg-white'; // 未送信（デフォルト）
-              if (staff.settlementStatus === 'unsettled') {
-                rowBgClass = 'bg-red-200'; // 未精算
-              } else if (staff.settlementStatus === 'completed') {
-                rowBgClass = 'bg-gray-300'; // 精算・送信完了
-              }
+          {/* 出勤ホステスタブの内容 */}
+          {activeTab === 'hostess' && (
+            <>
+              {/* ホステスヘッダー */}
+              <div className="flex text-xs bg-zinc-100 border-b border-[#323232] h-6">
+                <div className="w-5 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">番</div>
+                <div className="w-16 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">送り場所</div>
+                <div className="w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">交通費</div>
+                <div className="w-12 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">雑費</div>
+                <div className="w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">預り</div>
+                <div className="w-16 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">支払額</div>
+                <div className="w-10 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-center leading-tight">支払<br/>済</div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">回収額</div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-center leading-tight">ホステス<br/>報酬</div>
+                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">調整</div>
+                <div className="w-10 px-px py-0.5 flex items-center justify-center text-center leading-tight">確認</div>
+              </div>
+              {/* ホステスリスト */}
+              <div className="overflow-y-auto flex-1">
+                {hostessDisplayData.map((staff) => {
+                  // 色分け: 未精算=赤, 未送信=白, 完了=灰
+                  let rowBgClass = 'bg-white'; // 未送信（デフォルト）
+                  if (staff.settlementStatus === 'unsettled') {
+                    rowBgClass = 'bg-red-200'; // 未精算
+                  } else if (staff.settlementStatus === 'completed') {
+                    rowBgClass = 'bg-gray-300'; // 精算・送信完了
+                  }
 
-              return (
-                <div
-                  key={staff.id}
-                  className={`flex text-xs border-b border-[#323232] h-5 ${rowBgClass} cursor-pointer hover:brightness-95`}
-                >
-                  <div className="w-5 p-0.5 border-r border-[#323232] flex items-center justify-center bg-blue-100">{staff.rowNum}</div>
-                  <div className="w-16 p-0.5 border-r border-[#323232] flex items-center truncate">{staff.sendLocation}</div>
-                  <div className="w-14 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.transportFee)}</div>
-                  <div className="w-12 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.miscFee)}</div>
-                  <div className="w-14 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.deposit)}</div>
-                  <div className="w-16 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.paymentAmount)}</div>
-                  <div className="w-10 p-0.5 border-r border-[#323232] flex items-center justify-center">
-                    <input type="checkbox" className="w-3 h-3" checked={staff.isPaid} readOnly />
-                  </div>
-                  <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.collection)}</div>
-                  <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.salary)}</div>
-                  <div className="flex-1 p-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.adjust)}</div>
-                  <div className="w-10 p-0.5 flex items-center justify-center">
-                    <input type="checkbox" className="w-3 h-3" checked={staff.approval} readOnly />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                  return (
+                    <div
+                      key={staff.id}
+                      className={`flex text-xs border-b border-[#323232] h-5 ${rowBgClass} cursor-pointer hover:brightness-95`}
+                    >
+                      <div className="w-5 px-px py-0.5 border-r border-[#323232] flex items-center justify-center bg-blue-100">{staff.rowNum}</div>
+                      <div className="w-16 px-px py-0.5 border-r border-[#323232] flex items-center truncate">{staff.sendLocation}</div>
+                      <div className="w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.transportFee)}</div>
+                      <div className="w-12 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.miscFee)}</div>
+                      <div className="w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.hostessDeposit)}</div>
+                      <div className="w-16 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.paymentAmount)}</div>
+                      <div className="w-10 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">
+                        <input type="checkbox" className="w-3 h-3" checked={staff.isPaid} readOnly />
+                      </div>
+                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.collection)}</div>
+                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.salary)}</div>
+                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.adjust)}</div>
+                      <div className="w-10 px-px py-0.5 flex items-center justify-center">
+                        <input type="checkbox" className="w-3 h-3" checked={staff.approval} readOnly />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

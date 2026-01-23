@@ -12,7 +12,7 @@ export const DashboardHeader = () => {
   });
 
   return (
-    <div className="bg-gradient-header p-6 text-white shadow-pink">
+    <div className="bg-gradient-header p-6 text-white shadow-pink border-t-2 border-pink-400">
       {/* Top row with access rights and user info */}
       <div className="flex justify-between items-start mb-4">
         <div className="text-sm opacity-90">
