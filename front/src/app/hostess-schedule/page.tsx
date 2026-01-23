@@ -525,7 +525,7 @@ export default function HostessSchedule() {
                                     isWorkDay: e.target.value !== ''
                                   });
                                 }}
-                                className="w-[72px] h-7 text-sm border border-gray-400 rounded-sm px-0.5"
+                                className="w-[72px] h-7 text-sm border border-gray-400 rounded-sm px-0"
                               />
                               <span className="text-sm">〜</span>
                               <input
@@ -537,7 +537,7 @@ export default function HostessSchedule() {
                                     isWorkDay: daySchedule.startTime !== '' || e.target.value !== ''
                                   });
                                 }}
-                                className="w-[72px] h-7 text-sm border border-gray-400 rounded-sm px-0.5"
+                                className="w-[72px] h-7 text-sm border border-gray-400 rounded-sm px-0"
                               />
                             </div>
                           </td>
