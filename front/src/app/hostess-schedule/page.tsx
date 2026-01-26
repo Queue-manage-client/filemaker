@@ -1,347 +1,343 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import type { HostessScheduleData, DailyWorkSchedule } from '@/types/hostess';
-// WorkType は将来の実装で使用予定
+import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, Check } from "lucide-react";
 
-// 今週の日付を取得する関数
-const getCurrentWeekDates = (baseDate: Date = new Date()) => {
-  const today = new Date(baseDate);
-  const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
-  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Monday start
-  
-  const monday = new Date(today);
-  monday.setDate(today.getDate() + mondayOffset);
-  
-  const dates = [];
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(monday);
-    date.setDate(monday.getDate() + i);
-    dates.push(date);
-  }
-  return dates;
-};
+// 予約データの型定義
+interface Reservation {
+  id: string;
+  customerName: string;
+  startTime: string; // "HH:MM" 形式
+  endTime: string;   // "HH:MM" 形式
+  receptDate: string; // 受付日時
+  location: string;
+  status: 'pending' | 'confirmed' | 'completed';
+}
 
-// 空の日次スケジュールを作成
-const createEmptyDailySchedule = (): DailyWorkSchedule => ({
-  isWorkDay: false,
-  startTime: '',
-  endTime: '',
-  breakTime: 0,
-  workHours: 0,
-  notes: ''
-});
+// ホステスデータの型定義
+interface HostessTimelineData {
+  id: string;
+  name: string;           // 店内名
+  workType: string;       // 勤務形態
+  assignedStaff: string;  // 担当者
+  workStartTime: string;  // "HH:MM" 形式
+  workEndTime: string;    // "HH:MM" 形式
+  isOff: boolean;         // 休みかどうか
+  reservations: Reservation[];
+}
 
-// サンプルホステススケジュールデータ
-const sampleHostessSchedules: HostessScheduleData[] = [
+// サンプルデータ
+const sampleHostessTimeline: HostessTimelineData[] = [
   {
     id: "1",
-    hostessId: "H001",
-    workType: "full_time",
-    name: "田中美咲",
+    name: "すみれ",
+    workType: "正社員",
     assignedStaff: "佐藤",
-    hostessManager: "山田HM",
-    store: { id: "S001", name: "銀座店" },
-    weeklySchedule: {
-      monday: { isWorkDay: true, startTime: "19:00", endTime: "02:00", breakTime: 60, workHours: 6, notes: "" },
-      tuesday: { isWorkDay: false, startTime: "", endTime: "", breakTime: 0, workHours: 0, notes: "休み" },
-      wednesday: { isWorkDay: true, startTime: "19:00", endTime: "02:00", breakTime: 60, workHours: 6, notes: "" },
-      thursday: { isWorkDay: true, startTime: "19:00", endTime: "02:00", breakTime: 60, workHours: 6, notes: "" },
-      friday: { isWorkDay: true, startTime: "19:00", endTime: "03:00", breakTime: 60, workHours: 7, notes: "" },
-      saturday: { isWorkDay: true, startTime: "19:00", endTime: "03:00", breakTime: 60, workHours: 7, notes: "" },
-      sunday: { isWorkDay: false, startTime: "", endTime: "", breakTime: 0, workHours: 0, notes: "休み" }
-    },
-    weeklyStats: {
-      totalWorkDays: 5,
-      totalWorkHours: 32,
-      averageDailyHours: 6.4,
-      expectedEarnings: 160000
-    },
-    weekStartDate: "2025-01-27",
-    weekEndDate: "2025-02-02",
-    lastUpdated: "2025-01-26T10:00:00Z",
-    status: "confirmed",
-    remarks: "VIP対応あり"
+    workStartTime: "",
+    workEndTime: "",
+    isOff: true,
+    reservations: [
+      {
+        id: "r1",
+        customerName: "鈴木一✕ 様",
+        startTime: "15:00",
+        endTime: "16:30",
+        receptDate: "01/25 11:54",
+        location: "京都デリヘル...",
+        status: "completed"
+      }
+    ]
   },
   {
     id: "2",
-    hostessId: "H002",
-    workType: "part_time",
-    name: "鈴木さくら",
+    name: "瑠璃-ruri-",
+    workType: "パート",
     assignedStaff: "高橋",
-    hostessManager: "田中HM",
-    store: { id: "S002", name: "新宿店" },
-    weeklySchedule: {
-      monday: createEmptyDailySchedule(),
-      tuesday: { isWorkDay: true, startTime: "20:00", endTime: "01:00", breakTime: 30, workHours: 4.5, notes: "" },
-      wednesday: createEmptyDailySchedule(),
-      thursday: { isWorkDay: true, startTime: "20:00", endTime: "01:00", breakTime: 30, workHours: 4.5, notes: "" },
-      friday: { isWorkDay: true, startTime: "20:00", endTime: "02:00", breakTime: 30, workHours: 5.5, notes: "" },
-      saturday: { isWorkDay: true, startTime: "19:00", endTime: "02:00", breakTime: 60, workHours: 6, notes: "" },
-      sunday: createEmptyDailySchedule()
-    },
-    weeklyStats: {
-      totalWorkDays: 4,
-      totalWorkHours: 20.5,
-      averageDailyHours: 5.1,
-      expectedEarnings: 102500
-    },
-    weekStartDate: "2025-01-27",
-    weekEndDate: "2025-02-02",
-    lastUpdated: "2025-01-26T10:00:00Z",
-    status: "draft",
-    remarks: "火木のみ出勤"
+    workStartTime: "10:00",
+    workEndTime: "21:00",
+    isOff: false,
+    reservations: [
+      {
+        id: "r2",
+        customerName: "顧客:未登録",
+        startTime: "10:15",
+        endTime: "11:35",
+        receptDate: "01/22 20:15",
+        location: "",
+        status: "completed"
+      }
+    ]
   },
   {
     id: "3",
-    hostessId: "H003",
-    workType: "part_time",
-    name: "中村あい",
-    assignedStaff: "斎藤",
-    hostessManager: "木村HM",
-    isNewcomer: true,
-    store: { id: "S003", name: "渋谷店" },
-    weeklySchedule: {
-      monday: { isWorkDay: true, startTime: "18:00", endTime: "00:00", breakTime: 30, workHours: 5.5, notes: "" },
-      tuesday: createEmptyDailySchedule(),
-      wednesday: { isWorkDay: true, startTime: "18:00", endTime: "00:00", breakTime: 30, workHours: 5.5, notes: "" },
-      thursday: createEmptyDailySchedule(),
-      friday: { isWorkDay: true, startTime: "19:00", endTime: "01:00", breakTime: 30, workHours: 5, notes: "" },
-      saturday: createEmptyDailySchedule(),
-      sunday: createEmptyDailySchedule()
-    },
-    weeklyStats: {
-      totalWorkDays: 3,
-      totalWorkHours: 16,
-      averageDailyHours: 5.3,
-      expectedEarnings: 80000
-    },
-    weekStartDate: "2025-01-27",
-    weekEndDate: "2025-02-02",
-    lastUpdated: "2025-01-26T11:00:00Z",
-    status: "draft",
-    remarks: "新人研修中"
+    name: "かんな",
+    workType: "契約",
+    assignedStaff: "田中",
+    workStartTime: "10:00",
+    workEndTime: "18:30",
+    isOff: false,
+    reservations: []
   },
   {
     id: "4",
-    hostessId: "H004",
-    workType: "contract",
-    name: "小林ゆか",
-    assignedStaff: "渡辺",
-    hostessManager: "石井HM",
-    store: { id: "S004", name: "池袋店" },
-    weeklySchedule: {
-      monday: createEmptyDailySchedule(),
-      tuesday: { isWorkDay: true, startTime: "20:00", endTime: "02:00", breakTime: 45, workHours: 5.25, notes: "" },
-      wednesday: createEmptyDailySchedule(),
-      thursday: { isWorkDay: true, startTime: "20:00", endTime: "02:00", breakTime: 45, workHours: 5.25, notes: "" },
-      friday: { isWorkDay: true, startTime: "21:00", endTime: "03:00", breakTime: 30, workHours: 5.5, notes: "" },
-      saturday: { isWorkDay: true, startTime: "21:00", endTime: "03:00", breakTime: 30, workHours: 5.5, notes: "" },
-      sunday: createEmptyDailySchedule()
-    },
-    weeklyStats: {
-      totalWorkDays: 4,
-      totalWorkHours: 21.5,
-      averageDailyHours: 5.4,
-      expectedEarnings: 107500
-    },
-    weekStartDate: "2025-01-27",
-    weekEndDate: "2025-02-02",
-    lastUpdated: "2025-01-26T12:00:00Z",
-    status: "published",
-    remarks: "遅番中心"
+    name: "スイレン",
+    workType: "派遣",
+    assignedStaff: "山田",
+    workStartTime: "12:00",
+    workEndTime: "17:30",
+    isOff: false,
+    reservations: [
+      {
+        id: "r3",
+        customerName: "顧客:未登録",
+        startTime: "12:30",
+        endTime: "14:10",
+        receptDate: "01/13 19:48",
+        location: "",
+        status: "completed"
+      }
+    ]
   },
   {
     id: "5",
-    hostessId: "H005",
-    workType: "dispatch",
-    name: "加藤りな",
-    assignedStaff: "森",
-    hostessManager: "阿部HM",
-    store: { id: "S005", name: "赤坂店" },
-    weeklySchedule: {
-      monday: { isWorkDay: true, startTime: "19:00", endTime: "01:00", breakTime: 30, workHours: 5.5, notes: "" },
-      tuesday: { isWorkDay: true, startTime: "19:00", endTime: "01:00", breakTime: 30, workHours: 5.5, notes: "" },
-      wednesday: createEmptyDailySchedule(),
-      thursday: createEmptyDailySchedule(),
-      friday: { isWorkDay: true, startTime: "20:00", endTime: "02:00", breakTime: 30, workHours: 5.5, notes: "" },
-      saturday: { isWorkDay: true, startTime: "20:00", endTime: "02:00", breakTime: 30, workHours: 5.5, notes: "" },
-      sunday: createEmptyDailySchedule()
-    },
-    weeklyStats: {
-      totalWorkDays: 4,
-      totalWorkHours: 22,
-      averageDailyHours: 5.5,
-      expectedEarnings: 110000
-    },
-    weekStartDate: "2025-01-27",
-    weekEndDate: "2025-02-02",
-    lastUpdated: "2025-01-26T12:30:00Z",
-    status: "confirmed",
-    remarks: "金土は繁忙対応"
+    name: "妃-kisaki-",
+    workType: "正社員",
+    assignedStaff: "佐藤",
+    workStartTime: "14:00",
+    workEndTime: "21:00",
+    isOff: false,
+    reservations: [
+      {
+        id: "r4",
+        customerName: "顧客:未登録",
+        startTime: "14:30",
+        endTime: "16:10",
+        receptDate: "01/15 10:09",
+        location: "",
+        status: "completed"
+      }
+    ]
   },
   {
     id: "6",
-    hostessId: "H006",
-    workType: "full_time",
-    name: "山本かえで",
-    assignedStaff: "池田",
-    hostessManager: "山下HM",
-    store: { id: "S006", name: "恵比寿店" },
-    weeklySchedule: {
-      monday: { isWorkDay: true, startTime: "18:30", endTime: "00:30", breakTime: 60, workHours: 5, notes: "" },
-      tuesday: { isWorkDay: true, startTime: "18:30", endTime: "00:30", breakTime: 60, workHours: 5, notes: "" },
-      wednesday: { isWorkDay: true, startTime: "18:30", endTime: "00:30", breakTime: 60, workHours: 5, notes: "" },
-      thursday: createEmptyDailySchedule(),
-      friday: { isWorkDay: true, startTime: "19:00", endTime: "01:00", breakTime: 30, workHours: 5.5, notes: "" },
-      saturday: createEmptyDailySchedule(),
-      sunday: createEmptyDailySchedule()
-    },
-    weeklyStats: {
-      totalWorkDays: 4,
-      totalWorkHours: 20.5,
-      averageDailyHours: 5.1,
-      expectedEarnings: 102500
-    },
-    weekStartDate: "2025-01-27",
-    weekEndDate: "2025-02-02",
-    lastUpdated: "2025-01-26T13:00:00Z",
-    status: "draft",
-    remarks: "平日メイン"
+    name: "ミイ",
+    workType: "パート",
+    assignedStaff: "鈴木",
+    workStartTime: "12:00",
+    workEndTime: "18:00",
+    isOff: false,
+    reservations: [
+      {
+        id: "r5",
+        customerName: "顧客:未登録 様",
+        startTime: "12:10",
+        endTime: "14:10",
+        receptDate: "01/20 16:16",
+        location: "京都デリヘル倶楽部",
+        status: "pending"
+      }
+    ]
+  },
+  {
+    id: "7",
+    name: "かなの",
+    workType: "契約",
+    assignedStaff: "高橋",
+    workStartTime: "11:00",
+    workEndTime: "16:00",
+    isOff: false,
+    reservations: [
+      {
+        id: "r6",
+        customerName: "顧客:未登録",
+        startTime: "11:20",
+        endTime: "12:40",
+        receptDate: "01/24 13:11",
+        location: "",
+        status: "completed"
+      }
+    ]
+  },
+  {
+    id: "8",
+    name: "あみ",
+    workType: "派遣",
+    assignedStaff: "田中",
+    workStartTime: "16:00",
+    workEndTime: "22:00",
+    isOff: false,
+    reservations: []
+  },
+  {
+    id: "9",
+    name: "雪-yuki-",
+    workType: "正社員",
+    assignedStaff: "山田",
+    workStartTime: "13:00",
+    workEndTime: "20:30",
+    isOff: false,
+    reservations: [
+      {
+        id: "r7",
+        customerName: "顧客:未登録",
+        startTime: "15:30",
+        endTime: "17:30",
+        receptDate: "01/25 15:54",
+        location: "",
+        status: "pending"
+      }
+    ]
+  },
+  {
+    id: "10",
+    name: "か美-hiro-…",
+    workType: "パート",
+    assignedStaff: "佐藤",
+    workStartTime: "10:00",
+    workEndTime: "15:00",
+    isOff: false,
+    reservations: [
+      {
+        id: "r8",
+        customerName: "たつみ 様",
+        startTime: "10:20",
+        endTime: "12:40",
+        receptDate: "01/22 11:20",
+        location: "愛しいね@yeh",
+        status: "completed"
+      },
+      {
+        id: "r9",
+        customerName: "顧客:未登録",
+        startTime: "12:55",
+        endTime: "14:15",
+        receptDate: "01/22 17:52",
+        location: "",
+        status: "completed"
+      }
+    ]
+  },
+  {
+    id: "11",
+    name: "りあん",
+    workType: "契約",
+    assignedStaff: "鈴木",
+    workStartTime: "14:00",
+    workEndTime: "20:00",
+    isOff: false,
+    reservations: [
+      {
+        id: "r10",
+        customerName: "豊Q0501 様",
+        startTime: "14:30",
+        endTime: "16:00",
+        receptDate: "01/20 16:23",
+        location: "京都デリヘル倶楽部",
+        status: "completed"
+      }
+    ]
+  },
+  {
+    id: "12",
+    name: "あず",
+    workType: "派遣",
+    assignedStaff: "高橋",
+    workStartTime: "20:00",
+    workEndTime: "01:00",
+    isOff: false,
+    reservations: []
   }
 ];
 
-const dayNames = ['月', '火', '水', '木', '金', '土', '日'];
-const dayKeys: (keyof HostessScheduleData['weeklySchedule'])[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+// 時間軸の範囲（10:00〜翌2:00 = 16時間）
+const TIME_START_HOUR = 10;
+const TIME_END_HOUR = 26; // 翌2:00を26時として扱う
+const HOUR_WIDTH = 120; // 1時間あたりのピクセル幅
+const ROW_HEIGHT = 52; // 各行の高さ
 
 export default function HostessSchedule() {
   React.useEffect(() => {
     document.title = 'ホステススケジュール管理 - Dispatch Harmony Hub';
   }, []);
+
   const router = useRouter();
-  const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
-  const [weekDates, setWeekDates] = useState<Date[]>([]);
-  const [schedules, setSchedules] = useState<HostessScheduleData[]>(sampleHostessSchedules);
-  const [filterAssignedStaff, setFilterAssignedStaff] = useState<string>('');
-  const [filterWorkType, setFilterWorkType] = useState<HostessScheduleData['workType'] | ''>('');
-  const [filterStoreId, setFilterStoreId] = useState<string>('');
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [hostesses] = useState<HostessTimelineData[]>(sampleHostessTimeline);
 
-  useEffect(() => {
-    setWeekDates(getCurrentWeekDates(currentWeekStart));
-  }, [currentWeekStart]);
+  // スクロール同期用のref
+  const leftPanelRef = useRef<HTMLDivElement>(null);
+  const timelineBodyRef = useRef<HTMLDivElement>(null);
+  const timeHeaderRef = useRef<HTMLDivElement>(null);
 
-  const navigateWeek = (direction: 'prev' | 'next') => {
-    const newDate = new Date(currentWeekStart);
-    newDate.setDate(currentWeekStart.getDate() + (direction === 'next' ? 7 : -7));
-    setCurrentWeekStart(newDate);
+  // 日付ナビゲーション
+  const navigateDate = (direction: 'prev' | 'next') => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(currentDate.getDate() + (direction === 'next' ? 1 : -1));
+    setCurrentDate(newDate);
   };
 
   const formatDate = (date: Date) => {
+    const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    return `${month}/${day}`;
+    const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+    const dayOfWeek = dayNames[date.getDay()];
+    return `${year}/${month}/${day}(${dayOfWeek})`;
   };
 
-
-  const assignedStaffOptions = useMemo(() => {
-    const set = new Set<string>();
-    schedules.forEach(s => { if (s.assignedStaff) set.add(s.assignedStaff); });
-    return Array.from(set);
-  }, [schedules]);
-
-  const storeOptions = useMemo(() => {
-    const map = new Map<string, string>();
-    schedules.forEach(s => {
-      if (s.store?.id) {
-        map.set(s.store.id, s.store.name);
-      }
-    });
-    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
-  }, [schedules]);
-
-  const filteredSchedules = useMemo(() => {
-    return schedules.filter(s => {
-      if (filterAssignedStaff && s.assignedStaff !== filterAssignedStaff) return false;
-      if (filterWorkType && s.workType !== filterWorkType) return false;
-      if (filterStoreId && s.store?.id !== filterStoreId) return false;
-      return true;
-    });
-  }, [schedules, filterAssignedStaff, filterWorkType, filterStoreId]);
-
-  const updateScheduleCell = (scheduleId: string, day: keyof HostessScheduleData['weeklySchedule'], updates: Partial<DailyWorkSchedule>) => {
-    setSchedules(prev => prev.map(schedule => {
-      if (schedule.id === scheduleId) {
-        const updatedSchedule = {
-          ...schedule,
-          weeklySchedule: {
-            ...schedule.weeklySchedule,
-            [day]: {
-              ...schedule.weeklySchedule[day],
-              ...updates
-            }
-          }
-        };
-        
-        // 週間統計を再計算
-        const totalWorkDays = Object.values(updatedSchedule.weeklySchedule).filter(d => d.isWorkDay).length;
-        const totalWorkHours = Object.values(updatedSchedule.weeklySchedule).reduce((sum, d) => sum + (d.workHours || 0), 0);
-        
-        updatedSchedule.weeklyStats = {
-          totalWorkDays,
-          totalWorkHours,
-          averageDailyHours: totalWorkDays > 0 ? totalWorkHours / totalWorkDays : 0,
-          expectedEarnings: totalWorkHours * 5000 // 仮の時給計算
-        };
-        
-        return updatedSchedule;
-      }
-      return schedule;
-    }));
+  // 時間をピクセル位置に変換
+  const timeToPosition = (time: string): number => {
+    const [hours, minutes] = time.split(':').map(Number);
+    let adjustedHours = hours;
+    // 深夜0時以降は24時以降として扱う
+    if (hours < TIME_START_HOUR) {
+      adjustedHours = hours + 24;
+    }
+    const totalMinutes = adjustedHours * 60 + minutes - TIME_START_HOUR * 60;
+    return (totalMinutes / 60) * HOUR_WIDTH;
   };
 
-  const addNewSchedule = () => {
-    const newSchedule: HostessScheduleData = {
-      id: Date.now().toString(),
-      hostessId: `H${String(schedules.length + 1).padStart(3, '0')}`,
-      workType: "part_time",
-      name: "",
-      assignedStaff: "",
-      hostessManager: "",
-      weeklySchedule: {
-        monday: createEmptyDailySchedule(),
-        tuesday: createEmptyDailySchedule(),
-        wednesday: createEmptyDailySchedule(),
-        thursday: createEmptyDailySchedule(),
-        friday: createEmptyDailySchedule(),
-        saturday: createEmptyDailySchedule(),
-        sunday: createEmptyDailySchedule()
-      },
-      weeklyStats: {
-        totalWorkDays: 0,
-        totalWorkHours: 0,
-        averageDailyHours: 0,
-        expectedEarnings: 0
-      },
-      weekStartDate: "2025-01-27",
-      weekEndDate: "2025-02-02",
-      lastUpdated: new Date().toISOString(),
-      status: "draft"
-    };
-    
-    setSchedules(prev => [...prev, newSchedule]);
+  // 予約バーの幅を計算
+  const getBarWidth = (startTime: string, endTime: string): number => {
+    const startPos = timeToPosition(startTime);
+    const endPos = timeToPosition(endTime);
+    return endPos - startPos;
   };
+
+  // 時間軸の時間リストを生成
+  const timeSlots = useMemo(() => {
+    const slots = [];
+    for (let hour = TIME_START_HOUR; hour <= TIME_END_HOUR; hour++) {
+      const displayHour = hour >= 24 ? hour - 24 : hour;
+      slots.push({
+        hour,
+        display: `${displayHour}:00`
+      });
+    }
+    return slots;
+  }, []);
+
+  // 垂直スクロール同期
+  const handleTimelineScroll = useCallback(() => {
+    if (timelineBodyRef.current && leftPanelRef.current && timeHeaderRef.current) {
+      leftPanelRef.current.scrollTop = timelineBodyRef.current.scrollTop;
+      timeHeaderRef.current.scrollLeft = timelineBodyRef.current.scrollLeft;
+    }
+  }, []);
+
+  const handleLeftPanelScroll = useCallback(() => {
+    if (timelineBodyRef.current && leftPanelRef.current) {
+      timelineBodyRef.current.scrollTop = leftPanelRef.current.scrollTop;
+    }
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* ヘッダー - rt2-panel スタイル */}
-      <div className="h-[50px] bg-white border-b border-zinc-300">
+    <div className="h-screen bg-gray-100 flex flex-col overflow-hidden">
+      {/* ヘッダー */}
+      <div className="h-[50px] bg-white border-b border-zinc-300 flex-shrink-0">
         <div className="flex items-center h-full px-2">
-          {/* ダッシュボードに戻る - 左端 */}
           <Button
             variant="outline"
             onClick={() => router.push('/dashboard')}
@@ -351,96 +347,29 @@ export default function HostessSchedule() {
             ダッシュボードに戻る
           </Button>
 
-          {/* 中央配置のボタン群 */}
           <div className="flex-1 flex items-center justify-center gap-2">
-            {/* タイトル */}
-            <h1 className="text-lg font-bold mr-2">ホステススケジュール管理</h1>
+            <h1 className="text-lg font-bold mr-2">ホステススケジュール</h1>
 
-            {/* 週間ナビゲーション */}
+            {/* 日付ナビゲーション */}
             <div className="flex items-center">
               <Button
                 variant="outline"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => navigateWeek('prev')}
+                onClick={() => navigateDate('prev')}
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <div className="text-sm font-mono bg-gray-500 text-white px-2 py-1">
-                {weekDates.length > 0 && `${formatDate(weekDates[0])} - ${formatDate(weekDates[6])}`}
+              <div className="text-sm font-mono bg-gray-500 text-white px-3 py-1 min-w-[140px] text-center">
+                {formatDate(currentDate)}
               </div>
               <Button
                 variant="outline"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => navigateWeek('next')}
+                onClick={() => navigateDate('next')}
               >
                 <ChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
-
-            {/* アクションボタン */}
-            <Button 
-              className="h-8 px-4 text-sm bg-green-200 hover:bg-green-300 text-black border border-black"
-              onClick={addNewSchedule}
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              新規追加
-            </Button>
-            <Button className="h-8 px-4 text-sm bg-blue-200 hover:bg-blue-300 text-black border border-black">
-              一括保存
-            </Button>
-            <Button className="h-8 px-4 text-sm bg-purple-200 hover:bg-purple-300 text-black border border-black">
-              印刷
-            </Button>
-
-            {/* フィルター選択 */}
-            <div className="flex items-center gap-2 ml-4">
-              <span className="text-sm text-gray-600">担当者:</span>
-              <Select value={filterAssignedStaff || '__all__'} onValueChange={(v) => setFilterAssignedStaff(v === '__all__' ? '' : v)}>
-                <SelectTrigger className="h-8 w-[100px] text-sm">
-                  <SelectValue placeholder="全て" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__all__">全て</SelectItem>
-                  {assignedStaffOptions.map(name => (
-                    <SelectItem key={name} value={name}>{name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <span className="text-sm text-gray-600">勤務形態:</span>
-              <Select value={filterWorkType || '__all__'} onValueChange={(v) => setFilterWorkType(v === '__all__' ? '' : (v as HostessScheduleData['workType']))}>
-                <SelectTrigger className="h-8 w-[100px] text-sm">
-                  <SelectValue placeholder="全て" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__all__">全て</SelectItem>
-                  <SelectItem value="full_time">正社員</SelectItem>
-                  <SelectItem value="part_time">パート</SelectItem>
-                  <SelectItem value="contract">契約</SelectItem>
-                  <SelectItem value="dispatch">派遣</SelectItem>
-                  <SelectItem value="temp">臨時</SelectItem>
-                </SelectContent>
-              </Select>
-              <span className="text-sm text-gray-600">店舗:</span>
-              <Select value={filterStoreId || '__all__'} onValueChange={(v) => setFilterStoreId(v === '__all__' ? '' : v)}>
-                <SelectTrigger className="h-8 w-[100px] text-sm">
-                  <SelectValue placeholder="全て" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__all__">全て</SelectItem>
-                  {storeOptions.map(opt => (
-                    <SelectItem key={opt.id} value={opt.id}>{opt.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="h-8 text-sm" 
-                onClick={() => { setFilterAssignedStaff(''); setFilterWorkType(''); setFilterStoreId(''); }}
-              >
-                リセット
               </Button>
             </div>
           </div>
@@ -448,155 +377,191 @@ export default function HostessSchedule() {
       </div>
 
       {/* メインコンテンツ */}
-      <div className="p-4">
-
-      {/* メインスケジュールテーブル */}
-        <Card>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm table-fixed">
-                <colgroup>
-                  <col style={{width: '25px'}} />
-                  <col style={{width: '90px'}} />
-                  <col style={{width: '120px'}} />
-                  <col style={{width: '80px'}} />
-                  {dayNames.map((_, i) => (
-                    <col key={i} style={{width: '160px'}} />
-                  ))}
-                  <col style={{width: '100px'}} />
-                  <col style={{width: '180px'}} />
-                </colgroup>
-                <thead>
-                  <tr className="bg-white">
-                    <th className="border border-gray-600 px-1 py-1 text-center text-sm sticky left-0 bg-white">No</th>
-                    <th className="border border-gray-600 px-1 py-1 text-center text-sm sticky left-[30px] bg-white">勤務形態</th>
-                    <th className="border border-gray-600 px-1 py-1 text-center text-sm sticky left-[100px] bg-white">名前</th>
-                    <th className="border border-gray-600 px-1 py-1 text-center text-sm sticky left-[200px] bg-white">担当者</th>
-                    {dayNames.map((dayName, index) => (
-                      <th key={index} className="border border-gray-600 px-1 py-1 text-center text-sm">
-                        <div>{weekDates[index] && formatDate(weekDates[index])} {dayName}</div>
-                      </th>
-                    ))}
-                    <th className="border border-gray-600 px-1 py-1 text-center text-sm">週間統計</th>
-                    <th className="border border-gray-600 px-1 py-1 text-center text-sm">備考</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredSchedules.map((schedule, index) => (
-                    <tr 
-                      key={schedule.id} 
-                      className="hover:opacity-80"
-                      style={{ backgroundColor: schedule.store?.name === '銀座店' ? '#fff1f2' : 
-                               schedule.store?.name === '新宿店' ? '#eef2ff' :
-                               schedule.store?.name === '渋谷店' ? '#ecfdf5' :
-                               schedule.store?.name === '池袋店' ? '#fffbeb' :
-                               schedule.store?.name === '赤坂店' ? '#f0f9ff' :
-                               schedule.store?.name === '恵比寿店' ? '#faf5ff' : '#fef3c7' }}
-                    >
-                      <td className="border border-gray-600 px-1 py-1 text-center sticky left-0" style={{ backgroundColor: 'inherit' }}>
-                        <span className="text-sm">{index + 1}</span>
-                      </td>
-                      <td className="border border-gray-600 px-1 py-1 sticky left-[30px]" style={{ backgroundColor: 'inherit' }}>
-                        <span className="text-sm">
-                          {schedule.workType === 'full_time' ? '正社員' :
-                           schedule.workType === 'part_time' ? 'パート' :
-                           schedule.workType === 'contract' ? '契約' :
-                           schedule.workType === 'dispatch' ? '派遣' : '臨時'}
-                        </span>
-                      </td>
-                      <td className="border border-gray-600 px-1 py-1 sticky left-[100px]" style={{ backgroundColor: 'inherit' }}>
-                        <span className="text-sm font-bold">{schedule.isNewcomer && <span className="text-red-500 mr-1">【新人】</span>}{schedule.name}</span>
-                      </td>
-                      <td className="border border-gray-600 px-1 py-1 sticky left-[200px]" style={{ backgroundColor: 'inherit' }}>
-                        <span className="text-sm">{schedule.assignedStaff}</span>
-                      </td>
-                      {dayKeys.map((dayKey, dayIndex) => {
-                        const daySchedule = schedule.weeklySchedule[dayKey];
-
-                        return (
-                          <td key={dayIndex} className="border border-gray-600 px-0.5 py-1 align-top">
-                            <div className="flex items-center gap-0.5">
-                              <input
-                                type="time"
-                                value={daySchedule.startTime || ''}
-                                onChange={(e) => {
-                                  updateScheduleCell(schedule.id, dayKey, {
-                                    startTime: e.target.value,
-                                    isWorkDay: e.target.value !== ''
-                                  });
-                                }}
-                                className="w-[72px] h-7 text-sm border border-gray-400 rounded-sm px-0"
-                              />
-                              <span className="text-sm">〜</span>
-                              <input
-                                type="time"
-                                value={daySchedule.endTime || ''}
-                                onChange={(e) => {
-                                  updateScheduleCell(schedule.id, dayKey, {
-                                    endTime: e.target.value,
-                                    isWorkDay: daySchedule.startTime !== '' || e.target.value !== ''
-                                  });
-                                }}
-                                className="w-[72px] h-7 text-sm border border-gray-400 rounded-sm px-0"
-                              />
-                            </div>
-                          </td>
-                        );
-                      })}
-                      <td className="border border-gray-600 px-1 py-1 text-center">
-                        <div className="space-y-0">
-                          <div className="text-sm">勤務日: {schedule.weeklyStats.totalWorkDays}日</div>
-                          <div className="text-sm">時間: {schedule.weeklyStats.totalWorkHours}h</div>
-                        </div>
-                      </td>
-                      <td className="border border-gray-600 px-1 py-1 align-top">
-                        <input
-                          type="text"
-                          value={schedule.remarks ?? ''}
-                          onChange={(e) => {
-                            setSchedules(prev => prev.map(s =>
-                              s.id === schedule.id ? { ...s, remarks: e.target.value } : s
-                            ));
-                          }}
-                          className="w-full h-7 text-sm border border-gray-400 rounded-sm px-0.5"
-                          placeholder="備考"
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+      <div className="flex-1 flex overflow-hidden">
+        {/* 左側パネル - ホステスリスト（3カラム） */}
+        <div className="flex-shrink-0 flex flex-col bg-pink-100 border-r border-pink-300">
+          {/* ヘッダー行 */}
+          <div className="h-[30px] border-b border-pink-300 flex-shrink-0 flex">
+            <div className="w-[120px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
+              店内名
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="w-[70px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
+              勤務形態
+            </div>
+            <div className="w-[60px] flex items-center justify-center text-xs font-bold text-gray-700">
+              担当者
+            </div>
+          </div>
 
-      {/* フッター - 凡例 */}
-      <div className="mt-2 px-2">
-        <div className="flex items-center gap-4 text-sm text-gray-600">
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3" style={{backgroundColor: '#fff1f2'}}></div>
-            <span>銀座店</span>
+          {/* ホステスリスト */}
+          <div
+            ref={leftPanelRef}
+            className="flex-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden"
+            onScroll={handleLeftPanelScroll}
+            style={{ scrollbarWidth: 'none' }}
+          >
+            {hostesses.map((hostess) => (
+              <div
+                key={hostess.id}
+                className="border-b border-pink-300 flex"
+                style={{ height: `${ROW_HEIGHT}px` }}
+              >
+                {/* 店内名 */}
+                <div className="w-[120px] border-r border-pink-300 flex items-center px-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm font-medium truncate">{hostess.name}</span>
+                      <ChevronDown className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      {hostess.isOff ? (
+                        <span className="text-red-500 font-medium">休み</span>
+                      ) : (
+                        `${hostess.workStartTime}-${hostess.workEndTime}`
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {/* 勤務形態 */}
+                <div className="w-[70px] border-r border-pink-300 flex items-center justify-center">
+                  <span className="text-xs text-gray-700">{hostess.workType}</span>
+                </div>
+                {/* 担当者 */}
+                <div className="w-[60px] flex items-center justify-center">
+                  <span className="text-xs text-gray-700">{hostess.assignedStaff}</span>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3" style={{backgroundColor: '#eef2ff'}}></div>
-            <span>新宿店</span>
+        </div>
+
+        {/* 右側パネル - タイムライン */}
+        <div className="flex-1 overflow-hidden flex flex-col">
+          {/* 時間軸ヘッダー */}
+          <div
+            ref={timeHeaderRef}
+            className="h-[30px] bg-gray-50 border-b border-gray-300 flex-shrink-0 overflow-x-hidden"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <div
+              className="flex"
+              style={{ width: `${(TIME_END_HOUR - TIME_START_HOUR + 1) * HOUR_WIDTH}px` }}
+            >
+              {timeSlots.map((slot) => (
+                <div
+                  key={slot.hour}
+                  className="flex-shrink-0 border-r border-gray-300 flex items-center justify-center text-sm text-gray-600 font-medium"
+                  style={{ width: `${HOUR_WIDTH}px` }}
+                >
+                  {slot.display}
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3" style={{backgroundColor: '#ecfdf5'}}></div>
-            <span>渋谷店</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3" style={{backgroundColor: '#fffbeb'}}></div>
-            <span>池袋店</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3" style={{backgroundColor: '#f0f9ff'}}></div>
-            <span>赤坂店</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3" style={{backgroundColor: '#faf5ff'}}></div>
-            <span>恵比寿店</span>
+
+          {/* タイムラインボディ */}
+          <div
+            ref={timelineBodyRef}
+            className="flex-1 overflow-auto"
+            onScroll={handleTimelineScroll}
+          >
+            <div
+              style={{
+                width: `${(TIME_END_HOUR - TIME_START_HOUR + 1) * HOUR_WIDTH}px`,
+                minHeight: '100%'
+              }}
+            >
+              {hostesses.map((hostess, index) => (
+                <div
+                  key={hostess.id}
+                  className="relative border-b border-gray-200"
+                  style={{
+                    height: `${ROW_HEIGHT}px`,
+                    backgroundColor: index % 2 === 0 ? '#fafafa' : '#ffffff'
+                  }}
+                >
+                  {/* 時間のグリッド線 */}
+                  {timeSlots.map((slot) => (
+                    <div
+                      key={slot.hour}
+                      className="absolute top-0 bottom-0 border-r border-gray-200"
+                      style={{ left: `${(slot.hour - TIME_START_HOUR) * HOUR_WIDTH}px` }}
+                    />
+                  ))}
+
+                  {/* 勤務時間の背景 */}
+                  {!hostess.isOff && hostess.workStartTime && hostess.workEndTime && (
+                    <div
+                      className="absolute top-0 bottom-0"
+                      style={{
+                        left: `${timeToPosition(hostess.workStartTime)}px`,
+                        width: `${getBarWidth(hostess.workStartTime, hostess.workEndTime)}px`,
+                        backgroundColor: 'rgba(255, 182, 193, 0.2)'
+                      }}
+                    />
+                  )}
+
+                  {/* 予約バー */}
+                  {hostess.reservations.map((reservation) => {
+                    const isPending = reservation.status === 'pending';
+                    const barLeft = timeToPosition(reservation.startTime);
+                    const barWidth = getBarWidth(reservation.startTime, reservation.endTime);
+
+                    return (
+                      <div
+                        key={reservation.id}
+                        className="absolute top-[4px] bottom-[4px] rounded-full flex items-center px-2 cursor-pointer shadow-sm"
+                        style={{
+                          left: `${barLeft}px`,
+                          width: `${barWidth}px`,
+                          minWidth: '120px',
+                          background: isPending
+                            ? 'linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #9333ea 100%)'
+                            : 'linear-gradient(135deg, #d4d4d4 0%, #a3a3a3 50%, #737373 100%)'
+                        }}
+                      >
+                        {/* 時間表示 */}
+                        <div className="flex flex-col justify-center mr-2 text-[11px] leading-tight flex-shrink-0 font-medium">
+                          <span className={isPending ? 'text-white' : 'text-gray-700'}>
+                            {reservation.startTime}
+                          </span>
+                          <span className={isPending ? 'text-white' : 'text-gray-700'}>
+                            {reservation.endTime}
+                          </span>
+                        </div>
+
+                        {/* 予約情報 */}
+                        <div className="flex-1 min-w-0 overflow-hidden">
+                          <div className={`text-[11px] font-medium truncate leading-tight ${isPending ? 'text-white' : 'text-gray-800'}`}>
+                            {reservation.customerName}
+                          </div>
+                          <div className={`text-[10px] truncate leading-tight ${isPending ? 'text-purple-200' : 'text-gray-600'}`}>
+                            受付: {reservation.receptDate}
+                          </div>
+                          {reservation.location && (
+                            <div className={`text-[10px] truncate leading-tight ${isPending ? 'text-purple-200' : 'text-gray-600'}`}>
+                              {reservation.location}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 完了マーク */}
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ml-1 ${
+                          isPending ? 'bg-white/30' : 'bg-white/50'
+                        }`}>
+                          <Check className={`w-3 h-3 ${isPending ? 'text-white' : 'text-gray-600'}`} />
+                        </div>
+
+                        {/* ステータステキスト */}
+                        <div className={`text-[10px] ml-1 flex-shrink-0 ${isPending ? 'text-purple-200' : 'text-gray-500'}`}>
+                          完了
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

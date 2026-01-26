@@ -172,29 +172,29 @@ export default function Original() {
       return (
         <div key={reservation.id} className="w-[378px] h-5 left-0 absolute" style={{ top: `${topPosition}px` }}>
           {reservation.hasOption5 && (
-            <div className="w-4 h-5 left-[362px] top-0 absolute border border-rose-300/60" />
+            <div className="w-4 h-5 left-[346px] top-0 absolute border border-rose-300/60" />
           )}
           {reservation.hasOption4 && (
-            <div className="w-4 h-5 left-[346px] top-0 absolute border border-indigo-200/60" />
+            <div className="w-4 h-5 left-[330px] top-0 absolute border border-indigo-200/60" />
           )}
           {reservation.hasOption3 && (
-            <div className="w-4 h-5 left-[330px] top-0 absolute border border-rose-300/60" />
+            <div className="w-4 h-5 left-[314px] top-0 absolute border border-rose-300/60" />
           )}
           {reservation.hasOption2 && (
-            <div className="w-4 h-5 left-[314px] top-0 absolute border border-indigo-200/60" />
+            <div className="w-4 h-5 left-[298px] top-0 absolute border border-indigo-200/60" />
           )}
           {reservation.hasOption1 && (
-            <div className="w-4 h-5 left-[298px] top-0 absolute border border-rose-300/60" />
+            <div className="w-4 h-5 left-[282px] top-0 absolute border border-rose-300/60" />
           )}
-          <div className="w-10 h-5 left-[258px] top-0 absolute border border-indigo-200/60" />
-          <div className="w-3 left-[284px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">分</div>
-          <div className="w-5 left-[262px] top-[2px] absolute text-right justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.timeTotal}</div>
-          <div className="w-12 h-5 left-[210px] top-0 absolute border border-neutral-300" />
-          <div className="w-10 left-[214px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.sColumn}</div>
+          <div className="w-10 h-5 left-[242px] top-0 absolute border border-indigo-200/60" />
+          <div className="w-3 left-[268px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">分</div>
+          <div className="w-5 left-[246px] top-[2px] absolute text-right justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.timeTotal}</div>
+          <div className="w-8 h-5 left-[210px] top-0 absolute border border-neutral-300" />
+          <div className="w-6 left-[212px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.sColumn}</div>
           {reservation.isConfirmed && (
             <>
               <div className="w-[20px] h-5 left-[40px] top-0 absolute bg-purple-300 border border-neutral-300" />
-              <div className="w-3 left-[44px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">確</div>
+              <div className="w-3 left-[44px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">D</div>
             </>
           )}
           <div className="w-[70px] h-5 left-[140px] top-0 absolute bg-yellow-200 border border-rose-300/60" />
@@ -283,77 +283,70 @@ export default function Original() {
 
   {/* ヘッダー行 */}
   <div className="w-10 left-[745px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">開始</div>
-  <div className="w-[26px] left-[785px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">HP</div>
-  <div className="w-[70px] left-[811px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">ホステス名</div>
-  <div className="w-10 left-[881px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">時間計</div>
-  <div className="w-10 left-[921px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">開始</div>
-  <div className="w-10 left-[961px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">終了</div>
-  <div className="w-32 left-[1001px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">場所</div>
-  <div className="w-16 left-[1149px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">駅</div>
-  <div className="w-5 left-[1129px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">確</div>
-  <div className="w-10 left-[1213px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">INドラ</div>
-  <div className="w-10 left-[1253px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">OUTドラ</div>
-  <div className="w-10 h-4 left-[1343px] top-[78px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">オプション</div>
-  <div className="w-10 h-4 left-[1327px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">カード</div>
-  <div className="w-10 h-4 left-[1313px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">着TEL</div>
-  <div className="w-10 h-4 left-[1295px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">待合せ</div>
-  <div className="w-10 h-4 left-[1279px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">領収書</div>
+  <div className="w-[70px] left-[785px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">ホステス名</div>
+  <div className="w-10 left-[883px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">時間計</div>
+  <div className="w-12 left-[923px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">開始</div>
+  <div className="w-12 left-[971px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">終了</div>
+  <div className="w-32 left-[1019px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">場所</div>
+  <div className="w-16 left-[1147px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">地域</div>
+  <div className="w-10 left-[1211px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">INドラ</div>
+  <div className="w-10 left-[1251px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">OUTドラ</div>
+  <div className="w-10 h-4 left-[1341px] top-[78px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">オプション</div>
+  <div className="w-10 h-4 left-[1325px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">カード</div>
+  <div className="w-10 h-4 left-[1311px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">着TEL</div>
+  <div className="w-10 h-4 left-[1293px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">待合せ</div>
+  <div className="w-10 h-4 left-[1277px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">領収書</div>
   <div className="w-[634px] h-[880px] left-[745px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {outDriverUndecidedSampleData.map((item: OutDriverUndecided, index: number) => (
       <div key={item.id} className="w-[628px] h-6 left-0 absolute" style={{ top: `${index * 24}px` }}>
       <Button
-        className="w-10 h-6 p-[1px] left-0 top-0 absolute bg-cyan-100 hover:bg-cyan-200 text-black text-[13px] font-normal font-['Inter']"
+        className="w-10 h-6 px-0.5 py-[1px] left-0 top-0 absolute rounded-[2px] bg-gradient-to-b from-white via-cyan-100 to-cyan-300 hover:from-white hover:via-cyan-200 hover:to-cyan-400 active:from-cyan-400 active:via-cyan-300 active:to-cyan-200 text-black text-[13px] font-normal font-['Inter'] border-2 border-t-white border-l-white border-r-zinc-600 border-b-zinc-600 shadow-[3px_3px_5px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.9)] active:shadow-none active:border-t-zinc-600 active:border-l-zinc-600 active:border-r-zinc-300 active:border-b-zinc-300 active:translate-x-[2px] active:translate-y-[2px] transition-transform duration-75"
         onClick={() => {}}
       >
         開始
       </Button>
-      <Button
-        className="w-[26px] h-6 p-[1px] left-[40px] top-0 absolute bg-rose-100 hover:bg-rose-200 text-black text-[13px] font-normal font-['Inter']"
-        onClick={() => {}}
-      >
-        HP
-      </Button>
-      <div className="w-[70px] h-6 left-[66px] top-0 absolute bg-yellow-200 border border-rose-300/60" />
-      <div className="w-[66px] left-[70px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.hostessName}</div>
-      <div className="w-32 h-6 left-[256px] top-0 absolute border border-rose-300/60" />
-      <div className="w-32 left-[258px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.destination}</div>
-      <div className="w-16 h-6 left-[404px] top-0 absolute border border-rose-300/60" />
-      <div className="w-14 h-3.5 left-[408px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.station}</div>
+      <div className="w-[70px] h-6 left-[40px] top-0 absolute bg-yellow-200 border border-zinc-400" />
+      <div className="w-[66px] left-[44px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.hostessName}</div>
+      <div className="w-[28px] h-6 left-[110px] top-0 absolute border border-zinc-400" />
+      <div className="w-[24px] left-[112px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{item.shopCode || ''}</div>
+      <div className="w-32 h-6 left-[274px] top-0 absolute border border-zinc-400" />
+      <div className="w-32 left-[276px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.destination}</div>
+      <div className="w-16 h-6 left-[402px] top-0 absolute border border-zinc-400" />
+      <div className="w-14 h-3.5 left-[406px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.station}</div>
       {item.in_driver && (
-        <div className="w-10 h-6 left-[468px] top-0 absolute bg-yellow-200 border border-rose-300/60" />
+        <div className="w-10 h-6 left-[466px] top-0 absolute bg-yellow-200 border border-zinc-400" />
       )}
       {item.in_driver && (
-        <div className="w-9 left-[470px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.in_driver}</div>
+        <div className="w-9 left-[468px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.in_driver}</div>
       )}
       {item.out_driver && (
-        <div className="w-10 h-6 left-[508px] top-0 absolute bg-yellow-200 border border-indigo-200/60" />
+        <div className="w-10 h-6 left-[506px] top-0 absolute bg-yellow-200 border border-zinc-400" />
       )}
       {item.out_driver && (
-        <div className="w-9 left-[510px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.out_driver}</div>
+        <div className="w-9 left-[508px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.out_driver}</div>
       )}
-      <div className="w-10 h-6 left-[216px] top-0 absolute border border-indigo-200/60" />
-      <div className="w-9 left-[218px] top-[3px] absolute text-center justify-end text-red-800 text-[13px] font-normal font-['Inter']">{item.arrivalTime}</div>
-      <div className="w-10 h-6 left-[176px] top-0 absolute border border-rose-300/60" />
-      <div className="w-9 left-[178px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{item.pickupTime}</div>
-      <div className="w-10 h-6 left-[136px] top-0 absolute border border-indigo-200/60" />
-      <div className="w-3 left-[162px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">分</div>
-      <div className="w-5 left-[140px] top-[3px] absolute text-right justify-end text-black text-[13px] font-normal font-['Inter']">{item.timeTotal}</div>
+      <div className="w-12 h-6 left-[226px] top-0 absolute border border-zinc-400" />
+      <div className="w-11 left-[228px] top-[3px] absolute text-center justify-end text-red-800 text-[13px] font-normal font-['Inter']">{item.arrivalTime}</div>
+      <div className="w-12 h-6 left-[178px] top-0 absolute border border-zinc-400" />
+      <div className="w-11 left-[180px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{item.pickupTime}</div>
+      <div className="w-10 h-6 left-[138px] top-0 absolute border border-zinc-400" />
+      <div className="w-3 left-[164px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">分</div>
+      <div className="w-5 left-[142px] top-[3px] absolute text-right justify-end text-black text-[13px] font-normal font-['Inter']">{item.timeTotal}</div>
       {item.hasOption5 && (
-        <div className="w-4 h-6 left-[612px] top-0 absolute border border-rose-300/60" />
+        <div className="w-4 h-6 left-[610px] top-0 absolute border border-zinc-400" />
       )}
       {item.hasOption4 && (
-        <div className="w-4 h-6 left-[596px] top-0 absolute border border-indigo-200/60" />
+        <div className="w-4 h-6 left-[594px] top-0 absolute border border-zinc-400" />
       )}
       {item.hasOption3 && (
-        <div className="w-4 h-6 left-[580px] top-0 absolute border border-rose-300/60" />
+        <div className="w-4 h-6 left-[578px] top-0 absolute border border-zinc-400" />
       )}
       {item.hasOption2 && (
-        <div className="w-4 h-6 left-[564px] top-0 absolute border border-indigo-200/60" />
+        <div className="w-4 h-6 left-[562px] top-0 absolute border border-zinc-400" />
       )}
       {item.hasOption1 && (
-        <div className="w-4 h-6 left-[548px] top-0 absolute border border-rose-300/60" />
+        <div className="w-4 h-6 left-[546px] top-0 absolute border border-zinc-400" />
       )}
-      <div className="size-5 absolute bg-purple-300" style={{ left: '384px', top: '0px' }} />
       </div>
     ))}
   </div>
