@@ -558,7 +558,9 @@ export default function Original() {
   {/* ドライバ配車パネル */}
   <Button
     className="w-[172px] h-20 left-[1379px] top-[833px] absolute bg-rose-300/60 hover:bg-rose-400/60 text-black text-[13px] font-normal font-['Inter']"
-    onClick={() => {}}
+    onClick={() => {
+      window.open('/dispatch-panel-2d-sub', 'driverDispatchPanel', 'width=1920,height=1080,menubar=no,toolbar=no,location=no,status=no');
+    }}
   >
     ドライバ配車パネル
   </Button>
