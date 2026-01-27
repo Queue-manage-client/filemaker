@@ -1,9 +1,22 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, Check } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, Check, Plus, X } from "lucide-react";
+
+// 編集中のバーデータ
+interface EditingBar {
+  hostessId: string;
+  barId: string; // 新規の場合は 'new-{hostessId}'、既存の場合は reservation.id
+  startTime: string;
+  endTime: string;
+  isNew: boolean;
+  customerName?: string;
+  receptDate?: string;
+  location?: string;
+  status?: 'pending' | 'confirmed' | 'completed';
+}
 
 // 予約データの型定義
 interface Reservation {
@@ -257,6 +270,30 @@ const TIME_END_HOUR = 26; // 翌2:00を26時として扱う
 const HOUR_WIDTH = 120; // 1時間あたりのピクセル幅
 const ROW_HEIGHT = 52; // 各行の高さ
 
+// ソートタイプの定義
+type SortType = 'name-asc' | 'name-desc' | 'worktime-asc' | 'worktime-desc' | 'start-asc' | 'start-desc';
+
+// 滞在時間（勤務時間）を分単位で計算
+const calculateWorkMinutes = (hostess: HostessTimelineData): number => {
+  if (hostess.isOff || !hostess.workStartTime || !hostess.workEndTime) return 0;
+  const [startH, startM] = hostess.workStartTime.split(':').map(Number);
+  const [endH, endM] = hostess.workEndTime.split(':').map(Number);
+  let startMinutes = startH * 60 + startM;
+  let endMinutes = endH * 60 + endM;
+  // 深夜をまたぐ場合
+  if (endMinutes < startMinutes) {
+    endMinutes += 24 * 60;
+  }
+  return endMinutes - startMinutes;
+};
+
+// 勤務開始時間を分単位で取得
+const getStartMinutes = (hostess: HostessTimelineData): number => {
+  if (hostess.isOff || !hostess.workStartTime) return 9999;
+  const [h, m] = hostess.workStartTime.split(':').map(Number);
+  return h * 60 + m;
+};
+
 export default function HostessSchedule() {
   React.useEffect(() => {
     document.title = 'ホステススケジュール管理 - Dispatch Harmony Hub';
@@ -264,7 +301,44 @@ export default function HostessSchedule() {
 
   const router = useRouter();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [hostesses] = useState<HostessTimelineData[]>(sampleHostessTimeline);
+  const [hostessData] = useState<HostessTimelineData[]>(sampleHostessTimeline);
+  const [sortType, setSortType] = useState<SortType>('name-asc');
+
+  // 編集中のバー管理 (キーは barId)
+  const [editingBars, setEditingBars] = useState<Map<string, EditingBar>>(new Map());
+  // 現在編集モードのバーID
+  const [activeEditBarId, setActiveEditBarId] = useState<string | null>(null);
+  // 保存確認モーダル
+  const [showSaveConfirm, setShowSaveConfirm] = useState<string | null>(null); // barId
+
+  // ドラッグ状態
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragType, setDragType] = useState<'move' | 'resize-left' | 'resize-right' | null>(null);
+  const [dragBarId, setDragBarId] = useState<string | null>(null);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragStartBarLeft, setDragStartBarLeft] = useState(0);
+  const [dragStartBarWidth, setDragStartBarWidth] = useState(0);
+
+  // ソート済みホステスリスト
+  const hostesses = useMemo(() => {
+    const sorted = [...hostessData];
+    switch (sortType) {
+      case 'name-asc':
+        return sorted.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+      case 'name-desc':
+        return sorted.sort((a, b) => b.name.localeCompare(a.name, 'ja'));
+      case 'worktime-desc':
+        return sorted.sort((a, b) => calculateWorkMinutes(b) - calculateWorkMinutes(a));
+      case 'worktime-asc':
+        return sorted.sort((a, b) => calculateWorkMinutes(a) - calculateWorkMinutes(b));
+      case 'start-asc':
+        return sorted.sort((a, b) => getStartMinutes(a) - getStartMinutes(b));
+      case 'start-desc':
+        return sorted.sort((a, b) => getStartMinutes(b) - getStartMinutes(a));
+      default:
+        return sorted;
+    }
+  }, [hostessData, sortType]);
 
   // スクロール同期用のref
   const leftPanelRef = useRef<HTMLDivElement>(null);
@@ -333,6 +407,170 @@ export default function HostessSchedule() {
     }
   }, []);
 
+  // ピクセル位置を時間に変換
+  const positionToTime = (position: number): string => {
+    const totalMinutes = (position / HOUR_WIDTH) * 60 + TIME_START_HOUR * 60;
+    let hours = Math.floor(totalMinutes / 60);
+    const minutes = Math.round(totalMinutes % 60 / 5) * 5; // 5分単位に丸める
+    if (hours >= 24) hours -= 24;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  };
+
+  // 新しいバーを作成
+  const handleCreateBar = (hostessId: string) => {
+    const barId = `new-${hostessId}`;
+    const newBar: EditingBar = {
+      hostessId,
+      barId,
+      startTime: '12:00',
+      endTime: '14:00',
+      isNew: true,
+      customerName: '新規予約',
+      status: 'pending'
+    };
+    setEditingBars(new Map(editingBars.set(barId, newBar)));
+    setActiveEditBarId(barId);
+  };
+
+  // バーを削除（編集キャンセル）
+  const handleCancelEdit = (barId: string) => {
+    const newMap = new Map(editingBars);
+    newMap.delete(barId);
+    setEditingBars(newMap);
+    if (activeEditBarId === barId) {
+      setActiveEditBarId(null);
+    }
+  };
+
+  // 既存バーをタップして編集モードに
+  const handleBarClick = (hostessId: string, reservation: Reservation) => {
+    const barId = reservation.id;
+    // 既に編集中なら編集解除
+    if (activeEditBarId === barId) {
+      setActiveEditBarId(null);
+      return;
+    }
+    // まだ編集バーとして登録されていなければ登録
+    if (!editingBars.has(barId)) {
+      const editBar: EditingBar = {
+        hostessId,
+        barId,
+        startTime: reservation.startTime,
+        endTime: reservation.endTime,
+        isNew: false,
+        customerName: reservation.customerName,
+        receptDate: reservation.receptDate,
+        location: reservation.location,
+        status: reservation.status
+      };
+      setEditingBars(new Map(editingBars.set(barId, editBar)));
+    }
+    setActiveEditBarId(barId);
+  };
+
+  // 新規バーが存在するかチェック
+  const hasNewBar = (hostessId: string) => {
+    return editingBars.has(`new-${hostessId}`);
+  };
+
+  // 手動で時間を更新
+  const handleTimeChange = (barId: string, field: 'startTime' | 'endTime', value: string) => {
+    const bar = editingBars.get(barId);
+    if (bar) {
+      const updatedBar = { ...bar, [field]: value };
+      setEditingBars(new Map(editingBars.set(barId, updatedBar)));
+    }
+  };
+
+  // 保存確認モーダルを開く
+  const openSaveConfirm = (barId: string) => {
+    setShowSaveConfirm(barId);
+  };
+
+  // 保存を実行
+  const handleConfirmSave = () => {
+    if (showSaveConfirm) {
+      const bar = editingBars.get(showSaveConfirm);
+      if (bar) {
+        // ここで実際のAPI保存処理を行う（今は状態管理のみ）
+        console.log('保存:', bar);
+        // 保存後は編集状態を解除
+        const newMap = new Map(editingBars);
+        newMap.delete(showSaveConfirm);
+        setEditingBars(newMap);
+        if (activeEditBarId === showSaveConfirm) {
+          setActiveEditBarId(null);
+        }
+      }
+      setShowSaveConfirm(null);
+    }
+  };
+
+  // ドラッグ開始
+  const handleDragStart = (
+    e: React.MouseEvent,
+    barId: string,
+    type: 'move' | 'resize-left' | 'resize-right'
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const bar = editingBars.get(barId);
+    if (!bar) return;
+
+    setIsDragging(true);
+    setDragType(type);
+    setDragBarId(barId);
+    setDragStartX(e.clientX);
+    setDragStartBarLeft(timeToPosition(bar.startTime));
+    setDragStartBarWidth(getBarWidth(bar.startTime, bar.endTime));
+  };
+
+  // ドラッグ中
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !dragBarId || !dragType) return;
+
+      const deltaX = e.clientX - dragStartX;
+      const bar = editingBars.get(dragBarId);
+      if (!bar) return;
+
+      let newStartPos = dragStartBarLeft;
+      let newEndPos = dragStartBarLeft + dragStartBarWidth;
+
+      if (dragType === 'move') {
+        newStartPos = Math.max(0, dragStartBarLeft + deltaX);
+        newEndPos = newStartPos + dragStartBarWidth;
+      } else if (dragType === 'resize-left') {
+        newStartPos = Math.max(0, Math.min(dragStartBarLeft + deltaX, newEndPos - 30));
+      } else if (dragType === 'resize-right') {
+        newEndPos = Math.max(newStartPos + 30, dragStartBarLeft + dragStartBarWidth + deltaX);
+      }
+
+      const newStartTime = positionToTime(newStartPos);
+      const newEndTime = positionToTime(newEndPos);
+
+      const updatedBar = { ...bar, startTime: newStartTime, endTime: newEndTime };
+      setEditingBars(new Map(editingBars.set(dragBarId, updatedBar)));
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      setDragType(null);
+      setDragBarId(null);
+    };
+
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDragging, dragType, dragBarId, dragStartX, dragStartBarLeft, dragStartBarWidth, editingBars]);
+
   return (
     <div className="h-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* ヘッダー */}
@@ -376,20 +614,58 @@ export default function HostessSchedule() {
         </div>
       </div>
 
+      {/* ソートボタン */}
+      <div className="h-[36px] bg-white border-b border-zinc-300 flex items-center px-3 gap-2 flex-shrink-0">
+        <span className="text-xs text-gray-600 font-medium mr-1">並び替え:</span>
+        <button
+          onClick={() => setSortType(sortType === 'name-asc' ? 'name-desc' : 'name-asc')}
+          className={`px-2 py-1 text-xs rounded border ${
+            sortType === 'name-asc' || sortType === 'name-desc'
+              ? 'bg-pink-500 text-white border-pink-500'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+          }`}
+        >
+          五十音順 {sortType === 'name-asc' ? '▲' : sortType === 'name-desc' ? '▼' : ''}
+        </button>
+        <button
+          onClick={() => setSortType(sortType === 'worktime-desc' ? 'worktime-asc' : 'worktime-desc')}
+          className={`px-2 py-1 text-xs rounded border ${
+            sortType === 'worktime-desc' || sortType === 'worktime-asc'
+              ? 'bg-pink-500 text-white border-pink-500'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+          }`}
+        >
+          滞在時間 {sortType === 'worktime-desc' ? '▼多' : sortType === 'worktime-asc' ? '▲少' : ''}
+        </button>
+        <button
+          onClick={() => setSortType(sortType === 'start-asc' ? 'start-desc' : 'start-asc')}
+          className={`px-2 py-1 text-xs rounded border ${
+            sortType === 'start-asc' || sortType === 'start-desc'
+              ? 'bg-pink-500 text-white border-pink-500'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+          }`}
+        >
+          出勤時間 {sortType === 'start-asc' ? '▲早' : sortType === 'start-desc' ? '▼遅' : ''}
+        </button>
+      </div>
+
       {/* メインコンテンツ */}
       <div className="flex-1 flex overflow-hidden">
         {/* 左側パネル - ホステスリスト（3カラム） */}
         <div className="flex-shrink-0 flex flex-col bg-pink-100 border-r border-pink-300">
           {/* ヘッダー行 */}
           <div className="h-[30px] border-b border-pink-300 flex-shrink-0 flex">
-            <div className="w-[120px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
+            <div className="w-[100px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
               店内名
             </div>
-            <div className="w-[70px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
+            <div className="w-[60px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
               勤務形態
             </div>
-            <div className="w-[60px] flex items-center justify-center text-xs font-bold text-gray-700">
+            <div className="w-[50px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
               担当者
+            </div>
+            <div className="w-[50px] flex items-center justify-center text-xs font-bold text-gray-700">
+              作成
             </div>
           </div>
 
@@ -407,7 +683,7 @@ export default function HostessSchedule() {
                 style={{ height: `${ROW_HEIGHT}px` }}
               >
                 {/* 店内名 */}
-                <div className="w-[120px] border-r border-pink-300 flex items-center px-2">
+                <div className="w-[100px] border-r border-pink-300 flex items-center px-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1">
                       <span className="text-sm font-medium truncate">{hostess.name}</span>
@@ -423,12 +699,32 @@ export default function HostessSchedule() {
                   </div>
                 </div>
                 {/* 勤務形態 */}
-                <div className="w-[70px] border-r border-pink-300 flex items-center justify-center">
+                <div className="w-[60px] border-r border-pink-300 flex items-center justify-center">
                   <span className="text-xs text-gray-700">{hostess.workType}</span>
                 </div>
                 {/* 担当者 */}
-                <div className="w-[60px] flex items-center justify-center">
+                <div className="w-[50px] border-r border-pink-300 flex items-center justify-center">
                   <span className="text-xs text-gray-700">{hostess.assignedStaff}</span>
+                </div>
+                {/* 作成ボタン */}
+                <div className="w-[50px] flex items-center justify-center">
+                  {hasNewBar(hostess.id) ? (
+                    <button
+                      onClick={() => handleCancelEdit(`new-${hostess.id}`)}
+                      className="w-7 h-7 rounded bg-red-500 hover:bg-red-600 text-white flex items-center justify-center"
+                      title="キャンセル"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleCreateBar(hostess.id)}
+                      className="w-7 h-7 rounded bg-blue-400 hover:bg-blue-500 text-white flex items-center justify-center"
+                      title="バーを作成"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -501,32 +797,63 @@ export default function HostessSchedule() {
                     />
                   )}
 
-                  {/* 予約バー */}
+                  {/* 予約バー（既存） */}
                   {hostess.reservations.map((reservation) => {
-                    const isPending = reservation.status === 'pending';
-                    const barLeft = timeToPosition(reservation.startTime);
-                    const barWidth = getBarWidth(reservation.startTime, reservation.endTime);
+                    const barId = reservation.id;
+                    const isEditing = editingBars.has(barId);
+                    const isActiveEdit = activeEditBarId === barId;
+                    const editBar = editingBars.get(barId);
+
+                    // 編集中なら編集バーの時間を使う
+                    const displayStartTime = editBar?.startTime ?? reservation.startTime;
+                    const displayEndTime = editBar?.endTime ?? reservation.endTime;
+                    const isPending = (editBar?.status ?? reservation.status) === 'pending';
+
+                    const barLeft = timeToPosition(displayStartTime);
+                    const barWidth = getBarWidth(displayStartTime, displayEndTime);
 
                     return (
                       <div
                         key={reservation.id}
-                        className="absolute top-[4px] bottom-[4px] rounded-full flex items-center px-2 cursor-pointer shadow-sm"
+                        className={`absolute top-[4px] bottom-[4px] rounded-full flex items-center px-2 shadow-sm ${
+                          isActiveEdit ? 'cursor-move ring-2 ring-blue-400 ring-offset-1' : 'cursor-pointer'
+                        }`}
                         style={{
                           left: `${barLeft}px`,
-                          width: `${barWidth}px`,
+                          width: `${Math.max(barWidth, 120)}px`,
                           minWidth: '120px',
                           background: isPending
                             ? 'linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #9333ea 100%)'
-                            : 'linear-gradient(135deg, #d4d4d4 0%, #a3a3a3 50%, #737373 100%)'
+                            : 'linear-gradient(135deg, #d4d4d4 0%, #a3a3a3 50%, #737373 100%)',
+                          zIndex: isActiveEdit ? 10 : 1
+                        }}
+                        onClick={() => handleBarClick(hostess.id, reservation)}
+                        onMouseDown={(e) => {
+                          if (isActiveEdit) {
+                            handleDragStart(e, barId, 'move');
+                          }
                         }}
                       >
+                        {/* 左リサイズハンドル（編集モード時のみ） */}
+                        {isActiveEdit && (
+                          <div
+                            className="absolute left-0 top-0 bottom-0 w-4 cursor-ew-resize rounded-l-full flex items-center justify-center hover:bg-black/20"
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              handleDragStart(e, barId, 'resize-left');
+                            }}
+                          >
+                            <div className="w-0.5 h-4 bg-white/70 rounded" />
+                          </div>
+                        )}
+
                         {/* 時間表示 */}
                         <div className="flex flex-col justify-center mr-2 text-[11px] leading-tight flex-shrink-0 font-medium">
                           <span className={isPending ? 'text-white' : 'text-gray-700'}>
-                            {reservation.startTime}
+                            {displayStartTime}
                           </span>
                           <span className={isPending ? 'text-white' : 'text-gray-700'}>
-                            {reservation.endTime}
+                            {displayEndTime}
                           </span>
                         </div>
 
@@ -556,15 +883,192 @@ export default function HostessSchedule() {
                         <div className={`text-[10px] ml-1 flex-shrink-0 ${isPending ? 'text-purple-200' : 'text-gray-500'}`}>
                           完了
                         </div>
+
+                        {/* 右リサイズハンドル（編集モード時のみ） */}
+                        {isActiveEdit && (
+                          <div
+                            className="absolute right-0 top-0 bottom-0 w-4 cursor-ew-resize rounded-r-full flex items-center justify-center hover:bg-black/20"
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              handleDragStart(e, barId, 'resize-right');
+                            }}
+                          >
+                            <div className="w-0.5 h-4 bg-white/70 rounded" />
+                          </div>
+                        )}
+
+                        {/* 時間入力フィールド（編集モード時のみ） */}
+                        {isActiveEdit && (
+                          <div
+                            className="absolute -top-10 left-0 bg-white rounded shadow-lg border border-gray-300 px-2 py-1 flex items-center gap-1 z-20"
+                            onClick={(e) => e.stopPropagation()}
+                            onMouseDown={(e) => e.stopPropagation()}
+                          >
+                            <input
+                              type="time"
+                              value={displayStartTime}
+                              onChange={(e) => handleTimeChange(barId, 'startTime', e.target.value)}
+                              className="w-[85px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                            />
+                            <span className="text-xs text-gray-500">〜</span>
+                            <input
+                              type="time"
+                              value={displayEndTime}
+                              onChange={(e) => handleTimeChange(barId, 'endTime', e.target.value)}
+                              className="w-[85px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                            />
+                            <button
+                              onClick={() => openSaveConfirm(barId)}
+                              className="ml-2 px-3 py-0.5 bg-blue-400 hover:bg-blue-500 text-white text-xs rounded whitespace-nowrap"
+                            >
+                              保存
+                            </button>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
+
+                  {/* 新規作成バー */}
+                  {hasNewBar(hostess.id) && (() => {
+                    const barId = `new-${hostess.id}`;
+                    const bar = editingBars.get(barId)!;
+                    const isActiveEdit = activeEditBarId === barId;
+                    const barLeft = timeToPosition(bar.startTime);
+                    const barWidth = getBarWidth(bar.startTime, bar.endTime);
+
+                    return (
+                      <div
+                        className={`absolute top-[4px] bottom-[4px] rounded-full flex items-center px-2 shadow-sm ${
+                          isActiveEdit ? 'cursor-move ring-2 ring-blue-400 ring-offset-1' : 'cursor-pointer'
+                        }`}
+                        style={{
+                          left: `${barLeft}px`,
+                          width: `${Math.max(barWidth, 120)}px`,
+                          minWidth: '120px',
+                          background: 'linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #9333ea 100%)',
+                          zIndex: isActiveEdit ? 10 : 1
+                        }}
+                        onClick={() => setActiveEditBarId(isActiveEdit ? null : barId)}
+                        onMouseDown={(e) => {
+                          if (isActiveEdit) {
+                            handleDragStart(e, barId, 'move');
+                          }
+                        }}
+                      >
+                        {/* 左リサイズハンドル（編集モード時のみ） */}
+                        {isActiveEdit && (
+                          <div
+                            className="absolute left-0 top-0 bottom-0 w-4 cursor-ew-resize rounded-l-full flex items-center justify-center hover:bg-black/20"
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              handleDragStart(e, barId, 'resize-left');
+                            }}
+                          >
+                            <div className="w-0.5 h-4 bg-white/70 rounded" />
+                          </div>
+                        )}
+
+                        {/* 時間表示 */}
+                        <div className="flex flex-col justify-center mr-2 text-[11px] leading-tight flex-shrink-0 font-medium">
+                          <span className="text-white">{bar.startTime}</span>
+                          <span className="text-white">{bar.endTime}</span>
+                        </div>
+
+                        {/* 予約情報 */}
+                        <div className="flex-1 min-w-0 overflow-hidden">
+                          <div className="text-[11px] font-medium truncate leading-tight text-white">
+                            {bar.customerName || '新規予約'}
+                          </div>
+                          <div className="text-[10px] truncate leading-tight text-purple-200">
+                            新規作成
+                          </div>
+                        </div>
+
+                        {/* 完了マーク */}
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ml-1 bg-white/30">
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+
+                        {/* ステータステキスト */}
+                        <div className="text-[10px] ml-1 flex-shrink-0 text-purple-200">
+                          新規
+                        </div>
+
+                        {/* 右リサイズハンドル（編集モード時のみ） */}
+                        {isActiveEdit && (
+                          <div
+                            className="absolute right-0 top-0 bottom-0 w-4 cursor-ew-resize rounded-r-full flex items-center justify-center hover:bg-black/20"
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              handleDragStart(e, barId, 'resize-right');
+                            }}
+                          >
+                            <div className="w-0.5 h-4 bg-white/70 rounded" />
+                          </div>
+                        )}
+
+                        {/* 時間入力フィールド（編集モード時のみ） */}
+                        {isActiveEdit && (
+                          <div
+                            className="absolute -top-10 left-0 bg-white rounded shadow-lg border border-gray-300 px-2 py-1 flex items-center gap-1 z-20"
+                            onClick={(e) => e.stopPropagation()}
+                            onMouseDown={(e) => e.stopPropagation()}
+                          >
+                            <input
+                              type="time"
+                              value={bar.startTime}
+                              onChange={(e) => handleTimeChange(barId, 'startTime', e.target.value)}
+                              className="w-[85px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                            />
+                            <span className="text-xs text-gray-500">〜</span>
+                            <input
+                              type="time"
+                              value={bar.endTime}
+                              onChange={(e) => handleTimeChange(barId, 'endTime', e.target.value)}
+                              className="w-[85px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                            />
+                            <button
+                              onClick={() => openSaveConfirm(barId)}
+                              className="ml-2 px-3 py-0.5 bg-blue-400 hover:bg-blue-500 text-white text-xs rounded whitespace-nowrap"
+                            >
+                              保存
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
+
+      {/* 保存確認モーダル */}
+      {showSaveConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-[320px]">
+            <h3 className="text-lg font-bold mb-4">確認</h3>
+            <p className="text-sm text-gray-600 mb-6">本当に保存しますか？</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowSaveConfirm(null)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 text-sm font-medium"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleConfirmSave}
+                className="flex-1 px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 text-sm font-medium"
+              >
+                保存する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
