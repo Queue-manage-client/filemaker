@@ -47,7 +47,7 @@ export default function Original() {
 
   return (
     <div className="w-full h-[1080px] overflow-x-auto overflow-y-hidden">
-      <div className="w-[1976px] h-[1080px] relative overflow-hidden">
+      <div className="w-[1989px] h-[1080px] relative overflow-hidden">
       {/* ヘッダー */}
       <div className="absolute left-0 top-0 right-0 z-10 h-[50px] bg-white border-b border-zinc-300">
         <div className="flex items-center h-full px-2">
@@ -155,69 +155,57 @@ export default function Original() {
   </div>
 
   {/* INドラ未定予約リスト */}
-  <div className="w-10 h-4 left-[702px] top-[78px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">オプション</div>
-  <div className="w-10 h-4 left-[686px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">カード</div>
-  <div className="w-10 h-4 left-[670px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">着TEL</div>
-  <div className="w-10 h-4 left-[654px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">待合せ</div>
-  <div className="w-10 h-4 left-[638px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">領収書</div>
-  <div className="w-10 left-[612px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">時間計</div>
+  <div className="w-10 h-4 left-[693px] top-[78px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">オプション</div>
+  <div className="w-10 h-4 left-[677px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">カード</div>
+  <div className="w-10 h-4 left-[661px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">着TEL</div>
+  <div className="w-10 h-4 left-[645px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">待合せ</div>
+  <div className="w-10 h-4 left-[629px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">領収書</div>
+  <div className="w-10 left-[603px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">時間計</div>
   <div className="w-8 left-[441px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">迎え場所</div>
   <div className="w-[42px] left-[361px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">出勤</div>
   <div className="w-[70px] left-[504px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">ホステス名</div>
   <div className="w-[150px] h-5 left-[466px] top-[75px] absolute bg-lime-200" />
   <div className="w-[150px] h-5 left-[466px] top-[77px] absolute flex items-center justify-center text-black text-[13px] font-normal font-['Inter'] whitespace-nowrap">INドラ未定予約リスト</div>
-  <div className="w-[384px] h-[600px] left-[361px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-[368px] h-[600px] left-[361px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {undecidedDriverReservationSampleData.map((reservation: UndecidedDriverReservation, index: number) => {
       const topPosition = index * 22;
       return (
-        <div key={reservation.id} className="w-[378px] h-5 left-0 absolute" style={{ top: `${topPosition}px` }}>
-          {reservation.hasOption5 && (
-            <div className="w-4 h-5 left-[346px] top-0 absolute border border-rose-300/60" />
-          )}
-          {reservation.hasOption4 && (
-            <div className="w-4 h-5 left-[330px] top-0 absolute border border-indigo-200/60" />
-          )}
-          {reservation.hasOption3 && (
-            <div className="w-4 h-5 left-[314px] top-0 absolute border border-rose-300/60" />
-          )}
-          {reservation.hasOption2 && (
-            <div className="w-4 h-5 left-[298px] top-0 absolute border border-indigo-200/60" />
-          )}
-          {reservation.hasOption1 && (
-            <div className="w-4 h-5 left-[282px] top-0 absolute border border-rose-300/60" />
-          )}
-          <div className="w-10 h-5 left-[242px] top-0 absolute border border-indigo-200/60" />
+        <div key={reservation.id} className={`w-[362px] h-5 left-0 absolute ${index % 2 === 1 ? 'bg-zinc-200' : 'bg-white'} ${index === 0 ? 'border-t border-zinc-400' : ''}`} style={{ top: `${topPosition}px` }}>
+          <div className="w-4 h-5 left-[346px] top-0 absolute border-r border-b border-zinc-400" />
+          <div className="w-4 h-5 left-[330px] top-0 absolute border-r border-b border-zinc-400" />
+          <div className="w-4 h-5 left-[314px] top-0 absolute border-r border-b border-zinc-400" />
+          <div className="w-4 h-5 left-[298px] top-0 absolute border-r border-b border-zinc-400" />
+          <div className="w-4 h-5 left-[282px] top-0 absolute border-r border-b border-zinc-400" />
+          <div className="w-10 h-5 left-[242px] top-0 absolute border-r border-b border-zinc-400" />
           <div className="w-3 left-[268px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">分</div>
           <div className="w-5 left-[246px] top-[2px] absolute text-right justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.timeTotal}</div>
-          <div className="w-8 h-5 left-[210px] top-0 absolute border border-neutral-300" />
+          <div className="w-8 h-5 left-[210px] top-0 absolute border-r border-b border-zinc-400" />
           <div className="w-6 left-[212px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.sColumn}</div>
+          <div className={`w-[20px] h-5 left-[40px] top-0 absolute border-r border-b border-zinc-400 ${reservation.isConfirmed ? 'bg-purple-300' : ''}`} />
           {reservation.isConfirmed && (
-            <>
-              <div className="w-[20px] h-5 left-[40px] top-0 absolute bg-purple-300 border border-neutral-300" />
-              <div className="w-3 left-[44px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">D</div>
-            </>
+            <div className="w-3 left-[44px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">D</div>
           )}
-          <div className="w-[70px] h-5 left-[140px] top-0 absolute bg-yellow-200 border border-rose-300/60" />
+          <div className="w-[70px] h-5 left-[140px] top-0 absolute bg-yellow-200 border-r border-b border-zinc-400" />
           <div className="w-[66px] left-[142px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.area} {reservation.hostessName}</div>
-          <div className="w-16 h-5 left-[60px] top-0 absolute border border-indigo-200/60" />
+          <div className="w-16 h-5 left-[60px] top-0 absolute border-r border-b border-zinc-400" />
           <div className="w-14 left-[63px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.pickupLocation}</div>
-          <div className="w-4 h-[20px] left-[124px] top-0 absolute bg-purple-300 border border-neutral-300"/>
-          <div className="w-10 h-5 left-0 top-0 absolute bg-purple-300" />
+          <div className="w-4 h-[20px] left-[124px] top-0 absolute bg-purple-300 border-r border-b border-zinc-400"/>
+          <div className="w-10 h-5 left-0 top-0 absolute bg-purple-300 border-r border-b border-zinc-400" />
           <div className="w-9 left-[3px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.departureTime}</div>
         </div>
       );
     })}
   </div>
   {/* メモ・引継事項　ドラ休憩 */}
-  <div className="w-[384px] h-5 left-[361px] top-[708px] absolute bg-fuchsia-300" />
-  <div className="w-[384px] left-[363px] top-[711px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">メモ・引継事項　ドラ休憩</div>
-  <div className="w-[384px] h-[338px] left-[361px] top-[728px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-[368px] h-5 left-[361px] top-[708px] absolute bg-fuchsia-300" />
+  <div className="w-[368px] left-[363px] top-[711px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">メモ・引継事項　ドラ休憩</div>
+  <div className="w-[368px] h-[338px] left-[361px] top-[728px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {memoItemSampleData.map((memo: MemoItem, index: number) => {
       const topPosition = index * 34;
       return (
-        <div key={memo.id} className="w-[378px] h-8 left-0 absolute" style={{ top: `${topPosition}px` }}>
+        <div key={memo.id} className="w-[362px] h-8 left-0 absolute" style={{ top: `${topPosition}px` }}>
           
-          <div className="w-[378px] h-8 left-0 top-0 absolute bg-zinc-300" />
+          <div className="w-[362px] h-8 left-0 top-0 absolute bg-zinc-300" />
           <button
             type="button"
             onClick={() => {
@@ -228,7 +216,7 @@ export default function Original() {
           >
             <Pen className="w-4 h-4 text-black" />
           </button>
-          <div className="w-[378px] h-8 left-0 top-0 absolute justify-center text-black text-[13px] font-normal font-['Inter']">
+          <div className="w-[362px] h-8 left-0 top-0 absolute justify-center text-black text-[13px] font-normal font-['Inter']">
             {memo.content.split('\n').map((line, i) => (
               <React.Fragment key={i}>
                 {line}
@@ -278,12 +266,12 @@ export default function Original() {
   </div>
 
   {/* OUTドラ未定予約リスト */}
-  <div className="w-[176px] h-5 left-[969px] top-[75px] absolute bg-lime-200" />
-  <div className="w-[176px] h-5 left-[969px] top-[77px] absolute flex items-center justify-center text-black text-[13px] font-normal font-['Inter'] whitespace-nowrap">OUTドラ未定・接客中リスト</div>
+  <div className="w-[176px] h-5 left-[961px] top-[75px] absolute bg-lime-200" />
+  <div className="w-[176px] h-5 left-[961px] top-[77px] absolute flex items-center justify-center text-black text-[13px] font-normal font-['Inter'] whitespace-nowrap">OUTドラ未定・接客中リスト</div>
 
   {/* ヘッダー行 */}
-  <div className="w-10 left-[745px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">開始</div>
-  <div className="w-[70px] left-[785px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">ホステス名</div>
+  <div className="w-10 left-[729px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">開始</div>
+  <div className="w-[70px] left-[769px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">ホステス名</div>
   <div className="w-10 left-[883px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">時間計</div>
   <div className="w-12 left-[923px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">開始</div>
   <div className="w-12 left-[971px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">終了</div>
@@ -291,96 +279,82 @@ export default function Original() {
   <div className="w-16 left-[1147px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">地域</div>
   <div className="w-10 left-[1211px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">INドラ</div>
   <div className="w-10 left-[1251px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">OUTドラ</div>
-  <div className="w-10 h-4 left-[1341px] top-[78px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">オプション</div>
-  <div className="w-10 h-4 left-[1325px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">カード</div>
-  <div className="w-10 h-4 left-[1311px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">着TEL</div>
-  <div className="w-10 h-4 left-[1293px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">待合せ</div>
-  <div className="w-10 h-4 left-[1277px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">領収書</div>
-  <div className="w-[634px] h-[880px] left-[745px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-10 h-4 left-[1355px] top-[78px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">オプション</div>
+  <div className="w-10 h-4 left-[1336px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">カード</div>
+  <div className="w-10 h-4 left-[1317px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">着TEL</div>
+  <div className="w-10 h-4 left-[1298px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">待合せ</div>
+  <div className="w-10 h-4 left-[1279px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">領収書</div>
+  <div className="w-[663px] h-[880px] left-[729px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {outDriverUndecidedSampleData.map((item: OutDriverUndecided, index: number) => (
-      <div key={item.id} className="w-[628px] h-6 left-0 absolute" style={{ top: `${index * 24}px` }}>
+      <div key={item.id} className={`w-[657px] h-6 left-0 absolute ${index % 2 === 1 ? 'bg-zinc-200' : 'bg-white'} ${index === 0 ? 'border-t border-zinc-400' : ''}`} style={{ top: `${index * 24}px` }}>
       <Button
         className="w-10 h-6 px-0.5 py-[1px] left-0 top-0 absolute rounded-[2px] bg-gradient-to-b from-white via-cyan-100 to-cyan-300 hover:from-white hover:via-cyan-200 hover:to-cyan-400 active:from-cyan-400 active:via-cyan-300 active:to-cyan-200 text-black text-[13px] font-normal font-['Inter'] border-2 border-t-white border-l-white border-r-zinc-600 border-b-zinc-600 shadow-[3px_3px_5px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.9)] active:shadow-none active:border-t-zinc-600 active:border-l-zinc-600 active:border-r-zinc-300 active:border-b-zinc-300 active:translate-x-[2px] active:translate-y-[2px] transition-transform duration-75"
         onClick={() => {}}
       >
         開始
       </Button>
-      <div className="w-[70px] h-6 left-[40px] top-0 absolute bg-yellow-200 border border-zinc-400" />
+      <div className="w-[70px] h-6 left-[40px] top-0 absolute bg-yellow-200 border-r border-b border-zinc-400" />
       <div className="w-[66px] left-[44px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.hostessName}</div>
-      <div className="w-[28px] h-6 left-[110px] top-0 absolute border border-zinc-400" />
-      <div className="w-[24px] left-[112px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{item.shopCode || ''}</div>
-      <div className="w-32 h-6 left-[274px] top-0 absolute border border-zinc-400" />
-      <div className="w-32 left-[276px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.destination}</div>
-      <div className="w-16 h-6 left-[402px] top-0 absolute border border-zinc-400" />
-      <div className="w-14 h-3.5 left-[406px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.station}</div>
+      <div className="w-[44px] h-6 left-[110px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-[40px] left-[112px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{item.shopCode || ''}</div>
+      <div className="w-32 h-6 left-[290px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-32 left-[292px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.destination}</div>
+      <div className="w-16 h-6 left-[418px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-14 h-3.5 left-[422px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.station}</div>
+      <div className={`w-10 h-6 left-[482px] top-0 absolute border-r border-b border-zinc-400 ${item.in_driver ? 'bg-yellow-200' : ''}`} />
       {item.in_driver && (
-        <div className="w-10 h-6 left-[466px] top-0 absolute bg-yellow-200 border border-zinc-400" />
+        <div className="w-9 left-[484px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.in_driver}</div>
       )}
-      {item.in_driver && (
-        <div className="w-9 left-[468px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.in_driver}</div>
-      )}
+      <div className={`w-10 h-6 left-[522px] top-0 absolute border-r border-b border-zinc-400 ${item.out_driver ? 'bg-yellow-200' : ''}`} />
       {item.out_driver && (
-        <div className="w-10 h-6 left-[506px] top-0 absolute bg-yellow-200 border border-zinc-400" />
+        <div className="w-9 left-[524px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.out_driver}</div>
       )}
-      {item.out_driver && (
-        <div className="w-9 left-[508px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.out_driver}</div>
-      )}
-      <div className="w-12 h-6 left-[226px] top-0 absolute border border-zinc-400" />
-      <div className="w-11 left-[228px] top-[3px] absolute text-center justify-end text-red-800 text-[13px] font-normal font-['Inter']">{item.arrivalTime}</div>
-      <div className="w-12 h-6 left-[178px] top-0 absolute border border-zinc-400" />
-      <div className="w-11 left-[180px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{item.pickupTime}</div>
-      <div className="w-10 h-6 left-[138px] top-0 absolute border border-zinc-400" />
-      <div className="w-3 left-[164px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">分</div>
-      <div className="w-5 left-[142px] top-[3px] absolute text-right justify-end text-black text-[13px] font-normal font-['Inter']">{item.timeTotal}</div>
-      {item.hasOption5 && (
-        <div className="w-4 h-6 left-[610px] top-0 absolute border border-zinc-400" />
-      )}
-      {item.hasOption4 && (
-        <div className="w-4 h-6 left-[594px] top-0 absolute border border-zinc-400" />
-      )}
-      {item.hasOption3 && (
-        <div className="w-4 h-6 left-[578px] top-0 absolute border border-zinc-400" />
-      )}
-      {item.hasOption2 && (
-        <div className="w-4 h-6 left-[562px] top-0 absolute border border-zinc-400" />
-      )}
-      {item.hasOption1 && (
-        <div className="w-4 h-6 left-[546px] top-0 absolute border border-zinc-400" />
-      )}
+      <div className="w-12 h-6 left-[242px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-11 left-[244px] top-[3px] absolute text-center justify-end text-red-800 text-[13px] font-normal font-['Inter']">{item.arrivalTime}</div>
+      <div className="w-12 h-6 left-[194px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-11 left-[196px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{item.pickupTime}</div>
+      <div className="w-10 h-6 left-[154px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-3 left-[180px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">分</div>
+      <div className="w-5 left-[158px] top-[3px] absolute text-right justify-end text-black text-[13px] font-normal font-['Inter']">{item.timeTotal}</div>
+      <div className="w-[19px] h-6 left-[638px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-[19px] h-6 left-[619px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-[19px] h-6 left-[600px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-[19px] h-6 left-[581px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-[19px] h-6 left-[562px] top-0 absolute border-r border-b border-zinc-400" />
       </div>
     ))}
   </div>
 
   {/* 終了リスト */}
-  <div className="w-[338px] h-5 left-[1379px] top-[75px] absolute bg-fuchsia-300" />
-  <div className="w-[338px] left-[1379px] top-[77px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">終了リスト</div>
-  <div className="w-[338px] h-[65px] left-[1379px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-[338px] h-5 left-[1392px] top-[75px] absolute bg-fuchsia-300" />
+  <div className="w-[338px] left-[1392px] top-[77px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">終了リスト</div>
+  <div className="w-[338px] h-[65px] left-[1392px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {completedListSampleData.map((item: CompletedList, index: number) => {
     const topPosition = index * 22;
     return (
-      <React.Fragment key={item.id}>
+      <div key={item.id} className={`w-[338px] h-5 absolute ${index % 2 === 1 ? 'bg-zinc-200' : 'bg-white'} ${index === 0 ? 'border-t border-zinc-400' : ''}`} style={{ left: 0, top: topPosition }}>
         {item.option1 && (
           <>
-            <div className="w-[54px] h-5 absolute bg-yellow-200 border border-indigo-200/60" style={{ left: 278, top: topPosition }} />
-            <div className="w-12 absolute justify-end text-black text-[13px] font-normal font-['Inter']" style={{ left: 280, top: topPosition + 2 }}>{item.option1}</div>
+            <div className="w-[54px] h-5 absolute bg-yellow-200 border-r border-b border-zinc-400" style={{ left: 278, top: 0 }} />
+            <div className="w-12 absolute justify-end text-black text-[13px] font-normal font-['Inter']" style={{ left: 280, top: 2 }}>{item.option1}</div>
           </>
         )}
-        <div className="w-[86px] h-5 absolute bg-yellow-200 border border-rose-300/60" style={{ left: 0, top: topPosition }} />
-        <div className="w-[82px] absolute justify-end text-black text-[13px] font-normal font-['Inter']" style={{ left: 2, top: topPosition + 2 }}>{item.hostessName}</div>
-        <div className="w-10 h-5 absolute border border-indigo-200/60" style={{ left: 126, top: topPosition }} />
-        <div className="w-9 absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']" style={{ left: 128, top: topPosition + 2 }}>{item.arrivalTime}</div>
-        <div className="w-10 h-5 absolute border border-rose-300/60" style={{ left: 86, top: topPosition }} />
-        <div className="w-9 absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']" style={{ left: 88, top: topPosition + 2 }}>{item.pickupTime}</div>
-        <div className="w-28 h-5 absolute border border-rose-300/60" style={{ left: 166, top: topPosition }} />
-        <div className="w-28 absolute justify-end text-black text-[13px] font-normal font-['Inter']" style={{ left: 169, top: topPosition + 2 }}>{item.destination}</div>
-      </React.Fragment>
+        <div className="w-[86px] h-5 absolute bg-yellow-200 border-r border-b border-zinc-400" style={{ left: 0, top: 0 }} />
+        <div className="w-[82px] absolute justify-end text-black text-[13px] font-normal font-['Inter']" style={{ left: 2, top: 2 }}>{item.hostessName}</div>
+        <div className="w-10 h-5 absolute border-r border-b border-zinc-400" style={{ left: 126, top: 0 }} />
+        <div className="w-9 absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']" style={{ left: 128, top: 2 }}>{item.arrivalTime}</div>
+        <div className="w-10 h-5 absolute border-r border-b border-zinc-400" style={{ left: 86, top: 0 }} />
+        <div className="w-9 absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']" style={{ left: 88, top: 2 }}>{item.pickupTime}</div>
+        <div className="w-28 h-5 absolute border-r border-b border-zinc-400" style={{ left: 166, top: 0 }} />
+        <div className="w-28 absolute justify-end text-black text-[13px] font-normal font-['Inter']" style={{ left: 169, top: 2 }}>{item.destination}</div>
+      </div>
     );
     })}
   </div>
   
-  <div className="w-[172px] h-5 left-[1551px] top-[517px] absolute bg-yellow-200" />
-  <div className="w-[172px] left-[1551px] top-[519px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">精算告知済　ドライバー</div>
-  <div className="w-[172px] h-[176px] left-[1551px] top-[537px] absolute outline outline-1 outline-offset-[-1px] outline-rose-300/60 overflow-y-auto">
+  <div className="w-[172px] h-5 left-[1564px] top-[517px] absolute bg-yellow-200" />
+  <div className="w-[172px] left-[1564px] top-[519px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">精算告知済　ドライバー</div>
+  <div className="w-[172px] h-[176px] left-[1564px] top-[537px] absolute outline outline-1 outline-offset-[-1px] outline-rose-300/60 overflow-y-auto">
     <div className="w-[172px] h-5 left-0 top-0 absolute bg-zinc-300" />
     <div className="w-[172px] h-5 left-0 top-[20px] absolute bg-zinc-300" />
     <div className="w-[172px] h-5 left-0 top-[40px] absolute bg-zinc-300" />
@@ -389,9 +363,9 @@ export default function Original() {
   </div>
 
 
-  <div className="w-[172px] h-5 left-[1379px] top-[713px] absolute bg-yellow-200" />
-  <div className="w-[172px] left-[1379px] top-[715px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">南IC待機　ドライバー</div>
-  <div className="w-[172px] h-44 left-[1379px] top-[733px] absolute outline outline-1 outline-offset-[-1px] outline-rose-300/60 overflow-y-auto">
+  <div className="w-[172px] h-5 left-[1392px] top-[713px] absolute bg-yellow-200" />
+  <div className="w-[172px] left-[1392px] top-[715px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">南IC待機　ドライバー</div>
+  <div className="w-[172px] h-44 left-[1392px] top-[733px] absolute outline outline-1 outline-offset-[-1px] outline-rose-300/60 overflow-y-auto">
     <div className="w-[172px] h-5 left-0 top-0 absolute bg-zinc-300" />
     <div className="w-[172px] h-5 left-0 top-[20px] absolute bg-zinc-300" />
     <div className="w-[172px] h-5 left-0 top-[40px] absolute bg-zinc-300" />
@@ -405,29 +379,29 @@ export default function Original() {
 
 
   {/* 南IC事務所　待機 */}
-  <div className="w-[172px] h-5 left-[1379px] top-[173px] absolute bg-cyan-100" />
-  <div className="w-[172px] left-[1379px] top-[175px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">南IC事務所　待機</div>
-  <div className="w-[172px] h-[520px] left-[1379px] top-[193px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-[172px] h-5 left-[1392px] top-[173px] absolute bg-cyan-100" />
+  <div className="w-[172px] left-[1392px] top-[175px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">南IC事務所　待機</div>
+  <div className="w-[172px] h-[520px] left-[1392px] top-[193px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {officeWaitingSampleData.map((item: OfficeWaiting, index: number) => {
       const topPosition = index * 22;
       return (
-        <React.Fragment key={item.id}>
-          <div className="w-[18px] h-5 left-[148px] absolute border border-rose-300/60" style={{ top: `${topPosition}px` }} />
-          <div className="w-[18px] h-5 left-[130px] absolute border border-rose-300/60" style={{ top: `${topPosition}px` }} />
-          <div className="w-[18px] h-5 left-[112px] absolute border border-rose-300/60" style={{ top: `${topPosition}px` }} />
-          <div className="w-[70px] h-5 left-0 absolute bg-yellow-200 border border-rose-300/60" style={{ top: `${topPosition}px` }} />
-          <div className="w-16 left-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']" style={{ top: `${topPosition + 2}px` }}>{item.hostessName}</div>
-          <div className="w-[42px] h-5 left-[70px] absolute border border-rose-300/60" style={{ top: `${topPosition}px` }} />
-          <div className="w-9 left-[73px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']" style={{ top: `${topPosition + 2}px` }}>{item.departureTime}</div>
-        </React.Fragment>
+        <div key={item.id} className={`w-[172px] h-5 left-0 absolute ${index % 2 === 1 ? 'bg-zinc-200' : 'bg-white'} ${index === 0 ? 'border-t border-zinc-400' : ''}`} style={{ top: `${topPosition}px` }}>
+          <div className="w-[18px] h-5 left-[148px] absolute border-r border-b border-zinc-400" style={{ top: 0 }} />
+          <div className="w-[18px] h-5 left-[130px] absolute border-r border-b border-zinc-400" style={{ top: 0 }} />
+          <div className="w-[18px] h-5 left-[112px] absolute border-r border-b border-zinc-400" style={{ top: 0 }} />
+          <div className="w-[70px] h-5 left-0 absolute bg-yellow-200 border-r border-b border-zinc-400" style={{ top: 0 }} />
+          <div className="w-16 left-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']" style={{ top: 2 }}>{item.hostessName}</div>
+          <div className="w-[42px] h-5 left-[70px] absolute border-r border-b border-zinc-400" style={{ top: 0 }} />
+          <div className="w-9 left-[73px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']" style={{ top: 2 }}>{item.departureTime}</div>
+        </div>
       );
     })}
   </div>
   
   {/* FGCS　他撮影中 */}
-  <div className="w-[172px] h-5 left-[1551px] top-[173px] absolute bg-fuchsia-300" />
-  <div className="w-[172px] left-[1551px] top-[175px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">FGCS　他撮影中</div>
-  <div className="w-[172px] h-[64px] left-[1551px] top-[193px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-[172px] h-5 left-[1564px] top-[173px] absolute bg-fuchsia-300" />
+  <div className="w-[172px] left-[1564px] top-[175px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">FGCS　他撮影中</div>
+  <div className="w-[172px] h-[64px] left-[1564px] top-[193px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {shootingSampleData.map((item: Shooting, index: number) => {
       const topPosition = index * 22;
       return (
@@ -445,9 +419,9 @@ export default function Original() {
   </div>
 
   {/* 南IC徒歩派遣or仮置き */}
-  <div className="w-[172px] h-5 left-[1551px] top-[257px] absolute bg-cyan-100" />
-  <div className="w-[172px] h-5 left-[1551px] top-[259px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">南IC徒歩派遣or仮置き</div>
-  <div className="w-[172px] h-60 left-[1551px] top-[277px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-[172px] h-5 left-[1564px] top-[257px] absolute bg-cyan-100" />
+  <div className="w-[172px] h-5 left-[1564px] top-[259px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">南IC徒歩派遣or仮置き</div>
+  <div className="w-[172px] h-60 left-[1564px] top-[277px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {walkingDispatchSampleData.map((item: WalkingDispatch, index: number) => {
       const topPosition = index * 22;
       return (
@@ -471,11 +445,11 @@ export default function Original() {
 
   {/* 帰宅ホステス */}
 
-  <div className="w-[240px] h-5 left-[1723px] top-[568px] absolute bg-cyan-100" />
-  <div className="w-[240px] left-[1723px] top-[570px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">帰宅ホステス</div>
-  <div className="w-[240px] h-5 left-[1723px] top-[588px] absolute bg-yellow-200" />
-  <div className="w-[240px] left-[1723px] top-[590px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">自宅or寮　待機</div>
-  <div className="w-[240px] h-[105px] left-[1723px] top-[608px] absolute outline outline-1 outline-offset-[-1px] outline-rose-300/60 overflow-y-auto">
+  <div className="w-[240px] h-5 left-[1736px] top-[568px] absolute bg-cyan-100" />
+  <div className="w-[240px] left-[1736px] top-[570px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">帰宅ホステス</div>
+  <div className="w-[240px] h-5 left-[1736px] top-[588px] absolute bg-yellow-200" />
+  <div className="w-[240px] left-[1736px] top-[590px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">自宅or寮　待機</div>
+  <div className="w-[240px] h-[105px] left-[1736px] top-[608px] absolute outline outline-1 outline-offset-[-1px] outline-rose-300/60 overflow-y-auto">
     {returningHostessSampleData.map((item: ReturningHostess, index: number) => {
       const topPosition = index * 22;
       return (
@@ -489,15 +463,15 @@ export default function Original() {
   </div>
 
   {/* ホステス送り・帰宅 */}
-  <div className="w-[249px] h-5 left-[1723px] top-[75px] absolute bg-yellow-200" />
-  <div className="w-[249px] left-[1723px] top-[77px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">ホステス送り・帰宅</div>
-  <div className="w-5 left-[1723px] top-[96px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">荷物</div>
+  <div className="w-[249px] h-5 left-[1736px] top-[75px] absolute bg-yellow-200" />
+  <div className="w-[249px] left-[1736px] top-[77px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">ホステス送り・帰宅</div>
+  <div className="w-5 left-[1736px] top-[96px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">荷物</div>
   <div className="w-[42px] left-[1797px] top-[96px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">終了</div>
   <div className="w-[42px] left-[1839px] top-[96px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">帰宅</div>
   <div className="w-[19px] left-[1947px] top-[96px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">件数</div>
   <div className="w-[54px] left-[1739px] top-[96px] absolute justify-end text-black text-center text-[8px] font-normal font-['Inter']">ホステス名</div>
   <div className="w-[66px] left-[1879px] top-[96px] absolute justify-end text-black text-[8px] text-center font-normal font-['Inter']">送り場所</div>
-  <div className="w-[249px] h-[460px] left-[1723px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto overflow-y-hidden">
+  <div className="w-[249px] h-[460px] left-[1736px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto overflow-y-hidden">
     {hostessTransportSampleData.map((item: HostessTransport, index: number) => {
       const topPosition = index * 22;
       return (
@@ -522,9 +496,9 @@ export default function Original() {
   
   
   {/* 予定(打ち合わせ・撮影など) */}
-  <div className="w-[406px] h-5 left-[1551px] top-[713px] absolute bg-purple-300" />
-  <div className="w-[406px] left-[1551px] top-[715px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">予定(打ち合わせ・撮影など)</div>
-  <div className="w-[406px] h-[100px] left-[1551px] top-[733px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-[406px] h-5 left-[1564px] top-[713px] absolute bg-purple-300" />
+  <div className="w-[406px] left-[1564px] top-[715px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">予定(打ち合わせ・撮影など)</div>
+  <div className="w-[406px] h-[100px] left-[1564px] top-[733px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {scheduleItemSampleData.map((item: ScheduleItem, index: number) => {
       const topPosition = index * 34;
       return (
@@ -550,7 +524,7 @@ export default function Original() {
 
   {/* ドライバ配車パネル */}
   <Button
-    className="w-[172px] h-20 left-[1379px] top-[833px] absolute bg-rose-300/60 hover:bg-rose-400/60 text-black text-[13px] font-normal font-['Inter']"
+    className="w-[172px] h-20 left-[1392px] top-[833px] absolute bg-rose-300/60 hover:bg-rose-400/60 text-black text-[13px] font-normal font-['Inter']"
     onClick={() => {
       window.open('/dispatch-panel-2d-sub', 'driverDispatchPanel', 'width=1920,height=1080,menubar=no,toolbar=no,location=no,status=no');
     }}
@@ -560,9 +534,9 @@ export default function Original() {
 
 
   {/* 面接予定 */}
-  <div className="w-[406px] h-5 left-[1551px] top-[833px] absolute bg-rose-300/60" />
-  <div className="w-[406px] left-[1551px] top-[835px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">面接予定</div>
-  <div className="w-[406px] h-[130px] left-[1551px] top-[853px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+  <div className="w-[406px] h-5 left-[1564px] top-[833px] absolute bg-rose-300/60" />
+  <div className="w-[406px] left-[1564px] top-[835px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">面接予定</div>
+  <div className="w-[406px] h-[130px] left-[1564px] top-[853px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {driverDispatchPanelSampleData.map((item: DriverDispatchPanel, index: number) => {
       const topPosition = index * 22;
       return (
