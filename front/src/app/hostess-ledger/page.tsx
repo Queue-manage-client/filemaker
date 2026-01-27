@@ -38,7 +38,7 @@ export default function HostessLedgerPage() {
         {/* 左ブロック (6) */}
         <div className="w-[60%] flex flex-col gap-4">
           {/* 上ブロック (2) - ホステス基本情報フォーム */}
-          <div className="h-[20%] border border-lime-500 bg-gray-100 p-1 text-[11px] flex">
+          <div className="h-[20%] border border-black bg-gray-100 p-1 text-[11px] flex">
             {/* 左側フォーム部分 */}
             <div className="flex-1 leading-tight">
               {/* 1行目 */}
