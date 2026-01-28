@@ -42,9 +42,9 @@ export default function HostessLedgerPage() {
             <div className="flex-1 leading-tight">
               {/* 1行目 */}
               <div className="flex items-center mb-px">
-                <span className="text-red-600 font-bold w-[38px]">HSNo</span>
+                <span className="font-bold w-[58px]">HSNo</span>
                 <input type="text" className="w-[36px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400" defaultValue="305" />
-                <span className="text-red-600 font-bold ml-1">在職</span>
+                <span className="font-bold ml-1">在職</span>
                 <label className="flex items-center ml-1">
                   <input type="radio" name="status" checked={employmentStatus === 'active'} onChange={() => setEmploymentStatus('active')} className="w-3 h-3" />
                   <span className="ml-px">在職</span>
@@ -58,31 +58,36 @@ export default function HostessLedgerPage() {
                   <span className="ml-px">併用</span>
                 </label>
                 <div className="w-px h-4 bg-gray-400 mx-2" />
-                <span className="text-red-600 font-bold">星数</span>
+                <span className="font-bold">星数</span>
                 <input type="text" className="w-[24px] h-[18px] text-[11px] px-0.5 bg-yellow-200 border border-gray-400 ml-1" defaultValue="2" />
                 <div className="w-px h-4 bg-gray-400 mx-2" />
-                <span>入店日</span>
-                <input type="text" className="w-[70px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400 ml-1" />
-                <span className="text-red-600 font-bold ml-2">退職訂正</span>
-                <button type="button" className="h-[18px] px-1.5 text-[10px] bg-gray-200 hover:bg-gray-300 text-black border border-gray-400 ml-2">Web管理確認</button>
-                <button type="button" className="h-[18px] px-1.5 text-[10px] bg-gray-200 hover:bg-gray-300 text-black border border-gray-400 ml-1">Webページ</button>
+                <div className="flex flex-col leading-tight">
+                  <div className="flex items-center">
+                    <span>入店日</span>
+                    <input type="text" className="w-[70px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400 ml-1" />
+                  </div>
+                  <div className="flex items-center">
+                    <span>退職日</span>
+                    <input type="text" className="w-[70px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400 ml-1" />
+                  </div>
+                </div>
+                <span className="font-bold ml-2">退職訂正</span>
+                <div className="flex flex-col ml-2 gap-px">
+                  <button type="button" className="h-[18px] px-1.5 text-[10px] bg-gray-200 hover:bg-gray-300 text-black border border-gray-400">Web管理確認</button>
+                  <button type="button" className="h-[18px] px-1.5 text-[10px] bg-gray-200 hover:bg-gray-300 text-black border border-gray-400">Webページ</button>
+                </div>
               </div>
 
               {/* 2行目 */}
               <div className="flex items-start mb-px">
-                <span className="text-red-600 font-bold w-[38px]">在籍店舗</span>
+                <span className="font-bold w-[58px]">在籍店舗</span>
                 <input type="text" className="w-[24px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400" defaultValue="8" />
                 <input type="text" className="w-[50px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400 ml-px" defaultValue="FIRST" />
                 {/* 連絡方法ブロック（2行構成） */}
-                <div className="flex flex-col ml-4 leading-tight">
+                <div className="flex flex-col ml-[148px] leading-tight">
                   <span>連絡方法</span>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="w-3 h-3 border-gray-400" />
-                    <span className="ml-px">出確なしの場合</span>
-                  </label>
+                  <span>出確なしの場合</span>
                 </div>
-                <span className="ml-4">退職日</span>
-                <input type="text" className="w-[70px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400 ml-1" />
                 <label className="flex items-center ml-3">
                   <input type="checkbox" className="w-3 h-3 border-gray-400" />
                 </label>
@@ -91,13 +96,13 @@ export default function HostessLedgerPage() {
 
               {/* 3行目 */}
               <div className="flex items-center mb-px">
-                <span className="text-red-600 font-bold w-[38px]">ふりがな</span>
-                <input type="text" className="w-[50px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400" defaultValue="めぐる" />
+                <span className="font-bold w-[58px]">ふりがな</span>
+                <input type="text" className="w-[80px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400" defaultValue="めぐる" />
                 <label className="flex items-center ml-3 bg-yellow-200 px-1 border border-yellow-400">
                   <input type="checkbox" className="w-3 h-3" />
                   <span className="ml-px text-red-600 font-bold">帰宅厳守</span>
                 </label>
-                <label className="flex items-center ml-1 bg-pink-200 px-1 border border-pink-300">
+                <label className="flex items-center ml-[62px] bg-pink-200 px-1 border border-pink-300">
                   <input type="checkbox" className="w-3 h-3" />
                   <span className="ml-px">電話</span>
                 </label>
@@ -118,27 +123,31 @@ export default function HostessLedgerPage() {
 
               {/* 4行目 */}
               <div className="flex items-center mb-px">
-                <span className="text-red-600 font-bold w-[38px]">店内名</span>
-                <input type="text" className="w-[60px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400" />
+                <span className="font-bold w-[58px]">店内名</span>
+                <input type="text" className="w-[80px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400" />
                 <label className="flex items-center ml-2 border border-gray-400 px-1 bg-white">
                   <input type="checkbox" className="w-3 h-3" />
                   <span className="ml-px">主</span>
                 </label>
                 <span className="ml-1">主HSNo</span>
                 <input type="text" className="w-[50px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400 ml-1" />
-                <span className="ml-2">上記以外の場合</span>
-                <label className="flex items-center ml-1 bg-pink-200 px-1 border border-pink-300">
-                  <input type="checkbox" className="w-3 h-3" />
-                  <span className="ml-px">電話</span>
-                </label>
-                <label className="flex items-center ml-px bg-pink-200 px-1 border border-pink-300">
-                  <input type="checkbox" className="w-3 h-3" />
-                  <span className="ml-px">ライン</span>
-                </label>
-                <label className="flex items-center ml-px bg-pink-200 px-1 border border-pink-300">
-                  <input type="checkbox" className="w-3 h-3" />
-                  <span className="ml-px">メール</span>
-                </label>
+                <div className="flex flex-col leading-tight">
+                  <span>上記以外の場合</span>
+                  <div className="flex">
+                    <label className="flex items-center bg-pink-200 px-1 border border-pink-300">
+                      <input type="checkbox" className="w-3 h-3" />
+                      <span className="ml-px">電話</span>
+                    </label>
+                    <label className="flex items-center ml-px bg-pink-200 px-1 border border-pink-300">
+                      <input type="checkbox" className="w-3 h-3" />
+                      <span className="ml-px">ライン</span>
+                    </label>
+                    <label className="flex items-center ml-px bg-pink-200 px-1 border border-pink-300">
+                      <input type="checkbox" className="w-3 h-3" />
+                      <span className="ml-px">メール</span>
+                    </label>
+                  </div>
+                </div>
                 <span className="ml-2">安井掛け持ち</span>
                 <label className="flex items-center ml-1">
                   <input type="checkbox" className="w-3 h-3" />
@@ -148,8 +157,8 @@ export default function HostessLedgerPage() {
 
               {/* 5行目 */}
               <div className="flex items-center mb-px">
-                <span className="text-red-600 font-bold w-[38px]">旧店内名</span>
-                <input type="text" className="w-[60px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400" />
+                <span className="font-bold w-[58px]">旧店内名</span>
+                <input type="text" className="w-[80px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400" />
                 <label className="flex items-center ml-2 border border-gray-400 px-1 bg-white">
                   <input type="checkbox" className="w-3 h-3" />
                   <span className="ml-px">副</span>
@@ -158,14 +167,14 @@ export default function HostessLedgerPage() {
 
               {/* 6行目 */}
               <div className="flex items-center">
-                <span className="text-red-600 font-bold w-[38px]">所属事務所</span>
-                <input type="text" className="w-[60px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400" />
-                <span className="ml-2 bg-pink-300 px-1 text-red-600 font-bold border border-pink-400">GM区分</span>
+                <span className="font-bold w-[58px]">所属事務所</span>
+                <input type="text" className="w-[80px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400" />
+                <span className="ml-2 text-orange-500 font-bold">GM区分</span>
                 <input type="text" className="w-[40px] h-[18px] text-[11px] px-0.5 bg-yellow-200 border border-gray-400" defaultValue="ミセス" />
-                <span className="bg-red-500 text-white px-1 font-bold">コース種</span>
-                <input type="text" className="w-[60px] h-[18px] text-[11px] px-0.5 bg-lime-300 border border-gray-400" defaultValue="Standard" />
-                <span className="bg-pink-300 px-1 font-bold border border-pink-400">種別</span>
-                <input type="text" className="w-[30px] h-[18px] text-[11px] px-0.5 bg-white border border-gray-400" />
+                <span className="text-orange-500 font-bold">コース種</span>
+                <input type="text" className="w-[60px] h-[18px] text-[11px] px-0.5 bg-yellow-200 border border-gray-400" defaultValue="Standard" />
+                <span className="text-orange-500 font-bold">種別</span>
+                <input type="text" className="w-[30px] h-[18px] text-[11px] px-0.5 bg-yellow-200 border border-gray-400" />
                 <span className="font-bold ml-1">Web:</span>
                 <span className="ml-2">メンエス掛け持ち</span>
                 <label className="flex items-center ml-1">
