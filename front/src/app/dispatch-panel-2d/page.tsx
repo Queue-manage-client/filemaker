@@ -325,6 +325,11 @@ export default function Original() {
   {/* 終了リスト */}
   <div className="w-[338px] h-5 left-[1392px] top-[75px] absolute bg-fuchsia-300" />
   <div className="w-[338px] left-[1392px] top-[77px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">終了リスト</div>
+  {/* コラムヘッダー */}
+  <div className="w-[86px] left-[1392px] top-[95px] absolute text-center text-black text-[8px] font-normal font-['Inter']">ホステス名</div>
+  <div className="w-10 left-[1518px] top-[95px] absolute text-center text-black text-[8px] font-normal font-['Inter']">終了</div>
+  <div className="w-28 left-[1558px] top-[95px] absolute text-center text-black text-[8px] font-normal font-['Inter']">場所</div>
+  <div className="w-[54px] left-[1670px] top-[95px] absolute text-center text-black text-[8px] font-normal font-['Inter']">OUTドラ</div>
   <div className="w-[338px] h-[65px] left-[1392px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {completedListSampleData.map((item: CompletedList, index: number) => {
     const topPosition = index * 22;
