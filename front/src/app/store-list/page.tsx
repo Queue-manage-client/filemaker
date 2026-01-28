@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Edit3, Search, Plus, Download } from "lucide-react";
 import { useStoreList } from '@/hooks/use-store';
-import { StoreBasicInfo } from '@/types';
 
 export default function StoreList() {
   const router = useRouter();
@@ -32,7 +31,7 @@ export default function StoreList() {
     );
   }, [stores, searchQuery]);
 
-  const formatDate = (dateString?: string) => {
+  const _formatDate = (dateString?: string) => {
     if (!dateString) return '-';
     const date = new Date(dateString);
     return date.toLocaleDateString('ja-JP');

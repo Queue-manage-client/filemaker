@@ -5,7 +5,7 @@ import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { ArrowLeft, DollarSign, Download, Plus } from "lucide-react";
+import { ArrowLeft, DollarSign, Plus } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -276,7 +276,7 @@ export default function ExpenseSlip() {
                             transfer: '振込',
                             other: 'その他',
                           };
-                          const categoryLabels = {
+                          const _categoryLabels = {
                             fuel: '燃料費',
                             maintenance: '車両維持費',
                             insurance: '保険料',

@@ -5,7 +5,6 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { accountingService } from '@/services/accounting-service';
-import { AccountingSummary, IncomeSlip, ExpenseSlip, SalesSlip } from '@/types/accounting';
 
 // クエリキー定数
 const QUERY_KEYS = {

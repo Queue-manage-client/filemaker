@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Search, Plus, Download } from "lucide-react";
-import type { StaffLedgerRecord } from '@/types';
 import {
   JOB_TYPE_LABELS,
   ROLE_LABELS,
@@ -108,9 +107,8 @@ export default function StaffLedger() {
       const url = `/staff-ledger/${id}`;
       const features = 'noopener,noreferrer,width=1280,height=900,scrollbars=yes,resizable=yes';
       window.open(url, `staffDetail_${id}`, features);
-    } catch (error) {
+    } catch {
       // UI_001: 新規ウィンドウオープン失敗（個人情報非出力）
-      console.error('UI_001: failed to open staff detail window');
     }
   };
 

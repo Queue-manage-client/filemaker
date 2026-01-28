@@ -26,7 +26,7 @@ export default function HotelNewPage() {
       // 入力値の確認（保存処理は未実装）
       // TODO: API 作成時に DTO + zod バリデーションを実装
       alert('保存処理は未実装です。入力内容はこのウィンドウ専用です。');
-    } catch (_) {
+    } catch {
       // UI_002: 保存処理に失敗（未実装）
     }
   };
@@ -34,7 +34,7 @@ export default function HotelNewPage() {
   const handleCancel = () => {
     try {
       window.close();
-    } catch (_) {
+    } catch {
       // UI_003: ウィンドウを閉じられませんでした
     }
   };

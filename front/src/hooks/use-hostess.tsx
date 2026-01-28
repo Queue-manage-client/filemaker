@@ -5,7 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { hostessService } from '@/services/hostess-service';
-import { HostessLedger, HostessRanking, HostessManager } from '@/types/hostess';
+import { HostessLedger } from '@/types/hostess';
 import { HostessScheduleData } from '@/types/hostess';
 
 // クエリキー定数
@@ -117,7 +117,7 @@ export function useUpdateHostessSchedule() {
   return useMutation({
     mutationFn: ({ id, schedule }: { id: string; schedule: Partial<HostessScheduleData> }) =>
       hostessService.updateHostessSchedule(id, schedule),
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.HOSTESS_SCHEDULES],
       });

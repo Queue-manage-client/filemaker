@@ -5,7 +5,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { customerPointsService } from '@/services/customer-points-service';
-import { CustomerPoints, PointTransaction } from '@/types/customer';
 
 // クエリキー定数
 const QUERY_KEYS = {

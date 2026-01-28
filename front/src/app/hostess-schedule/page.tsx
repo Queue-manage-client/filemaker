@@ -278,7 +278,7 @@ const calculateWorkMinutes = (hostess: HostessTimelineData): number => {
   if (hostess.isOff || !hostess.workStartTime || !hostess.workEndTime) return 0;
   const [startH, startM] = hostess.workStartTime.split(':').map(Number);
   const [endH, endM] = hostess.workEndTime.split(':').map(Number);
-  let startMinutes = startH * 60 + startM;
+  const startMinutes = startH * 60 + startM;
   let endMinutes = endH * 60 + endM;
   // 深夜をまたぐ場合
   if (endMinutes < startMinutes) {
@@ -493,7 +493,7 @@ export default function HostessSchedule() {
       const bar = editingBars.get(showSaveConfirm);
       if (bar) {
         // ここで実際のAPI保存処理を行う（今は状態管理のみ）
-        console.log('保存:', bar);
+        // console.log('保存:', bar);
         // 保存後は編集状態を解除
         const newMap = new Map(editingBars);
         newMap.delete(showSaveConfirm);
@@ -568,7 +568,6 @@ export default function HostessSchedule() {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDragging, dragType, dragBarId, dragStartX, dragStartBarLeft, dragStartBarWidth, editingBars]);
 
   return (
@@ -800,7 +799,7 @@ export default function HostessSchedule() {
                   {/* 予約バー（既存） */}
                   {hostess.reservations.map((reservation) => {
                     const barId = reservation.id;
-                    const isEditing = editingBars.has(barId);
+                    const _isEditing = editingBars.has(barId);
                     const isActiveEdit = activeEditBarId === barId;
                     const editBar = editingBars.get(barId);
 

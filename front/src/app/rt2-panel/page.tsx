@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, ChevronLeft, ArrowUpDown, Check, Star } from "lucide-react";
 import type { TodayCastData } from '@/types';
 import { sampleCastData } from '@/data/castSampleData';
@@ -118,6 +118,7 @@ export default function RT2Panel() {
 
       return sortOrder === 'asc' ? comparison : -comparison;
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortKey, sortOrder, filterManager, filterWorkStyle, filterStore]);
 
 

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, ChevronLeft, ChevronRight, Search, Calendar, Users, FileText, Calculator, BookOpen } from "lucide-react";
-import type { EmployeeWeeklyShift, ShiftType } from '@/types/employee';
+import type { ShiftType } from '@/types/employee';
 import { shiftTypeSettings } from '@/types/employee';
 import { sampleEmployeeWeeklyShifts } from '@/data/employeeSampleData';
 import { useEmployeeWeeklyShifts } from '@/hooks/use-employee';

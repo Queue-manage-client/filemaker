@@ -5,7 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { employeeService } from '@/services/employee-service';
-import { EmployeeSalary, PartTimeSalary, EmployeeWeeklyShift } from '@/types/employee';
+import { EmployeeWeeklyShift } from '@/types/employee';
 
 // クエリキー定数
 const QUERY_KEYS = {

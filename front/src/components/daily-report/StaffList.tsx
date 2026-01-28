@@ -1,5 +1,5 @@
 import React from 'react';
-import { Staff, EMPLOYMENT_TYPE_LABELS } from '@/types/staff';
+import { EMPLOYMENT_TYPE_LABELS } from '@/types/staff';
 import type { StaffListItemProps, StaffListProps } from '@/types/staff-list';
 
 /**

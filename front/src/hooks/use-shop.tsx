@@ -5,7 +5,6 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { shopService } from '@/services/shop-service';
-import { Shop } from '@/types/shop';
 
 // クエリキー定数
 const QUERY_KEYS = {

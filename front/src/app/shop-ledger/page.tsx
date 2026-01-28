@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Search, Plus, Download, Building } from "lucide-react";
-import { Shop } from '@/types/shop';
 import { useShopList } from '@/hooks/use-shop';
 
 export default function ShopLedger() {
@@ -68,7 +67,7 @@ export default function ShopLedger() {
     }
   };
 
-  const formatExtensionStyle = (style: string | null) => {
+  const _formatExtensionStyle = (style: string | null) => {
     if (!style) return '-';
     switch (style) {
       case 'fixed_rate':
@@ -127,8 +126,8 @@ export default function ShopLedger() {
       const url = `/shop-ledger/${id}`;
       const features = 'noopener,noreferrer,width=1280,height=900,scrollbars=yes,resizable=yes';
       window.open(url, `shopDetail_${id}`, features);
-    } catch (error) {
-      console.error('UI_001: failed to open shop detail window');
+    } catch {
+      // UI_001: failed to open shop detail window
     }
   };
 

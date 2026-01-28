@@ -146,7 +146,7 @@ export default function StoreLedger() {
         setActiveTab(nonAdminTab.id);
       }
     }
-  }, [isAdminMode, activeTab]);
+  }, [isAdminMode, activeTab, setActiveTab]);
 
   // 店舗一覧取得
   const { data: storeBasicInfoList } = useStoreBasicInfo();

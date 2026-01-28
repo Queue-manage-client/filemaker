@@ -6,7 +6,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { customerService } from '@/services/customer-service';
 import { Customer } from '@/types';
-import { Vehicle, UsageHistory } from '@/types/customer-ledger';
 
 // クエリキー定数
 const QUERY_KEYS = {

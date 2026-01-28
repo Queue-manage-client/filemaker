@@ -255,7 +255,7 @@ export default function HostessRanking() {
       years.push(y);
     }
     return years;
-  }, []);
+  }, [currentDate]);
 
   // 月のオプション生成
   const monthOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];

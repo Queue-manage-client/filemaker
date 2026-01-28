@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AttendingStaff, AttendingHostess, EMPLOYMENT_TYPE_LABELS } from '@/types/attendance';
+import { EMPLOYMENT_TYPE_LABELS } from '@/types/attendance';
 import type { AttendingStaffItemProps, AttendingHostessItemProps, AttendanceTabProps } from '@/types/attendance-tab';
 
 /**

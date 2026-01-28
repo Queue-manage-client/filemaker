@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Search, Plus, Download } from "lucide-react";
-import type { InterviewRecord, InterviewProgress } from '@/types';
+import type { InterviewRecord } from '@/types';
 import { INTERVIEW_TYPE_LABELS, INTERVIEW_RESULT_LABELS, EMPLOYMENT_STATUS_LABELS, INTERVIEW_PROGRESS_LABELS } from '@/types';
 import { interviewSampleData } from '@/data/interviewSampleData';
 

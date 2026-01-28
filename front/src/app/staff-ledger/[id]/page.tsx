@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -22,7 +22,6 @@ import {
   EMPLOYMENT_TYPE_LABELS,
   JOB_TYPE_LABELS,
   ROLE_LABELS,
-  STAFF_EMPLOYMENT_STATUS_LABELS,
 } from '@/types';
 
 type StaffDetailPageProps = {
@@ -196,9 +195,8 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
           }
         });
         setSchedule(applySchedule);
-      } catch (e) {
-        // 取得失敗時は初期値のまま
-        console.error('UI_002: staff detail fetch failed');
+      } catch {
+        // UI_002: 取得失敗時は初期値のまま
       }
     };
     fetchDetail();
@@ -732,7 +730,7 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
                     ))}
                   </tr>
                   <tr>
-                    {orderedDays.map((day, idx) => (
+                    {orderedDays.map((day) => (
                       <td key={day} className="border border-gray-300 px-2 py-2">
                         <Button variant="outline" size="sm" className="w-full">データ表示</Button>
                       </td>

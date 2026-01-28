@@ -198,7 +198,7 @@ export default function HotelPage() {
               onClick={() => {
                 try {
                   window.open('/hotel/new', 'hotel-new', 'width=900,height=700,noopener,noreferrer');
-                } catch (_) {
+                } catch {
                   // UI_001: 新規ウィンドウを開けませんでした
                 }
               }}

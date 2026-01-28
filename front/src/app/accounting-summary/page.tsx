@@ -5,9 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, BarChart3, Download, TrendingUp, TrendingDown } from "lucide-react";
+import { ArrowLeft, BarChart3, Download } from "lucide-react";
 import { useAccountingSummary } from '@/hooks/use-accounting';
-import { AccountingSummary } from '@/types/accounting';
 
 export default function AccountingSummaryPage() {
   const router = useRouter();

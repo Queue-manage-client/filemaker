@@ -7,10 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { FileText, User2, ArrowLeft, Pen } from "lucide-react";
-import { Customer, STORE_MAPPING } from '@/types';
+import { Customer } from '@/types';
 import type { Vehicle, UsageHistory, PreferenceForm, ReceiptForm, PetOption, WorkAreaOption } from '@/types/customer-ledger';
 import { sampleCustomers } from '@/data/customerSampleData';
 
@@ -23,8 +23,8 @@ export default function CustomerLedger() {
     document.title = '顧客台帳 - Dispatch Harmony Hub';
   }, []);
 
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer>(sampleCustomers[0]);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([
+  const [, setSelectedCustomer] = useState<Customer>(sampleCustomers[0]);
+  const [, setVehicles] = useState<Vehicle[]>([
     { id: '1', type: 'BMW 7シリーズ', color: 'ブラック', number: '品川300あ1234' }
   ]);
   
@@ -109,14 +109,14 @@ export default function CustomerLedger() {
     }
   ]);
 
-  const handleCustomerChange = (updatedFields: Partial<Customer>) => {
+  const _handleCustomerChange = (updatedFields: Partial<Customer>) => {
     setSelectedCustomer(prev => ({
       ...prev,
       ...updatedFields
     }));
   };
 
-  const addVehicle = () => {
+  const _addVehicle = () => {
     const newVehicle: Vehicle = {
       id: Date.now().toString(),
       type: '',
@@ -126,12 +126,12 @@ export default function CustomerLedger() {
     setVehicles(prev => [...prev, newVehicle]);
   };
 
-  const removeVehicle = (id: string) => {
+  const _removeVehicle = (id: string) => {
     setVehicles(prev => prev.filter(v => v.id !== id));
   };
 
-  const updateVehicle = (id: string, field: keyof Omit<Vehicle, 'id'>, value: string) => {
-    setVehicles(prev => prev.map(v => 
+  const _updateVehicle = (id: string, field: keyof Omit<Vehicle, 'id'>, value: string) => {
+    setVehicles(prev => prev.map(v =>
       v.id === id ? { ...v, [field]: value } : v
     ));
   };
