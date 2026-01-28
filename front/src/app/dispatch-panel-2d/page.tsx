@@ -44,9 +44,9 @@ export default function Original() {
 
   return (
     <div className="w-full h-[1080px] overflow-x-auto overflow-y-hidden">
-      <div className="w-[1989px] h-[1080px] relative overflow-hidden">
-      {/* ヘッダー */}
-      <div className="absolute left-0 top-0 right-0 z-10 h-[50px] bg-white border-b border-zinc-300">
+      <div className="w-[1989px] h-[1080px] relative">
+      {/* ヘッダー（固定） */}
+      <div className="sticky left-0 top-0 w-full z-20 h-[50px] bg-white border-b border-zinc-300">
         <div className="flex items-center h-full px-2">
           {/* ダッシュボードに戻る - 左端 */}
           <Button
@@ -133,7 +133,7 @@ export default function Original() {
           </div>
         </div>
       </div>
-  
+
     {/* スタッフ予定リスト */}
     <div className="w-[357px] h-5 left-[4px] top-[708px] absolute bg-lime-200" />
     <div className="w-[357px] left-[4px] top-[710px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">スタッフ予定リスト</div>
