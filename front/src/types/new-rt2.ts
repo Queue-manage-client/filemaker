@@ -88,6 +88,7 @@ export interface OutDriverUndecided {
   id: string;
   status: 'start' | 'hp'; // 開始/HP
   hostessName: string; // ホステス名（例：「南 リョウナ」）
+  shopCode?: string; // 店舗コード
   pickupTime: string; // 迎え時間
   arrivalTime: string; // 到着時間
   timeTotal: number; // 時間計（分）

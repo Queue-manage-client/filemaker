@@ -4,6 +4,16 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import {
+  ProfileTab,
+  HPDataTab,
+  ManagementTab,
+  CourseRatioTab,
+  CourseFixedTab,
+  CourseCombinedTab,
+  ClassTab,
+  OptionTab,
+} from './_components';
 
 export default function HostessLedgerPage() {
   const router = useRouter();
@@ -256,30 +266,14 @@ export default function HostessLedgerPage() {
 
             {/* タブコンテンツ */}
             <div className="flex-1 border border-gray-400 border-t-0 p-2 overflow-auto">
-              {activeMiddleTab === 'プロフィール' && (
-                <div className="text-[11px] text-gray-600">プロフィールの内容</div>
-              )}
-              {activeMiddleTab === 'HPデータ' && (
-                <div className="text-[11px] text-gray-600">HPデータの内容</div>
-              )}
-              {activeMiddleTab === '管理専用' && (
-                <div className="text-[11px] text-gray-600">管理専用の内容</div>
-              )}
-              {activeMiddleTab === 'コース料金割合制' && (
-                <div className="text-[11px] text-gray-600">コース料金割合制の内容</div>
-              )}
-              {activeMiddleTab === 'コース料金定額制' && (
-                <div className="text-[11px] text-gray-600">コース料金定額制の内容</div>
-              )}
-              {activeMiddleTab === 'コース料金同一併用' && (
-                <div className="text-[11px] text-gray-600">コース料金同一併用の内容</div>
-              )}
-              {activeMiddleTab === 'クラス' && (
-                <div className="text-[11px] text-gray-600">クラスの内容</div>
-              )}
-              {activeMiddleTab === 'オプション' && (
-                <div className="text-[11px] text-gray-600">オプションの内容</div>
-              )}
+              {activeMiddleTab === 'プロフィール' && <ProfileTab />}
+              {activeMiddleTab === 'HPデータ' && <HPDataTab />}
+              {activeMiddleTab === '管理専用' && <ManagementTab />}
+              {activeMiddleTab === 'コース料金割合制' && <CourseRatioTab />}
+              {activeMiddleTab === 'コース料金定額制' && <CourseFixedTab />}
+              {activeMiddleTab === 'コース料金同一併用' && <CourseCombinedTab />}
+              {activeMiddleTab === 'クラス' && <ClassTab />}
+              {activeMiddleTab === 'オプション' && <OptionTab />}
             </div>
           </div>
 
