@@ -13,6 +13,14 @@ import {
   CourseCombinedTab,
   ClassTab,
   OptionTab,
+  TodayAttendanceTab,
+  SameStoreHostessTab,
+  PerformanceDetailTab,
+  AttendanceRightTab,
+  FromFrontTab,
+  TodayReservationNGHistoryTab,
+  ReservationTab,
+  GoalTab,
 } from './_components';
 
 export default function HostessLedgerPage() {
@@ -430,30 +438,14 @@ export default function HostessLedgerPage() {
 
           {/* タブコンテンツ */}
           <div className="flex-1 border border-t-0 border-gray-400 p-2 overflow-auto">
-            {activeRightTab === '当日出勤ホステス' && (
-              <div className="text-[11px] text-gray-600">当日出勤ホステスの内容</div>
-            )}
-            {activeRightTab === '同店舗ホステス' && (
-              <div className="text-[11px] text-gray-600">同店舗ホステスの内容</div>
-            )}
-            {activeRightTab === '実績詳細' && (
-              <div className="text-[11px] text-gray-600">実績詳細の内容</div>
-            )}
-            {activeRightTab === '出勤' && (
-              <div className="text-[11px] text-gray-600">出勤の内容</div>
-            )}
-            {activeRightTab === 'フロントから' && (
-              <div className="text-[11px] text-gray-600">フロントからの内容</div>
-            )}
-            {activeRightTab === '本日予約・NG履歴' && (
-              <div className="text-[11px] text-gray-600">本日予約・NG履歴の内容</div>
-            )}
-            {activeRightTab === '予約' && (
-              <div className="text-[11px] text-gray-600">予約の内容</div>
-            )}
-            {activeRightTab === '目標' && (
-              <div className="text-[11px] text-gray-600">目標の内容</div>
-            )}
+            {activeRightTab === '当日出勤ホステス' && <TodayAttendanceTab />}
+            {activeRightTab === '同店舗ホステス' && <SameStoreHostessTab />}
+            {activeRightTab === '実績詳細' && <PerformanceDetailTab />}
+            {activeRightTab === '出勤' && <AttendanceRightTab />}
+            {activeRightTab === 'フロントから' && <FromFrontTab />}
+            {activeRightTab === '本日予約・NG履歴' && <TodayReservationNGHistoryTab />}
+            {activeRightTab === '予約' && <ReservationTab />}
+            {activeRightTab === '目標' && <GoalTab />}
           </div>
         </div>
       </div>
