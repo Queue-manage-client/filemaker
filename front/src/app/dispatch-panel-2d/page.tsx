@@ -135,21 +135,21 @@ export default function Original() {
       </div>
 
     {/* スタッフ予定リスト */}
-    <div className="w-[357px] h-5 left-[4px] top-[708px] absolute bg-lime-200" />
-    <div className="w-[357px] left-[4px] top-[710px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">スタッフ予定リスト</div>
-    <div className="w-[357px] h-96 left-[4px] top-[728px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto relative">
-      {staffScheduleSampleData.map((schedule: StaffSchedule, index: number) => {
-        const topPosition = index * 36;
-        return (
-          <div key={schedule.id} className="w-[357px] h-8 left-0 absolute" style={{ top: `${topPosition}px` }}>
-            <div className={`w-[357px] h-8 left-0 top-0 absolute ${schedule.isHighlighted ? 'bg-lime-200' : 'bg-white'}`} />
-            <div className="w-[357px] h-8 left-0 top-0 absolute justify-center text-black text-[13px] font-normal font-['Inter']">
-              {schedule.driverName}→{schedule.destination}<br />{schedule.note}
-            </div>
+    <div className="w-[357px] h-5 left-[4px] top-[708px] absolute bg-lime-200 flex items-center justify-center">
+      <span className="text-black text-[13px] font-normal font-['Inter']">スタッフ予定リスト</span>
+    </div>
+    <div className="w-[357px] h-96 left-[4px] top-[728px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+      {staffScheduleSampleData.map((schedule: StaffSchedule, index: number) => (
+        <div
+          key={schedule.id}
+          className={`w-full h-8 flex items-center px-1 text-black text-[13px] font-normal font-['Inter'] ${schedule.isHighlighted ? 'bg-lime-200' : 'bg-white'}`}
+        >
+          <div>
+            {schedule.driverName}→{schedule.destination}<br />{schedule.note}
           </div>
-        );
-      })}
-  </div>
+        </div>
+      ))}
+    </div>
 
   {/* INドラ未定予約リスト */}
   <div className="w-10 h-4 left-[693px] top-[78px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">オプション</div>
@@ -208,12 +208,12 @@ export default function Original() {
             onClick={() => {
               // TODO: 編集機能を実装
             }}
-            className="size-6 p-1 left-[350.5px] top-[3.5px] absolute bg-white rounded-[3px] inline-flex flex-col justify-center items-center gap-2.5 overflow-hidden hover:bg-gray-100 cursor-pointer transition-colors"
+            className="size-6 p-1 left-[330px] top-[3.5px] absolute bg-white rounded-[3px] inline-flex flex-col justify-center items-center gap-2.5 overflow-hidden hover:bg-gray-100 cursor-pointer transition-colors"
             aria-label="編集"
           >
             <Pen className="w-4 h-4 text-black" />
           </button>
-          <div className="w-[362px] h-8 left-0 top-0 absolute justify-center text-black text-[13px] font-normal font-['Inter']">
+          <div className="w-[362px] h-8 left-0 top-0 absolute justify-center text-black text-[13px] font-normal font-['Inter'] leading-tight">
             {memo.content.split('\n').map((line, i) => (
               <React.Fragment key={i}>
                 {line}

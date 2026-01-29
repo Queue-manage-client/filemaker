@@ -81,30 +81,22 @@ export function DispatchPanel2DLeftPanels() {
       </div>
 
       {/* スタッフ予定リスト */}
-      <div className="w-[344px] h-5 left-[4px] top-[708px] absolute bg-lime-200" />
-      <div className="w-[344px] left-[4px] top-[710px] absolute text-center justify-end text-black text-xs font-normal font-['Inter']">
-        スタッフ予定リスト
+      <div className="w-[344px] h-5 left-[4px] top-[708px] absolute bg-lime-200 flex items-center justify-center">
+        <span className="text-black text-xs font-normal font-['Inter']">スタッフ予定リスト</span>
       </div>
-      <div className="w-[344px] h-96 left-[4px] top-[728px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto relative">
-        {staffScheduleSampleData.map((schedule: StaffSchedule, index: number) => {
-          const topPosition = index * 36;
-          return (
-            <div
-              key={schedule.id}
-              className="w-[344px] h-8 left-0 absolute"
-              style={{ top: `${topPosition}px` }}
-            >
-              <div
-                className={`w-[344px] h-8 left-0 top-0 absolute ${schedule.isHighlighted ? "bg-lime-200" : "bg-white"}`}
-              />
-              <div className="w-[344px] h-8 left-0 top-0 absolute justify-center text-black text-xs font-normal font-['Inter']">
-                {schedule.driverName}→{schedule.destination}
-                <br />
-                {schedule.note}
-              </div>
+      <div className="w-[344px] h-96 left-[4px] top-[728px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
+        {staffScheduleSampleData.map((schedule: StaffSchedule, index: number) => (
+          <div
+            key={schedule.id}
+            className={`w-full h-8 flex items-center px-1 text-black text-xs font-normal font-['Inter'] ${schedule.isHighlighted ? "bg-lime-200" : "bg-white"}`}
+          >
+            <div>
+              {schedule.driverName}→{schedule.destination}
+              <br />
+              {schedule.note}
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </>
   );
