@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -45,7 +45,39 @@ export default function CustomerLedger() {
     recipient: '',
     note: ''
   });
-  
+
+  // 顧客の統計カード表示状態
+  const [showCustomerStats, setShowCustomerStats] = useState(false);
+  const statsCardRef = useRef<HTMLDivElement>(null);
+
+  // カード外クリックで閉じる
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (statsCardRef.current && !statsCardRef.current.contains(event.target as Node)) {
+        setShowCustomerStats(false);
+      }
+    };
+
+    if (showCustomerStats) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showCustomerStats]);
+
+  // 顧客の統計データ
+  const customerStats = {
+    firstVisit: '2017/04/07',
+    historyCount: 4,
+    continuousDays: 3064,
+    nominationCount: 1,
+    nominationRate: 25,
+    extensionCount: null as number | null,
+    averageTime: 30
+  };
+
   // ポイント履歴ウィンドウを開く関数
   const openPointHistoryWindow = () => {
     const width = Math.floor(window.screen.width / 2);
@@ -816,8 +848,50 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* 顧客の統計ボタン */}
-                  <div className="p-1">
-                    <Button size="sm" variant="outline" className="h-7 text-xs">顧客の統計</Button>
+                  <div className="p-1 relative w-fit" ref={statsCardRef}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={() => setShowCustomerStats(!showCustomerStats)}
+                    >
+                      顧客の統計
+                    </Button>
+
+                    {/* 顧客の統計カード */}
+                    {showCustomerStats && (
+                      <div className="absolute top-0 left-full ml-0.5 z-50 bg-gray-100 border border-gray-300 rounded shadow-lg p-4 min-w-[220px]">
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-700 font-medium">初回</span>
+                            <span className="text-gray-900">{customerStats.firstVisit}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-700 font-medium">履歴回数</span>
+                            <span className="text-gray-900">{customerStats.historyCount}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-700 font-medium">継続日数</span>
+                            <span className="text-gray-900">{customerStats.continuousDays}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-700 font-medium">指名本数</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-gray-900">{customerStats.nominationCount}</span>
+                              <span className="text-gray-900">{customerStats.nominationRate}%</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-700 font-medium">延長本数</span>
+                            <span className="text-gray-900">{customerStats.extensionCount ?? ''}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-700 font-medium">平均時間</span>
+                            <span className="text-gray-900">{customerStats.averageTime}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* 履歴対象 */}
