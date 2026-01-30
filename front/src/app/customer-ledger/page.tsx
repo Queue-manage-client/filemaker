@@ -362,160 +362,99 @@ export default function CustomerLedger() {
       <div className="bg-white p-1 mb-0">
         <div>
           {/* 第1行 */}
-          <div className="flex items-stretch gap-0 mb-1">
+          <div className="flex items-center h-7 gap-1">
             {/* 顧客番号 */}
-            <div className="flex items-stretch">
-              <div className="bg-purple-300 px-2 py-1 text-xs font-semibold flex items-center border border-gray-400">
-                顧客番号
-              </div>
-              <Input
-                value="324"
-                className="h-auto w-16 text-sm border border-gray-400 rounded-none"
-                onChange={() => {}}
-              />
-            </div>
+            <span className="text-xs">顧客番号</span>
+            <div className="w-6 h-6 bg-yellow-100 border border-gray-400"></div>
+            <input
+              value="324"
+              className="w-16 px-1 text-sm border border-gray-400 bg-white outline-none h-6"
+              onChange={() => {}}
+            />
 
             {/* 名前 */}
-            <div className="flex items-stretch">
-              <div className="bg-purple-300 px-2 py-1 text-xs font-semibold flex items-center border border-gray-400 border-l-0">
-                名前
-              </div>
-              <Input
-                value="ミヤタ"
-                className="h-auto w-20 text-sm border border-gray-400 border-l-0 rounded-none"
-                onChange={() => {}}
-              />
-            </div>
+            <span className="text-xs ml-2">名前</span>
+            <div className="w-20 h-6 bg-white border border-gray-400"></div>
+            <input
+              value="ミヤタ"
+              className="w-20 px-1 text-sm font-bold border border-gray-400 bg-white outline-none h-6"
+              onChange={() => {}}
+            />
 
             {/* 氏名ふりがな */}
-            <div className="flex items-stretch">
-              <div className="bg-purple-300 px-2 py-1 text-xs font-semibold flex items-center border border-gray-400 border-l-0">
-                氏名ふりがな
-              </div>
-              <Input
-                value="みやた"
-                className="h-auto w-16 text-sm border border-gray-400 border-l-0 rounded-none"
-                onChange={() => {}}
-              />
-            </div>
+            <span className="text-xs ml-2">氏名ふりがな</span>
+            <input
+              value="みやた"
+              className="w-20 px-1 text-sm border border-gray-400 bg-white outline-none h-6"
+              onChange={() => {}}
+            />
 
             {/* 1 */}
-            <div className="flex items-stretch">
-              <div className="px-2 py-1 text-xs flex items-center border border-gray-400 border-l-0 bg-white">
-                1
-              </div>
-            </div>
+            <span className="text-xs border border-gray-400 px-2 h-6 flex items-center bg-white">1</span>
 
             {/* 京都ホテル俱楽部 */}
-            <div className="flex items-stretch">
-              <div className="bg-blue-600 text-white px-2 py-1 text-xs font-semibold flex items-center border border-gray-400 border-l-0">
-                京都ホテル俱楽部
-              </div>
-            </div>
+            <span className="text-xs ml-2">京都ホテル俱楽部</span>
 
             {/* L */}
-            <div className="flex items-stretch">
-              <div className="bg-black text-white px-2 py-1 text-xs font-bold flex items-center border border-gray-400 border-l-0">
-                L
-              </div>
-            </div>
+            <div className="w-6 h-6 bg-black text-white text-xs font-bold flex items-center justify-center border border-gray-400">L</div>
 
             {/* 空白フィールド */}
-            <div className="flex items-stretch flex-1">
-              <div className="flex-1 border border-gray-400 border-l-0 bg-white"></div>
-            </div>
+            <div className="w-48 border border-gray-400 bg-white h-6"></div>
+
+            {/* 小さいブロック */}
+            <div className="w-16 border border-gray-400 bg-white h-6"></div>
 
             {/* Web登録チェックボックス */}
-            <div className="flex items-stretch">
-              <div className="px-2 py-1 text-xs flex items-center border border-gray-400 border-l-0 bg-white">
-                <label className="flex items-center gap-1">
-                  <input type="checkbox" className="w-3 h-3" />
-                  Web登録
-                </label>
-              </div>
-            </div>
-
-            {/* 3 */}
-            <div className="flex items-stretch">
-              <div className="px-2 py-1 text-xs flex items-center border border-gray-400 border-l-0 bg-white">
-                3
-              </div>
+            <div className="flex items-center gap-1 text-xs border border-gray-400 px-2 h-6 bg-white">
+              <input type="checkbox" className="w-3 h-3" />
+              <span>Web登録</span>
             </div>
           </div>
 
           {/* 第2行 */}
-          <div className="flex items-stretch gap-0">
-            {/* 基本情報ボタン */}
-            <button className="bg-gray-300 border border-gray-600 px-3 py-1 text-xs font-semibold hover:bg-gray-400 transition-colors">
-              基本情報
-            </button>
-
-            {/* プロフィールボタン */}
-            <button className="bg-gray-300 border border-gray-600 border-l-0 px-3 py-1 text-xs font-semibold hover:bg-gray-400 transition-colors">
-              プロフィール
-            </button>
-
+          <div className="flex items-center h-7 gap-1 mt-1">
             {/* 旧顧客番号 */}
-            <div className="flex items-stretch">
-              <div className="bg-purple-300 px-2 py-1 text-xs font-semibold flex items-center border border-gray-400 border-l-0">
-                旧顧客番号
-              </div>
-              <Input
-                value="324"
-                className="h-auto w-16 text-sm border border-gray-400 border-l-0 rounded-none"
-                onChange={() => {}}
-              />
-            </div>
+            <span className="text-xs">旧顧客番号</span>
+            <div className="w-16 h-6 px-1 text-sm flex items-center border border-gray-400 bg-white">324</div>
 
             {/* 参照メディア */}
-            <div className="flex items-stretch">
-              <div className="bg-purple-300 px-2 py-1 text-xs font-semibold flex items-center border border-gray-400 border-l-0">
-                参照メディア
-              </div>
-              <Input
-                value="2"
-                className="h-auto w-8 text-sm border border-gray-400 border-l-0 rounded-none text-center"
-                onChange={() => {}}
-              />
-            </div>
+            <span className="text-xs ml-2">参照メディア</span>
+            <div className="w-6 h-6 px-1 text-sm flex items-center justify-center border border-gray-400 bg-white">2</div>
 
             {/* ヘブンネット */}
-            <div className="flex items-stretch">
-              <div className="px-2 py-1 text-xs flex items-center border border-gray-400 border-l-0 bg-white">
-                ヘブンネット
-              </div>
+            <div className="w-28 h-6 px-1 text-xs flex items-center border border-gray-400 bg-white">ヘブンネット</div>
+
+            {/* VIP Gold Platinum チェックボックス */}
+            <div className="flex items-center gap-2 text-xs">
+              <label className="flex items-center gap-1">
+                <input type="checkbox" className="w-3 h-3" />
+                <span>VIP</span>
+              </label>
+              <label className="flex items-center gap-1">
+                <input type="checkbox" className="w-3 h-3" />
+                <span>Gold</span>
+              </label>
+              <label className="flex items-center gap-1">
+                <input type="checkbox" className="w-3 h-3" />
+                <span>Platinum</span>
+              </label>
             </div>
 
-            {/* 空白フィールド */}
-            <div className="flex items-stretch flex-1">
-              <div className="flex-1 border border-gray-400 border-l-0 bg-white"></div>
-            </div>
+            {/* 空白フィールド（長い） */}
+            <div className="w-32 h-6 border border-gray-400 bg-white"></div>
 
-            {/* 記録番号 */}
-            <div className="flex items-stretch">
-              <div className="bg-purple-300 px-2 py-1 text-xs font-semibold flex items-center border border-gray-400 border-l-0">
-                記録番号
-              </div>
-              <Input
-                value="328"
-                className="h-auto w-12 text-sm border border-gray-400 border-l-0 rounded-none text-center"
-                onChange={() => {}}
-              />
-            </div>
+            {/* 記帳者 */}
+            <span className="text-xs ml-2">記帳者</span>
+            <div className="w-10 h-6 px-1 text-sm flex items-center justify-center border border-gray-400 bg-white">328</div>
 
             {/* 岸本 礼人 */}
-            <div className="flex items-stretch">
-              <div className="px-2 py-1 text-xs flex items-center border border-gray-400 border-l-0 bg-white">
-                岸本 礼人
-              </div>
-            </div>
+            <div className="w-20 h-6 px-1 text-xs flex items-center border border-gray-400 bg-white">岸本 礼人</div>
 
             {/* 統合済 */}
-            <div className="flex items-stretch">
-              <div className="px-2 py-1 text-xs flex items-center border border-gray-400 border-l-0 bg-white text-blue-600">
-                統合済
-              </div>
-            </div>
+            <div className="h-6 px-2 text-xs flex items-center bg-blue-600 text-white">統合済</div>
+
+            {/* 空白 */}
+            <div className="w-8 h-6 border border-gray-400 bg-white"></div>
           </div>
         </div>
       </div>
