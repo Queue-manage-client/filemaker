@@ -46,6 +46,19 @@ export default function CustomerLedger() {
     note: ''
   });
   
+  // ポイント履歴ウィンドウを開く関数
+  const openPointHistoryWindow = () => {
+    const width = Math.floor(window.screen.width / 2);
+    const height = 600;
+    const left = Math.floor((window.screen.width - width) / 2);
+    const top = Math.floor((window.screen.height - height) / 2);
+    window.open(
+      '/customer-ledger/point-history',
+      'pointHistory',
+      `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+    );
+  };
+
   const [usageHistory] = useState<UsageHistory[]>([
     {
       id: '1',
@@ -813,7 +826,14 @@ export default function CustomerLedger() {
                       <span className="text-xs font-semibold">履歴対象:</span>
                       <span className="text-xs">京都デリヘル俱楽部</span>
                       <Button size="sm" variant="outline" className="h-6 text-xs ml-auto">全履歴表示</Button>
-                      <Button size="sm" variant="outline" className="h-6 text-xs">ポイント履歴</Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 text-xs"
+                        onClick={openPointHistoryWindow}
+                      >
+                        ポイント履歴
+                      </Button>
                       <Button size="sm" variant="outline" className="h-6 text-xs">初期ポイント入力</Button>
                     </div>
                   </div>
