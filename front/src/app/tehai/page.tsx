@@ -412,7 +412,7 @@ export default function TehaiPage() {
         </div>
 
         {/* 右コラム */}
-        <div className="h-full border-r border-gray-400 flex-1 grid grid-rows-[55%_23%_22%]" style={{ gridTemplateColumns: '35% 30% calc(35% - 100px) 100px' }}>
+        <div className="h-full border-r border-gray-400 flex-1 grid grid-rows-[55%_23%_22%]" style={{ gridTemplateColumns: '35% calc(30% + 16px) calc(35% - 116px) 100px' }}>
             {/* ポジションブロック - 写真通りの完全な内容 */}
             <div className="row-span-2 border-r border-gray-400 bg-white flex flex-col text-[13px]">
               <div className="text-center text-blue-600 font-bold border-b border-gray-400 py-1">ポジション</div>
@@ -607,7 +607,7 @@ export default function TehaiPage() {
           <div className="col-span-3 border-t border-gray-400 flex">
             {/* 面接予定ブロック */}
             <div className="w-1/2 border-r border-gray-400 bg-white flex flex-col">
-              <div className="bg-gradient-to-b from-blue-400 to-blue-500 text-white text-center py-2 text-base font-bold border-b-2 border-blue-600 shadow-md">
+              <div className="bg-blue-400 text-black text-center py-1 text-[13px] font-bold">
                 面接予定
               </div>
               {/* 面接情報 */}
