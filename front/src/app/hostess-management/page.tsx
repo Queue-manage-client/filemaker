@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,6 @@ import { useHostessLedger } from '@/hooks/use-hostess';
 import { HostessLedger, WORK_STYLE_LABELS } from '@/types/hostess';
 
 export default function HostessManagementPage() {
-  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
 
   React.useEffect(() => {
@@ -98,14 +97,15 @@ export default function HostessManagementPage() {
     <div className="min-h-screen bg-[#323232] p-4">
       {/* 戻るボタン */}
       <div className="mb-4">
-        <Button
-          variant="outline"
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2 bg-[#fff] text-[#323232] hover:bg-gray-200"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 bg-[#fff] text-[#323232] hover:bg-gray-200"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+        </Link>
       </div>
 
       {/* ヘッダー */}

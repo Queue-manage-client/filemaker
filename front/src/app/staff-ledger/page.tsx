@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,6 @@ import { EMPLOYMENT_TYPE_LABELS, type EmploymentType } from '@/types/staff-atten
 import { useStaffLedger } from '@/hooks/use-staff';
 
 export default function StaffLedger() {
-  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
 
   React.useEffect(() => {
@@ -116,14 +115,15 @@ export default function StaffLedger() {
     <div className="min-h-screen bg-gray-100">
       {/* 戻るボタン */}
       <div className="p-4">
-        <Button
-          variant="outline"
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+        </Link>
       </div>
 
       {/* ヘッダー */}

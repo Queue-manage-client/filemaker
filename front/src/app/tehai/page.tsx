@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from 'lucide-react';
 
@@ -165,8 +165,6 @@ const interviewScheduleData = [
 ];
 
 export default function TehaiPage() {
-  const router = useRouter();
-
   React.useEffect(() => {
     document.title = '手配表 - Dispatch Harmony Hub';
   }, []);
@@ -177,14 +175,15 @@ export default function TehaiPage() {
       <div className="w-full h-[50px] bg-white border-b border-zinc-300">
         <div className="flex items-center h-full px-2">
           {/* ダッシュボードに戻る - 左端 */}
-          <Button
-            variant="outline"
-            onClick={() => router.push('/dashboard')}
-            className="h-8 px-3 text-xs flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            ダッシュボードに戻る
-          </Button>
+          <Link href="/dashboard">
+            <Button
+              variant="outline"
+              className="h-8 px-3 text-xs flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              ダッシュボードに戻る
+            </Button>
+          </Link>
 
           {/* 中央配置のボタン群 */}
           <div className="flex-1 flex items-center justify-center gap-2">
@@ -209,21 +208,23 @@ export default function TehaiPage() {
             </Button>
 
             {/* 新顧客検索 */}
-            <Button
-              variant="outline"
-              className="h-8 px-4 text-xs border-black"
-              onClick={() => router.push('/customer-ledger')}
-            >
-              新顧客検索
-            </Button>
+            <Link href="/customer-ledger">
+              <Button
+                variant="outline"
+                className="h-8 px-4 text-xs border-black"
+              >
+                新顧客検索
+              </Button>
+            </Link>
 
             {/* RT IIパネル */}
-            <Button
-              className="h-8 px-4 text-xs bg-purple-400 hover:bg-purple-500 text-black border border-black"
-              onClick={() => router.push('/rt2-panel')}
-            >
-              RT IIパネル
-            </Button>
+            <Link href="/rt2-panel">
+              <Button
+                className="h-8 px-4 text-xs bg-purple-400 hover:bg-purple-500 text-black border border-black"
+              >
+                RT IIパネル
+              </Button>
+            </Link>
 
             {/* RTパネル */}
             <Button
@@ -234,12 +235,13 @@ export default function TehaiPage() {
             </Button>
 
             {/* 配車パネル */}
-            <Button
-              className="h-8 px-4 text-xs bg-amber-200 hover:bg-amber-300 text-black border border-black"
-              onClick={() => router.push('/dispatch-panel-2d')}
-            >
-              配車パネル
-            </Button>
+            <Link href="/dispatch-panel-2d">
+              <Button
+                className="h-8 px-4 text-xs bg-amber-200 hover:bg-amber-300 text-black border border-black"
+              >
+                配車パネル
+              </Button>
+            </Link>
 
             {/* Menu */}
             <Button

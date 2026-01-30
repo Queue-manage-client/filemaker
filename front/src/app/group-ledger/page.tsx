@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,6 @@ import { GroupMaster } from '@/types/group-ledger';
 import { groupMasterSampleData } from '@/data/groupLedgerSampleData';
 
 export default function GroupLedgerPage() {
-  const router = useRouter();
   const [selectedGroup, setSelectedGroup] = useState<GroupMaster | null>(groupMasterSampleData[0] || null);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<Partial<GroupMaster>>({});
@@ -56,15 +55,16 @@ export default function GroupLedgerPage() {
           {/* ヘッダー */}
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center gap-3 mb-4">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => router.push('/dashboard')}
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                戻る
-              </Button>
+              <Link href="/dashboard">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  戻る
+                </Button>
+              </Link>
             </div>
             <div className="flex items-center gap-3">
               <Users className="w-6 h-6" />

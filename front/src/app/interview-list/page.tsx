@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,6 @@ import { INTERVIEW_TYPE_LABELS, INTERVIEW_RESULT_LABELS, EMPLOYMENT_STATUS_LABEL
 import { interviewSampleData } from '@/data/interviewSampleData';
 
 export default function InterviewList() {
-  const router = useRouter();
   const [interviews] = useState<InterviewRecord[]>(interviewSampleData);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -84,14 +83,15 @@ export default function InterviewList() {
     <div className="min-h-screen bg-gray-100">
       {/* 戻るボタン */}
       <div className="p-4">
-        <Button
-          variant="outline"
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+        </Link>
       </div>
 
       {/* ヘッダー */}

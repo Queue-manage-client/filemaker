@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,6 @@ import { interviewSampleData } from '@/data/interviewSampleData';
 // 将来の実装で使用予定: interviewerList, assignedStaffList, mediaList
 
 export default function ViewList() {
-  const router = useRouter();
   const [interviews] = useState<InterviewRecord[]>(interviewSampleData);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedInterviews, setSelectedInterviews] = useState<string[]>([]);
@@ -101,14 +100,15 @@ export default function ViewList() {
     <div className="min-h-screen bg-gray-100">
       {/* 戻るボタン */}
       <div className="p-4">
-        <Button
-          variant="outline"
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+        </Link>
       </div>
 
       {/* ヘッダー */}

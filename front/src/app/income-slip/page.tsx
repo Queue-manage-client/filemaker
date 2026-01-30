@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeft, DollarSign, Plus } from "lucide-react";
@@ -20,7 +19,6 @@ import { useIncomeSlips } from '@/hooks/use-accounting';
 import type { IncomeSlip } from '@/types/accounting';
 
 export default function IncomeSlip() {
-  const router = useRouter();
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [paymentMethodFilter, setPaymentMethodFilter] = useState<string>('all');
@@ -48,14 +46,15 @@ export default function IncomeSlip() {
     <div className="min-h-screen bg-gray-100 p-4">
       {/* 戻るボタン */}
       <div className="mb-4">
-        <Button 
-          variant="outline" 
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+        </Link>
       </div>
 
       {/* ヘッダー */}

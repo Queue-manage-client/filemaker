@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeft, Award, Download, Search } from "lucide-react";
@@ -26,7 +25,6 @@ type RowData = {
 };
 
 export default function CustomerPoints() {
-  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
 
   React.useEffect(() => {
@@ -108,14 +106,15 @@ export default function CustomerPoints() {
     <div className="min-h-screen bg-gray-100 p-4">
       {/* 戻るボタン */}
       <div className="mb-4">
-        <Button 
-          variant="outline" 
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+        </Link>
       </div>
 
       {/* ヘッダー */}

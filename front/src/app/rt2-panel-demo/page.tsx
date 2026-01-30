@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeft, ChevronLeft } from "lucide-react";
@@ -9,7 +9,6 @@ import { sampleCastData } from '@/data/castSampleData';
 import { formatDate } from 'date-fns';
 
 export default function RT2PanelDemo() {
-  const router = useRouter();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -36,14 +35,15 @@ export default function RT2PanelDemo() {
     <div className="w-[2064px] h-[1280px] relative overflow-hidden">
       {/* 戻るボタン */}
       <div className="absolute left-4 top-4 z-10">
-        <Button 
-          variant="outline" 
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+        </Link>
       </div>
       
       {/* ヘッダー */}

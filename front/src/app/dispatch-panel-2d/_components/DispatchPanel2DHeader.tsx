@@ -1,25 +1,24 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 export function DispatchPanel2DHeader() {
-  const router = useRouter();
-
   return (
     <div className="absolute left-0 top-0 right-0 z-10 h-[50px] bg-white border-b border-zinc-300">
       <div className="flex items-center h-full px-2">
         {/* ダッシュボードに戻る - 左端 */}
-        <Button
-          variant="outline"
-          onClick={() => router.push("/dashboard")}
-          className="h-8 px-3 text-xs flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="h-8 px-3 text-xs flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+        </Link>
 
         {/* 中央配置のボタン群 */}
         <div className="flex-1 flex items-center justify-center gap-2">

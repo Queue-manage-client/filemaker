@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -262,7 +262,6 @@ const hostessDisplayData = staffData.map((s, i) => ({
 }));
 
 export default function DailyReport() {
-  const router = useRouter();
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'staff' | 'hostess'>('staff');
@@ -297,14 +296,15 @@ export default function DailyReport() {
       <div className="w-full h-[50px] bg-white">
         <div className="flex items-center h-full px-2">
           {/* ダッシュボードに戻る - 左端 */}
-          <Button
-            variant="outline"
-            onClick={() => router.push('/dashboard')}
-            className="h-8 px-3 text-xs flex items-center gap-2 border-[#323232]"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            ダッシュボードに戻る
-          </Button>
+          <Link href="/dashboard">
+            <Button
+              variant="outline"
+              className="h-8 px-3 text-xs flex items-center gap-2 border-[#323232]"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              ダッシュボードに戻る
+            </Button>
+          </Link>
 
           {/* 中央配置のボタン群 */}
           <div className="flex-1 flex items-center justify-center gap-2">

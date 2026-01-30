@@ -1,13 +1,13 @@
 'use client';
 
+import Link from "next/link";
 import { BusinessCard } from "@/components/ui/business-card";
-import { useRouter } from "next/navigation";
-import { 
-  Building, 
-  Users, 
-  // UserCheck, 
-  Award, 
-  MapPin, 
+import {
+  Building,
+  Users,
+  // UserCheck,
+  Award,
+  MapPin,
   Hotel,
   // Calculator,
   Settings,
@@ -17,52 +17,28 @@ import {
 } from "lucide-react";
 
 export const CenterPanel = () => {
-  const router = useRouter();
-
-  const handleNavigation = (name: string) => {
-    const routeMap: { [key: string]: string } = {
-      "グループ台帳": "/group-ledger",
-      "店舗台帳": "/store-ledger",
-      "顧客台帳": "/customer-ledger",
-      "顧客ポイント": "/customer-points",
-      "ホステス台帳": "/hostess-ledger",
-      "プロフィール設定": "/hostess-management",
-      "スタッフ台帳": "/staff-ledger",
-      "週間ホステス出勤": "/weekly-hostess-attendance",
-      "地域区分": "/area-division",
-      "ホテル": "/hotel",
-      "有料道路": "/toll-road",
-      "燃料・エコ手当管理": "/fuel-eco-management",
-      "メディア管理": "/media-management"
-    };
-
-    const route = routeMap[name];
-    if (route) {
-      router.push(route);
-    }
-  };
   const sections = [
     {
       title: "D",
       items: [
-        { name: "グループ台帳", icon: Building },
-        { name: "店舗台帳", icon: Building },
-        { name: "顧客台帳", icon: Users },
-        { name: "顧客ポイント", icon: Award },
-        { name: "ホステス台帳", icon: Users },
-        { name: "プロフィール設定", icon: Settings },
-        { name: "スタッフ台帳", icon: Users },
-        { name: "週間ホステス出勤", icon: Calendar },
-        { name: "地域区分", icon: Map },
-        { name: "ホテル", icon: Hotel },
-        { name: "有料道路", icon: MapPin }
+        { name: "グループ台帳", icon: Building, href: "/group-ledger" },
+        { name: "店舗台帳", icon: Building, href: "/store-ledger" },
+        { name: "顧客台帳", icon: Users, href: "/customer-ledger" },
+        { name: "顧客ポイント", icon: Award, href: "/customer-points" },
+        { name: "ホステス台帳", icon: Users, href: "/hostess-ledger" },
+        { name: "プロフィール設定", icon: Settings, href: "/hostess-management" },
+        { name: "スタッフ台帳", icon: Users, href: "/staff-ledger" },
+        { name: "週間ホステス出勤", icon: Calendar, href: "/weekly-hostess-attendance" },
+        { name: "地域区分", icon: Map, href: "/area-division" },
+        { name: "ホテル", icon: Hotel, href: "/hotel" },
+        { name: "有料道路", icon: MapPin, href: "/toll-road" }
       ]
     },
     {
       title: "E",
       items: [
-        { name: "燃料・エコ手当管理", icon: Settings },
-        { name: "メディア管理", icon: Database }
+        { name: "燃料・エコ手当管理", icon: Settings, href: "/fuel-eco-management" },
+        { name: "メディア管理", icon: Database, href: "/media-management" }
       ]
     }
   ];
@@ -73,15 +49,15 @@ export const CenterPanel = () => {
         <div key={index} className="border border-border rounded-lg p-4">
           <div className="grid grid-cols-1 gap-2">
             {section.items.map((item) => (
-              <BusinessCard 
-                key={item.name} 
-                variant="gray"
-                className="flex items-center gap-3 p-3 text-sm cursor-pointer hover:bg-opacity-80 transition-colors"
-                onClick={() => handleNavigation(item.name)}
-              >
-                <item.icon className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">{item.name}</span>
-              </BusinessCard>
+              <Link key={item.name} href={item.href}>
+                <BusinessCard
+                  variant="gray"
+                  className="flex items-center gap-3 p-3 text-sm cursor-pointer hover:bg-opacity-80 transition-colors"
+                >
+                  <item.icon className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">{item.name}</span>
+                </BusinessCard>
+              </Link>
             ))}
           </div>
         </div>

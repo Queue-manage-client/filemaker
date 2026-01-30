@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, Check, Plus, X } from "lucide-react";
 
@@ -299,7 +299,6 @@ export default function HostessSchedule() {
     document.title = 'ホステススケジュール管理 - Dispatch Harmony Hub';
   }, []);
 
-  const router = useRouter();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [hostessData] = useState<HostessTimelineData[]>(sampleHostessTimeline);
   const [sortType, setSortType] = useState<SortType>('name-asc');
@@ -575,14 +574,15 @@ export default function HostessSchedule() {
       {/* ヘッダー */}
       <div className="h-[50px] bg-white border-b border-zinc-300 flex-shrink-0">
         <div className="flex items-center h-full px-2">
-          <Button
-            variant="outline"
-            onClick={() => router.push('/dashboard')}
-            className="h-8 px-3 text-sm flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            ダッシュボードに戻る
-          </Button>
+          <Link href="/dashboard">
+            <Button
+              variant="outline"
+              className="h-8 px-3 text-sm flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              ダッシュボードに戻る
+            </Button>
+          </Link>
 
           <div className="flex-1 flex items-center justify-center gap-2">
             <h1 className="text-lg font-bold mr-2">ホステススケジュール</h1>

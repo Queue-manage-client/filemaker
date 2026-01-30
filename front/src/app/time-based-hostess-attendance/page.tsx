@@ -3,7 +3,7 @@
 // ハイドレーションエラーあり　要修正
 
 import React, { useEffect, useRef, useState } from "react";
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -88,7 +88,6 @@ export default function TimeBasedHostessAttendance() {
   React.useEffect(() => {
     document.title = '時間別ホステス出勤管理 - Dispatch Harmony Hub';
   }, []);
-  const router = useRouter();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [width, setWidth] = useState(1200);
   const [searchQuery, setSearchQuery] = useState('');
@@ -319,14 +318,15 @@ export default function TimeBasedHostessAttendance() {
     <div className="min-h-screen bg-gray-100">
       {/* ヘッダー */}
       <div className="p-4">
-        <Button
-          variant="outline"
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2 mb-4"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 mb-4"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+        </Link>
 
         <Card>
           <CardHeader className="pb-3">

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import {
@@ -24,7 +24,6 @@ import {
 } from './_components';
 
 export default function HostessLedgerPage() {
-  const router = useRouter();
   const [employmentStatus, setEmploymentStatus] = useState<'active' | 'retired'>('retired');
   const [displayStatus, setDisplayStatus] = useState<'ok' | 'ng'>('ok');
   const [activeRightTab, setActiveRightTab] = useState<string>('当日出勤ホステス');
@@ -39,14 +38,15 @@ export default function HostessLedgerPage() {
     <div className="h-screen flex flex-col bg-gray-100">
       {/* ヘッダー */}
       <div className="h-12 bg-white border-b border-zinc-300 flex items-center px-4 shrink-0">
-        <Button
-          variant="outline"
-          onClick={() => router.push('/dashboard')}
-          className="h-8 px-3 text-[13px] flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="h-8 px-3 text-[13px] flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+        </Link>
         <h1 className="text-lg font-bold ml-4">ホステス台帳</h1>
       </div>
 

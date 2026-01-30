@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -11,16 +11,15 @@ import { ArrowLeft, MapPin, Plus, Edit, Trash2 } from "lucide-react";
 
 // データとタイプのインポート
 import { tollRoadSampleData } from '@/data/tollRoadSampleData';
-import { 
-  expressways, 
-  tollOperators, 
+import {
+  expressways,
+  tollOperators,
   getOperatorName,
-  getInterchangesByExpressway 
+  getInterchangesByExpressway
 } from '@/data/interchangeSampleData';
 // import { TollRoad } from '@/types/toll-road'; // 将来の実装で使用予定
 
 export default function TollRoadPage() {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<string>('list');
 
   React.useEffect(() => {
@@ -36,14 +35,15 @@ export default function TollRoadPage() {
     <div className="min-h-screen bg-gray-100 p-4">
       {/* 戻るボタン */}
       <div className="mb-4">
-        <Button 
-          variant="outline" 
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+        </Link>
       </div>
 
       {/* ヘッダー */}

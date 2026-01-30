@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Pen, Package, ArrowLeft } from 'lucide-react';
 import {
@@ -36,8 +36,6 @@ import {
 } from '@/types/new-rt2';
 
 export default function Original() {
-  const router = useRouter();
-
   React.useEffect(() => {
     document.title = '配車パネル2D - Dispatch Harmony Hub';
   }, []);
@@ -49,14 +47,15 @@ export default function Original() {
       <div className="sticky left-0 top-0 w-full z-20 h-[50px] bg-white border-b border-zinc-300">
         <div className="flex items-center h-full px-2">
           {/* ダッシュボードに戻る - 左端 */}
-          <Button
-            variant="outline"
-            onClick={() => router.push('/dashboard')}
-            className="h-8 px-3 text-[13px] flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            ダッシュボードに戻る
-          </Button>
+          <Link href="/dashboard">
+            <Button
+              variant="outline"
+              className="h-8 px-3 text-[13px] flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              ダッシュボードに戻る
+            </Button>
+          </Link>
 
           {/* 中央配置のボタン群 */}
           <div className="flex-1 flex items-center justify-center gap-2">

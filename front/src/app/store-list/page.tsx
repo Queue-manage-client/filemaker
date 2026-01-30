@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,6 @@ import { ArrowLeft, Edit3, Search, Plus, Download } from "lucide-react";
 import { useStoreList } from '@/hooks/use-store';
 
 export default function StoreList() {
-  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
 
   React.useEffect(() => {
@@ -65,14 +64,15 @@ export default function StoreList() {
     <div className="min-h-screen bg-gray-100 p-4">
       {/* 戻るボタン */}
       <div className="mb-4">
-        <Button 
-          variant="outline" 
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+        </Link>
       </div>
 
       {/* ヘッダー */}
@@ -153,13 +153,14 @@ export default function StoreList() {
                       <td className="border border-gray-300 px-4 py-3">{store.address || '-'}</td>
                       <td className="border border-gray-300 px-4 py-3">{store.phoneNumber || '-'}</td>
                       <td className="border border-gray-300 px-4 py-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => router.push(`/store-ledger?store=${store.storeName}`)}
-                        >
-                          詳細
-                        </Button>
+                        <Link href={`/store-ledger?store=${store.storeName}`}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                          >
+                            詳細
+                          </Button>
+                        </Link>
                       </td>
                     </tr>
                   ))}

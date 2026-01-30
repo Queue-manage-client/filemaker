@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -53,8 +53,6 @@ const tabIcons: Record<StoreLedgerTab, React.ComponentType<{ className?: string 
 const adminOnlyTabs: StoreLedgerTab[] = ['basic', 'gm-division', 'course-prices', 'special-prices', 'staff-composition', 'class-prices'];
 
 export default function StoreLedger() {
-  const router = useRouter();
-
   React.useEffect(() => {
     document.title = '店舗台帳 - Dispatch Harmony Hub';
   }, []);
@@ -2617,15 +2615,16 @@ export default function StoreLedger() {
           {/* ヘッダー */}
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center gap-3 mb-4">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => router.push('/dashboard')}
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                戻る
-              </Button>
+              <Link href="/dashboard">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  戻る
+                </Button>
+              </Link>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">

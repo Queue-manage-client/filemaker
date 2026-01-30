@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -17,8 +17,6 @@ import { sampleCustomers } from '@/data/customerSampleData';
 // 型は分離済み
 
 export default function CustomerLedger() {
-  const router = useRouter();
-
   React.useEffect(() => {
     document.title = '顧客台帳 - Dispatch Harmony Hub';
   }, []);
@@ -251,32 +249,36 @@ export default function CustomerLedger() {
           <div className="flex items-center justify-between">
             {/* 左側：ダッシュボードに戻るボタンとナビゲーションボタン */}
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                onClick={() => router.push('/dashboard')}
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                ダッシュボードに戻る
-              </Button>
-              <button
-                onClick={() => router.push('/customer-ledger')}
-                className="px-4 py-2 bg-blue-500 border-2 border-blue-700 text-white text-sm font-semibold rounded hover:bg-blue-600 transition-colors"
-              >
-                顧客検索
-              </button>
-              <button
-                onClick={() => router.push('/dispatch-panel-2d')}
-                className="px-4 py-2 bg-amber-200 border-2 border-amber-700 text-amber-900 text-sm font-semibold rounded hover:bg-amber-300 transition-colors"
-              >
-                配車パネル
-              </button>
-              <button
-                onClick={() => router.push('/rt2-panel')}
-                className="px-4 py-2 bg-pink-300 border-2 border-pink-700 text-pink-900 text-sm font-semibold rounded hover:bg-pink-400 transition-colors"
-              >
-                RTⅡパネル
-              </button>
+              <Link href="/dashboard">
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  ダッシュボードに戻る
+                </Button>
+              </Link>
+              <Link href="/customer-ledger">
+                <button
+                  className="px-4 py-2 bg-blue-500 border-2 border-blue-700 text-white text-sm font-semibold rounded hover:bg-blue-600 transition-colors"
+                >
+                  顧客検索
+                </button>
+              </Link>
+              <Link href="/dispatch-panel-2d">
+                <button
+                  className="px-4 py-2 bg-amber-200 border-2 border-amber-700 text-amber-900 text-sm font-semibold rounded hover:bg-amber-300 transition-colors"
+                >
+                  配車パネル
+                </button>
+              </Link>
+              <Link href="/rt2-panel">
+                <button
+                  className="px-4 py-2 bg-pink-300 border-2 border-pink-700 text-pink-900 text-sm font-semibold rounded hover:bg-pink-400 transition-colors"
+                >
+                  RTⅡパネル
+                </button>
+              </Link>
               <button
                 onClick={() => {
                   // RTパネルの処理をここに追加

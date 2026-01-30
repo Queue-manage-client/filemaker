@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,7 +15,6 @@ type SortKey = 'endTime' | 'category' | 'ranking' | 'startTime' | 'name';
 type SortOrder = 'asc' | 'desc';
 
 export default function RT2Panel() {
-  const router = useRouter();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [sortKey, setSortKey] = useState<SortKey>('endTime');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
@@ -136,14 +135,15 @@ export default function RT2Panel() {
       <div className="h-[50px] bg-white border-b border-zinc-300">
         <div className="flex items-center h-full px-2">
           {/* ダッシュボードに戻る - 左端 */}
-          <Button
-            variant="outline"
-            onClick={() => router.push('/dashboard')}
-            className="h-8 px-3 text-xs flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            ダッシュボードに戻る
-          </Button>
+          <Link href="/dashboard">
+            <Button
+              variant="outline"
+              className="h-8 px-3 text-xs flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              ダッシュボードに戻る
+            </Button>
+          </Link>
 
           {/* 中央配置のボタン群 */}
           <div className="flex-1 flex items-center justify-center gap-2">
@@ -161,38 +161,42 @@ export default function RT2Panel() {
             </div>
 
             {/* 新顧客検索 */}
-            <Button
-              variant="outline"
-              className="h-8 px-4 text-xs border-black"
-              onClick={() => router.push('/customer-ledger')}
-            >
-              新顧客検索
-            </Button>
+            <Link href="/customer-ledger">
+              <Button
+                variant="outline"
+                className="h-8 px-4 text-xs border-black"
+              >
+                新顧客検索
+              </Button>
+            </Link>
 
             {/* 配車パネル */}
-            <Button
-              className="h-8 px-4 text-xs bg-amber-200 hover:bg-amber-300 text-black border border-black"
-              onClick={() => router.push('/dispatch-panel-2d')}
-            >
-              配車パネル
-            </Button>
+            <Link href="/dispatch-panel-2d">
+              <Button
+                className="h-8 px-4 text-xs bg-amber-200 hover:bg-amber-300 text-black border border-black"
+              >
+                配車パネル
+              </Button>
+            </Link>
 
             {/* 手配表 */}
-            <Button
-              className="h-8 px-4 text-xs bg-purple-400 hover:bg-purple-500 text-black border border-black"
-              onClick={() => router.push('/tehai')}
-            >
-              手配表
-            </Button>
+            <Link href="/tehai">
+              <Button
+                className="h-8 px-4 text-xs bg-purple-400 hover:bg-purple-500 text-black border border-black"
+              >
+                手配表
+              </Button>
+            </Link>
 
             {/* Menu */}
-            <Button
-              variant="outline"
-              className="h-8 px-4 text-xs border-black"
-              onClick={() => router.push('/dashboard')}
-            >
-              Menu
-            </Button>
+            <Link href="/dashboard">
+              <Button
+                variant="outline"
+                className="h-8 px-4 text-xs border-black"
+              >
+                Menu
+              </Button>
+            </Link>
 
             {/* ソート選択 */}
             <div className="flex items-center gap-2 ml-4">

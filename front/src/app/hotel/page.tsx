@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,8 +12,6 @@ import { hotelDivisionSampleData } from '@/data/hotelDivisionSampleData';
 import type { HotelDivision } from '@/types/hotel-division';
 
 export default function HotelPage() {
-  const router = useRouter();
-
   React.useEffect(() => {
     document.title = 'ホテル区分管理 - Dispatch Harmony Hub';
   }, []);
@@ -113,14 +110,15 @@ export default function HotelPage() {
     <div className="min-h-screen bg-gray-100 p-4">
       {/* 戻るボタン */}
       <div className="mb-4">
-        <Button
-          variant="outline"
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ダッシュボードに戻る
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+        </Link>
       </div>
 
       {/* ヘッダー */}
