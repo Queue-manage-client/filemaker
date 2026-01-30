@@ -212,7 +212,7 @@ export default function TehaiPage() {
   }, []);
 
   return (
-    <div className="w-[1920px] h-[1080px] relative bg-white flex flex-col text-[13px]">
+    <div className="w-[2022px] h-[1080px] relative bg-white flex flex-col text-[13px]">
       {/* ヘッダー - 配車パネルと同じスタイル */}
       <div className="w-full h-[50px] bg-white border-b border-zinc-300">
         <div className="flex items-center h-full px-2">
@@ -346,49 +346,49 @@ export default function TehaiPage() {
         </div>
 
         {/* 左2列目: 所属事務所 */}
-        <div className="h-full border-r border-gray-400 w-[404px] bg-white flex flex-col">
+        <div className="h-full border-r border-gray-400 w-[464px] bg-white flex flex-col">
           <div className="border-b border-gray-400 px-2 bg-gray-100">
-            <span className="border border-gray-600 px-2 py-0.5 text-sm">所属事務所:</span>
-          </div>
-          {/* ヘッダー行 */}
-          <div className="flex items-center border-b border-gray-400 text-[13px] bg-gray-100 font-bold">
-            <div className="w-5 text-center border-r border-gray-300"></div>
-            <div className="w-16 text-center border-r border-gray-300 px-1">現地 迎えドライバ</div>
-            <div className="w-10 text-center border-r border-gray-300"></div>
-            <div className="flex-1 text-center border-r border-gray-300 px-1">出発支場所</div>
-            <div className="w-10 text-center border-r border-gray-300">終了</div>
-            <div className="w-10 text-center border-r border-gray-300">帰宅</div>
-            <div className="text-center border-r border-gray-300 px-1">送り場所</div>
-            <div className="text-center px-1">担当者</div>
+            <span className="border border-gray-600 px-2 py-0.5 text-[11px]">所属事務所:</span>
           </div>
           <div className="flex-1 overflow-y-scroll">
+            {/* ヘッダー行 */}
+            <div className="flex items-center border-b border-gray-400 text-[10px] bg-gray-100 font-bold sticky top-0 z-10">
+              <div className="w-5 text-center border-r border-gray-300"></div>
+              <div className="w-16 text-center border-r border-gray-300">迎えドライバ</div>
+              <div className="w-10 text-center border-r border-gray-300"></div>
+              <div className="flex-1 text-center border-r border-gray-300">出発支場所</div>
+              <div className="w-10 text-center border-r border-gray-300">終了</div>
+              <div className="w-10 text-center border-r border-gray-300">帰宅</div>
+              <div className="w-[70px] text-center border-r border-gray-300">送り場所</div>
+              <div className="w-10 text-center">担当者</div>
+            </div>
             {officeAssignmentData.map((data) => (
               <div key={data.id} className="flex items-center border-b border-gray-300 text-[13px] bg-white">
                 <div className="w-5 text-center border-r border-gray-300 bg-lime-400 font-bold">{data.id}</div>
-                <div className="w-16 border-r border-gray-300 px-1">{data.driverArea}</div>
+                <div className="w-16 border-r border-gray-300">{data.driverArea}</div>
                 <div className="w-10 text-center border-r border-gray-300">{data.startTime}</div>
-                <div className="flex-1 border-r border-gray-300 px-1">{data.departure}</div>
+                <div className="flex-1 border-r border-gray-300">{data.departure}</div>
                 <div className="w-10 text-center border-r border-gray-300">{data.endTime}</div>
                 <div className="w-10 text-center border-r border-gray-300">{data.returnTime}</div>
-                <div className="border-r border-gray-300 px-1">{data.destination}</div>
-                <div className="text-center px-1">{data.staff}</div>
+                <div className="w-[70px] border-r border-gray-300">{data.destination}</div>
+                <div className="w-10 text-center">{data.staff}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* 左3列目: 出勤管理テーブル */}
-        <div className="h-full border-r border-gray-400 w-[446px] bg-white flex flex-col">
+        <div className="h-full border-r border-gray-400 w-[488px] bg-white flex flex-col">
           <div className="flex-1 overflow-y-scroll">
             {attendanceManagementData.map((data) => (
               <div key={data.id} className="flex items-center border-b border-gray-300 text-[13px] bg-white">
                 <div className="w-4 text-center border-r border-gray-300 bg-blue-600 text-white font-bold">{data.id}</div>
                 <div className="w-10 text-center border-r border-gray-300 bg-lime-400">{data.status}</div>
-                <div className="w-10 text-center border-r border-gray-300 bg-lime-400">{data.type}</div>
+                <div className="w-[78px] text-center border-r border-gray-300 bg-lime-400">{data.type}</div>
                 <div className="w-24 border-r border-gray-300">{data.name}</div>
                 <div className="w-12 text-center border-r border-gray-300 text-blue-600 font-bold">{data.startTime}</div>
                 <div className="w-12 text-center border-r border-gray-300">{data.endTime}</div>
-                <div className="w-6 text-center border-r border-gray-300 bg-lime-400 text-[11px]">{data.statusLabel}</div>
+                <div className="w-[40px] text-center border-r border-gray-300 bg-lime-400 text-[11px]">{data.statusLabel}</div>
                 <div className="w-12 flex items-center justify-center gap-1 border-r border-gray-300">
                   {data.checkboxes.map((checked, idx) => (
                     <input key={idx} type="checkbox" className="w-3 h-3" defaultChecked={checked} />
@@ -397,16 +397,15 @@ export default function TehaiPage() {
                 <div className="w-24 flex items-center gap-0.5">
                   {data.icons.map((icon, idx) => (
                     <div key={idx} className={`w-5 h-5 flex items-center justify-center text-[11px] ${
-                      icon === '✉' ? 'bg-lime-400' : 
-                      icon === '✕' ? 'bg-gray-200' : 
-                      icon === '👤' ? 'bg-pink-300' : 
+                      icon === '✉' ? 'bg-lime-400' :
+                      icon === '✕' ? 'bg-gray-200' :
+                      icon === '👤' ? 'bg-pink-300' :
                       'border border-gray-400 bg-white'
                     }`}>
                       {icon}
                     </div>
                   ))}
                 </div>
-                <div className="w-3 border-l border-gray-300"></div>
               </div>
             ))}
           </div>
