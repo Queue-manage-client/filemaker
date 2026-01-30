@@ -109,6 +109,48 @@ const officeChangeData = [
   { id: 2, checkboxes: [false, false, false, false], number: 23, area: '大阪', type: 'L', name: 'みゆき', count: 1, status: '待機' },
   { id: 3, checkboxes: [false, false, false, false], number: 38, area: '南心', type: 'G', name: 'あかり', count: 3, status: '移動中' },
   { id: 4, checkboxes: [false, false, false, false], number: 15, area: '京都', type: 'L', name: 'さくら', count: 1, status: '終了' },
+  { id: 5, checkboxes: [true, false, false, false], number: 52, area: '神戸', type: 'G', name: 'ゆうな', count: 4, status: '待機' },
+  { id: 6, checkboxes: [false, true, false, false], number: 31, area: '奈良', type: 'L', name: 'まい', count: 2, status: '終了' },
+  { id: 7, checkboxes: [false, false, true, false], number: 67, area: '京都', type: 'G', name: 'りこ', count: 1, status: '移動中' },
+  { id: 8, checkboxes: [false, false, false, true], number: 19, area: '大阪', type: 'L', name: 'ひな', count: 3, status: '待機' },
+  { id: 9, checkboxes: [true, true, false, false], number: 44, area: '南心', type: 'G', name: 'あおい', count: 2, status: '終了' },
+  { id: 10, checkboxes: [false, false, true, true], number: 28, area: '神戸', type: 'L', name: 'ここな', count: 1, status: '移動中' },
+  { id: 11, checkboxes: [true, false, true, false], number: 55, area: '奈良', type: 'G', name: 'れな', count: 5, status: '待機' },
+  { id: 12, checkboxes: [false, true, false, true], number: 12, area: '京都', type: 'L', name: 'なつき', count: 2, status: '終了' },
+  { id: 13, checkboxes: [true, true, true, false], number: 73, area: '大阪', type: 'G', name: 'かなで', count: 3, status: '移動中' },
+  { id: 14, checkboxes: [false, false, false, false], number: 36, area: '南心', type: 'L', name: 'ゆい', count: 1, status: '待機' },
+  { id: 15, checkboxes: [true, false, false, true], number: 61, area: '神戸', type: 'G', name: 'みお', count: 4, status: '終了' },
+  { id: 16, checkboxes: [false, true, true, false], number: 8, area: '奈良', type: 'L', name: 'すず', count: 2, status: '移動中' },
+  { id: 17, checkboxes: [true, true, false, true], number: 49, area: '京都', type: 'G', name: 'あんな', count: 1, status: '待機' },
+  { id: 18, checkboxes: [false, false, true, true], number: 27, area: '大阪', type: 'L', name: 'えま', count: 3, status: '終了' },
+  { id: 19, checkboxes: [true, false, true, true], number: 82, area: '南心', type: 'G', name: 'はる', count: 2, status: '移動中' },
+  { id: 20, checkboxes: [false, true, true, true], number: 41, area: '神戸', type: 'L', name: 'りん', count: 1, status: '待機' },
+  { id: 21, checkboxes: [true, false, false, false], number: 33, area: '京都', type: 'G', name: 'もも', count: 2, status: '終了' },
+  { id: 22, checkboxes: [false, true, false, false], number: 58, area: '大阪', type: 'L', name: 'しおり', count: 1, status: '移動中' },
+  { id: 23, checkboxes: [false, false, true, false], number: 14, area: '南心', type: 'G', name: 'ふうか', count: 3, status: '待機' },
+  { id: 24, checkboxes: [false, false, false, true], number: 71, area: '神戸', type: 'L', name: 'みさき', count: 2, status: '終了' },
+  { id: 25, checkboxes: [true, true, false, false], number: 25, area: '奈良', type: 'G', name: 'ちはる', count: 1, status: '移動中' },
+  { id: 26, checkboxes: [false, false, true, true], number: 47, area: '京都', type: 'L', name: 'ありさ', count: 4, status: '待機' },
+  { id: 27, checkboxes: [true, false, true, false], number: 63, area: '大阪', type: 'G', name: 'めい', count: 2, status: '終了' },
+  { id: 28, checkboxes: [false, true, false, true], number: 9, area: '南心', type: 'L', name: 'ゆな', count: 1, status: '移動中' },
+  { id: 29, checkboxes: [true, true, true, false], number: 84, area: '神戸', type: 'G', name: 'さな', count: 3, status: '待機' },
+  { id: 30, checkboxes: [false, false, false, false], number: 21, area: '奈良', type: 'L', name: 'のあ', count: 2, status: '終了' },
+  { id: 31, checkboxes: [true, false, false, true], number: 56, area: '京都', type: 'G', name: 'あいり', count: 1, status: '移動中' },
+  { id: 32, checkboxes: [false, true, true, false], number: 39, area: '大阪', type: 'L', name: 'ひより', count: 5, status: '待機' },
+  { id: 33, checkboxes: [true, true, false, true], number: 17, area: '南心', type: 'G', name: 'まひろ', count: 2, status: '終了' },
+  { id: 34, checkboxes: [false, false, true, true], number: 76, area: '神戸', type: 'L', name: 'ことね', count: 1, status: '移動中' },
+  { id: 35, checkboxes: [true, false, true, true], number: 42, area: '奈良', type: 'G', name: 'みなみ', count: 3, status: '待機' },
+  { id: 36, checkboxes: [false, true, true, true], number: 68, area: '京都', type: 'L', name: 'せな', count: 2, status: '終了' },
+  { id: 37, checkboxes: [true, true, true, true], number: 11, area: '大阪', type: 'G', name: 'ほのか', count: 1, status: '移動中' },
+  { id: 38, checkboxes: [false, false, false, false], number: 53, area: '南心', type: 'L', name: 'いろは', count: 4, status: '待機' },
+  { id: 39, checkboxes: [true, false, false, false], number: 29, area: '神戸', type: 'G', name: 'つむぎ', count: 2, status: '終了' },
+  { id: 40, checkboxes: [false, true, false, false], number: 87, area: '奈良', type: 'L', name: 'あやね', count: 1, status: '移動中' },
+  { id: 41, checkboxes: [false, false, true, false], number: 34, area: '京都', type: 'G', name: 'みつき', count: 3, status: '待機' },
+  { id: 42, checkboxes: [false, false, false, true], number: 62, area: '大阪', type: 'L', name: 'かのん', count: 2, status: '終了' },
+  { id: 43, checkboxes: [true, true, false, false], number: 7, area: '南心', type: 'G', name: 'りお', count: 1, status: '移動中' },
+  { id: 44, checkboxes: [false, false, true, true], number: 79, area: '神戸', type: 'L', name: 'ゆあ', count: 5, status: '待機' },
+  { id: 45, checkboxes: [true, false, true, false], number: 48, area: '奈良', type: 'G', name: 'まお', count: 2, status: '終了' },
+  { id: 46, checkboxes: [false, true, false, true], number: 22, area: '京都', type: 'L', name: 'ここあ', count: 1, status: '移動中' },
 ];
 
 // 所属事務所データ
@@ -170,7 +212,7 @@ export default function TehaiPage() {
   }, []);
 
   return (
-    <div className="w-[1920px] h-[1080px] relative bg-white flex flex-col text-xs">
+    <div className="w-[1920px] h-[1080px] relative bg-white flex flex-col text-[13px]">
       {/* ヘッダー - 配車パネルと同じスタイル */}
       <div className="w-full h-[50px] bg-white border-b border-zinc-300">
         <div className="flex items-center h-full px-2">
@@ -178,7 +220,7 @@ export default function TehaiPage() {
           <Link href="/dashboard">
             <Button
               variant="outline"
-              className="h-8 px-3 text-xs flex items-center gap-2"
+              className="h-8 px-3 text-[13px] flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
               ダッシュボードに戻る
@@ -193,7 +235,7 @@ export default function TehaiPage() {
             {/* 日付移動 */}
             <Button
               variant="outline"
-              className="h-8 px-3 text-xs border-black"
+              className="h-8 px-3 text-[13px] border-black"
               onClick={() => {}}
             >
               日付移動
@@ -201,7 +243,7 @@ export default function TehaiPage() {
 
             {/* ドライバ精算 */}
             <Button
-              className="h-8 px-4 text-xs bg-lime-400 hover:bg-lime-500 text-black border border-black"
+              className="h-8 px-4 text-[13px] bg-lime-400 hover:bg-lime-500 text-black border border-black"
               onClick={() => {}}
             >
               ドライバ精算
@@ -211,7 +253,7 @@ export default function TehaiPage() {
             <Link href="/customer-ledger">
               <Button
                 variant="outline"
-                className="h-8 px-4 text-xs border-black"
+                className="h-8 px-4 text-[13px] border-black"
               >
                 新顧客検索
               </Button>
@@ -220,7 +262,7 @@ export default function TehaiPage() {
             {/* RT IIパネル */}
             <Link href="/rt2-panel">
               <Button
-                className="h-8 px-4 text-xs bg-purple-400 hover:bg-purple-500 text-black border border-black"
+                className="h-8 px-4 text-[13px] bg-purple-400 hover:bg-purple-500 text-black border border-black"
               >
                 RT IIパネル
               </Button>
@@ -228,7 +270,7 @@ export default function TehaiPage() {
 
             {/* RTパネル */}
             <Button
-              className="h-8 px-4 text-xs bg-orange-400 hover:bg-orange-500 text-black border border-black"
+              className="h-8 px-4 text-[13px] bg-orange-400 hover:bg-orange-500 text-black border border-black"
               onClick={() => {}}
             >
               RTパネル
@@ -237,7 +279,7 @@ export default function TehaiPage() {
             {/* 配車パネル */}
             <Link href="/dispatch-panel-2d">
               <Button
-                className="h-8 px-4 text-xs bg-amber-200 hover:bg-amber-300 text-black border border-black"
+                className="h-8 px-4 text-[13px] bg-amber-200 hover:bg-amber-300 text-black border border-black"
               >
                 配車パネル
               </Button>
@@ -246,7 +288,7 @@ export default function TehaiPage() {
             {/* Menu */}
             <Button
               variant="outline"
-              className="h-8 px-4 text-xs border-black"
+              className="h-8 px-4 text-[13px] border-black"
               onClick={() => {}}
             >
               Menu
@@ -254,7 +296,7 @@ export default function TehaiPage() {
 
             {/* チャット表示 */}
             <Button
-              className="h-8 px-4 text-xs bg-cyan-300 hover:bg-cyan-400 text-black border border-black"
+              className="h-8 px-4 text-[13px] bg-cyan-300 hover:bg-cyan-400 text-black border border-black"
               onClick={() => {}}
             >
               チャット表示
@@ -266,37 +308,50 @@ export default function TehaiPage() {
       {/* メインコンテンツ */}
       <div className="flex flex-1">
         {/* 左1列目: 所属事務所変更 */}
-        <div className="h-full border-r border-gray-400 w-[280px] bg-white flex flex-col">
+        <div className="h-full border-r border-gray-400 w-[316px] bg-white flex flex-col">
           <div className="border-b border-gray-400 py-1 px-2">
             <a href="#" className="text-blue-600 underline font-bold text-sm">所属事務所変更</a>
           </div>
-          <div className="flex-1 overflow-auto">
+          {/* ヘッダー行 */}
+          <div className="flex items-center border-b border-gray-400 text-[11px] bg-gray-100 font-bold">
+            <div className="w-4 text-center border-r border-gray-300">デ</div>
+            <div className="w-4 text-center border-r border-gray-300">ホ</div>
+            <div className="w-4 text-center border-r border-gray-300">併</div>
+            <div className="w-4 text-center border-r border-gray-300">温</div>
+            <div className="w-6 text-center border-r border-gray-300"></div>
+            <div className="w-10 text-center border-r border-gray-300"></div>
+            <div className="w-6 text-center border-r border-gray-300"></div>
+            <div className="flex-1 border-r border-gray-300"></div>
+            <div className="w-10 text-center"></div>
+          </div>
+          <div className="flex-1 overflow-y-scroll">
             {officeChangeData.map((data) => (
-              <div key={data.id} className="flex items-center border-b border-gray-300 text-[12px] bg-white">
+              <div key={data.id} className="flex items-center border-b border-gray-300 text-[13px] bg-white">
                 {data.checkboxes.map((checked, idx) => (
                   <div key={idx} className="w-4 text-center border-r border-gray-300">
                     <input type="checkbox" className="w-3 h-3" defaultChecked={checked} />
                   </div>
                 ))}
-                <div className="w-6 text-center border-r border-gray-300">{data.number}</div>
-                <div className="w-10 text-center border-r border-gray-300">{data.area}</div>
-                <div className="w-8 text-center border-r border-gray-300 bg-white">{data.type}</div>
-                <div className="flex-1 border-r border-gray-300 text-blue-600">{data.name}</div>
-                <div className="w-4 text-center border-r border-gray-300 font-bold">{data.count}</div>
-                <div className="w-8 text-center border-r border-gray-300 bg-gray-200">{data.status}</div>
-                <div className="w-4 text-center"></div>
+                <div className="w-6 text-center border-r border-pink-300 bg-pink-100 font-bold">{data.number}</div>
+                <div className="w-10 text-center border-r border-pink-300 bg-pink-100">{data.area}</div>
+                <div className="w-6 text-center border-r border-gray-300 text-[13px] font-bold rounded-sm bg-gradient-to-b from-white via-gray-100 to-gray-200 border border-gray-400 shadow-[inset_0_1px_0_rgba(255,255,255,1),inset_0_-1px_2px_rgba(0,0,0,0.1),0_1px_2px_rgba(0,0,0,0.2)]">{data.type}</div>
+                <div className="flex-1 flex items-center border-r border-gray-300 rounded-sm bg-gradient-to-b from-white via-gray-100 to-gray-200 border border-gray-400 shadow-[inset_0_1px_0_rgba(255,255,255,1),inset_0_-1px_2px_rgba(0,0,0,0.1),0_1px_2px_rgba(0,0,0,0.2)]">
+                  <span className="flex-1 text-[13px] text-blue-600">{data.name}</span>
+                  <span className="w-5 text-center text-[13px] font-bold border-l border-gray-400">{data.count}</span>
+                </div>
+                <div className="w-10 text-center bg-gray-200">{data.status}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* 左2列目: 所属事務所 */}
-        <div className="h-full border-r border-gray-400 w-[380px] bg-white flex flex-col">
+        <div className="h-full border-r border-gray-400 w-[404px] bg-white flex flex-col">
           <div className="border-b border-gray-400 px-2 bg-gray-100">
             <span className="border border-gray-600 px-2 py-0.5 text-sm">所属事務所:</span>
           </div>
           {/* ヘッダー行 */}
-          <div className="flex items-center border-b border-gray-400 text-[11px] bg-gray-100 font-bold">
+          <div className="flex items-center border-b border-gray-400 text-[13px] bg-gray-100 font-bold">
             <div className="w-5 text-center border-r border-gray-300"></div>
             <div className="w-16 text-center border-r border-gray-300 px-1">現地 迎えドライバ</div>
             <div className="w-10 text-center border-r border-gray-300"></div>
@@ -306,9 +361,9 @@ export default function TehaiPage() {
             <div className="text-center border-r border-gray-300 px-1">送り場所</div>
             <div className="text-center px-1">担当者</div>
           </div>
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-y-scroll">
             {officeAssignmentData.map((data) => (
-              <div key={data.id} className="flex items-center border-b border-gray-300 text-[12px] bg-white">
+              <div key={data.id} className="flex items-center border-b border-gray-300 text-[13px] bg-white">
                 <div className="w-5 text-center border-r border-gray-300 bg-lime-400 font-bold">{data.id}</div>
                 <div className="w-16 border-r border-gray-300 px-1">{data.driverArea}</div>
                 <div className="w-10 text-center border-r border-gray-300">{data.startTime}</div>
@@ -324,16 +379,16 @@ export default function TehaiPage() {
 
         {/* 左3列目: 出勤管理テーブル */}
         <div className="h-full border-r border-gray-400 w-[446px] bg-white flex flex-col">
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-y-scroll">
             {attendanceManagementData.map((data) => (
-              <div key={data.id} className="flex items-center border-b border-gray-300 text-[12px] bg-white">
+              <div key={data.id} className="flex items-center border-b border-gray-300 text-[13px] bg-white">
                 <div className="w-4 text-center border-r border-gray-300 bg-blue-600 text-white font-bold">{data.id}</div>
                 <div className="w-10 text-center border-r border-gray-300 bg-lime-400">{data.status}</div>
                 <div className="w-10 text-center border-r border-gray-300 bg-lime-400">{data.type}</div>
                 <div className="w-24 border-r border-gray-300">{data.name}</div>
                 <div className="w-12 text-center border-r border-gray-300 text-blue-600 font-bold">{data.startTime}</div>
                 <div className="w-12 text-center border-r border-gray-300">{data.endTime}</div>
-                <div className="w-6 text-center border-r border-gray-300 bg-lime-400 text-[9px]">{data.statusLabel}</div>
+                <div className="w-6 text-center border-r border-gray-300 bg-lime-400 text-[11px]">{data.statusLabel}</div>
                 <div className="w-12 flex items-center justify-center gap-1 border-r border-gray-300">
                   {data.checkboxes.map((checked, idx) => (
                     <input key={idx} type="checkbox" className="w-3 h-3" defaultChecked={checked} />
@@ -341,7 +396,7 @@ export default function TehaiPage() {
                 </div>
                 <div className="w-24 flex items-center gap-0.5">
                   {data.icons.map((icon, idx) => (
-                    <div key={idx} className={`w-5 h-5 flex items-center justify-center text-[9px] ${
+                    <div key={idx} className={`w-5 h-5 flex items-center justify-center text-[11px] ${
                       icon === '✉' ? 'bg-lime-400' : 
                       icon === '✕' ? 'bg-gray-200' : 
                       icon === '👤' ? 'bg-pink-300' : 
@@ -358,9 +413,9 @@ export default function TehaiPage() {
         </div>
 
         {/* 右コラム */}
-        <div className="h-full border-r border-gray-400 flex-1 grid grid-rows-[55%_23%_22%]" style={{ gridTemplateColumns: '33.33% 33.33% calc(33.33% - 160px) 160px' }}>
+        <div className="h-full border-r border-gray-400 flex-1 grid grid-rows-[55%_23%_22%]" style={{ gridTemplateColumns: '35% 30% calc(35% - 100px) 100px' }}>
             {/* ポジションブロック - 写真通りの完全な内容 */}
-            <div className="row-span-2 border-r border-gray-400 bg-white flex flex-col text-[12px]">
+            <div className="row-span-2 border-r border-gray-400 bg-white flex flex-col text-[13px]">
               <div className="text-center text-blue-600 font-bold border-b border-gray-400 py-1">ポジション</div>
               <div className="text-center border-b border-gray-400 py-0.5">
                 <span className="text-pink-500">（配車3区目は責任者）</span>
@@ -369,7 +424,7 @@ export default function TehaiPage() {
                 {/* 前半列 */}
                 <div className="w-1/2 flex flex-col border-r border-gray-400">
                   <div className="text-center border-b border-gray-400 bg-gray-100 py-0.5">前半</div>
-                  <div className="flex-1 flex flex-col px-1 py-1">
+                  <div className="flex-1 flex flex-col px-1 py-1 overflow-y-scroll">
                     {positionFirstHalfData.map((position) => (
                       <div key={position.id} className="mb-2">
                         <div className={`text-center mb-1 ${position.position === '配車' ? 'font-bold' : ''}`}>
@@ -386,7 +441,7 @@ export default function TehaiPage() {
                               {member.name && <span>{member.name}</span>}
                               {member.hasAction && (
                                 <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center ml-auto">
-                                  <span className="text-white text-[10px] leading-none">×</span>
+                                  <span className="text-white text-[11px] leading-none">×</span>
                                 </div>
                               )}
                             </div>
@@ -399,7 +454,7 @@ export default function TehaiPage() {
                 {/* 後半列 */}
                 <div className="w-1/2 flex flex-col">
                   <div className="text-center border-b border-gray-400 bg-gray-100 py-0.5">後半</div>
-                  <div className="flex-1 flex flex-col px-1 py-1">
+                  <div className="flex-1 flex flex-col px-1 py-1 overflow-y-scroll">
                     {positionSecondHalfData.map((position) => (
                       <div key={position.id} className="mb-2">
                         <div className={`text-center mb-1 ${position.position === '会計' || position.position === '配車' ? 'font-bold' : ''}`}>
@@ -416,7 +471,7 @@ export default function TehaiPage() {
                               {member.name && <span>{member.name}</span>}
                               {member.hasAction && (
                                 <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center ml-auto">
-                                  <span className="text-white text-[10px] leading-none">×</span>
+                                  <span className="text-white text-[11px] leading-none">×</span>
                                 </div>
                               )}
                             </div>
@@ -431,21 +486,21 @@ export default function TehaiPage() {
               <div className="border-t border-gray-400">
                 <div className="flex">
                   <div className="w-1/2 border-r border-gray-400 px-1 py-1">
-                    <div className="text-center text-[10px] mb-1">有給使用者及び給引き者</div>
+                    <div className="text-center text-[11px] mb-1">有給使用者及び給引き者</div>
                     <div className="border border-gray-800">
                       <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
                         <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
+                          <span className="text-white text-[11px] leading-none">×</span>
                         </div>
                       </div>
                     </div>
                   </div>
                   <div className="w-1/2 px-1 py-1">
-                    <div className="text-center text-[10px] mb-1">南IC会計</div>
+                    <div className="text-center text-[11px] mb-1">南IC会計</div>
                     <div className="border border-gray-800">
                       <div className="flex items-center justify-end h-5 bg-gray-200 px-0.5">
                         <div className="w-4 h-4 rounded-full bg-pink-500 flex items-center justify-center">
-                          <span className="text-white text-[10px] leading-none">×</span>
+                          <span className="text-white text-[11px] leading-none">×</span>
                         </div>
                       </div>
                     </div>
@@ -457,14 +512,14 @@ export default function TehaiPage() {
             {/* 出勤希望アルバイト（シアン） */}
             <div className="border-r border-gray-400 bg-cyan-300 flex flex-col">
               <div className="flex gap-2 justify-center items-center py-1 border-b border-gray-400">
-                <button className="px-4 py-1 bg-blue-100 border border-gray-800 text-black text-xs font-bold">
+                <button className="px-4 py-1 bg-blue-100 border border-gray-800 text-black text-[13px] font-bold">
                   ⬇ 一括戻す ⬇
                 </button>
-                <button className="px-4 py-1 bg-blue-100 border border-gray-800 text-black text-xs font-bold">
+                <button className="px-4 py-1 bg-blue-100 border border-gray-800 text-black text-[13px] font-bold">
                   ⬇ 一括移動 ⬇
                 </button>
               </div>
-              <div className="flex items-center justify-between bg-cyan-300 text-black py-1 text-xs border-b border-gray-800">
+              <div className="flex items-center justify-between bg-cyan-300 text-black py-1 text-[13px] border-b border-gray-800">
                 <div className="flex-1 text-center font-normal">出勤希望アルバイト</div>
                 <div className="flex gap-6 pr-3">
                   <span className="font-normal">出勤</span>
@@ -472,9 +527,9 @@ export default function TehaiPage() {
                   <span className="font-normal">配務</span>
                 </div>
               </div>
-              <div className="flex-1 overflow-auto bg-cyan-300">
-                <table className="w-full text-xs border-collapse">
-                  <tbody className="text-[10px]">
+              <div className="flex-1 overflow-y-scroll bg-cyan-300">
+                <table className="w-full text-[13px] border-collapse">
+                  <tbody className="text-[11px]">
                     {attendanceData.map((data) => (
                       <tr key={data.id} className={data.selected ? 'bg-blue-400' : 'bg-white'}>
                         <td className="text-center border-b border-r border-gray-400">{data.id}</td>
@@ -493,10 +548,10 @@ export default function TehaiPage() {
 
             {/* スタッフ予定リスト（黄色） */}
             <div className="col-span-2 bg-white flex flex-col">
-              <div className="bg-yellow-300 text-black text-center py-1 text-xs font-bold">
+              <div className="bg-yellow-300 text-black text-center py-1 text-[13px] font-bold">
                 ▲スタッフ予定リスト
               </div>
-              <div className="flex-1 overflow-auto text-[11px] relative" style={{
+              <div className="flex-1 overflow-y-scroll text-[13px] relative" style={{
                 background: 'repeating-linear-gradient(to bottom, #d4f1d4 0px, #d4f1d4 24px, white 24px, white 48px)',
                 lineHeight: '12px'
               }}>
@@ -510,14 +565,14 @@ export default function TehaiPage() {
             </div>
           {/* 2行目 - 2列目: 予約 */}
           <div className="col-span-2 border-t border-gray-400 border-r border-gray-400 bg-white flex flex-col">
-            <div className="bg-gray-300 text-black text-center py-0.5 text-xs border-b border-gray-400">
+            <div className="bg-gray-300 text-black text-center py-0.5 text-[13px] border-b border-gray-400">
               予約
             </div>
-            <div className="flex-1 overflow-auto">
+            <div className="flex-1 overflow-y-scroll">
               {reservationData.map((res, index) => (
                 <div 
                   key={index} 
-                  className={`flex items-center text-xs border-b border-gray-300 ${
+                  className={`flex items-center text-[13px] border-b border-gray-300 ${
                     res.color === 'pink' ? 'bg-pink-200' : 'bg-blue-200'
                   }`}
                   style={{ height: '24px' }}
@@ -538,14 +593,14 @@ export default function TehaiPage() {
 
           {/* 2行目 - 3列目: クイックメニュー（2行分） */}
           <div className="row-span-2 border-t border-gray-400 bg-gray-200 flex flex-col">
-            <div className="bg-gray-400 text-black text-center py-1 text-xs font-bold">
+            <div className="bg-gray-400 text-black text-center py-1 text-[13px] font-bold">
               クイック
             </div>
-            <div className="flex-1 p-1 overflow-auto">
-              <button className="w-full mb-1 px-1 py-2 bg-red-400 text-black text-xs border border-gray-600">緊急連絡</button>
-              <button className="w-full mb-1 px-1 py-2 bg-cyan-300 text-black text-xs border border-gray-600">レポート</button>
-              <button className="w-full mb-1 px-1 py-2 bg-lime-400 text-black text-xs border border-gray-600">集計</button>
-              <button className="w-full mb-1 px-1 py-2 bg-gray-300 text-black text-xs border border-gray-600">設定</button>
+            <div className="flex-1 p-1 overflow-y-scroll">
+              <button className="w-full mb-1 px-1 py-2 bg-red-400 text-black text-[13px] border border-gray-600">緊急連絡</button>
+              <button className="w-full mb-1 px-1 py-2 bg-cyan-300 text-black text-[13px] border border-gray-600">レポート</button>
+              <button className="w-full mb-1 px-1 py-2 bg-lime-400 text-black text-[13px] border border-gray-600">集計</button>
+              <button className="w-full mb-1 px-1 py-2 bg-gray-300 text-black text-[13px] border border-gray-600">設定</button>
             </div>
           </div>
 
@@ -557,9 +612,10 @@ export default function TehaiPage() {
                 面接予定
               </div>
               {/* 面接情報 */}
+              <div className="flex-1 overflow-y-scroll">
               {interviewScheduleData.map((interview) => (
                 <div key={interview.id} className="bg-white px-3 py-2 border-b border-gray-300">
-                  <div className="text-xs flex items-center gap-2">
+                  <div className="text-[13px] flex items-center gap-2">
                     <span className="font-bold text-sm">{interview.time}</span>
                     <span className="font-semibold">{interview.type}</span>
                     <span>{interview.location}</span>
@@ -574,14 +630,15 @@ export default function TehaiPage() {
               {/* ピンクブロック2 */}
               <div className="bg-pink-200 mx-2 mb-3" style={{ height: '100px' }}>
               </div>
+              </div>
             </div>
 
             {/* 予約詳細 */}
             <div className="w-1/2 border-r border-gray-400 bg-white flex flex-col">
-              <div className="bg-cyan-400 text-black text-center py-1 text-xs font-bold">
+              <div className="bg-cyan-400 text-black text-center py-1 text-[13px] font-bold">
                 予約詳細
               </div>
-              <div className="flex-1 p-2 overflow-auto text-xs">
+              <div className="flex-1 p-2 overflow-y-scroll text-[13px]">
                 <table className="w-full border border-gray-400">
                   <thead className="bg-cyan-200">
                     <tr>
@@ -597,7 +654,7 @@ export default function TehaiPage() {
                         <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.startTime}</td>
                         <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.name1}</td>
                         <td className="py-1 text-center border-b border-gray-400 border-r border-gray-400">{res.type2}</td>
-                        <td className="py-1 text-center border-b border-gray-400 text-xs">{res.store}</td>
+                        <td className="py-1 text-center border-b border-gray-400 text-[13px]">{res.store}</td>
                       </tr>
                     ))}
                   </tbody>
