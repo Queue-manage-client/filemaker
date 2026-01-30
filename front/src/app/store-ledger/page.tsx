@@ -25,8 +25,7 @@ import { BasicTag } from '@/types/basic-tag';
 
 import { useStoreLedger, useStoreBasicInfo } from '@/hooks/use-store-ledger';
 import { calculateCourseFeeShares } from '@/lib/utils';
-import { discountSampleData, storeOptionsSampleData } from '@/data/storeLedgerSampleData';
-import { useShopList } from '@/hooks/use-shop';
+import { discountSampleData, storeOptionsSampleData, storeBasicInfoSampleData } from '@/data/storeLedgerSampleData';
 
 // 各タブのアイコンマッピング
 const tabIcons: Record<StoreLedgerTab, React.ComponentType<{ className?: string }>> = {
@@ -60,24 +59,21 @@ export default function StoreLedger() {
     document.title = '店舗台帳 - Dispatch Harmony Hub';
   }, []);
   
-  // shopテーブルから店舗一覧を取得
-  const { data: shops = [] } = useShopList();
-
-  // フロント側で追加した店舗名を保持（DB保存は別途実装が必要）
+  // フロント側で追加した店舗名を保持
   const [localStoreList, setLocalStoreList] = React.useState<string[]>([]);
 
-  // storeListをuseMemoでメモ化して不要な再計算を防ぐ
+  // サンプルデータから店舗一覧を取得
   const storeList = React.useMemo(() => {
-    const base = shops.map(shop => shop.store_name || '').filter(Boolean);
+    const base = storeBasicInfoSampleData.map(store => store.storeName);
     const merged = [...base, ...localStoreList].filter(Boolean);
     return Array.from(new Set(merged));
-  }, [shops, localStoreList]);
+  }, [localStoreList]);
 
   // initialStoreをメモ化して無限ループを防ぐ
   const initialStore = React.useMemo(() => storeList[0] || '', [storeList]);
 
-  // 管理者スイッチの状態管理（デモ用）
-  const [isAdminMode, setIsAdminMode] = React.useState(false);
+  // 管理者スイッチの状態管理（デモ用）- 常にオン
+  const [isAdminMode] = React.useState(true);
   
   // 編集モードの状態管理
   const [isEditMode, setIsEditMode] = React.useState(false);
@@ -2689,29 +2685,6 @@ export default function StoreLedger() {
 
         {/* 右側：タブコンテンツ */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* 管理者スイッチ（デモ用） */}
-          <div className="bg-yellow-50 border-b border-yellow-200 px-4 py-2 flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Settings className="w-4 h-4 text-yellow-700" />
-                <span className="text-sm font-medium text-yellow-800">デモ用管理者モード</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-yellow-700">オフ</span>
-                <Switch
-                  checked={isAdminMode}
-                  onCheckedChange={setIsAdminMode}
-                />
-                <span className="text-sm text-yellow-700">オン</span>
-              </div>
-            </div>
-            {isCurrentTabAdminOnly && !isAdminMode && (
-              <div className="mt-2 text-xs text-yellow-700">
-                ⚠️ このタブは管理者のみ編集可能です。管理者モードをオンにしてください。
-              </div>
-            )}
-          </div>
-          
           {/* 選択店舗情報ヘッダー */}
           <div className="bg-white border-b border-gray-200 p-4 flex-shrink-0">
             <div className="flex items-center justify-between">
