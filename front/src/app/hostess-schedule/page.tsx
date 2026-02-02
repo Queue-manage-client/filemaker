@@ -16,6 +16,7 @@ interface EditingBar {
   receptDate?: string;
   location?: string;
   status?: 'pending' | 'confirmed' | 'completed';
+  memo?: string; // 備考
 }
 
 // 予約データの型定義
@@ -27,6 +28,7 @@ interface Reservation {
   receptDate: string; // 受付日時
   location: string;
   status: 'pending' | 'confirmed' | 'completed';
+  memo?: string; // 備考
 }
 
 // ホステスデータの型定義
@@ -59,7 +61,8 @@ const sampleHostessTimeline: HostessTimelineData[] = [
         endTime: "16:30",
         receptDate: "01/25 11:54",
         location: "京都デリヘル...",
-        status: "completed"
+        status: "completed",
+        memo: "VIP顧客、特別対応必要"
       }
     ]
   },
@@ -79,7 +82,8 @@ const sampleHostessTimeline: HostessTimelineData[] = [
         endTime: "11:35",
         receptDate: "01/22 20:15",
         location: "",
-        status: "completed"
+        status: "completed",
+        memo: "初回利用のお客様"
       }
     ]
   },
@@ -109,7 +113,8 @@ const sampleHostessTimeline: HostessTimelineData[] = [
         endTime: "14:10",
         receptDate: "01/13 19:48",
         location: "",
-        status: "completed"
+        status: "completed",
+        memo: "リピーター様"
       }
     ]
   },
@@ -129,7 +134,8 @@ const sampleHostessTimeline: HostessTimelineData[] = [
         endTime: "16:10",
         receptDate: "01/15 10:09",
         location: "",
-        status: "completed"
+        status: "completed",
+        memo: "時間厳守でお願いします"
       }
     ]
   },
@@ -149,7 +155,8 @@ const sampleHostessTimeline: HostessTimelineData[] = [
         endTime: "14:10",
         receptDate: "01/20 16:16",
         location: "京都デリヘル倶楽部",
-        status: "pending"
+        status: "pending",
+        memo: "送迎必要"
       }
     ]
   },
@@ -169,7 +176,8 @@ const sampleHostessTimeline: HostessTimelineData[] = [
         endTime: "12:40",
         receptDate: "01/24 13:11",
         location: "",
-        status: "completed"
+        status: "completed",
+        memo: "延長の可能性あり"
       }
     ]
   },
@@ -199,7 +207,8 @@ const sampleHostessTimeline: HostessTimelineData[] = [
         endTime: "17:30",
         receptDate: "01/25 15:54",
         location: "",
-        status: "pending"
+        status: "pending",
+        memo: "電話確認済み"
       }
     ]
   },
@@ -219,7 +228,8 @@ const sampleHostessTimeline: HostessTimelineData[] = [
         endTime: "12:40",
         receptDate: "01/22 11:20",
         location: "愛しいね@yeh",
-        status: "completed"
+        status: "completed",
+        memo: "常連様・ドリンク好み把握済"
       },
       {
         id: "r9",
@@ -228,7 +238,8 @@ const sampleHostessTimeline: HostessTimelineData[] = [
         endTime: "14:15",
         receptDate: "01/22 17:52",
         location: "",
-        status: "completed"
+        status: "completed",
+        memo: "次回予約希望あり"
       }
     ]
   },
@@ -248,7 +259,8 @@ const sampleHostessTimeline: HostessTimelineData[] = [
         endTime: "16:00",
         receptDate: "01/20 16:23",
         location: "京都デリヘル倶楽部",
-        status: "completed"
+        status: "completed",
+        memo: "駐車場確認済み"
       }
     ]
   },
@@ -512,7 +524,8 @@ export default function HostessSchedule() {
         customerName: reservation.customerName,
         receptDate: reservation.receptDate,
         location: reservation.location,
-        status: reservation.status
+        status: reservation.status,
+        memo: reservation.memo
       };
       setEditingBars(new Map(editingBars.set(barId, editBar)));
     }
@@ -553,6 +566,15 @@ export default function HostessSchedule() {
       const { hours } = parseTime(currentTime);
       const newTime = buildTime(hours, newMinute);
       handleTimeChange(barId, field, newTime);
+    }
+  };
+
+  // 備考を変更
+  const handleMemoChange = (barId: string, memo: string) => {
+    const bar = editingBars.get(barId);
+    if (bar) {
+      const updatedBar = { ...bar, memo };
+      setEditingBars(new Map(editingBars.set(barId, updatedBar)));
     }
   };
 
@@ -978,6 +1000,7 @@ export default function HostessSchedule() {
                     const displayStartTime = editBar?.startTime ?? reservation.startTime;
                     const displayEndTime = editBar?.endTime ?? reservation.endTime;
                     const isPending = (editBar?.status ?? reservation.status) === 'pending';
+                    const displayMemo = editBar?.memo ?? reservation.memo;
 
                     const barLeft = timeToPosition(displayStartTime);
                     const barWidth = getBarWidth(displayStartTime, displayEndTime);
@@ -985,25 +1008,41 @@ export default function HostessSchedule() {
                     return (
                       <div
                         key={reservation.id}
-                        className={`absolute top-[4px] bottom-[4px] rounded-full flex items-center px-2 shadow-sm ${
-                          isActiveEdit ? 'cursor-move ring-2 ring-blue-400 ring-offset-1' : 'cursor-pointer'
-                        }`}
+                        className="group absolute top-[4px] bottom-[4px]"
                         style={{
                           left: `${barLeft}px`,
-                          width: `${Math.max(barWidth, 120)}px`,
-                          minWidth: '120px',
-                          background: isPending
-                            ? 'linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #9333ea 100%)'
-                            : 'linear-gradient(135deg, #d4d4d4 0%, #a3a3a3 50%, #737373 100%)',
+                          width: `${barWidth}px`,
+                          minWidth: '60px',
                           zIndex: isActiveEdit ? 10 : 1
                         }}
-                        onClick={() => handleBarClick(hostess.id, reservation)}
-                        onMouseDown={(e) => {
-                          if (isActiveEdit) {
-                            handleDragStart(e, barId, 'move');
-                          }
-                        }}
                       >
+                        {/* 備考ツールチップ（ホバー時表示） */}
+                        {displayMemo && (
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                            <div className="font-medium mb-1">備考:</div>
+                            <div>{displayMemo}</div>
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
+                          </div>
+                        )}
+
+                        {/* バー本体 */}
+                        <div
+                          className={`absolute inset-0 rounded-full flex items-center px-2 shadow-sm overflow-hidden ${
+                            isActiveEdit ? 'cursor-move ring-2 ring-blue-400 ring-offset-1' : 'cursor-pointer'
+                          }`}
+                          style={{
+                            background: isPending
+                              ? 'linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #9333ea 100%)'
+                              : 'linear-gradient(135deg, #d4d4d4 0%, #a3a3a3 50%, #737373 100%)'
+                          }}
+                          onClick={() => handleBarClick(hostess.id, reservation)}
+                          onMouseDown={(e) => {
+                            if (isActiveEdit) {
+                              handleDragStart(e, barId, 'move');
+                            }
+                          }}
+                        >
+
                         {/* 左リサイズハンドル（編集モード時のみ） */}
                         {isActiveEdit && (
                           <div
@@ -1041,7 +1080,7 @@ export default function HostessSchedule() {
                         </div>
 
                         {/* ステータステキスト */}
-                        <div className="text-[10px] ml-1 flex-shrink-0 text-white">
+                        <div className="text-[10px] ml-1 text-white whitespace-nowrap">
                           完了
                         </div>
 
@@ -1057,62 +1096,78 @@ export default function HostessSchedule() {
                             <div className="w-0.5 h-4 bg-white/70 rounded" />
                           </div>
                         )}
+                        </div>
 
-                        {/* 時間入力フィールド（編集モード時のみ） */}
+                        {/* 時間入力フィールド（編集モード時のみ） - バー外に配置 */}
                         {isActiveEdit && (() => {
                           const startParsed = parseTime(displayStartTime);
                           const endParsed = parseTime(displayEndTime);
+                          const currentMemo = editBar?.memo ?? reservation.memo ?? '';
                           return (
                           <div
-                            className="absolute -top-10 left-0 bg-white rounded shadow-lg border border-gray-300 px-2 py-1 flex items-center gap-1 z-20"
+                            className="absolute -top-[72px] left-0 bg-white rounded shadow-lg border border-gray-300 px-2 py-2 z-50"
                             onClick={(e) => e.stopPropagation()}
                             onMouseDown={(e) => e.stopPropagation()}
                           >
-                            <select
-                              value={startParsed.hours}
-                              onChange={(e) => handleHourChange(barId, 'startTime', Number(e.target.value))}
-                              className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                            >
-                              {hourOptions.map(h => (
-                                <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
-                              ))}
-                            </select>
-                            <span className="text-xs text-gray-500">:</span>
-                            <select
-                              value={startParsed.minutes}
-                              onChange={(e) => handleMinuteChange(barId, 'startTime', Number(e.target.value))}
-                              className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                            >
-                              {minuteOptions.map(m => (
-                                <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
-                              ))}
-                            </select>
-                            <span className="text-xs text-gray-500">〜</span>
-                            <select
-                              value={endParsed.hours}
-                              onChange={(e) => handleHourChange(barId, 'endTime', Number(e.target.value))}
-                              className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                            >
-                              {hourOptions.map(h => (
-                                <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
-                              ))}
-                            </select>
-                            <span className="text-xs text-gray-500">:</span>
-                            <select
-                              value={endParsed.minutes}
-                              onChange={(e) => handleMinuteChange(barId, 'endTime', Number(e.target.value))}
-                              className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                            >
-                              {minuteOptions.map(m => (
-                                <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
-                              ))}
-                            </select>
-                            <button
-                              onClick={() => openSaveConfirm(barId)}
-                              className="ml-2 px-3 py-0.5 bg-blue-400 hover:bg-blue-500 text-white text-xs rounded whitespace-nowrap"
-                            >
-                              保存
-                            </button>
+                            {/* 時間入力行 */}
+                            <div className="flex items-center gap-1 mb-2">
+                              <select
+                                value={startParsed.hours}
+                                onChange={(e) => handleHourChange(barId, 'startTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {hourOptions.map(h => (
+                                  <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <span className="text-xs text-gray-500">:</span>
+                              <select
+                                value={startParsed.minutes}
+                                onChange={(e) => handleMinuteChange(barId, 'startTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {minuteOptions.map(m => (
+                                  <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <span className="text-xs text-gray-500">〜</span>
+                              <select
+                                value={endParsed.hours}
+                                onChange={(e) => handleHourChange(barId, 'endTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {hourOptions.map(h => (
+                                  <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <span className="text-xs text-gray-500">:</span>
+                              <select
+                                value={endParsed.minutes}
+                                onChange={(e) => handleMinuteChange(barId, 'endTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {minuteOptions.map(m => (
+                                  <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={() => openSaveConfirm(barId)}
+                                className="ml-2 px-3 py-0.5 bg-blue-400 hover:bg-blue-500 text-white text-xs rounded whitespace-nowrap"
+                              >
+                                保存
+                              </button>
+                            </div>
+                            {/* 備考入力行 */}
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs text-gray-500">備考:</span>
+                              <input
+                                type="text"
+                                value={currentMemo}
+                                onChange={(e) => handleMemoChange(barId, e.target.value)}
+                                placeholder="備考を入力"
+                                className="flex-1 text-xs border border-gray-300 rounded px-2 py-0.5 min-w-[200px]"
+                              />
+                            </div>
                           </div>
                           );
                         })()}
@@ -1203,57 +1258,72 @@ export default function HostessSchedule() {
                         {isActiveEdit && (() => {
                           const startParsed = parseTime(bar.startTime);
                           const endParsed = parseTime(bar.endTime);
+                          const currentMemo = bar.memo ?? '';
                           return (
                           <div
-                            className="absolute -top-10 left-0 bg-white rounded shadow-lg border border-gray-300 px-2 py-1 flex items-center gap-1 z-20"
+                            className="absolute -top-[72px] left-0 bg-white rounded shadow-lg border border-gray-300 px-2 py-2 z-50"
                             onClick={(e) => e.stopPropagation()}
                             onMouseDown={(e) => e.stopPropagation()}
                           >
-                            <select
-                              value={startParsed.hours}
-                              onChange={(e) => handleHourChange(barId, 'startTime', Number(e.target.value))}
-                              className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                            >
-                              {hourOptions.map(h => (
-                                <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
-                              ))}
-                            </select>
-                            <span className="text-xs text-gray-500">:</span>
-                            <select
-                              value={startParsed.minutes}
-                              onChange={(e) => handleMinuteChange(barId, 'startTime', Number(e.target.value))}
-                              className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                            >
-                              {minuteOptions.map(m => (
-                                <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
-                              ))}
-                            </select>
-                            <span className="text-xs text-gray-500">〜</span>
-                            <select
-                              value={endParsed.hours}
-                              onChange={(e) => handleHourChange(barId, 'endTime', Number(e.target.value))}
-                              className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                            >
-                              {hourOptions.map(h => (
-                                <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
-                              ))}
-                            </select>
-                            <span className="text-xs text-gray-500">:</span>
-                            <select
-                              value={endParsed.minutes}
-                              onChange={(e) => handleMinuteChange(barId, 'endTime', Number(e.target.value))}
-                              className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                            >
-                              {minuteOptions.map(m => (
-                                <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
-                              ))}
-                            </select>
-                            <button
-                              onClick={() => openSaveConfirm(barId)}
-                              className="ml-2 px-3 py-0.5 bg-blue-400 hover:bg-blue-500 text-white text-xs rounded whitespace-nowrap"
-                            >
-                              保存
-                            </button>
+                            {/* 時間入力行 */}
+                            <div className="flex items-center gap-1 mb-2">
+                              <select
+                                value={startParsed.hours}
+                                onChange={(e) => handleHourChange(barId, 'startTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {hourOptions.map(h => (
+                                  <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <span className="text-xs text-gray-500">:</span>
+                              <select
+                                value={startParsed.minutes}
+                                onChange={(e) => handleMinuteChange(barId, 'startTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {minuteOptions.map(m => (
+                                  <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <span className="text-xs text-gray-500">〜</span>
+                              <select
+                                value={endParsed.hours}
+                                onChange={(e) => handleHourChange(barId, 'endTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {hourOptions.map(h => (
+                                  <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <span className="text-xs text-gray-500">:</span>
+                              <select
+                                value={endParsed.minutes}
+                                onChange={(e) => handleMinuteChange(barId, 'endTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {minuteOptions.map(m => (
+                                  <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={() => openSaveConfirm(barId)}
+                                className="ml-2 px-3 py-0.5 bg-blue-400 hover:bg-blue-500 text-white text-xs rounded whitespace-nowrap"
+                              >
+                                保存
+                              </button>
+                            </div>
+                            {/* 備考入力行 */}
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs text-gray-500">備考:</span>
+                              <input
+                                type="text"
+                                value={currentMemo}
+                                onChange={(e) => handleMemoChange(barId, e.target.value)}
+                                placeholder="備考を入力"
+                                className="flex-1 text-xs border border-gray-300 rounded px-2 py-0.5 min-w-[200px]"
+                              />
+                            </div>
                           </div>
                           );
                         })()}
