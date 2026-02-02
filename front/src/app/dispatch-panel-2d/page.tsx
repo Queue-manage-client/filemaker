@@ -166,26 +166,26 @@ export default function Original() {
     {undecidedDriverReservationSampleData.map((reservation: UndecidedDriverReservation, index: number) => {
       const topPosition = index * 22;
       return (
-        <div key={reservation.id} className={`w-[362px] h-5 left-0 absolute ${index % 2 === 1 ? 'bg-zinc-200' : 'bg-white'} ${index === 0 ? 'border-t border-zinc-400' : ''}`} style={{ top: `${topPosition}px` }}>
-          <div className="w-4 h-5 left-[346px] top-0 absolute border-r border-b border-zinc-400" />
-          <div className="w-4 h-5 left-[330px] top-0 absolute border-r border-b border-zinc-400" />
-          <div className="w-4 h-5 left-[314px] top-0 absolute border-r border-b border-zinc-400" />
-          <div className="w-4 h-5 left-[298px] top-0 absolute border-r border-b border-zinc-400" />
-          <div className="w-4 h-5 left-[282px] top-0 absolute border-r border-b border-zinc-400" />
-          <div className="w-10 h-5 left-[242px] top-0 absolute border-r border-b border-zinc-400" />
+        <div key={reservation.id} className={`w-[362px] h-5 left-0 absolute ${index % 2 === 1 ? 'bg-zinc-200' : 'bg-white'} ${index === 0 ? 'border-t border-zinc-300' : ''}`} style={{ top: `${topPosition}px` }}>
+          <div className="w-4 h-5 left-[346px] top-0 absolute border-r border-b border-zinc-300" />
+          <div className="w-4 h-5 left-[330px] top-0 absolute border-r border-b border-zinc-300" />
+          <div className="w-4 h-5 left-[314px] top-0 absolute border-r border-b border-zinc-300" />
+          <div className="w-4 h-5 left-[298px] top-0 absolute border-r border-b border-zinc-300" />
+          <div className="w-4 h-5 left-[282px] top-0 absolute border-r border-b border-zinc-300" />
+          <div className="w-10 h-5 left-[242px] top-0 absolute border-r border-b border-zinc-300" />
           <div className="w-3 left-[268px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">分</div>
           <div className="w-5 left-[246px] top-[2px] absolute text-right justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.timeTotal}</div>
-          <div className="w-6 h-5 left-[218px] top-0 absolute border-r border-b border-zinc-400" />
+          <div className="w-6 h-5 left-[218px] top-0 absolute border-r border-b border-zinc-300" />
           <div className="w-4 left-[220px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.sColumn}</div>
-          <div className={`w-[20px] h-5 left-[48px] top-0 absolute border-r border-b border-zinc-400 ${reservation.isConfirmed ? 'bg-purple-300' : ''}`} />
+          <div className={`w-[20px] h-5 left-[48px] top-0 absolute border-r border-b border-zinc-300 ${reservation.isConfirmed ? 'bg-purple-300' : ''}`} />
           {reservation.isConfirmed && (
             <div className="w-3 left-[52px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">確</div>
           )}
-          <div className="w-[70px] h-5 left-[148px] top-0 absolute bg-yellow-200 border-r border-b border-zinc-400" />
+          <div className="w-[70px] h-5 left-[148px] top-0 absolute bg-yellow-200 border-r border-b border-zinc-300" />
           <div className="w-[66px] left-[150px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.area} {reservation.hostessName}</div>
-          <div className="w-16 h-5 left-[68px] top-0 absolute border-r border-b border-zinc-400" />
+          <div className="w-16 h-5 left-[68px] top-0 absolute border-r border-b border-zinc-300" />
           <div className="w-14 left-[71px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.pickupLocation}</div>
-          <div className="w-4 h-[20px] left-[132px] top-0 absolute bg-purple-300 border-r border-b border-zinc-400"/>
+          <div className="w-4 h-[20px] left-[132px] top-0 absolute bg-purple-300 border-r border-b border-zinc-300"/>
           <div className="w-3 left-[134px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">D</div>
           <div className="w-12 h-5 left-0 top-0 absolute rounded-[2px] bg-gradient-to-b from-purple-200 via-purple-300 to-purple-400 border-2 border-t-purple-100 border-l-purple-100 border-r-purple-500 border-b-purple-500 shadow-[2px_2px_3px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.5)]" />
           <div className="w-11 left-[3px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.departureTime}</div>
@@ -284,43 +284,43 @@ export default function Original() {
   <div className="w-10 h-4 left-[1279px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">領収書</div>
   <div className="w-[663px] h-[960px] left-[729px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {outDriverUndecidedSampleData.map((item: OutDriverUndecided, index: number) => (
-      <div key={item.id} className={`w-[657px] h-6 left-0 absolute ${index % 2 === 1 ? 'bg-zinc-200' : 'bg-white'} ${index === 0 ? 'border-t border-zinc-400' : ''}`} style={{ top: `${index * 24}px` }}>
+      <div key={item.id} className={`w-[657px] h-6 left-0 absolute ${index % 2 === 1 ? 'bg-zinc-200' : 'bg-white'} ${index === 0 ? 'border-t border-zinc-300' : ''}`} style={{ top: `${index * 24}px` }}>
       <Button
         className="w-10 h-6 px-0.5 py-[1px] left-0 top-0 absolute rounded-[2px] bg-gradient-to-b from-white via-cyan-100 to-cyan-300 hover:from-white hover:via-cyan-200 hover:to-cyan-400 active:from-cyan-400 active:via-cyan-300 active:to-cyan-200 text-black text-[13px] font-normal font-['Inter'] border-2 border-t-white border-l-white border-r-zinc-600 border-b-zinc-600 shadow-[3px_3px_5px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.9)] active:shadow-none active:border-t-zinc-600 active:border-l-zinc-600 active:border-r-zinc-300 active:border-b-zinc-300 active:translate-x-[2px] active:translate-y-[2px] transition-transform duration-75"
         onClick={() => {}}
       >
         開始
       </Button>
-      <div className="w-[70px] h-6 left-[40px] top-0 absolute bg-yellow-200 border-r border-b border-zinc-400" />
+      <div className="w-[70px] h-6 left-[40px] top-0 absolute bg-yellow-200 border-r border-b border-zinc-300" />
       <div className="w-[66px] left-[44px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.hostessName}</div>
-      <div className="w-[28px] h-6 left-[110px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-[28px] h-6 left-[110px] top-0 absolute border-r border-b border-zinc-300" />
       <div className="w-[24px] left-[112px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{item.shopCode || ''}</div>
-      <div className="w-32 h-6 left-[274px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-32 h-6 left-[274px] top-0 absolute border-r border-b border-zinc-300" />
       <div className="w-32 left-[276px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.destination}</div>
-      <div className="w-4 h-6 left-[402px] top-0 absolute bg-purple-300 border-r border-b border-zinc-400" />
+      <div className="w-4 h-6 left-[402px] top-0 absolute bg-purple-300 border-r border-b border-zinc-300" />
       <div className="w-3 left-[404px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">D</div>
-      <div className="w-16 h-6 left-[418px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-16 h-6 left-[418px] top-0 absolute border-r border-b border-zinc-300" />
       <div className="w-14 h-3.5 left-[422px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.station}</div>
-      <div className={`w-10 h-6 left-[482px] top-0 absolute border-r border-b border-zinc-400 ${item.in_driver ? 'bg-yellow-200' : ''}`} />
+      <div className={`w-10 h-6 left-[482px] top-0 absolute border-r border-b border-zinc-300 ${item.in_driver ? 'bg-yellow-200' : ''}`} />
       {item.in_driver && (
         <div className="w-9 left-[484px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.in_driver}</div>
       )}
-      <div className={`w-10 h-6 left-[522px] top-0 absolute border-r border-b border-zinc-400 ${item.out_driver ? 'bg-yellow-200' : ''}`} />
+      <div className={`w-10 h-6 left-[522px] top-0 absolute border-r border-b border-zinc-300 ${item.out_driver ? 'bg-yellow-200' : ''}`} />
       {item.out_driver && (
         <div className="w-9 left-[524px] top-[3px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{item.out_driver}</div>
       )}
-      <div className="w-12 h-6 left-[226px] top-0 absolute border-r border-b border-zinc-400" />
-      <div className="w-11 left-[228px] top-[3px] absolute text-center justify-end text-red-800 text-[13px] font-normal font-['Inter']">{item.arrivalTime}</div>
-      <div className="w-12 h-6 left-[178px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-12 h-6 left-[226px] top-0 absolute border-r border-b border-zinc-300" />
+      <div className="w-11 left-[228px] top-[3px] absolute text-center justify-end text-red-800 text-[13px] font-bold font-['Inter']">{item.arrivalTime}</div>
+      <div className="w-12 h-6 left-[178px] top-0 absolute border-r border-b border-zinc-300" />
       <div className="w-11 left-[180px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{item.pickupTime}</div>
-      <div className="w-10 h-6 left-[138px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-10 h-6 left-[138px] top-0 absolute border-r border-b border-zinc-300" />
       <div className="w-3 left-[164px] top-[3px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">分</div>
       <div className="w-5 left-[142px] top-[3px] absolute text-right justify-end text-black text-[13px] font-normal font-['Inter']">{item.timeTotal}</div>
-      <div className="w-[19px] h-6 left-[638px] top-0 absolute border-r border-b border-zinc-400" />
-      <div className="w-[19px] h-6 left-[619px] top-0 absolute border-r border-b border-zinc-400" />
-      <div className="w-[19px] h-6 left-[600px] top-0 absolute border-r border-b border-zinc-400" />
-      <div className="w-[19px] h-6 left-[581px] top-0 absolute border-r border-b border-zinc-400" />
-      <div className="w-[19px] h-6 left-[562px] top-0 absolute border-r border-b border-zinc-400" />
+      <div className="w-[19px] h-6 left-[638px] top-0 absolute border-r border-b border-zinc-300" />
+      <div className="w-[19px] h-6 left-[619px] top-0 absolute border-r border-b border-zinc-300" />
+      <div className="w-[19px] h-6 left-[600px] top-0 absolute border-r border-b border-zinc-300" />
+      <div className="w-[19px] h-6 left-[581px] top-0 absolute border-r border-b border-zinc-300" />
+      <div className="w-[19px] h-6 left-[562px] top-0 absolute border-r border-b border-zinc-300" />
       </div>
     ))}
   </div>
