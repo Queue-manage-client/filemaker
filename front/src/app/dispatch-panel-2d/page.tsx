@@ -158,7 +158,7 @@ export default function Original() {
   <div className="w-10 h-4 left-[629px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">領収書</div>
   <div className="w-10 left-[603px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">時間計</div>
   <div className="w-8 left-[441px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">迎え場所</div>
-  <div className="w-[42px] left-[361px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">出勤</div>
+  <div className="w-[42px] left-[361px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">案内時間</div>
   <div className="w-[70px] left-[504px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">ホステス名</div>
   <div className="w-[150px] h-5 left-[466px] top-[75px] absolute bg-lime-200" />
   <div className="w-[150px] h-5 left-[466px] top-[77px] absolute flex items-center justify-center text-black text-[13px] font-normal font-['Inter'] whitespace-nowrap">INドラ未定予約リスト</div>
@@ -175,19 +175,20 @@ export default function Original() {
           <div className="w-10 h-5 left-[242px] top-0 absolute border-r border-b border-zinc-400" />
           <div className="w-3 left-[268px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">分</div>
           <div className="w-5 left-[246px] top-[2px] absolute text-right justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.timeTotal}</div>
-          <div className="w-8 h-5 left-[210px] top-0 absolute border-r border-b border-zinc-400" />
-          <div className="w-6 left-[212px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.sColumn}</div>
-          <div className={`w-[20px] h-5 left-[40px] top-0 absolute border-r border-b border-zinc-400 ${reservation.isConfirmed ? 'bg-purple-300' : ''}`} />
+          <div className="w-6 h-5 left-[218px] top-0 absolute border-r border-b border-zinc-400" />
+          <div className="w-4 left-[220px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.sColumn}</div>
+          <div className={`w-[20px] h-5 left-[48px] top-0 absolute border-r border-b border-zinc-400 ${reservation.isConfirmed ? 'bg-purple-300' : ''}`} />
           {reservation.isConfirmed && (
-            <div className="w-3 left-[44px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">D</div>
+            <div className="w-3 left-[52px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">確</div>
           )}
-          <div className="w-[70px] h-5 left-[140px] top-0 absolute bg-yellow-200 border-r border-b border-zinc-400" />
-          <div className="w-[66px] left-[142px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.area} {reservation.hostessName}</div>
-          <div className="w-16 h-5 left-[60px] top-0 absolute border-r border-b border-zinc-400" />
-          <div className="w-14 left-[63px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.pickupLocation}</div>
-          <div className="w-4 h-[20px] left-[124px] top-0 absolute bg-purple-300 border-r border-b border-zinc-400"/>
-          <div className="w-10 h-5 left-0 top-0 absolute bg-purple-300 border-r border-b border-zinc-400" />
-          <div className="w-9 left-[3px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.departureTime}</div>
+          <div className="w-[70px] h-5 left-[148px] top-0 absolute bg-yellow-200 border-r border-b border-zinc-400" />
+          <div className="w-[66px] left-[150px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.area} {reservation.hostessName}</div>
+          <div className="w-16 h-5 left-[68px] top-0 absolute border-r border-b border-zinc-400" />
+          <div className="w-14 left-[71px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.pickupLocation}</div>
+          <div className="w-4 h-[20px] left-[132px] top-0 absolute bg-purple-300 border-r border-b border-zinc-400"/>
+          <div className="w-3 left-[134px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">D</div>
+          <div className="w-12 h-5 left-0 top-0 absolute rounded-[2px] bg-gradient-to-b from-purple-200 via-purple-300 to-purple-400 border-2 border-t-purple-100 border-l-purple-100 border-r-purple-500 border-b-purple-500 shadow-[2px_2px_3px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.5)]" />
+          <div className="w-11 left-[3px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{reservation.departureTime}</div>
         </div>
       );
     })}
@@ -229,7 +230,7 @@ export default function Original() {
   <div className="w-[357px] left-[4px] top-[77px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">出勤予定ホステス</div>
   <div className="w-4 left-[311px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">帰宅</div>
   <div className="w-4 left-[269px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">終了</div>
-  <div className="w-8 left-[207px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">迎え場所</div>
+  <div className="w-8 left-[207px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">地域</div>
   <div className="w-4 left-[161px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">出勤</div>
   <div className="w-4 left-[139px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">決定</div>
   <div className="w-9 left-[99px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">迎えドラ</div>
@@ -240,14 +241,14 @@ export default function Original() {
       return (
         <div key={hostess.id} className="w-[336px] h-5 left-[1px] absolute" style={{ top: `${topPosition}px` }}>
 
-          <div className="w-[197px] h-5 left-[151px] top-0 absolute bg-zinc-300" />
+          <div className="w-[197px] h-5 left-[151px] top-0 absolute bg-white" />
           <div className="w-4 h-5 left-[135px] top-0 absolute bg-zinc-400" />
           <div className="w-[70px] h-5 left-[23px] top-0 absolute bg-yellow-200" />
           <div className="w-5 h-5 left-0 top-0 absolute bg-zinc-300" />
-          <div className="w-9 left-[306px] top-[2px] absolute text-center justify-end text-pink-500 text-[13px] font-normal font-['Inter']">{hostess.endTime}</div>
-          <div className="w-9 left-[264px] top-[2px] absolute text-center justify-end text-orange-500 text-[13px] font-normal font-['Inter']">{hostess.startTime}</div>
+          <div className="w-9 left-[306px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{hostess.endTime}</div>
+          <div className="w-9 left-[264px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{hostess.startTime}</div>
           <div className="w-20 left-[198px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{hostess.location}</div>
-          <div className="w-9 left-[156px] top-[2px] absolute text-center justify-end text-lime-500 text-[13px] font-normal font-['Inter']">{hostess.arrivalTime}</div>
+          <div className="w-9 left-[156px] top-[2px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">{hostess.arrivalTime}</div>
           <div className="w-3 left-[138px] top-[2px] absolute text-center justify-end text-white text-[13px] font-normal font-['Inter']">{hostess.count}</div>
           <div className="w-9 left-[96px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{hostess.driverName}</div>
           <div className="w-12 left-[42px] top-[2px] absolute justify-end text-black text-[13px] font-normal font-['Inter']">{hostess.hostessName}</div>

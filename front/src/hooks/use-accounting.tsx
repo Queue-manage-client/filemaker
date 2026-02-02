@@ -8,3 +8,7 @@ export function useAccountingList() {
 export function useAccountingById(id: string) {
   return { data: null, isLoading: false, error: null };
 }
+
+export function useIncomeSlips(startDate?: string, endDate?: string) {
+  return { data: [], isLoading: false, error: null };
+}
