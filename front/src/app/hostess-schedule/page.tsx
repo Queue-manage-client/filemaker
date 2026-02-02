@@ -311,6 +311,9 @@ export default function HostessSchedule() {
   const [activeEditBarId, setActiveEditBarId] = useState<string | null>(null);
   // 保存確認モーダル
   const [showSaveConfirm, setShowSaveConfirm] = useState<string | null>(null); // barId
+  // 一括保存モーダル
+  const [showBulkSaveModal, setShowBulkSaveModal] = useState(false);
+  const [selectedForSave, setSelectedForSave] = useState<Set<string>>(new Set());
 
   // ドラッグ状態
   const [isDragging, setIsDragging] = useState(false);
@@ -577,6 +580,46 @@ export default function HostessSchedule() {
     }
   };
 
+  // 一括保存モーダルを開く
+  const openBulkSaveModal = () => {
+    // 全ての編集中のバーを選択状態にする
+    const allBarIds = new Set(editingBars.keys());
+    setSelectedForSave(allBarIds);
+    setShowBulkSaveModal(true);
+  };
+
+  // チェックボックスの切り替え
+  const toggleSaveSelection = (barId: string) => {
+    const newSet = new Set(selectedForSave);
+    if (newSet.has(barId)) {
+      newSet.delete(barId);
+    } else {
+      newSet.add(barId);
+    }
+    setSelectedForSave(newSet);
+  };
+
+  // 一括保存を実行
+  const handleBulkSave = () => {
+    const newMap = new Map(editingBars);
+    selectedForSave.forEach(barId => {
+      // ここで実際のAPI保存処理を行う（今は状態管理のみ）
+      newMap.delete(barId);
+      if (activeEditBarId === barId) {
+        setActiveEditBarId(null);
+      }
+    });
+    setEditingBars(newMap);
+    setShowBulkSaveModal(false);
+    setSelectedForSave(new Set());
+  };
+
+  // ホステス名を取得
+  const getHostessName = (hostessId: string): string => {
+    const hostess = hostessData.find(h => h.id === hostessId);
+    return hostess?.name || '不明';
+  };
+
   // ドラッグ開始
   const handleDragStart = (
     e: React.MouseEvent,
@@ -759,6 +802,21 @@ export default function HostessSchedule() {
             className="w-[180px] h-7 px-3 text-xs border border-gray-500 rounded-full focus:outline-none focus:ring-1 focus:ring-pink-400"
           />
         </div>
+
+        {/* 一括保存ボタン（編集中のバーがある場合のみ表示） */}
+        {editingBars.size > 0 && (
+          <div className="ml-auto flex items-center gap-2">
+            <span className="text-xs text-orange-600 font-medium">
+              {editingBars.size}件の変更あり
+            </span>
+            <button
+              onClick={openBulkSaveModal}
+              className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 font-medium"
+            >
+              一括保存
+            </button>
+          </div>
+        )}
       </div>
 
       {/* メインコンテンツ */}
@@ -959,7 +1017,10 @@ export default function HostessSchedule() {
                           </div>
                         )}
 
-                        {/* 時間表示 */}
+                        {/* 出勤日時表示 */}
+                        <div className={`text-[10px] mr-1 flex-shrink-0 ${isPending ? 'text-purple-200' : 'text-gray-500'}`}>
+                          出勤日時
+                        </div>
                         <div className="flex flex-col justify-center mr-2 text-[11px] leading-tight flex-shrink-0 font-medium">
                           <span className={isPending ? 'text-white' : 'text-gray-700'}>
                             {displayStartTime}
@@ -969,20 +1030,8 @@ export default function HostessSchedule() {
                           </span>
                         </div>
 
-                        {/* 予約情報 */}
-                        <div className="flex-1 min-w-0 overflow-hidden">
-                          <div className={`text-[11px] font-medium truncate leading-tight ${isPending ? 'text-white' : 'text-gray-800'}`}>
-                            {reservation.customerName}
-                          </div>
-                          <div className={`text-[10px] truncate leading-tight ${isPending ? 'text-purple-200' : 'text-gray-600'}`}>
-                            受付: {reservation.receptDate}
-                          </div>
-                          {reservation.location && (
-                            <div className={`text-[10px] truncate leading-tight ${isPending ? 'text-purple-200' : 'text-gray-600'}`}>
-                              {reservation.location}
-                            </div>
-                          )}
-                        </div>
+                        {/* スペーサー */}
+                        <div className="flex-1" />
 
                         {/* 完了マーク */}
                         <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ml-1 ${
@@ -992,7 +1041,7 @@ export default function HostessSchedule() {
                         </div>
 
                         {/* ステータステキスト */}
-                        <div className={`text-[10px] ml-1 flex-shrink-0 ${isPending ? 'text-purple-200' : 'text-gray-500'}`}>
+                        <div className="text-[10px] ml-1 flex-shrink-0 text-white">
                           完了
                         </div>
 
@@ -1234,6 +1283,73 @@ export default function HostessSchedule() {
               <button
                 onClick={handleConfirmSave}
                 className="flex-1 px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 text-sm font-medium"
+              >
+                保存する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 一括保存モーダル */}
+      {showBulkSaveModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-[450px] max-h-[80vh] flex flex-col">
+            <h3 className="text-lg font-bold mb-2">一括保存</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              保存する変更にチェックを入れてください。チェックを外すと保存されません。
+            </p>
+
+            {/* 変更リスト */}
+            <div className="flex-1 overflow-y-auto border border-gray-200 rounded mb-4">
+              {Array.from(editingBars.entries()).map(([barId, bar]) => (
+                <label
+                  key={barId}
+                  className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedForSave.has(barId)}
+                    onChange={() => toggleSaveSelection(barId)}
+                    className="w-4 h-4 text-blue-500 rounded border-gray-300 focus:ring-blue-400"
+                  />
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-gray-800">
+                      {getHostessName(bar.hostessId)}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {bar.startTime} 〜 {bar.endTime}
+                      {bar.isNew && <span className="ml-2 text-purple-500">（新規）</span>}
+                    </div>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            {/* 選択数表示 */}
+            <div className="text-sm text-gray-600 mb-4">
+              {selectedForSave.size} / {editingBars.size} 件を保存
+            </div>
+
+            {/* ボタン */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setShowBulkSaveModal(false);
+                  setSelectedForSave(new Set());
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 text-sm font-medium"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleBulkSave}
+                disabled={selectedForSave.size === 0}
+                className={`flex-1 px-4 py-2 rounded text-sm font-medium ${
+                  selectedForSave.size > 0
+                    ? 'bg-blue-500 text-white hover:bg-blue-600'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
               >
                 保存する
               </button>
