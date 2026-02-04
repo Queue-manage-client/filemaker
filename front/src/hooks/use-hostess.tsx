@@ -1,13 +1,25 @@
 'use client';
 
-import { hostessSampleData } from '@/data/hostessSampleData';
+import { sampleHostessLedger, sampleHostessManagers, sampleHostessRanking } from '@/data/hostessSampleData';
 
 // ダミーフック（API不要、サンプルデータ使用）
 export function useHostessList() {
-  return { data: hostessSampleData, isLoading: false, error: null };
+  return { data: sampleHostessLedger, isLoading: false, error: null };
 }
 
 export function useHostessById(id: string) {
-  const hostess = hostessSampleData.find(h => h.id === id) || null;
+  const hostess = sampleHostessLedger.find(h => h.id === id) || null;
   return { data: hostess, isLoading: false, error: null };
+}
+
+export function useHostessLedger() {
+  return { data: sampleHostessLedger, isLoading: false, error: null };
+}
+
+export function useHostessManagers() {
+  return { data: sampleHostessManagers, isLoading: false, error: null };
+}
+
+export function useHostessRanking() {
+  return { data: sampleHostessRanking, isLoading: false, error: null };
 }

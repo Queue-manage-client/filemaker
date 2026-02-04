@@ -11,3 +11,7 @@ export function useCustomerById(id: string) {
   const customer = sampleCustomers.find(c => c.id === id) || null;
   return { data: customer, isLoading: false, error: null };
 }
+
+export function useCustomers() {
+  return { data: sampleCustomers, isLoading: false, error: null };
+}

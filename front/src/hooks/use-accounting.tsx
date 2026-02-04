@@ -12,3 +12,15 @@ export function useAccountingById(id: string) {
 export function useIncomeSlips(startDate?: string, endDate?: string) {
   return { data: [], isLoading: false, error: null };
 }
+
+export function useAccountingSummary(startDate?: string, endDate?: string) {
+  return { data: [], isLoading: false, error: null };
+}
+
+export function useExpenseSlips(startDate?: string, endDate?: string) {
+  return { data: [], isLoading: false, error: null };
+}
+
+export function useSalesSlips(startDate?: string, endDate?: string) {
+  return { data: [], isLoading: false, error: null };
+}
