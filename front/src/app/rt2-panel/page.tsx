@@ -13,7 +13,7 @@ import { sampleCastData } from '@/data/castSampleData';
 const TIME_START_HOUR = 17;
 const TIME_END_HOUR = 31; // 翌日7時 = 24 + 7
 const HOUR_WIDTH = 100;
-const ROW_HEIGHT = 52;
+const ROW_HEIGHT = 40;
 const ROW_GAP = 6; // 行間のギャップ
 
 type SortKey = 'endTime' | 'category' | 'ranking' | 'startTime' | 'name';
@@ -451,13 +451,7 @@ export default function RT2Panel() {
             <div className="w-[40px] border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700">帰宅</div>
             <div className="w-[60px] border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700">送場所</div>
             <div className="w-[30px] border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700">実績</div>
-            <div className="w-[60px] border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700">出勤値客</div>
-            <div className="w-[60px] border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700">特記</div>
-            <div className="w-[60px] border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700">NG場所</div>
-            <div className="w-[40px] border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700">待ち</div>
-            <div className="w-[50px] border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700">web</div>
-            <div className="w-[35px] border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700">mode</div>
-            <div className="w-[30px] flex items-center justify-center text-[10px] font-bold text-gray-700">順位</div>
+            <div className="w-[60px] flex items-center justify-center text-[10px] font-bold text-gray-700">出勤値客</div>
           </div>
 
           {/* キャストリスト */}
@@ -526,15 +520,15 @@ export default function RT2Panel() {
                 </div>
                 {/* 受付 */}
                 <div className="w-[40px] border-r border-blue-200 flex items-center justify-center">
-                  <span className="text-[10px] text-black">{cast.startTime}</span>
+                  <span className="text-[11px] text-gray-900 font-bold">{cast.startTime}</span>
                 </div>
                 {/* 終了 */}
                 <div className="w-[40px] border-r border-blue-200 flex items-center justify-center">
-                  <span className="text-[10px] text-black">{cast.endTime}</span>
+                  <span className="text-[11px] text-gray-900 font-bold">{cast.endTime}</span>
                 </div>
                 {/* 帰宅 */}
                 <div className="w-[40px] border-r border-blue-200 flex items-center justify-center">
-                  <span className="text-[10px] text-black">{cast.homeTime}</span>
+                  <span className="text-[11px] text-gray-900 font-bold">{cast.homeTime}</span>
                 </div>
                 {/* 送場所 */}
                 <div className="w-[60px] border-r border-blue-200 flex items-center justify-center">
@@ -545,36 +539,8 @@ export default function RT2Panel() {
                   <span className="text-[10px] text-black">{cast.deliverCount || ''}</span>
                 </div>
                 {/* 出勤値客 */}
-                <div className="w-[60px] border-r border-blue-200 flex items-center justify-center">
+                <div className="w-[60px] flex items-center justify-center">
                   <span className="text-[9px] text-black truncate">{cast.special}</span>
-                </div>
-                {/* 特記事項 */}
-                <div className="w-[60px] border-r border-blue-200 flex items-center justify-center">
-                  <span className="text-[9px] text-black truncate">{cast.remark}</span>
-                </div>
-                {/* NG場所 */}
-                <div className="w-[60px] border-r border-blue-200 flex items-center justify-center">
-                  <span className="text-[9px] text-red-600 truncate">{cast.ngPlace}</span>
-                </div>
-                {/* 待ち時間 */}
-                <div className="w-[40px] border-r border-blue-200 flex items-center justify-center">
-                  <span className="text-[9px] text-black">{cast.waitTime}</span>
-                </div>
-                {/* web状態 */}
-                <div className="w-[50px] border-r border-blue-200 flex items-center justify-center">
-                  <span className={`text-[9px] ${cast.webStatus === "オンライン" ? "text-green-600" : "text-red-600"}`}>
-                    {cast.webStatus}
-                  </span>
-                </div>
-                {/* mode */}
-                <div className="w-[35px] border-r border-blue-200 flex items-center justify-center">
-                  <span className={`text-[9px] ${cast.mode === "自動" ? "text-blue-600" : "text-orange-600"}`}>
-                    {cast.mode}
-                  </span>
-                </div>
-                {/* 順位 */}
-                <div className="w-[30px] flex items-center justify-center">
-                  <span className="text-xs font-bold text-black">{cast.ranking}</span>
                 </div>
               </div>
             ))}
@@ -591,7 +557,7 @@ export default function RT2Panel() {
           >
             <div
               className="flex"
-              style={{ width: `${(TIME_END_HOUR - TIME_START_HOUR + 1) * HOUR_WIDTH}px` }}
+              style={{ width: `${(TIME_END_HOUR - TIME_START_HOUR + 1) * HOUR_WIDTH + 310}px` }}
             >
               {timeSlots.map((slot) => (
                 <div
@@ -602,120 +568,238 @@ export default function RT2Panel() {
                   {slot.display}
                 </div>
               ))}
+              {/* 追加カラム - 右にスクロールして表示（左パネルと同じデザイン） */}
+              <div className="w-[60px] flex-shrink-0 border-l border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700 bg-blue-50">特記</div>
+              <div className="w-[60px] flex-shrink-0 border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700 bg-blue-50">NG場所</div>
+              <div className="w-[40px] flex-shrink-0 border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700 bg-blue-50">待ち</div>
+              <div className="w-[60px] flex-shrink-0 border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700 bg-blue-50">web</div>
+              <div className="w-[50px] flex-shrink-0 border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700 bg-blue-50">mode</div>
+              <div className="w-[40px] flex-shrink-0 border-r border-blue-200 flex items-center justify-center text-[10px] font-bold text-gray-700 bg-blue-50">順位</div>
             </div>
           </div>
 
           {/* タイムラインボディ */}
           <div
             ref={timelineBodyRef}
-            className="flex-1 overflow-auto bg-slate-400"
+            className="flex-1 overflow-auto"
             onScroll={handleTimelineScroll}
           >
             <div
+              className="flex"
               style={{
-                width: `${(TIME_END_HOUR - TIME_START_HOUR + 1) * HOUR_WIDTH}px`,
-                minHeight: '100%',
-                padding: '2px 0'
+                width: `${(TIME_END_HOUR - TIME_START_HOUR + 1) * HOUR_WIDTH + 310}px`,
+                minHeight: '100%'
               }}
             >
-              {sortedData.map((cast, index) => {
-                const reservations = getReservations(cast);
+              {/* タイムライン部分 */}
+              <div
+                className="flex-shrink-0 bg-slate-400"
+                style={{
+                  width: `${(TIME_END_HOUR - TIME_START_HOUR + 1) * HOUR_WIDTH}px`,
+                  padding: '2px 0'
+                }}
+              >
+                {sortedData.map((cast, index) => {
+                  const reservations = getReservations(cast);
 
-                return (
-                  <div
-                    key={cast.id}
-                    className="relative border border-gray-200"
-                    style={{
-                      height: `${ROW_HEIGHT}px`,
-                      marginBottom: `${ROW_GAP}px`,
-                      backgroundColor: index % 2 === 0 ? '#f8fafc' : '#ffffff'
-                    }}
-                  >
-                    {/* 時間のグリッド線 */}
-                    {timeSlots.map((slot) => (
-                      <div
-                        key={slot.hour}
-                        className="absolute top-0 bottom-0 border-r border-gray-200"
-                        style={{ left: `${(slot.hour - TIME_START_HOUR) * HOUR_WIDTH}px` }}
-                      />
-                    ))}
-
-                    {/* 勤務時間の背景 */}
-                    {cast.startTime && cast.endTime && (
-                      <div
-                        className="absolute top-0 bottom-0"
-                        style={{
-                          left: `${timeToPosition(cast.startTime)}px`,
-                          width: `${timeToPosition(cast.endTime) - timeToPosition(cast.startTime)}px`,
-                          backgroundColor: 'rgba(59, 130, 246, 0.1)'
-                        }}
-                      />
-                    )}
-
-                    {/* 予約バー */}
-                    {reservations.map((reservation) => {
-                      const barLeft = timeToPosition(reservation.time);
-                      const barWidth = 120;
-
-                      return (
+                  return (
+                    <div
+                      key={cast.id}
+                      className="relative border border-gray-200"
+                      style={{
+                        height: `${ROW_HEIGHT}px`,
+                        marginBottom: `${ROW_GAP}px`,
+                        backgroundColor: index % 2 === 0 ? '#f8fafc' : '#ffffff'
+                      }}
+                    >
+                      {/* 時間のグリッド線 */}
+                      {timeSlots.map((slot) => (
                         <div
-                          key={reservation.id}
-                          className="group absolute top-[6px] bottom-[6px] cursor-pointer"
-                          style={{
-                            left: `${barLeft}px`,
-                            width: `${barWidth}px`,
-                            zIndex: 1
-                          }}
-                        >
-                          {/* ツールチップ */}
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                            <div className="font-medium mb-1">{getReservationLabel(reservation.type)}</div>
-                            <div>{reservation.time} - {reservation.location}</div>
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
-                          </div>
+                          key={slot.hour}
+                          className="absolute top-0 bottom-0 border-r border-gray-200"
+                          style={{ left: `${(slot.hour - TIME_START_HOUR) * HOUR_WIDTH}px` }}
+                        />
+                      ))}
 
-                          {/* バー本体 */}
+                      {/* 勤務時間の背景 */}
+                      {cast.startTime && cast.endTime && (
+                        <div
+                          className="absolute top-0 bottom-0"
+                          style={{
+                            left: `${timeToPosition(cast.startTime)}px`,
+                            width: `${timeToPosition(cast.endTime) - timeToPosition(cast.startTime)}px`,
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)'
+                          }}
+                        />
+                      )}
+
+                      {/* 予約バー */}
+                      {reservations.map((reservation) => {
+                        const barLeft = timeToPosition(reservation.time);
+                        const barWidth = 120;
+
+                        return (
                           <div
-                            className="absolute inset-0 rounded-full flex items-center px-2 shadow-sm overflow-hidden hover:ring-2 hover:ring-offset-1 hover:ring-blue-400"
+                            key={reservation.id}
+                            className="group absolute cursor-pointer"
                             style={{
-                              background: getReservationColor(reservation.type)
+                              left: `${barLeft}px`,
+                              width: `${barWidth}px`,
+                              top: '6px',
+                              bottom: '6px',
+                              zIndex: 1
                             }}
                           >
-                            {/* 時間表示 */}
-                            <div className="flex flex-col justify-center mr-1 text-[10px] leading-tight flex-shrink-0 font-medium">
-                              <span className="text-white">{reservation.time}</span>
+                            {/* ツールチップ */}
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                              <div className="font-medium mb-1">{getReservationLabel(reservation.type)}</div>
+                              <div>{reservation.time} - {reservation.location}</div>
+                              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
                             </div>
 
-                            {/* 場所 */}
-                            <div className="flex-1 min-w-0 overflow-hidden">
-                              <div className="text-[10px] font-medium truncate leading-tight text-white">
-                                {reservation.location}
+                            {/* バー本体 */}
+                            <div
+                              className="absolute inset-0 rounded-full flex items-center px-2 shadow-sm overflow-hidden hover:ring-2 hover:ring-offset-1 hover:ring-blue-400"
+                              style={{
+                                background: getReservationColor(reservation.type)
+                              }}
+                            >
+                              {/* 時間表示 */}
+                              <div className="flex flex-col justify-center mr-1 text-[10px] leading-tight flex-shrink-0 font-medium">
+                                <span className="text-white">{reservation.time}</span>
+                              </div>
+
+                              {/* 場所 */}
+                              <div className="flex-1 min-w-0 overflow-hidden">
+                                <div className="text-[10px] font-medium truncate leading-tight text-white">
+                                  {reservation.location}
+                                </div>
+                              </div>
+
+                              {/* ラベル */}
+                              <div className="text-[9px] ml-1 flex-shrink-0 text-white/80 whitespace-nowrap">
+                                {getReservationLabel(reservation.type)}
+                              </div>
+
+                              {/* 矢印ボタン */}
+                              <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ml-1 bg-white/30 hover:bg-white/50">
+                                <ChevronLeft className="w-3 h-3 text-white" strokeWidth={3} />
                               </div>
                             </div>
-
-                            {/* ラベル */}
-                            <div className="text-[9px] ml-1 flex-shrink-0 text-white/80 whitespace-nowrap">
-                              {getReservationLabel(reservation.type)}
-                            </div>
-
-                            {/* 矢印ボタン */}
-                            <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ml-1 bg-white/30 hover:bg-white/50">
-                              <ChevronLeft className="w-3 h-3 text-white" strokeWidth={3} />
-                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
 
-                    {/* 待機中表示（予約がない場合） */}
-                    {reservations.length === 0 && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-xs text-gray-400">待機中</span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                      {/* 待機中表示（予約がない場合） */}
+                      {reservations.length === 0 && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xs text-gray-400">待機中</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* 右側カラム群（左パネルと同じデザイン - ボーダーが縦に突っ切る） */}
+              <div className="flex flex-shrink-0 bg-slate-400" style={{ padding: '2px 0' }}>
+                {/* 特記 */}
+                <div className="w-[60px] border-l border-blue-200 bg-slate-400">
+                  {sortedData.map((cast) => (
+                    <div
+                      key={`special-${cast.id}`}
+                      className="border-t border-b border-r border-blue-200 flex items-center justify-center"
+                      style={{
+                        height: `${ROW_HEIGHT}px`,
+                        marginBottom: `${ROW_GAP}px`,
+                        backgroundColor: getRemarkColor(cast.remark, cast.storeColor)
+                      }}
+                    >
+                      <span className="text-[9px] text-black truncate px-1">{cast.special || ''}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* NG場所 */}
+                <div className="w-[60px] border-l border-blue-200 bg-slate-400">
+                  {sortedData.map((cast) => (
+                    <div
+                      key={`ng-${cast.id}`}
+                      className="border-t border-b border-r border-blue-200 flex items-center justify-center"
+                      style={{
+                        height: `${ROW_HEIGHT}px`,
+                        marginBottom: `${ROW_GAP}px`,
+                        backgroundColor: getRemarkColor(cast.remark, cast.storeColor)
+                      }}
+                    >
+                      <span className="text-[9px] text-red-600 truncate px-1">{cast.ngPlace || ''}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* 待ち */}
+                <div className="w-[40px] border-l border-blue-200 bg-slate-400">
+                  {sortedData.map((cast) => (
+                    <div
+                      key={`wait-${cast.id}`}
+                      className="border-t border-b border-r border-blue-200 flex items-center justify-center"
+                      style={{
+                        height: `${ROW_HEIGHT}px`,
+                        marginBottom: `${ROW_GAP}px`,
+                        backgroundColor: getRemarkColor(cast.remark, cast.storeColor)
+                      }}
+                    >
+                      <span className="text-[9px] text-black">{cast.waitTime || ''}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* web */}
+                <div className="w-[60px] border-l border-blue-200 bg-slate-400">
+                  {sortedData.map((cast) => (
+                    <div
+                      key={`web-${cast.id}`}
+                      className="border-t border-b border-r border-blue-200 flex items-center justify-center"
+                      style={{
+                        height: `${ROW_HEIGHT}px`,
+                        marginBottom: `${ROW_GAP}px`,
+                        backgroundColor: getRemarkColor(cast.remark, cast.storeColor)
+                      }}
+                    >
+                      <span className={`text-[9px] ${cast.webStatus === 'オンライン' ? 'text-green-600' : 'text-red-600'}`}>{cast.webStatus || ''}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* mode */}
+                <div className="w-[50px] border-l border-blue-200 bg-slate-400">
+                  {sortedData.map((cast) => (
+                    <div
+                      key={`mode-${cast.id}`}
+                      className="border-t border-b border-r border-blue-200 flex items-center justify-center"
+                      style={{
+                        height: `${ROW_HEIGHT}px`,
+                        marginBottom: `${ROW_GAP}px`,
+                        backgroundColor: getRemarkColor(cast.remark, cast.storeColor)
+                      }}
+                    >
+                      <span className={`text-[9px] ${cast.mode === '自動' ? 'text-blue-600' : 'text-orange-600'}`}>{cast.mode || ''}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* 順位 */}
+                <div className="w-[40px] border-l border-blue-200 bg-slate-400">
+                  {sortedData.map((cast) => (
+                    <div
+                      key={`rank-${cast.id}`}
+                      className="border-t border-b border-r border-blue-200 flex items-center justify-center"
+                      style={{
+                        height: `${ROW_HEIGHT}px`,
+                        marginBottom: `${ROW_GAP}px`,
+                        backgroundColor: getRemarkColor(cast.remark, cast.storeColor)
+                      }}
+                    >
+                      <span className="text-[9px] text-black font-medium">{cast.ranking || ''}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
