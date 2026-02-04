@@ -71,7 +71,7 @@ export default function StoreLedger() {
   const initialStore = React.useMemo(() => storeList[0] || '', [storeList]);
 
   // 管理者スイッチの状態管理（デモ用）- 常にオン
-  const [isAdminMode] = React.useState(true);
+  const [isAdminMode, setIsAdminMode] = React.useState(true);
   
   // 編集モードの状態管理
   const [isEditMode, setIsEditMode] = React.useState(false);

@@ -2,6 +2,7 @@
 
 import { staffSampleList } from '@/data/staffSampleData';
 import { sampleStaffLedger } from '@/data/employeeSampleData';
+import { staffLedgerSampleData } from '@/data/staffLedgerSampleData';
 
 // ダミーフック（API不要、サンプルデータ使用）
 export function useStaffList() {
@@ -14,5 +15,5 @@ export function useStaffById(id: string) {
 }
 
 export function useStaffLedger() {
-  return { data: sampleStaffLedger, isLoading: false, error: null };
+  return { data: staffLedgerSampleData, isLoading: false, error: null };
 }

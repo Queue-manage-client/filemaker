@@ -1,14 +1,16 @@
 'use client';
 
+import type { CustomerPoints } from '@/types/customer';
+
 // ダミーフック（API不要）
 export function useCustomerPointsList() {
-  return { data: [], isLoading: false, error: null };
+  return { data: [] as CustomerPoints[], isLoading: false, error: null };
 }
 
 export function useCustomerPointsById(id: string) {
-  return { data: null, isLoading: false, error: null };
+  return { data: null as CustomerPoints | null, isLoading: false, error: null };
 }
 
 export function useCustomerPoints() {
-  return { data: [], isLoading: false, error: null };
+  return { data: [] as CustomerPoints[], isLoading: false, error: null };
 }
