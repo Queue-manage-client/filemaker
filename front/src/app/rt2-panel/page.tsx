@@ -4,8 +4,11 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, ArrowUpDown, Check, Star } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, ArrowUpDown, Check, Star, X } from "lucide-react";
 import type { TodayCastData } from '@/types';
 import { sampleCastData } from '@/data/castSampleData';
 
@@ -113,7 +116,52 @@ export default function RT2Panel() {
   const [filterManager, setFilterManager] = useState<string>('all');
   const [filterWorkStyle, setFilterWorkStyle] = useState<string>('all');
   const [filterStore, setFilterStore] = useState<string>('all');
-  const [selectedCast, setSelectedCast] = useState<TodayCastData | null>(null);
+
+  // 料金計算ポップオーバー状態
+  const [pricePopoverCastId, setPricePopoverCastId] = useState<string | null>(null);
+  const [nominationType, setNominationType] = useState<'free' | 'panel' | 'honshimei'>('free');
+  const [transportFee, setTransportFee] = useState<number>(2000);
+  const [locationType, setLocationType] = useState<'love_hotel' | 'city_hotel' | 'home'>('love_hotel');
+  const [discountType, setDiscountType] = useState<'none' | '1000off' | '2000off' | '10percent'>('none');
+
+  // 料金計算
+  const calculateTotal = useMemo(() => {
+    // ベース料金（例: 60分コース）
+    const baseFee = 15000;
+
+    // 指名料金
+    const nominationFee = nominationType === 'free' ? 0 : nominationType === 'panel' ? 1000 : 2000;
+
+    // 場所料金
+    const locationFee = locationType === 'love_hotel' ? 0 : locationType === 'city_hotel' ? 1000 : 0;
+
+    // 小計
+    let subtotal = baseFee + nominationFee + transportFee + locationFee;
+
+    // 割引計算
+    let discount = 0;
+    if (discountType === '1000off') discount = 1000;
+    else if (discountType === '2000off') discount = 2000;
+    else if (discountType === '10percent') discount = Math.floor(subtotal * 0.1);
+
+    return {
+      baseFee,
+      nominationFee,
+      transportFee,
+      locationFee,
+      discount,
+      total: subtotal - discount
+    };
+  }, [nominationType, transportFee, locationType, discountType]);
+
+  // ポップオーバーを開く時に状態をリセット
+  const openPricePopover = (castId: string) => {
+    setNominationType('free');
+    setTransportFee(2000);
+    setLocationType('love_hotel');
+    setDiscountType('none');
+    setPricePopoverCastId(castId);
+  };
 
   // フィルターオプションを動的に生成
   const filterOptions = useMemo(() => {
@@ -470,7 +518,6 @@ export default function RT2Panel() {
                   marginBottom: `${ROW_GAP}px`,
                   backgroundColor: getRemarkColor(cast.remark, cast.storeColor)
                 }}
-                onClick={() => setSelectedCast(cast)}
               >
                 {/* チェックボックス */}
                 <div className="w-[25px] border-r border-blue-200 flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
@@ -503,12 +550,131 @@ export default function RT2Panel() {
                   </div>
                 </div>
                 {/* ￥ボタン */}
-                <div className="w-[25px] border-r border-blue-200 flex items-center justify-center bg-blue-600">
-                  <button className="w-full h-full bg-transparent hover:bg-blue-700 text-white text-[10px] border-0 flex items-center justify-center">￥</button>
+                <div className="w-[25px] border-r border-blue-200 flex items-center justify-center p-0.5" onClick={(e) => e.stopPropagation()}>
+                  <Popover open={pricePopoverCastId === cast.id} onOpenChange={(open) => !open && setPricePopoverCastId(null)}>
+                    <PopoverTrigger asChild>
+                      <button
+                        onClick={() => openPricePopover(cast.id)}
+                        className="w-full h-full rounded text-white text-[10px] font-bold flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-2px_0_rgba(0,0,0,0.2),0_2px_3px_rgba(0,0,0,0.3)] active:shadow-[inset_0_2px_3px_rgba(0,0,0,0.3)] active:translate-y-[1px]"
+                        style={{ background: 'linear-gradient(180deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)' }}
+                      >
+                        ￥
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-72 p-0" side="right" align="start">
+                      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-2 flex items-center justify-between rounded-t-md">
+                        <span className="font-bold text-sm">料金計算 - {cast.name}</span>
+                        <button onClick={() => setPricePopoverCastId(null)} className="hover:bg-blue-500 rounded p-0.5">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="p-3 space-y-3">
+                        {/* 指名区分 */}
+                        <div>
+                          <Label className="text-xs font-bold text-gray-700 mb-1.5 block">指名区分</Label>
+                          <RadioGroup value={nominationType} onValueChange={(v) => setNominationType(v as typeof nominationType)} className="flex gap-2">
+                            <div className="flex items-center">
+                              <RadioGroupItem value="free" id={`free-${cast.id}`} className="w-3 h-3" />
+                              <Label htmlFor={`free-${cast.id}`} className="text-xs ml-1 cursor-pointer">フリー</Label>
+                            </div>
+                            <div className="flex items-center">
+                              <RadioGroupItem value="panel" id={`panel-${cast.id}`} className="w-3 h-3" />
+                              <Label htmlFor={`panel-${cast.id}`} className="text-xs ml-1 cursor-pointer">パネル</Label>
+                            </div>
+                            <div className="flex items-center">
+                              <RadioGroupItem value="honshimei" id={`hon-${cast.id}`} className="w-3 h-3" />
+                              <Label htmlFor={`hon-${cast.id}`} className="text-xs ml-1 cursor-pointer">本指名</Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+
+                        {/* 交通費 */}
+                        <div>
+                          <Label className="text-xs font-bold text-gray-700 mb-1.5 block">交通費</Label>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="number"
+                              value={transportFee}
+                              onChange={(e) => setTransportFee(Number(e.target.value))}
+                              className="h-7 text-xs w-24"
+                            />
+                            <span className="text-xs text-gray-600">円</span>
+                          </div>
+                        </div>
+
+                        {/* 場所選択 */}
+                        <div>
+                          <Label className="text-xs font-bold text-gray-700 mb-1.5 block">場所</Label>
+                          <RadioGroup value={locationType} onValueChange={(v) => setLocationType(v as typeof locationType)} className="flex flex-wrap gap-2">
+                            <div className="flex items-center">
+                              <RadioGroupItem value="love_hotel" id={`love-${cast.id}`} className="w-3 h-3" />
+                              <Label htmlFor={`love-${cast.id}`} className="text-xs ml-1 cursor-pointer">ラブホテル</Label>
+                            </div>
+                            <div className="flex items-center">
+                              <RadioGroupItem value="city_hotel" id={`city-${cast.id}`} className="w-3 h-3" />
+                              <Label htmlFor={`city-${cast.id}`} className="text-xs ml-1 cursor-pointer">シティホテル</Label>
+                            </div>
+                            <div className="flex items-center">
+                              <RadioGroupItem value="home" id={`home-${cast.id}`} className="w-3 h-3" />
+                              <Label htmlFor={`home-${cast.id}`} className="text-xs ml-1 cursor-pointer">自宅</Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+
+                        {/* 割引 */}
+                        <div>
+                          <Label className="text-xs font-bold text-gray-700 mb-1.5 block">割引</Label>
+                          <Select value={discountType} onValueChange={(v) => setDiscountType(v as typeof discountType)}>
+                            <SelectTrigger className="h-7 text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">割引なし</SelectItem>
+                              <SelectItem value="1000off">1,000円引き</SelectItem>
+                              <SelectItem value="2000off">2,000円引き</SelectItem>
+                              <SelectItem value="10percent">10%OFF</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* 料金明細 */}
+                        <div className="border-t pt-2 mt-2 space-y-1">
+                          <div className="flex justify-between text-xs text-gray-600">
+                            <span>基本料金</span>
+                            <span>¥{calculateTotal.baseFee.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between text-xs text-gray-600">
+                            <span>指名料</span>
+                            <span>¥{calculateTotal.nominationFee.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between text-xs text-gray-600">
+                            <span>交通費</span>
+                            <span>¥{calculateTotal.transportFee.toLocaleString()}</span>
+                          </div>
+                          {calculateTotal.locationFee > 0 && (
+                            <div className="flex justify-between text-xs text-gray-600">
+                              <span>場所料金</span>
+                              <span>¥{calculateTotal.locationFee.toLocaleString()}</span>
+                            </div>
+                          )}
+                          {calculateTotal.discount > 0 && (
+                            <div className="flex justify-between text-xs text-red-600">
+                              <span>割引</span>
+                              <span>-¥{calculateTotal.discount.toLocaleString()}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between text-sm font-bold border-t pt-1 mt-1">
+                            <span>総額</span>
+                            <span className="text-blue-600">¥{calculateTotal.total.toLocaleString()}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 {/* Hボタン */}
-                <div className="w-[25px] border-r border-blue-200 flex items-center justify-center bg-pink-200">
-                  <button className="w-full h-full bg-transparent hover:bg-pink-300 text-black text-[10px] border-0 flex items-center justify-center font-bold">H</button>
+                <div className="w-[25px] border-r border-blue-200 flex items-center justify-center p-0.5" onClick={(e) => e.stopPropagation()}>
+                  <button className="w-full h-full rounded text-black text-[10px] font-bold flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.5),inset_0_-2px_0_rgba(0,0,0,0.15),0_2px_3px_rgba(0,0,0,0.2)] active:shadow-[inset_0_2px_3px_rgba(0,0,0,0.2)] active:translate-y-[1px]" style={{ background: 'linear-gradient(180deg, #fbcfe8 0%, #f9a8d4 50%, #f472b6 100%)' }}>H</button>
                 </div>
                 {/* 併用 */}
                 <div className="w-[45px] border-r border-blue-200 flex items-center justify-center">
@@ -805,90 +971,6 @@ export default function RT2Panel() {
         </div>
       </div>
 
-      {/* キャスト詳細ポップアップ */}
-      <Dialog open={!!selectedCast} onOpenChange={(open) => !open && setSelectedCast(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              {selectedCast?.isNewbie && (
-                <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-              )}
-              {selectedCast?.name}
-              <span className="text-sm font-normal text-gray-500">
-                ({selectedCast?.store})
-              </span>
-            </DialogTitle>
-          </DialogHeader>
-          {selectedCast && (
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="space-y-2">
-                <div className="flex justify-between border-b pb-1">
-                  <span className="text-gray-600">勤務形態:</span>
-                  <span className="font-medium">{selectedCast.workStyle || '-'}</span>
-                </div>
-                <div className="flex justify-between border-b pb-1">
-                  <span className="text-gray-600">担当者:</span>
-                  <span className="font-medium">{selectedCast.manager || '-'}</span>
-                </div>
-                <div className="flex justify-between border-b pb-1">
-                  <span className="text-gray-600">カテゴリー:</span>
-                  <span className="font-medium">{selectedCast.remark}</span>
-                </div>
-                <div className="flex justify-between border-b pb-1">
-                  <span className="text-gray-600">順位:</span>
-                  <span className="font-medium">{selectedCast.ranking}</span>
-                </div>
-                <div className="flex justify-between border-b pb-1">
-                  <span className="text-gray-600">出勤時間:</span>
-                  <span className="font-medium">{selectedCast.startTime}</span>
-                </div>
-                <div className="flex justify-between border-b pb-1">
-                  <span className="text-gray-600">終了時間:</span>
-                  <span className="font-medium">{selectedCast.endTime}</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between border-b pb-1">
-                  <span className="text-gray-600">帰宅時間:</span>
-                  <span className="font-medium">{selectedCast.homeTime}</span>
-                </div>
-                <div className="flex justify-between border-b pb-1">
-                  <span className="text-gray-600">待ち時間:</span>
-                  <span className="font-medium">{selectedCast.waitTime}</span>
-                </div>
-                <div className="flex justify-between border-b pb-1">
-                  <span className="text-gray-600">web状態:</span>
-                  <span className={`font-medium ${selectedCast.webStatus === 'オンライン' ? 'text-green-600' : 'text-red-600'}`}>
-                    {selectedCast.webStatus}
-                  </span>
-                </div>
-                <div className="flex justify-between border-b pb-1">
-                  <span className="text-gray-600">モード:</span>
-                  <span className={`font-medium ${selectedCast.mode === '自動' ? 'text-blue-600' : 'text-orange-600'}`}>
-                    {selectedCast.mode}
-                  </span>
-                </div>
-                <div className="flex justify-between border-b pb-1">
-                  <span className="text-gray-600">実績:</span>
-                  <span className="font-medium">{selectedCast.achieve}</span>
-                </div>
-                <div className="flex justify-between border-b pb-1">
-                  <span className="text-gray-600">NG場所:</span>
-                  <span className="font-medium text-red-600">{selectedCast.ngPlace || '-'}</span>
-                </div>
-              </div>
-              {selectedCast.weeklyRemarks && (
-                <div className="col-span-2 mt-2">
-                  <div className="text-gray-600 mb-1">週間備考:</div>
-                  <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-sm">
-                    {selectedCast.weeklyRemarks}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
