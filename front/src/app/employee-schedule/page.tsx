@@ -15,6 +15,7 @@ interface EditingBar {
   taskName?: string;
   location?: string;
   status?: 'pending' | 'confirmed' | 'completed';
+  memo?: string;
 }
 
 // 勤務予定データの型定義
@@ -25,6 +26,7 @@ interface WorkSchedule {
   endTime: string;
   location: string;
   status: 'pending' | 'confirmed' | 'completed';
+  memo?: string;
 }
 
 // 従業員タイムラインデータの型定義
@@ -56,7 +58,8 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         startTime: "10:00",
         endTime: "12:00",
         location: "東京本社",
-        status: "completed"
+        status: "completed",
+        memo: "重要顧客・事前準備必須"
       }
     ]
   },
@@ -75,7 +78,8 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         startTime: "10:00",
         endTime: "11:30",
         location: "会議室A",
-        status: "completed"
+        status: "completed",
+        memo: "プロジェクト進捗報告"
       },
       {
         id: "s3",
@@ -83,7 +87,8 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         startTime: "14:00",
         endTime: "16:00",
         location: "オフィス",
-        status: "pending"
+        status: "pending",
+        memo: "来週のプレゼン用"
       }
     ]
   },
@@ -112,7 +117,8 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         startTime: "09:30",
         endTime: "12:00",
         location: "経理室",
-        status: "completed"
+        status: "completed",
+        memo: "締め切り厳守"
       }
     ]
   },
@@ -131,7 +137,8 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         startTime: "13:00",
         endTime: "15:00",
         location: "面接室",
-        status: "pending"
+        status: "pending",
+        memo: "新卒採用・3名予定"
       }
     ]
   },
@@ -150,7 +157,8 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         startTime: "10:30",
         endTime: "12:30",
         location: "開発室",
-        status: "completed"
+        status: "completed",
+        memo: "新機能実装"
       },
       {
         id: "s7",
@@ -158,7 +166,8 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         startTime: "14:00",
         endTime: "15:30",
         location: "開発室",
-        status: "pending"
+        status: "pending",
+        memo: "PR#123確認"
       }
     ]
   },
@@ -177,7 +186,8 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         startTime: "11:00",
         endTime: "13:00",
         location: "新宿支店",
-        status: "completed"
+        status: "completed",
+        memo: "契約更新交渉"
       }
     ]
   },
@@ -206,7 +216,8 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         startTime: "14:00",
         endTime: "16:00",
         location: "全館",
-        status: "pending"
+        status: "pending",
+        memo: "月次点検"
       }
     ]
   },
@@ -225,7 +236,8 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         startTime: "10:00",
         endTime: "11:30",
         location: "経理室",
-        status: "completed"
+        status: "completed",
+        memo: "月末締め処理"
       },
       {
         id: "s11",
@@ -233,7 +245,8 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         startTime: "15:00",
         endTime: "17:00",
         location: "会議室B",
-        status: "pending"
+        status: "pending",
+        memo: "次期予算案検討"
       }
     ]
   },
@@ -252,7 +265,8 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         startTime: "10:30",
         endTime: "12:00",
         location: "開発室",
-        status: "completed"
+        status: "completed",
+        memo: "Sprint #15"
       }
     ]
   },
@@ -318,11 +332,16 @@ export default function EmployeeSchedule() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [employeeData] = useState<EmployeeTimelineData[]>(sampleEmployeeTimeline);
   const [sortType, setSortType] = useState<SortType>('name-asc');
+  const [searchText, setSearchText] = useState('');
+  const [departmentFilter, setDepartmentFilter] = useState<string>('');
 
   // 編集中のバー管理
   const [editingBars, setEditingBars] = useState<Map<string, EditingBar>>(new Map());
   const [activeEditBarId, setActiveEditBarId] = useState<string | null>(null);
   const [showSaveConfirm, setShowSaveConfirm] = useState<string | null>(null);
+  // 一括保存モーダル
+  const [showBulkSaveModal, setShowBulkSaveModal] = useState(false);
+  const [selectedForSave, setSelectedForSave] = useState<Set<string>>(new Set());
 
   // ドラッグ状態
   const [isDragging, setIsDragging] = useState(false);
@@ -332,30 +351,53 @@ export default function EmployeeSchedule() {
   const [dragStartBarLeft, setDragStartBarLeft] = useState(0);
   const [dragStartBarWidth, setDragStartBarWidth] = useState(0);
 
-  // ソート済み従業員リスト
+  // 部署リストを抽出
+  const departmentList = useMemo(() => {
+    const deptSet = new Set<string>();
+    employeeData.forEach(e => {
+      if (e.department) deptSet.add(e.department);
+    });
+    return Array.from(deptSet).sort((a, b) => a.localeCompare(b, 'ja'));
+  }, [employeeData]);
+
+  // フィルタ・ソート済み従業員リスト
   const employees = useMemo(() => {
-    const sorted = [...employeeData];
+    let filtered = [...employeeData];
+
+    // 名前で検索
+    if (searchText.trim()) {
+      filtered = filtered.filter(e =>
+        e.name.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+
+    // 部署でフィルター
+    if (departmentFilter) {
+      filtered = filtered.filter(e => e.department === departmentFilter);
+    }
+
+    // ソート
     switch (sortType) {
       case 'name-asc':
-        return sorted.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+        return filtered.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
       case 'name-desc':
-        return sorted.sort((a, b) => b.name.localeCompare(a.name, 'ja'));
+        return filtered.sort((a, b) => b.name.localeCompare(a.name, 'ja'));
       case 'worktime-desc':
-        return sorted.sort((a, b) => calculateWorkMinutes(b) - calculateWorkMinutes(a));
+        return filtered.sort((a, b) => calculateWorkMinutes(b) - calculateWorkMinutes(a));
       case 'worktime-asc':
-        return sorted.sort((a, b) => calculateWorkMinutes(a) - calculateWorkMinutes(b));
+        return filtered.sort((a, b) => calculateWorkMinutes(a) - calculateWorkMinutes(b));
       case 'start-asc':
-        return sorted.sort((a, b) => getStartMinutes(a) - getStartMinutes(b));
+        return filtered.sort((a, b) => getStartMinutes(a) - getStartMinutes(b));
       case 'start-desc':
-        return sorted.sort((a, b) => getStartMinutes(b) - getStartMinutes(a));
+        return filtered.sort((a, b) => getStartMinutes(b) - getStartMinutes(a));
       case 'department-asc':
-        return sorted.sort((a, b) => a.department.localeCompare(b.department, 'ja'));
+        return filtered.sort((a, b) => a.department.localeCompare(b.department, 'ja'));
       case 'department-desc':
-        return sorted.sort((a, b) => b.department.localeCompare(a.department, 'ja'));
+        return filtered.sort((a, b) => b.department.localeCompare(a.department, 'ja'));
       default:
-        return sorted;
+        return filtered;
     }
-  }, [employeeData, sortType]);
+  }, [employeeData, sortType, searchText, departmentFilter]);
 
   // スクロール同期用のref
   const leftPanelRef = useRef<HTMLDivElement>(null);
@@ -418,14 +460,34 @@ export default function EmployeeSchedule() {
     }
   }, []);
 
-  // ピクセル位置を時間に変換
+  // ピクセル位置を時間に変換（ドラッグ時は30分単位）
   const positionToTime = (position: number): string => {
     const totalMinutes = (position / HOUR_WIDTH) * 60 + TIME_START_HOUR * 60;
     let hours = Math.floor(totalMinutes / 60);
-    const minutes = Math.round(totalMinutes % 60 / 5) * 5;
+    const minutes = Math.round(totalMinutes % 60 / 30) * 30;
+    if (minutes >= 60) {
+      hours += 1;
+    }
+    const adjustedMinutes = minutes % 60;
     if (hours >= 24) hours -= 24;
+    return `${String(hours).padStart(2, '0')}:${String(adjustedMinutes).padStart(2, '0')}`;
+  };
+
+  // 時間の時と分を分離
+  const parseTime = (time: string): { hours: number; minutes: number } => {
+    const [h, m] = time.split(':').map(Number);
+    return { hours: h, minutes: m };
+  };
+
+  // 時間を組み立て
+  const buildTime = (hours: number, minutes: number): string => {
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
   };
+
+  // 時間オプション（0-23）
+  const hourOptions = Array.from({ length: 24 }, (_, i) => i);
+  // 分オプション（10分単位）
+  const minuteOptions = [0, 10, 20, 30, 40, 50];
 
   // 新しいバーを作成
   const handleCreateBar = (employeeId: string) => {
@@ -469,7 +531,8 @@ export default function EmployeeSchedule() {
         isNew: false,
         taskName: schedule.taskName,
         location: schedule.location,
-        status: schedule.status
+        status: schedule.status,
+        memo: schedule.memo
       };
       setEditingBars(new Map(editingBars.set(barId, editBar)));
     }
@@ -486,6 +549,37 @@ export default function EmployeeSchedule() {
     const bar = editingBars.get(barId);
     if (bar) {
       const updatedBar = { ...bar, [field]: value };
+      setEditingBars(new Map(editingBars.set(barId, updatedBar)));
+    }
+  };
+
+  // 時のみ変更
+  const handleHourChange = (barId: string, field: 'startTime' | 'endTime', newHour: number) => {
+    const bar = editingBars.get(barId);
+    if (bar) {
+      const currentTime = field === 'startTime' ? bar.startTime : bar.endTime;
+      const { minutes } = parseTime(currentTime);
+      const newTime = buildTime(newHour, minutes);
+      handleTimeChange(barId, field, newTime);
+    }
+  };
+
+  // 分のみ変更
+  const handleMinuteChange = (barId: string, field: 'startTime' | 'endTime', newMinute: number) => {
+    const bar = editingBars.get(barId);
+    if (bar) {
+      const currentTime = field === 'startTime' ? bar.startTime : bar.endTime;
+      const { hours } = parseTime(currentTime);
+      const newTime = buildTime(hours, newMinute);
+      handleTimeChange(barId, field, newTime);
+    }
+  };
+
+  // 備考を変更
+  const handleMemoChange = (barId: string, memo: string) => {
+    const bar = editingBars.get(barId);
+    if (bar) {
+      const updatedBar = { ...bar, memo };
       setEditingBars(new Map(editingBars.set(barId, updatedBar)));
     }
   };
@@ -509,6 +603,44 @@ export default function EmployeeSchedule() {
       }
       setShowSaveConfirm(null);
     }
+  };
+
+  // 一括保存モーダルを開く
+  const openBulkSaveModal = () => {
+    const allBarIds = new Set(editingBars.keys());
+    setSelectedForSave(allBarIds);
+    setShowBulkSaveModal(true);
+  };
+
+  // チェックボックスの切り替え
+  const toggleSaveSelection = (barId: string) => {
+    const newSet = new Set(selectedForSave);
+    if (newSet.has(barId)) {
+      newSet.delete(barId);
+    } else {
+      newSet.add(barId);
+    }
+    setSelectedForSave(newSet);
+  };
+
+  // 一括保存を実行
+  const handleBulkSave = () => {
+    const newMap = new Map(editingBars);
+    selectedForSave.forEach(barId => {
+      newMap.delete(barId);
+      if (activeEditBarId === barId) {
+        setActiveEditBarId(null);
+      }
+    });
+    setEditingBars(newMap);
+    setShowBulkSaveModal(false);
+    setSelectedForSave(new Set());
+  };
+
+  // 従業員名を取得
+  const getEmployeeName = (employeeId: string): string => {
+    const employee = employeeData.find(e => e.id === employeeId);
+    return employee?.name || '不明';
   };
 
   // ドラッグ開始
@@ -619,49 +751,95 @@ export default function EmployeeSchedule() {
         </div>
       </div>
 
-      {/* ソートボタン */}
-      <div className="h-[36px] bg-white border-b border-zinc-300 flex items-center px-3 gap-2 flex-shrink-0">
-        <span className="text-xs text-gray-600 font-medium mr-1">並び替え:</span>
-        <button
-          onClick={() => setSortType(sortType === 'name-asc' ? 'name-desc' : 'name-asc')}
-          className={`px-2 py-1 text-xs rounded border ${
-            sortType === 'name-asc' || sortType === 'name-desc'
-              ? 'bg-blue-500 text-white border-blue-500'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          五十音順 {sortType === 'name-asc' ? '▲' : sortType === 'name-desc' ? '▼' : ''}
-        </button>
-        <button
-          onClick={() => setSortType(sortType === 'department-asc' ? 'department-desc' : 'department-asc')}
-          className={`px-2 py-1 text-xs rounded border ${
-            sortType === 'department-asc' || sortType === 'department-desc'
-              ? 'bg-blue-500 text-white border-blue-500'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          部署 {sortType === 'department-asc' ? '▲' : sortType === 'department-desc' ? '▼' : ''}
-        </button>
-        <button
-          onClick={() => setSortType(sortType === 'worktime-desc' ? 'worktime-asc' : 'worktime-desc')}
-          className={`px-2 py-1 text-xs rounded border ${
-            sortType === 'worktime-desc' || sortType === 'worktime-asc'
-              ? 'bg-blue-500 text-white border-blue-500'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          勤務時間 {sortType === 'worktime-desc' ? '▼多' : sortType === 'worktime-asc' ? '▲少' : ''}
-        </button>
-        <button
-          onClick={() => setSortType(sortType === 'start-asc' ? 'start-desc' : 'start-asc')}
-          className={`px-2 py-1 text-xs rounded border ${
-            sortType === 'start-asc' || sortType === 'start-desc'
-              ? 'bg-blue-500 text-white border-blue-500'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          出勤時間 {sortType === 'start-asc' ? '▲早' : sortType === 'start-desc' ? '▼遅' : ''}
-        </button>
+      {/* ソートボタン・検索・フィルター */}
+      <div className="h-[36px] bg-white border-b border-zinc-300 flex items-center px-3 flex-shrink-0">
+        {/* 左側: 部署フィルター・ソートボタン */}
+        <div className="flex items-center gap-2">
+          {/* 部署フィルター */}
+          <span className="text-xs text-gray-600 font-medium">部署:</span>
+          <select
+            value={departmentFilter}
+            onChange={(e) => setDepartmentFilter(e.target.value)}
+            className="h-7 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-400"
+          >
+            <option value="">全部署</option>
+            {departmentList.map(dept => (
+              <option key={dept} value={dept}>{dept}</option>
+            ))}
+          </select>
+
+          <div className="w-px h-5 bg-gray-300 mx-1" />
+
+          {/* ソートボタン */}
+          <span className="text-xs text-gray-600 font-medium">並び替え:</span>
+          <button
+            onClick={() => setSortType(sortType === 'name-asc' ? 'name-desc' : 'name-asc')}
+            className={`px-2 py-1 text-xs rounded border ${
+              sortType === 'name-asc' || sortType === 'name-desc'
+                ? 'bg-blue-500 text-white border-blue-500'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            五十音順 {sortType === 'name-asc' ? '▲' : sortType === 'name-desc' ? '▼' : ''}
+          </button>
+          <button
+            onClick={() => setSortType(sortType === 'department-asc' ? 'department-desc' : 'department-asc')}
+            className={`px-2 py-1 text-xs rounded border ${
+              sortType === 'department-asc' || sortType === 'department-desc'
+                ? 'bg-blue-500 text-white border-blue-500'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            部署 {sortType === 'department-asc' ? '▲' : sortType === 'department-desc' ? '▼' : ''}
+          </button>
+          <button
+            onClick={() => setSortType(sortType === 'worktime-desc' ? 'worktime-asc' : 'worktime-desc')}
+            className={`px-2 py-1 text-xs rounded border ${
+              sortType === 'worktime-desc' || sortType === 'worktime-asc'
+                ? 'bg-blue-500 text-white border-blue-500'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            勤務時間 {sortType === 'worktime-desc' ? '▼多' : sortType === 'worktime-asc' ? '▲少' : ''}
+          </button>
+          <button
+            onClick={() => setSortType(sortType === 'start-asc' ? 'start-desc' : 'start-asc')}
+            className={`px-2 py-1 text-xs rounded border ${
+              sortType === 'start-asc' || sortType === 'start-desc'
+                ? 'bg-blue-500 text-white border-blue-500'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            出勤時間 {sortType === 'start-asc' ? '▲早' : sortType === 'start-desc' ? '▼遅' : ''}
+          </button>
+        </div>
+
+        {/* 従業員検索 */}
+        <div className="ml-8 flex items-center gap-2">
+          <span className="text-xs text-gray-600 font-medium">検索:</span>
+          <input
+            type="text"
+            placeholder="従業員名"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            className="w-[180px] h-7 px-3 text-xs border border-gray-500 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-400"
+          />
+        </div>
+
+        {/* 一括保存ボタン（編集中のバーがある場合のみ表示） */}
+        {editingBars.size > 0 && (
+          <div className="ml-auto flex items-center gap-2">
+            <span className="text-xs text-orange-600 font-medium">
+              {editingBars.size}件の変更あり
+            </span>
+            <button
+              onClick={openBulkSaveModal}
+              className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 font-medium"
+            >
+              一括保存
+            </button>
+          </div>
+        )}
       </div>
 
       {/* メインコンテンツ */}
@@ -824,6 +1002,7 @@ export default function EmployeeSchedule() {
                     const displayStartTime = editBar?.startTime ?? schedule.startTime;
                     const displayEndTime = editBar?.endTime ?? schedule.endTime;
                     const isPending = (editBar?.status ?? schedule.status) === 'pending';
+                    const displayMemo = editBar?.memo ?? schedule.memo;
 
                     const barLeft = timeToPosition(displayStartTime);
                     const barWidth = getBarWidth(displayStartTime, displayEndTime);
@@ -831,111 +1010,168 @@ export default function EmployeeSchedule() {
                     return (
                       <div
                         key={schedule.id}
-                        className={`absolute top-[4px] bottom-[4px] rounded-full flex items-center px-2 shadow-sm ${
-                          isActiveEdit ? 'cursor-move ring-2 ring-blue-400 ring-offset-1' : 'cursor-pointer'
-                        }`}
+                        className="group absolute top-[4px] bottom-[4px]"
                         style={{
                           left: `${barLeft}px`,
-                          width: `${Math.max(barWidth, 120)}px`,
-                          minWidth: '120px',
-                          background: isPending
-                            ? 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)'
-                            : 'linear-gradient(135deg, #d4d4d4 0%, #a3a3a3 50%, #737373 100%)',
+                          width: `${barWidth}px`,
+                          minWidth: '60px',
                           zIndex: isActiveEdit ? 10 : 1
                         }}
-                        onClick={() => handleBarClick(employee.id, schedule)}
-                        onMouseDown={(e) => {
-                          if (isActiveEdit) {
-                            handleDragStart(e, barId, 'move');
-                          }
-                        }}
                       >
-                        {/* 左リサイズハンドル */}
-                        {isActiveEdit && (
-                          <div
-                            className="absolute left-0 top-0 bottom-0 w-4 cursor-ew-resize rounded-l-full flex items-center justify-center hover:bg-black/20"
-                            onMouseDown={(e) => {
-                              e.stopPropagation();
-                              handleDragStart(e, barId, 'resize-left');
-                            }}
-                          >
-                            <div className="w-0.5 h-4 bg-white/70 rounded" />
+                        {/* 備考ツールチップ（ホバー時表示） */}
+                        {displayMemo && (
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                            <div className="font-medium mb-1">備考:</div>
+                            <div>{displayMemo}</div>
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
                           </div>
                         )}
 
-                        {/* 時間表示 */}
-                        <div className="flex flex-col justify-center mr-2 text-[11px] leading-tight flex-shrink-0 font-medium">
-                          <span className={isPending ? 'text-white' : 'text-gray-700'}>
-                            {displayStartTime}
-                          </span>
-                          <span className={isPending ? 'text-white' : 'text-gray-700'}>
-                            {displayEndTime}
-                          </span>
-                        </div>
+                        {/* バー本体 */}
+                        <div
+                          className={`absolute inset-0 rounded-full flex items-center px-2 shadow-sm overflow-hidden ${
+                            isActiveEdit ? 'cursor-move ring-2 ring-blue-400 ring-offset-1' : 'cursor-pointer'
+                          }`}
+                          style={{
+                            background: isPending
+                              ? 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)'
+                              : 'linear-gradient(135deg, #d4d4d4 0%, #a3a3a3 50%, #737373 100%)'
+                          }}
+                          onClick={() => handleBarClick(employee.id, schedule)}
+                          onMouseDown={(e) => {
+                            if (isActiveEdit) {
+                              handleDragStart(e, barId, 'move');
+                            }
+                          }}
+                        >
+                          {/* 左リサイズハンドル */}
+                          {isActiveEdit && (
+                            <div
+                              className="absolute left-0 top-0 bottom-0 w-4 cursor-ew-resize rounded-l-full flex items-center justify-center hover:bg-black/20"
+                              onMouseDown={(e) => {
+                                e.stopPropagation();
+                                handleDragStart(e, barId, 'resize-left');
+                              }}
+                            >
+                              <div className="w-0.5 h-4 bg-white/70 rounded" />
+                            </div>
+                          )}
 
-                        {/* 予定情報 */}
-                        <div className="flex-1 min-w-0 overflow-hidden">
-                          <div className={`text-[11px] font-medium truncate leading-tight ${isPending ? 'text-white' : 'text-gray-800'}`}>
-                            {schedule.taskName}
+                          {/* 出勤日時表示 */}
+                          <div className={`text-[10px] mr-1 flex-shrink-0 ${isPending ? 'text-blue-200' : 'text-gray-500'}`}>
+                            予定時間
                           </div>
-                          <div className={`text-[10px] truncate leading-tight ${isPending ? 'text-blue-200' : 'text-gray-600'}`}>
-                            {schedule.location}
+                          <div className="flex flex-col justify-center mr-2 text-[11px] leading-tight flex-shrink-0 font-medium">
+                            <span className={isPending ? 'text-white' : 'text-gray-700'}>
+                              {displayStartTime}
+                            </span>
+                            <span className={isPending ? 'text-white' : 'text-gray-700'}>
+                              {displayEndTime}
+                            </span>
                           </div>
+
+                          {/* スペーサー */}
+                          <div className="flex-1" />
+
+                          {/* 完了マーク */}
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ml-1 ${
+                            isPending ? 'bg-white/30' : 'bg-white/50'
+                          }`}>
+                            <Check className={`w-3 h-3 ${isPending ? 'text-white' : 'text-gray-600'}`} />
+                          </div>
+
+                          {/* ステータステキスト */}
+                          <div className="text-[10px] ml-1 text-white whitespace-nowrap">
+                            {isPending ? '予定' : '完了'}
+                          </div>
+
+                          {/* 右リサイズハンドル */}
+                          {isActiveEdit && (
+                            <div
+                              className="absolute right-0 top-0 bottom-0 w-4 cursor-ew-resize rounded-r-full flex items-center justify-center hover:bg-black/20"
+                              onMouseDown={(e) => {
+                                e.stopPropagation();
+                                handleDragStart(e, barId, 'resize-right');
+                              }}
+                            >
+                              <div className="w-0.5 h-4 bg-white/70 rounded" />
+                            </div>
+                          )}
                         </div>
 
-                        {/* 完了マーク */}
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ml-1 ${
-                          isPending ? 'bg-white/30' : 'bg-white/50'
-                        }`}>
-                          <Check className={`w-3 h-3 ${isPending ? 'text-white' : 'text-gray-600'}`} />
-                        </div>
-
-                        {/* ステータステキスト */}
-                        <div className={`text-[10px] ml-1 flex-shrink-0 ${isPending ? 'text-blue-200' : 'text-gray-500'}`}>
-                          {isPending ? '予定' : '完了'}
-                        </div>
-
-                        {/* 右リサイズハンドル */}
-                        {isActiveEdit && (
+                        {/* 時間入力フィールド（編集モード時のみ） - バー外に配置 */}
+                        {isActiveEdit && (() => {
+                          const startParsed = parseTime(displayStartTime);
+                          const endParsed = parseTime(displayEndTime);
+                          const currentMemo = editBar?.memo ?? schedule.memo ?? '';
+                          return (
                           <div
-                            className="absolute right-0 top-0 bottom-0 w-4 cursor-ew-resize rounded-r-full flex items-center justify-center hover:bg-black/20"
-                            onMouseDown={(e) => {
-                              e.stopPropagation();
-                              handleDragStart(e, barId, 'resize-right');
-                            }}
-                          >
-                            <div className="w-0.5 h-4 bg-white/70 rounded" />
-                          </div>
-                        )}
-
-                        {/* 時間入力フィールド（編集モード時のみ） */}
-                        {isActiveEdit && (
-                          <div
-                            className="absolute -top-10 left-0 bg-white rounded shadow-lg border border-gray-300 px-2 py-1 flex items-center gap-1 z-20"
+                            className="absolute -top-[72px] left-0 bg-white rounded shadow-lg border border-gray-300 px-2 py-2 z-50"
                             onClick={(e) => e.stopPropagation()}
                             onMouseDown={(e) => e.stopPropagation()}
                           >
-                            <input
-                              type="time"
-                              value={displayStartTime}
-                              onChange={(e) => handleTimeChange(barId, 'startTime', e.target.value)}
-                              className="w-[85px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                            />
-                            <span className="text-xs text-gray-500">〜</span>
-                            <input
-                              type="time"
-                              value={displayEndTime}
-                              onChange={(e) => handleTimeChange(barId, 'endTime', e.target.value)}
-                              className="w-[85px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                            />
-                            <button
-                              onClick={() => openSaveConfirm(barId)}
-                              className="ml-2 px-3 py-0.5 bg-blue-400 hover:bg-blue-500 text-white text-xs rounded whitespace-nowrap"
-                            >
-                              保存
-                            </button>
+                            {/* 時間入力行 */}
+                            <div className="flex items-center gap-1 mb-2">
+                              <select
+                                value={startParsed.hours}
+                                onChange={(e) => handleHourChange(barId, 'startTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {hourOptions.map(h => (
+                                  <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <span className="text-xs text-gray-500">:</span>
+                              <select
+                                value={startParsed.minutes}
+                                onChange={(e) => handleMinuteChange(barId, 'startTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {minuteOptions.map(m => (
+                                  <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <span className="text-xs text-gray-500">〜</span>
+                              <select
+                                value={endParsed.hours}
+                                onChange={(e) => handleHourChange(barId, 'endTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {hourOptions.map(h => (
+                                  <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <span className="text-xs text-gray-500">:</span>
+                              <select
+                                value={endParsed.minutes}
+                                onChange={(e) => handleMinuteChange(barId, 'endTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {minuteOptions.map(m => (
+                                  <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={() => openSaveConfirm(barId)}
+                                className="ml-2 px-3 py-0.5 bg-blue-400 hover:bg-blue-500 text-white text-xs rounded whitespace-nowrap"
+                              >
+                                保存
+                              </button>
+                            </div>
+                            {/* 備考入力行 */}
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs text-gray-500">備考:</span>
+                              <input
+                                type="text"
+                                value={currentMemo}
+                                onChange={(e) => handleMemoChange(barId, e.target.value)}
+                                placeholder="備考を入力"
+                                className="flex-1 text-xs border border-gray-300 rounded px-2 py-0.5 min-w-[200px]"
+                              />
+                            </div>
                           </div>
-                        )}
+                          );
+                        })()}
                       </div>
                     );
                   })}
@@ -1020,33 +1256,78 @@ export default function EmployeeSchedule() {
                         )}
 
                         {/* 時間入力フィールド（編集モード時のみ） */}
-                        {isActiveEdit && (
+                        {isActiveEdit && (() => {
+                          const startParsed = parseTime(bar.startTime);
+                          const endParsed = parseTime(bar.endTime);
+                          const currentMemo = bar.memo ?? '';
+                          return (
                           <div
-                            className="absolute -top-10 left-0 bg-white rounded shadow-lg border border-gray-300 px-2 py-1 flex items-center gap-1 z-20"
+                            className="absolute -top-[72px] left-0 bg-white rounded shadow-lg border border-gray-300 px-2 py-2 z-50"
                             onClick={(e) => e.stopPropagation()}
                             onMouseDown={(e) => e.stopPropagation()}
                           >
-                            <input
-                              type="time"
-                              value={bar.startTime}
-                              onChange={(e) => handleTimeChange(barId, 'startTime', e.target.value)}
-                              className="w-[85px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                            />
-                            <span className="text-xs text-gray-500">〜</span>
-                            <input
-                              type="time"
-                              value={bar.endTime}
-                              onChange={(e) => handleTimeChange(barId, 'endTime', e.target.value)}
-                              className="w-[85px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                            />
-                            <button
-                              onClick={() => openSaveConfirm(barId)}
-                              className="ml-2 px-3 py-0.5 bg-blue-400 hover:bg-blue-500 text-white text-xs rounded whitespace-nowrap"
-                            >
-                              保存
-                            </button>
+                            {/* 時間入力行 */}
+                            <div className="flex items-center gap-1 mb-2">
+                              <select
+                                value={startParsed.hours}
+                                onChange={(e) => handleHourChange(barId, 'startTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {hourOptions.map(h => (
+                                  <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <span className="text-xs text-gray-500">:</span>
+                              <select
+                                value={startParsed.minutes}
+                                onChange={(e) => handleMinuteChange(barId, 'startTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {minuteOptions.map(m => (
+                                  <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <span className="text-xs text-gray-500">〜</span>
+                              <select
+                                value={endParsed.hours}
+                                onChange={(e) => handleHourChange(barId, 'endTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {hourOptions.map(h => (
+                                  <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <span className="text-xs text-gray-500">:</span>
+                              <select
+                                value={endParsed.minutes}
+                                onChange={(e) => handleMinuteChange(barId, 'endTime', Number(e.target.value))}
+                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
+                              >
+                                {minuteOptions.map(m => (
+                                  <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={() => openSaveConfirm(barId)}
+                                className="ml-2 px-3 py-0.5 bg-blue-400 hover:bg-blue-500 text-white text-xs rounded whitespace-nowrap"
+                              >
+                                保存
+                              </button>
+                            </div>
+                            {/* 備考入力行 */}
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs text-gray-500">備考:</span>
+                              <input
+                                type="text"
+                                value={currentMemo}
+                                onChange={(e) => handleMemoChange(barId, e.target.value)}
+                                placeholder="備考を入力"
+                                className="flex-1 text-xs border border-gray-300 rounded px-2 py-0.5 min-w-[200px]"
+                              />
+                            </div>
                           </div>
-                        )}
+                          );
+                        })()}
                       </div>
                     );
                   })()}
@@ -1073,6 +1354,73 @@ export default function EmployeeSchedule() {
               <button
                 onClick={handleConfirmSave}
                 className="flex-1 px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 text-sm font-medium"
+              >
+                保存する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 一括保存モーダル */}
+      {showBulkSaveModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-[450px] max-h-[80vh] flex flex-col">
+            <h3 className="text-lg font-bold mb-2">一括保存</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              保存する変更にチェックを入れてください。チェックを外すと保存されません。
+            </p>
+
+            {/* 変更リスト */}
+            <div className="flex-1 overflow-y-auto border border-gray-200 rounded mb-4">
+              {Array.from(editingBars.entries()).map(([barId, bar]) => (
+                <label
+                  key={barId}
+                  className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedForSave.has(barId)}
+                    onChange={() => toggleSaveSelection(barId)}
+                    className="w-4 h-4 text-blue-500 rounded border-gray-300 focus:ring-blue-400"
+                  />
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-gray-800">
+                      {getEmployeeName(bar.employeeId)}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {bar.startTime} 〜 {bar.endTime}
+                      {bar.isNew && <span className="ml-2 text-blue-500">（新規）</span>}
+                    </div>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            {/* 選択数表示 */}
+            <div className="text-sm text-gray-600 mb-4">
+              {selectedForSave.size} / {editingBars.size} 件を保存
+            </div>
+
+            {/* ボタン */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setShowBulkSaveModal(false);
+                  setSelectedForSave(new Set());
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 text-sm font-medium"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleBulkSave}
+                disabled={selectedForSave.size === 0}
+                className={`flex-1 px-4 py-2 rounded text-sm font-medium ${
+                  selectedForSave.size > 0
+                    ? 'bg-blue-500 text-white hover:bg-blue-600'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
               >
                 保存する
               </button>

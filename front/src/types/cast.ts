@@ -8,7 +8,9 @@ export interface TodayCastData {
   deliverPlace: string;
   achieve: string;
   finalCustomer: string;
+  finalCustomerTime?: string; // 最終接客の予定時刻
   nowCustomer: string;
+  nowCustomerTime?: string; // 接客中の開始時刻
   inDriverMoving: string;
   next1: string;
   next2: string;
