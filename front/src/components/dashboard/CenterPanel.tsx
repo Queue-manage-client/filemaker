@@ -38,7 +38,8 @@ export const CenterPanel = () => {
       title: "E",
       items: [
         { name: "燃料・エコ手当管理", icon: Settings, href: "/fuel-eco-management" },
-        { name: "メディア管理", icon: Database, href: "/media-management" }
+        { name: "メディア管理", icon: Database, href: "/media-management" },
+        { name: "交通費設定", icon: Map, href: "/transportation-fee-settings" }
       ]
     }
   ];

@@ -16,7 +16,9 @@ import {
   // FileSpreadsheet,
   Unlock,
   // Download,
-  // CreditCard
+  // CreditCard,
+  User,
+  Shield
 } from "lucide-react";
 
 export const RightPanel = () => {
@@ -31,6 +33,13 @@ export const RightPanel = () => {
         { name: "リアルタイム自動成績集計表", icon: Activity, href: "/realtime-performance-summary" },
         { name: "店舗別メディア利用集計", icon: BarChart3, href: "/store-media-usage-summary" },
         { name: "ロック解除承認リスト", icon: Unlock, href: "/unlock-approval-list" }
+      ]
+    },
+    {
+      title: "G",
+      items: [
+        { name: "キャストマイページ", icon: User, href: "/cast-mypage" },
+        { name: "管理部マイページ", icon: Shield, href: "/admin-mypage" }
       ]
     }
   ];

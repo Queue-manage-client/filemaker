@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
@@ -119,10 +118,17 @@ export default function RT2Panel() {
 
   // 料金計算ポップオーバー状態
   const [pricePopoverCastId, setPricePopoverCastId] = useState<string | null>(null);
+  const [pricePopoverPosition, setPricePopoverPosition] = useState<{ top: number; left: number } | null>(null);
   const [nominationType, setNominationType] = useState<'free' | 'panel' | 'honshimei'>('free');
   const [transportFee, setTransportFee] = useState<number>(2000);
   const [locationType, setLocationType] = useState<'love_hotel' | 'city_hotel' | 'home'>('love_hotel');
   const [discountType, setDiscountType] = useState<'none' | '1000off' | '2000off' | '10percent'>('none');
+
+  // 選択されたキャストを取得
+  const selectedCastForPrice = useMemo(() => {
+    if (!pricePopoverCastId) return null;
+    return sampleCastData.find(cast => cast.id === pricePopoverCastId) || null;
+  }, [pricePopoverCastId]);
 
   // 料金計算
   const calculateTotal = useMemo(() => {
@@ -155,13 +161,28 @@ export default function RT2Panel() {
   }, [nominationType, transportFee, locationType, discountType]);
 
   // ポップオーバーを開く時に状態をリセット
-  const openPricePopover = (castId: string) => {
+  const openPricePopover = useCallback((castId: string) => {
+    // ボタンの位置を取得
+    const button = document.querySelector(`[data-price-button="${castId}"]`);
+    if (button) {
+      const rect = button.getBoundingClientRect();
+      setPricePopoverPosition({
+        top: rect.top,
+        left: rect.right + 8
+      });
+    }
     setNominationType('free');
     setTransportFee(2000);
     setLocationType('love_hotel');
     setDiscountType('none');
     setPricePopoverCastId(castId);
-  };
+  }, []);
+
+  // ポップオーバーを閉じる
+  const closePricePopover = useCallback(() => {
+    setPricePopoverCastId(null);
+    setPricePopoverPosition(null);
+  }, []);
 
   // フィルターオプションを動的に生成
   const filterOptions = useMemo(() => {
@@ -551,126 +572,14 @@ export default function RT2Panel() {
                 </div>
                 {/* ￥ボタン */}
                 <div className="w-[25px] border-r border-blue-200 flex items-center justify-center p-0.5" onClick={(e) => e.stopPropagation()}>
-                  <Popover open={pricePopoverCastId === cast.id} onOpenChange={(open) => !open && setPricePopoverCastId(null)}>
-                    <PopoverTrigger asChild>
-                      <button
-                        onClick={() => openPricePopover(cast.id)}
-                        className="w-full h-full rounded text-white text-[10px] font-bold flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-2px_0_rgba(0,0,0,0.2),0_2px_3px_rgba(0,0,0,0.3)] active:shadow-[inset_0_2px_3px_rgba(0,0,0,0.3)] active:translate-y-[1px]"
-                        style={{ background: 'linear-gradient(180deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)' }}
-                      >
-                        ￥
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-72 p-0" side="right" align="start">
-                      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-2 flex items-center justify-between rounded-t-md">
-                        <span className="font-bold text-sm">料金計算 - {cast.name}</span>
-                        <button onClick={() => setPricePopoverCastId(null)} className="hover:bg-blue-500 rounded p-0.5">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <div className="p-3 space-y-3">
-                        {/* 指名区分 */}
-                        <div>
-                          <Label className="text-xs font-bold text-gray-700 mb-1.5 block">指名区分</Label>
-                          <RadioGroup value={nominationType} onValueChange={(v) => setNominationType(v as typeof nominationType)} className="flex gap-2">
-                            <div className="flex items-center">
-                              <RadioGroupItem value="free" id={`free-${cast.id}`} className="w-3 h-3" />
-                              <Label htmlFor={`free-${cast.id}`} className="text-xs ml-1 cursor-pointer">フリー</Label>
-                            </div>
-                            <div className="flex items-center">
-                              <RadioGroupItem value="panel" id={`panel-${cast.id}`} className="w-3 h-3" />
-                              <Label htmlFor={`panel-${cast.id}`} className="text-xs ml-1 cursor-pointer">パネル</Label>
-                            </div>
-                            <div className="flex items-center">
-                              <RadioGroupItem value="honshimei" id={`hon-${cast.id}`} className="w-3 h-3" />
-                              <Label htmlFor={`hon-${cast.id}`} className="text-xs ml-1 cursor-pointer">本指名</Label>
-                            </div>
-                          </RadioGroup>
-                        </div>
-
-                        {/* 交通費 */}
-                        <div>
-                          <Label className="text-xs font-bold text-gray-700 mb-1.5 block">交通費</Label>
-                          <div className="flex items-center gap-2">
-                            <Input
-                              type="number"
-                              value={transportFee}
-                              onChange={(e) => setTransportFee(Number(e.target.value))}
-                              className="h-7 text-xs w-24"
-                            />
-                            <span className="text-xs text-gray-600">円</span>
-                          </div>
-                        </div>
-
-                        {/* 場所選択 */}
-                        <div>
-                          <Label className="text-xs font-bold text-gray-700 mb-1.5 block">場所</Label>
-                          <RadioGroup value={locationType} onValueChange={(v) => setLocationType(v as typeof locationType)} className="flex flex-wrap gap-2">
-                            <div className="flex items-center">
-                              <RadioGroupItem value="love_hotel" id={`love-${cast.id}`} className="w-3 h-3" />
-                              <Label htmlFor={`love-${cast.id}`} className="text-xs ml-1 cursor-pointer">ラブホテル</Label>
-                            </div>
-                            <div className="flex items-center">
-                              <RadioGroupItem value="city_hotel" id={`city-${cast.id}`} className="w-3 h-3" />
-                              <Label htmlFor={`city-${cast.id}`} className="text-xs ml-1 cursor-pointer">シティホテル</Label>
-                            </div>
-                            <div className="flex items-center">
-                              <RadioGroupItem value="home" id={`home-${cast.id}`} className="w-3 h-3" />
-                              <Label htmlFor={`home-${cast.id}`} className="text-xs ml-1 cursor-pointer">自宅</Label>
-                            </div>
-                          </RadioGroup>
-                        </div>
-
-                        {/* 割引 */}
-                        <div>
-                          <Label className="text-xs font-bold text-gray-700 mb-1.5 block">割引</Label>
-                          <Select value={discountType} onValueChange={(v) => setDiscountType(v as typeof discountType)}>
-                            <SelectTrigger className="h-7 text-xs">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">割引なし</SelectItem>
-                              <SelectItem value="1000off">1,000円引き</SelectItem>
-                              <SelectItem value="2000off">2,000円引き</SelectItem>
-                              <SelectItem value="10percent">10%OFF</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        {/* 料金明細 */}
-                        <div className="border-t pt-2 mt-2 space-y-1">
-                          <div className="flex justify-between text-xs text-gray-600">
-                            <span>基本料金</span>
-                            <span>¥{calculateTotal.baseFee.toLocaleString()}</span>
-                          </div>
-                          <div className="flex justify-between text-xs text-gray-600">
-                            <span>指名料</span>
-                            <span>¥{calculateTotal.nominationFee.toLocaleString()}</span>
-                          </div>
-                          <div className="flex justify-between text-xs text-gray-600">
-                            <span>交通費</span>
-                            <span>¥{calculateTotal.transportFee.toLocaleString()}</span>
-                          </div>
-                          {calculateTotal.locationFee > 0 && (
-                            <div className="flex justify-between text-xs text-gray-600">
-                              <span>場所料金</span>
-                              <span>¥{calculateTotal.locationFee.toLocaleString()}</span>
-                            </div>
-                          )}
-                          {calculateTotal.discount > 0 && (
-                            <div className="flex justify-between text-xs text-red-600">
-                              <span>割引</span>
-                              <span>-¥{calculateTotal.discount.toLocaleString()}</span>
-                            </div>
-                          )}
-                          <div className="flex justify-between text-sm font-bold border-t pt-1 mt-1">
-                            <span>総額</span>
-                            <span className="text-blue-600">¥{calculateTotal.total.toLocaleString()}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
+                  <button
+                    data-price-button={cast.id}
+                    onClick={() => openPricePopover(cast.id)}
+                    className="w-full h-full rounded text-white text-[10px] font-bold flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-2px_0_rgba(0,0,0,0.2),0_2px_3px_rgba(0,0,0,0.3)] active:shadow-[inset_0_2px_3px_rgba(0,0,0,0.3)] active:translate-y-[1px]"
+                    style={{ background: 'linear-gradient(180deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)' }}
+                  >
+                    ￥
+                  </button>
                 </div>
                 {/* Hボタン */}
                 <div className="w-[25px] border-r border-blue-200 flex items-center justify-center p-0.5" onClick={(e) => e.stopPropagation()}>
@@ -971,6 +880,132 @@ export default function RT2Panel() {
         </div>
       </div>
 
+      {/* 料金計算ポップオーバー（1つだけ） */}
+      {pricePopoverCastId && selectedCastForPrice && pricePopoverPosition && (
+        <>
+          {/* オーバーレイ */}
+          <div
+            className="fixed inset-0 z-40"
+            onClick={closePricePopover}
+          />
+          {/* ポップオーバー本体 */}
+          <div
+            className="fixed z-50 w-72 bg-white rounded-md shadow-lg border"
+            style={{
+              top: `${pricePopoverPosition.top}px`,
+              left: `${pricePopoverPosition.left}px`
+            }}
+          >
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-2 flex items-center justify-between rounded-t-md">
+              <span className="font-bold text-sm">料金計算 - {selectedCastForPrice.name}</span>
+              <button onClick={closePricePopover} className="hover:bg-blue-500 rounded p-0.5">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-3 space-y-3">
+              {/* 指名区分 */}
+              <div>
+                <Label className="text-xs font-bold text-gray-700 mb-1.5 block">指名区分</Label>
+                <RadioGroup value={nominationType} onValueChange={(v) => setNominationType(v as typeof nominationType)} className="flex gap-2">
+                  <div className="flex items-center">
+                    <RadioGroupItem value="free" id="price-free" className="w-3 h-3" />
+                    <Label htmlFor="price-free" className="text-xs ml-1 cursor-pointer">フリー</Label>
+                  </div>
+                  <div className="flex items-center">
+                    <RadioGroupItem value="panel" id="price-panel" className="w-3 h-3" />
+                    <Label htmlFor="price-panel" className="text-xs ml-1 cursor-pointer">パネル</Label>
+                  </div>
+                  <div className="flex items-center">
+                    <RadioGroupItem value="honshimei" id="price-hon" className="w-3 h-3" />
+                    <Label htmlFor="price-hon" className="text-xs ml-1 cursor-pointer">本指名</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              {/* 交通費 */}
+              <div>
+                <Label className="text-xs font-bold text-gray-700 mb-1.5 block">交通費</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    value={transportFee}
+                    onChange={(e) => setTransportFee(Number(e.target.value))}
+                    className="h-7 text-xs w-24"
+                  />
+                  <span className="text-xs text-gray-600">円</span>
+                </div>
+              </div>
+
+              {/* 場所選択 */}
+              <div>
+                <Label className="text-xs font-bold text-gray-700 mb-1.5 block">場所</Label>
+                <RadioGroup value={locationType} onValueChange={(v) => setLocationType(v as typeof locationType)} className="flex flex-wrap gap-2">
+                  <div className="flex items-center">
+                    <RadioGroupItem value="love_hotel" id="price-love" className="w-3 h-3" />
+                    <Label htmlFor="price-love" className="text-xs ml-1 cursor-pointer">ラブホテル</Label>
+                  </div>
+                  <div className="flex items-center">
+                    <RadioGroupItem value="city_hotel" id="price-city" className="w-3 h-3" />
+                    <Label htmlFor="price-city" className="text-xs ml-1 cursor-pointer">シティホテル</Label>
+                  </div>
+                  <div className="flex items-center">
+                    <RadioGroupItem value="home" id="price-home" className="w-3 h-3" />
+                    <Label htmlFor="price-home" className="text-xs ml-1 cursor-pointer">自宅</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              {/* 割引 */}
+              <div>
+                <Label className="text-xs font-bold text-gray-700 mb-1.5 block">割引</Label>
+                <Select value={discountType} onValueChange={(v) => setDiscountType(v as typeof discountType)}>
+                  <SelectTrigger className="h-7 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">割引なし</SelectItem>
+                    <SelectItem value="1000off">1,000円引き</SelectItem>
+                    <SelectItem value="2000off">2,000円引き</SelectItem>
+                    <SelectItem value="10percent">10%OFF</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 料金明細 */}
+              <div className="border-t pt-2 mt-2 space-y-1">
+                <div className="flex justify-between text-xs text-gray-600">
+                  <span>基本料金</span>
+                  <span>¥{calculateTotal.baseFee.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-600">
+                  <span>指名料</span>
+                  <span>¥{calculateTotal.nominationFee.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-600">
+                  <span>交通費</span>
+                  <span>¥{calculateTotal.transportFee.toLocaleString()}</span>
+                </div>
+                {calculateTotal.locationFee > 0 && (
+                  <div className="flex justify-between text-xs text-gray-600">
+                    <span>場所料金</span>
+                    <span>¥{calculateTotal.locationFee.toLocaleString()}</span>
+                  </div>
+                )}
+                {calculateTotal.discount > 0 && (
+                  <div className="flex justify-between text-xs text-red-600">
+                    <span>割引</span>
+                    <span>-¥{calculateTotal.discount.toLocaleString()}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm font-bold border-t pt-1 mt-1">
+                  <span>総額</span>
+                  <span className="text-blue-600">¥{calculateTotal.total.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
