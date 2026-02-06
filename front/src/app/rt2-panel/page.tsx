@@ -27,7 +27,15 @@ interface ReservationData {
   time: string;
   location: string;
   type: 'final' | 'current' | 'inDriver' | 'next1' | 'next2' | 'next3' | 'next4' | 'next5';
+  customerName?: string; // 顧客名（未登録の場合はundefined）
 }
+
+// サンプル顧客名リスト
+const sampleCustomerNames = [
+  '山田様', '田中様', '佐藤様', '鈴木様', '高橋様',
+  '渡辺様', '伊藤様', '中村様', '小林様', '加藤様',
+  null, null, null, // 一部は未登録
+];
 
 // 時間を分に変換（深夜帯対応）
 const timeToMinutes = (time: string): number => {
@@ -324,6 +332,14 @@ export default function RT2Panel() {
     return slots;
   }, []);
 
+  // 顧客名をランダムに取得（デモ用）
+  const getRandomCustomerName = (seed: string): string | undefined => {
+    // シード値を使って一貫した顧客名を返す
+    const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const name = sampleCustomerNames[hash % sampleCustomerNames.length];
+    return name || undefined;
+  };
+
   // キャストの予約データを抽出
   const getReservations = (cast: TodayCastData): ReservationData[] => {
     const reservations: ReservationData[] = [];
@@ -334,7 +350,8 @@ export default function RT2Panel() {
         id: `${cast.id}-final`,
         time: cast.finalCustomerTime || cast.homeTime,
         location: cast.finalCustomer,
-        type: 'final'
+        type: 'final',
+        customerName: getRandomCustomerName(`${cast.id}-final`)
       });
     }
 
@@ -344,7 +361,8 @@ export default function RT2Panel() {
         id: `${cast.id}-current`,
         time: cast.nowCustomerTime,
         location: cast.nowCustomer,
-        type: 'current'
+        type: 'current',
+        customerName: getRandomCustomerName(`${cast.id}-current`)
       });
     }
 
@@ -354,7 +372,8 @@ export default function RT2Panel() {
         id: `${cast.id}-inDriver`,
         time: cast.inDriverMoving,
         location: cast.deliverPlace,
-        type: 'inDriver'
+        type: 'inDriver',
+        customerName: getRandomCustomerName(`${cast.id}-inDriver`)
       });
     }
 
@@ -375,7 +394,8 @@ export default function RT2Panel() {
             id: `${cast.id}-${type}`,
             time: parts[0],
             location: parts.slice(1).join(' '),
-            type
+            type,
+            customerName: getRandomCustomerName(`${cast.id}-${type}`)
           });
         }
       }
@@ -729,6 +749,10 @@ export default function RT2Panel() {
                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
                               <div className="font-medium mb-1">{getReservationLabel(reservation.type)}</div>
                               <div>{reservation.time} - {reservation.location}</div>
+                              {/* 顧客名表示 */}
+                              <div className={`mt-1 pt-1 border-t border-gray-600 ${reservation.customerName ? 'text-green-300' : 'text-orange-300'}`}>
+                                顧客: {reservation.customerName || '顧客未登録'}
+                              </div>
                               <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
                             </div>
 

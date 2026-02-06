@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ArrowLeft, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, CalendarIcon, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 
@@ -266,9 +267,27 @@ export default function DailyReport() {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'staff' | 'hostess'>('staff');
 
+  // 空伝票起票用の状態
+  const [blankSlipCount, setBlankSlipCount] = useState<string>('1');
+  const [blankSlips, setBlankSlips] = useState<Array<{ id: number; category: string; name: string; amount: number }>>([]);
+
   useEffect(() => {
     document.title = '日報 - Dispatch Harmony Hub';
   }, []);
+
+  // 空伝票を起票する関数
+  const createBlankSlips = () => {
+    const count = parseInt(blankSlipCount, 10);
+    if (count > 0 && count <= 10) {
+      const newSlips = Array.from({ length: count }, (_, i) => ({
+        id: Date.now() + i,
+        category: '',
+        name: '',
+        amount: 0,
+      }));
+      setBlankSlips([...blankSlips, ...newSlips]);
+    }
+  };
 
   // 日付を前後に移動
   const goToPreviousDay = () => {
@@ -543,14 +562,69 @@ export default function DailyReport() {
 
           {/* 出金 */}
           <div className="w-1/2">
-            <div className="bg-blue-300 h-5 flex items-center justify-center border-b border-[#323232]">
+            <div className="bg-blue-300 h-8 flex items-center justify-between px-2 border-b border-[#323232]">
               <span className="text-xs font-bold">出金</span>
+              {/* 空伝票起票ボタン */}
+              <div className="flex items-center gap-1">
+                <Select value={blankSlipCount} onValueChange={setBlankSlipCount}>
+                  <SelectTrigger className="h-5 w-12 text-[10px] bg-white border-gray-400">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                      <SelectItem key={num} value={String(num)} className="text-xs">
+                        {num}枚
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  size="sm"
+                  className="h-5 px-2 text-[10px] bg-yellow-400 hover:bg-yellow-500 text-black border border-gray-600"
+                  onClick={createBlankSlips}
+                >
+                  <Plus className="w-3 h-3 mr-1" />
+                  空伝票起票
+                </Button>
+              </div>
             </div>
-            <div className="overflow-y-auto h-[456px]">
+            <div className="overflow-y-auto h-[453px]">
+              {/* 既存の出金データ */}
               {withdrawalData.map((item, idx) => (
                 <div key={idx} className="flex text-xs border-b border-[#323232] h-5">
                   <div className="flex-1 px-1 py-0.5 border-r border-[#323232] flex items-center truncate">{`${item.category} ${item.name}`}</div>
                   <div className="w-16 flex-shrink-0 text-right px-1 py-0.5 flex items-end justify-end">{item.amount > 0 ? formatNumber(item.amount) : ''}</div>
+                </div>
+              ))}
+              {/* 空伝票（編集可能） */}
+              {blankSlips.map((slip, idx) => (
+                <div key={slip.id} className="flex text-xs border-b border-[#323232] h-5 bg-yellow-50">
+                  <div className="flex-1 px-1 py-0.5 border-r border-[#323232] flex items-center">
+                    <input
+                      type="text"
+                      placeholder="項目を入力"
+                      className="w-full h-4 text-xs px-1 border border-gray-300 bg-white"
+                      value={slip.category ? `${slip.category} ${slip.name}` : ''}
+                      onChange={(e) => {
+                        const newSlips = [...blankSlips];
+                        newSlips[idx].category = e.target.value;
+                        setBlankSlips(newSlips);
+                      }}
+                    />
+                  </div>
+                  <div className="w-16 flex-shrink-0 px-1 py-0.5 flex items-center">
+                    <input
+                      type="number"
+                      placeholder="0"
+                      className="w-full h-4 text-xs px-1 text-right border border-gray-300 bg-white"
+                      value={slip.amount || ''}
+                      onChange={(e) => {
+                        const newSlips = [...blankSlips];
+                        newSlips[idx].amount = Number(e.target.value) || 0;
+                        setBlankSlips(newSlips);
+                      }}
+                    />
+                  </div>
                 </div>
               ))}
             </div>

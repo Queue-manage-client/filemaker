@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeft, Search, Calendar, Plus, Clock, MapPin, FileText } from "lucide-react";
+import { ArrowLeft, Search, Calendar, Plus, Clock, MapPin, FileText, Settings, AlertTriangle } from "lucide-react";
 import { timeBasedHostessAttendanceSampleData } from '@/data/timeBasedHostessAttendanceSampleData';
 import type { HostessAttendanceTask, AttendanceDataItem } from '@/types/time-based-hostess-attendance';
 
@@ -105,6 +105,18 @@ export default function TimeBasedHostessAttendance() {
 
   // クリック時の詳細表示用
   const [selectedTask, setSelectedTask] = useState<HostessAttendanceTask | null>(null);
+
+  // 目標設定ダイアログ
+  const [showTargetSettings, setShowTargetSettings] = useState(false);
+
+  // 時間区分の目標設定（編集可能）
+  const [timeSlotTargets, setTimeSlotTargets] = useState([
+    { label: '9時〜13時', start: 9, end: 13, targetMinutes: 480, targetPercent: 13 },
+    { label: '13時〜17時', start: 13, end: 17, targetMinutes: 720, targetPercent: 19 },
+    { label: '17時〜21時', start: 17, end: 21, targetMinutes: 960, targetPercent: 26 },
+    { label: '21時〜1時', start: 21, end: 25, targetMinutes: 1200, targetPercent: 32 },
+    { label: '1時〜4時', start: 1, end: 4, targetMinutes: 360, targetPercent: 10 },
+  ]);
 
   // 検索フィルター
   const filteredTasks = tasks.filter(task =>
@@ -213,14 +225,8 @@ export default function TimeBasedHostessAttendance() {
     return `${year}/${month}/${day}`;
   };
 
-  // 時間区分の定義（目標時間を追加）
-  const timeSlots = [
-    { label: '9時〜13時', start: 9, end: 13, targetMinutes: 480 },
-    { label: '13時〜17時', start: 13, end: 17, targetMinutes: 720 },
-    { label: '17時〜21時', start: 17, end: 21, targetMinutes: 960 },
-    { label: '21時〜1時', start: 21, end: 25, targetMinutes: 1200 }, // 翌日1時 = 25時として扱う
-    { label: '1時〜4時', start: 1, end: 4, targetMinutes: 360 },
-  ];
+  // 時間区分の定義（状態管理のtimeSlotTargetsを使用）
+  const timeSlots = timeSlotTargets;
 
   // 時間区分別の統計計算
   const calculateTimeSlotStats = () => {
@@ -306,13 +312,41 @@ export default function TimeBasedHostessAttendance() {
   const totalDisplayTime = `${totalStats.totalMinutes}分`;
   const totalDifferenceDisplay = totalStats.totalDifference >= 0 ? `+${totalStats.totalDifference}分` : `${totalStats.totalDifference}分`;
 
-  // 各区分に割合を追加
-  const timeSlotStatsWithPercentage = timeSlotStats.map(stat => ({
-    ...stat,
-    percentage: totalStats.totalMinutes > 0 
-      ? Math.round((stat.totalMinutes / totalStats.totalMinutes) * 100 * 10) / 10 // 小数点第1位まで
-      : 0
-  }));
+  // 各区分に達成率・割合・マイナスポイントを追加
+  const timeSlotStatsWithPercentage = timeSlotStats.map((stat, index) => {
+    // 達成率 = 実績 / 目標 × 100
+    const achievementRate = stat.targetMinutes > 0
+      ? Math.round((stat.totalMinutes / stat.targetMinutes) * 100 * 10) / 10
+      : 0;
+
+    // 全体に対する割合
+    const percentage = totalStats.totalMinutes > 0
+      ? Math.round((stat.totalMinutes / totalStats.totalMinutes) * 100 * 10) / 10
+      : 0;
+
+    // 目標%
+    const targetPercent = timeSlotTargets[index]?.targetPercent || 0;
+
+    // マイナスポイント計算（達成率が100%未満の場合、不足%に応じてポイント減）
+    // 例: 達成率80%なら -20ポイント
+    const minusPoints = achievementRate < 100 ? Math.round(100 - achievementRate) : 0;
+
+    return {
+      ...stat,
+      achievementRate,
+      percentage,
+      targetPercent,
+      minusPoints,
+    };
+  });
+
+  // 総合達成率
+  const totalAchievementRate = totalStats.totalTargetMinutes > 0
+    ? Math.round((totalStats.totalMinutes / totalStats.totalTargetMinutes) * 100 * 10) / 10
+    : 0;
+
+  // 総合マイナスポイント
+  const totalMinusPoints = totalAchievementRate < 100 ? Math.round(100 - totalAchievementRate) : 0;
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -354,6 +388,16 @@ export default function TimeBasedHostessAttendance() {
                 <Button size="sm" className="flex items-center gap-2">
                   <Plus className="w-4 h-4" />
                   新規追加
+                </Button>
+
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex items-center gap-2"
+                  onClick={() => setShowTargetSettings(true)}
+                >
+                  <Settings className="w-4 h-4" />
+                  目標%設定
                 </Button>
               </div>
             </div>
@@ -532,48 +576,213 @@ export default function TimeBasedHostessAttendance() {
               {timeSlotStatsWithPercentage.map((stat, index) => (
                 <div
                   key={index}
-                  className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3 border border-blue-200"
+                  className={`rounded-lg p-3 border ${
+                    stat.difference >= 0
+                      ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200'
+                      : 'bg-gradient-to-r from-red-50 to-red-100 border-red-200'
+                  }`}
                 >
-                  <div className="text-xs font-medium text-blue-800 mb-1">
+                  {/* 時間帯ラベル */}
+                  <div className={`text-xs font-bold mb-2 pb-1 border-b ${stat.difference >= 0 ? 'text-blue-800 border-blue-200' : 'text-red-800 border-red-200'}`}>
                     {stat.label}
                   </div>
-                  <div className="text-sm font-semibold text-blue-800">
-                    {stat.hostessCount}人
+
+                  {/* 延人数計 */}
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[10px] text-gray-600">延人数計</span>
+                    <span className="text-sm font-bold">{stat.hostessCount}</span>
                   </div>
-                  <div className="text-base font-bold text-blue-900">
-                    実績: {stat.displayTime}
+
+                  {/* 実績（分と%） */}
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[10px] text-gray-600">実績</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm font-bold">{stat.totalMinutes.toLocaleString()}</span>
+                      <span className="text-[10px] bg-blue-200 px-1 rounded">{stat.percentage}%</span>
+                    </div>
                   </div>
-                  <div className="text-xs text-blue-600">
-                    目標: {stat.targetMinutes}分
+
+                  {/* 目標時間(分)と% */}
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[10px] text-gray-600">目標時間(分)</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm font-bold">{stat.targetMinutes.toLocaleString()}</span>
+                      <span className="text-[10px] bg-blue-200 px-1 rounded">{stat.targetPercent}%</span>
+                    </div>
                   </div>
-                  <div className={`text-sm font-bold ${stat.difference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    差分: {stat.differenceDisplay}
+
+                  {/* 目標との差 */}
+                  <div className={`flex justify-between items-center mt-2 pt-1 border-t ${stat.difference >= 0 ? 'border-blue-200' : 'border-red-200'}`}>
+                    <span className="text-[10px] text-gray-600">目標との差</span>
+                    <div className="flex items-center gap-1">
+                      <span className={`text-sm font-bold ${stat.difference >= 0 ? 'text-blue-700' : 'text-red-600'}`}>
+                        {stat.difference >= 0 ? '+' : ''}{stat.difference.toLocaleString()}
+                      </span>
+                      <span className={`text-[10px] px-1 rounded ${stat.difference >= 0 ? 'bg-blue-200' : 'bg-red-200'}`}>
+                        {stat.difference >= 0 ? '+' : ''}{((stat.difference / (stat.targetMinutes || 1)) * 100).toFixed(0)}%
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
-              
+
               {/* 総計カード */}
-              <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-3 border border-green-200">
-                <div className="text-xs font-medium text-green-800 mb-1">
+              <div className="rounded-lg p-3 border bg-gradient-to-r from-green-50 to-green-100 border-green-200">
+                {/* 総計ラベル */}
+                <div className="text-xs font-bold mb-2 pb-1 border-b text-green-800 border-green-200">
                   総計
                 </div>
-                <div className="text-sm font-semibold text-green-800">
-                  {totalStats.totalHostessCount}人
+
+                {/* 延人数計 */}
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] text-gray-600">延人数計</span>
+                  <span className="text-sm font-bold">{totalStats.totalHostessCount}</span>
                 </div>
-                <div className="text-base font-bold text-green-900">
-                  実績: {totalDisplayTime}
+
+                {/* 実績（分と%） */}
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] text-gray-600">実績</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm font-bold">{totalStats.totalMinutes.toLocaleString()}</span>
+                    <span className="text-[10px] bg-green-200 px-1 rounded">100%</span>
+                  </div>
                 </div>
-                <div className="text-xs text-green-600">
-                  目標: {totalStats.totalTargetMinutes}分
+
+                {/* 目標時間(分)と% */}
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] text-gray-600">目標時間(分)</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm font-bold">{totalStats.totalTargetMinutes.toLocaleString()}</span>
+                    <span className="text-[10px] bg-green-200 px-1 rounded">100%</span>
+                  </div>
                 </div>
-                <div className={`text-sm font-bold ${totalStats.totalDifference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  差分: {totalDifferenceDisplay}
+
+                {/* 目標との差 */}
+                <div className={`flex justify-between items-center mt-2 pt-1 border-t border-green-200`}>
+                  <span className="text-[10px] text-gray-600">目標との差</span>
+                  <div className="flex items-center gap-1">
+                    <span className={`text-sm font-bold ${totalStats.totalDifference >= 0 ? 'text-blue-700' : 'text-red-600'}`}>
+                      {totalStats.totalDifference >= 0 ? '+' : ''}{totalStats.totalDifference.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 達成目標率・ポイント */}
+                <div className="mt-2 pt-2 border-t border-green-300 bg-white/50 rounded p-2">
+                  <div className="text-[10px] text-gray-600 mb-1">達成目標率</div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-gray-500">達成率</span>
+                    <span className={`text-lg font-bold ${totalAchievementRate >= 100 ? 'text-blue-600' : 'text-red-600'}`}>
+                      {totalAchievementRate}%
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-[10px] text-gray-500">ポイント</span>
+                    <span className={`text-lg font-bold ${totalAchievementRate >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                      {totalAchievementRate >= 100 ? ((totalAchievementRate - 100) / 10).toFixed(1) : `-${totalMinusPoints}`}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* 目標%設定ダイアログ */}
+      <Dialog open={showTargetSettings} onOpenChange={setShowTargetSettings}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings className="w-5 h-5 text-blue-600" />
+              時間別目標%設定
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-sm text-gray-600 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+              <p className="font-medium text-yellow-800 mb-1">管理部歩合への影響</p>
+              <p>各時間帯の達成率が100%を下回ると、不足分に応じてマイナスポイントが発生します。</p>
+            </div>
+
+            {/* 目標設定テーブル */}
+            <div className="border rounded-lg overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="text-left px-3 py-2">時間帯</th>
+                    <th className="text-center px-3 py-2">目標時間(分)</th>
+                    <th className="text-center px-3 py-2">目標%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {timeSlotTargets.map((slot, index) => (
+                    <tr key={index} className="border-t">
+                      <td className="px-3 py-2 font-medium">{slot.label}</td>
+                      <td className="px-3 py-2">
+                        <Input
+                          type="number"
+                          value={slot.targetMinutes}
+                          onChange={(e) => {
+                            const newTargets = [...timeSlotTargets];
+                            newTargets[index].targetMinutes = Number(e.target.value);
+                            setTimeSlotTargets(newTargets);
+                          }}
+                          className="w-24 text-center"
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex items-center justify-center gap-1">
+                          <Input
+                            type="number"
+                            value={slot.targetPercent}
+                            onChange={(e) => {
+                              const newTargets = [...timeSlotTargets];
+                              newTargets[index].targetPercent = Number(e.target.value);
+                              setTimeSlotTargets(newTargets);
+                            }}
+                            className="w-16 text-center"
+                            min={0}
+                            max={100}
+                          />
+                          <span>%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot className="bg-gray-50">
+                  <tr className="border-t font-bold">
+                    <td className="px-3 py-2">合計</td>
+                    <td className="px-3 py-2 text-center">
+                      {timeSlotTargets.reduce((sum, s) => sum + s.targetMinutes, 0)}分
+                    </td>
+                    <td className="px-3 py-2 text-center">
+                      {timeSlotTargets.reduce((sum, s) => sum + s.targetPercent, 0)}%
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            {/* 目標%合計が100でない場合の警告 */}
+            {timeSlotTargets.reduce((sum, s) => sum + s.targetPercent, 0) !== 100 && (
+              <div className="flex items-center gap-2 text-orange-600 bg-orange-50 p-2 rounded">
+                <AlertTriangle className="w-4 h-4" />
+                <span className="text-sm">目標%の合計が100%になるように調整してください</span>
+              </div>
+            )}
+
+            <div className="flex gap-2 pt-4 border-t">
+              <Button variant="outline" className="flex-1" onClick={() => setShowTargetSettings(false)}>
+                キャンセル
+              </Button>
+              <Button className="flex-1" onClick={() => setShowTargetSettings(false)}>
+                保存
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* 詳細表示ダイアログ */}
       <Dialog open={!!selectedTask} onOpenChange={(open) => !open && setSelectedTask(null)}>
