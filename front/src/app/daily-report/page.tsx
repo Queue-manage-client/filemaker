@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ArrowLeft, CalendarIcon, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ArrowLeft, CalendarIcon, ChevronLeft, ChevronRight, Plus, FileText } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 // 売上リストのサンプルデータ（写真に基づく）
 const salesListData = [
@@ -262,6 +264,37 @@ const hostessDisplayData = staffData.map((s, i) => ({
   approval: i % 3 === 0,
 }));
 
+// 日報出力用サンプルデータ
+const dailyReportExportData = {
+  // 本日の件数
+  todayTotalCount: 130,
+  todayTotalAmount: 1411995,
+  // 店舗別売上
+  storesSales: [
+    { name: '京都', count: 22, amount: 177040 },
+    { name: '人妻', count: 26, amount: 300760 },
+    { name: 'ファ', count: 20, amount: 104800 },
+    { name: 'ホテ', count: 62, amount: 426990 },
+    { name: '滋賀', count: 0, amount: 0 },
+  ],
+  // 明日の出勤計
+  tomorrowAttendance: 45,
+  // 明日の予約
+  tomorrowReservations: 12,
+  // 明日の面接
+  tomorrowInterviews: 3,
+  // 本日の無派遣
+  todayNoDispatch: 2,
+  // 本日の当欠
+  todayAbsent: 1,
+  // 本日の無欠
+  todayNoAbsent: 0,
+  // 本日のバイト代
+  todayPartTimePay: 14350,
+  // 作成送信者
+  creator: '管理者',
+};
+
 export default function DailyReport() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -307,6 +340,112 @@ export default function DailyReport() {
     if (typeof num === 'string') return num;
     if (num === 0) return '';
     return num.toLocaleString();
+  };
+
+  // PDF生成関数
+  const generateDailyReportPDF = async () => {
+    // 一時的なHTMLコンテナを作成
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '0';
+    container.style.width = '595px'; // A4幅（72dpi）
+    container.style.padding = '40px';
+    container.style.backgroundColor = 'white';
+    container.style.fontFamily = 'sans-serif';
+    container.innerHTML = `
+      <div style="font-size: 24px; font-weight: bold; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 10px;">
+        日報 - ${format(currentDate, 'yyyy年MM月dd日(E)', { locale: ja })}
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【本日の件数】</div>
+        <div style="font-size: 14px; margin-left: 15px; margin-bottom: 4px;">合計: ${dailyReportExportData.todayTotalCount}件</div>
+        <div style="font-size: 14px; margin-left: 15px;">金額: ${dailyReportExportData.todayTotalAmount.toLocaleString()}円</div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【店舗別売上】</div>
+        ${dailyReportExportData.storesSales.map(store =>
+          `<div style="font-size: 14px; margin-left: 15px; margin-bottom: 4px;">${store.name}: ${store.count}件 / ${store.amount.toLocaleString()}円</div>`
+        ).join('')}
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【明日の出勤計】</div>
+        <div style="font-size: 14px; margin-left: 15px;">${dailyReportExportData.tomorrowAttendance}名</div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【明日の予約】</div>
+        <div style="font-size: 14px; margin-left: 15px;">${dailyReportExportData.tomorrowReservations}件</div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【明日の面接】</div>
+        <div style="font-size: 14px; margin-left: 15px;">${dailyReportExportData.tomorrowInterviews}件</div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【本日の無派遣】</div>
+        <div style="font-size: 14px; margin-left: 15px;">${dailyReportExportData.todayNoDispatch}件</div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【本日の当欠】</div>
+        <div style="font-size: 14px; margin-left: 15px;">${dailyReportExportData.todayAbsent}件</div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【本日の無欠】</div>
+        <div style="font-size: 14px; margin-left: 15px;">${dailyReportExportData.todayNoAbsent}件</div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【本日のバイト代】</div>
+        <div style="font-size: 14px; margin-left: 15px;">${dailyReportExportData.todayPartTimePay.toLocaleString()}円</div>
+      </div>
+
+      <div style="margin-bottom: 30px;">
+        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【作成送信者】</div>
+        <div style="font-size: 14px; margin-left: 15px;">${dailyReportExportData.creator}</div>
+      </div>
+
+      <div style="font-size: 12px; color: #666; border-top: 1px solid #ccc; padding-top: 15px;">
+        出力日時: ${format(new Date(), 'yyyy/MM/dd HH:mm:ss')}
+      </div>
+    `;
+
+    document.body.appendChild(container);
+
+    try {
+      // HTMLをキャンバスに変換
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      // PDFを作成
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdfWidth = doc.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+      // PDFをダウンロード
+      const fileName = `日報_${format(currentDate, 'yyyyMMdd')}.pdf`;
+      doc.save(fileName);
+    } finally {
+      // クリーンアップ
+      document.body.removeChild(container);
+    }
   };
 
   return (
@@ -374,6 +513,15 @@ export default function DailyReport() {
               onClick={goToNextDay}
             >
               <ChevronRight className="w-4 h-4" />
+            </Button>
+
+            {/* 日報出力 */}
+            <Button
+              className="h-8 px-4 text-xs bg-orange-400 hover:bg-orange-500 text-black border border-[#323232] flex items-center gap-1"
+              onClick={generateDailyReportPDF}
+            >
+              <FileText className="w-4 h-4" />
+              日報出力
             </Button>
 
             {/* 印刷 */}

@@ -205,7 +205,7 @@ export default function DispatchPanel2DSubPage() {
           {scheduledHostessSampleData.map((hostess: ScheduledHostess) => (
             <div key={hostess.id} className="grid h-[22px] whitespace-nowrap border-b border-zinc-300" style={{ gridTemplateColumns: '24px 1fr 56px 32px 40px 1fr 40px 40px' }}>
               {/* 左のカラーバー */}
-              <div className="h-full flex items-center justify-center bg-zinc-300 border-r border-zinc-400">
+              <div className="h-full flex items-center justify-center bg-white border-r border-zinc-400">
                 <div className="w-1.5 h-3 bg-rose-300/60" />
               </div>
               {/* ホステス名 */}
@@ -214,7 +214,7 @@ export default function DispatchPanel2DSubPage() {
                 <span className="text-black text-[13px] pl-1 truncate">{hostess.hostessName}</span>
               </div>
               {/* 迎えドラ */}
-              <div className="h-full bg-zinc-300 flex items-center justify-center overflow-hidden border-r border-zinc-400">
+              <div className="h-full bg-white flex items-center justify-center overflow-hidden border-r border-zinc-400">
                 <span className="text-black text-[13px] truncate">{hostess.driverName}</span>
               </div>
               {/* 決定 */}
@@ -222,19 +222,19 @@ export default function DispatchPanel2DSubPage() {
                 <span className="text-white text-[13px]">{hostess.count}</span>
               </div>
               {/* 出勤 */}
-              <div className="h-full bg-zinc-300 flex items-center justify-center border-r border-zinc-400">
+              <div className="h-full bg-white flex items-center justify-center border-r border-zinc-400">
                 <span className="text-lime-500 text-[13px]">{hostess.arrivalTime}</span>
               </div>
               {/* 迎え場所 */}
-              <div className="h-full bg-zinc-300 flex items-center justify-center overflow-hidden border-r border-zinc-400">
+              <div className="h-full bg-white flex items-center justify-center overflow-hidden border-r border-zinc-400">
                 <span className="text-black text-[13px] truncate">{hostess.location}</span>
               </div>
               {/* 終了 */}
-              <div className="h-full bg-zinc-300 flex items-center justify-center border-r border-zinc-400">
+              <div className="h-full bg-white flex items-center justify-center border-r border-zinc-400">
                 <span className="text-orange-500 text-[13px]">{hostess.startTime}</span>
               </div>
               {/* 帰宅 */}
-              <div className="h-full bg-zinc-300 flex items-center justify-center">
+              <div className="h-full bg-white flex items-center justify-center">
                 <span className="text-pink-500 text-[13px]">{hostess.endTime}</span>
               </div>
             </div>
@@ -512,7 +512,7 @@ export default function DispatchPanel2DSubPage() {
           {sendHostessSampleData.map((hostess: SendHostess) => (
             <div key={hostess.id} className="grid h-[22px] whitespace-nowrap border-b border-zinc-300" style={{ gridTemplateColumns: '28px 1fr 1fr 40px 40px 1fr 32px' }}>
               {/* 荷物アイコン */}
-              <div className="h-full bg-zinc-300 flex items-center justify-center border-r border-zinc-400">
+              <div className="h-full bg-white flex items-center justify-center border-r border-zinc-400">
                 {hostess.hasPackage && <Package size={14} className="text-zinc-500" />}
               </div>
               {/* ホステス名 */}
@@ -525,22 +525,22 @@ export default function DispatchPanel2DSubPage() {
                 <span className="text-black text-[13px] truncate">{hostess.driverName}</span>
               </div>
               {/* 終了 */}
-              <div className="h-full bg-zinc-300 flex items-center justify-center border-r border-zinc-400">
+              <div className="h-full bg-white flex items-center justify-center border-r border-zinc-400">
                 <span className="text-black text-[13px]">{hostess.endTime}</span>
               </div>
               {/* 帰宅 */}
-              <div className="h-full bg-zinc-300 flex items-center justify-center border-r border-zinc-400">
+              <div className="h-full bg-white flex items-center justify-center border-r border-zinc-400">
                 <span className="text-black text-[13px]">{hostess.returnTime}</span>
               </div>
               {/* 送り場所 */}
-              <div className="h-full bg-zinc-300 flex items-center overflow-hidden border-r border-zinc-400">
+              <div className="h-full bg-white flex items-center overflow-hidden border-r border-zinc-400">
                 <span className="text-black text-[13px] pl-1 truncate">
                   {hostess.destinationMark && <span>{hostess.destinationMark}</span>}
                   {hostess.destination}
                 </span>
               </div>
               {/* 件数 */}
-              <div className="h-full bg-zinc-300 flex items-center justify-center">
+              <div className="h-full bg-white flex items-center justify-center">
                 <span className="text-black text-[13px]">{hostess.count > 0 ? hostess.count : ''}</span>
               </div>
             </div>

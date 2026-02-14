@@ -26,7 +26,6 @@ export const CenterPanel = () => {
         { name: "顧客台帳", icon: Users, href: "/customer-ledger" },
         { name: "顧客ポイント", icon: Award, href: "/customer-points" },
         { name: "ホステス台帳", icon: Users, href: "/hostess-ledger" },
-        { name: "プロフィール設定", icon: Settings, href: "/hostess-management" },
         { name: "スタッフ台帳", icon: Users, href: "/staff-ledger" },
         { name: "週間ホステス出勤", icon: Calendar, href: "/weekly-hostess-attendance" },
         { name: "地域区分", icon: Map, href: "/area-division" },
@@ -37,7 +36,6 @@ export const CenterPanel = () => {
     {
       title: "E",
       items: [
-        { name: "燃料・エコ手当管理", icon: Settings, href: "/fuel-eco-management" },
         { name: "メディア管理", icon: Database, href: "/media-management" },
         { name: "交通費設定", icon: Map, href: "/transportation-fee-settings" }
       ]

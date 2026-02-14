@@ -18,7 +18,10 @@ import {
   // Download,
   // CreditCard,
   User,
-  Shield
+  Shield,
+  UserCircle,
+  Database,
+  LogOut
 } from "lucide-react";
 
 export const RightPanel = () => {
@@ -38,8 +41,9 @@ export const RightPanel = () => {
     {
       title: "G",
       items: [
-        { name: "キャストマイページ", icon: User, href: "/cast-mypage" },
-        { name: "管理部マイページ", icon: Shield, href: "/admin-mypage" }
+        { name: "ホステスマイページ管理", icon: UserCircle, href: "/hostess-management" },
+        { name: "在籍・担当データ管理", icon: Database, href: "#" },
+        { name: "退店管理", icon: LogOut, href: "#" }
       ]
     }
   ];
