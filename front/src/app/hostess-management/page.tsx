@@ -23,8 +23,7 @@ import {
   Upload,
   Clock,
   User,
-  Save,
-  X
+  Save
 } from "lucide-react";
 
 export default function HostessManagementPage() {

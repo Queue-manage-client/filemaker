@@ -20,6 +20,6 @@ export function useHostessManagers() {
   return { data: sampleHostessManagers, isLoading: false, error: null };
 }
 
-export function useHostessRanking(period?: string) {
+export function useHostessRanking(_period?: string) {
   return { data: sampleHostessRanking, isLoading: false, error: null };
 }

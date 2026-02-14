@@ -10,7 +10,6 @@ import {
   MapPin,
   Hotel,
   // Calculator,
-  Settings,
   Database,
   Map,
   Calendar

@@ -29,7 +29,6 @@ import {
   StaffSchedule,
   OutDriverUndecided,
   CompletedList,
-  OfficeWaiting,
   Shooting,
   MemoItem,
   WalkingDispatch,
@@ -138,7 +137,7 @@ export default function Original() {
       <span className="text-black text-[13px] font-normal font-['Inter']">スタッフ予定リスト</span>
     </div>
     <div className="w-[357px] h-96 left-[4px] top-[728px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
-      {staffScheduleSampleData.map((schedule: StaffSchedule, index: number) => (
+      {staffScheduleSampleData.map((schedule: StaffSchedule, _index: number) => (
         <div
           key={schedule.id}
           className={`w-full h-8 flex items-center px-1 text-black text-[13px] font-normal font-['Inter'] ${schedule.isHighlighted ? 'bg-lime-200' : 'bg-white'}`}

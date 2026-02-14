@@ -8,9 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { ArrowLeft, Building, Plus, Settings, Users, FileText, DollarSign, 
-         Calendar, MessageSquare, TrendingUp, Award, Minus, Gift, 
+import { ArrowLeft, Building, Plus, Settings, Users, FileText, DollarSign,
+         Calendar, MessageSquare, TrendingUp, Award, Minus, Gift,
          Percent, Eye, Camera, Cog, Edit, Save, X, Copy } from "lucide-react";
 
 import { 

@@ -309,8 +309,8 @@ export default function TimeBasedHostessAttendance() {
     totalDifference: timeSlotStats.reduce((sum, stat) => sum + stat.totalMinutes, 0) - totalTargetMinutes,
   };
 
-  const totalDisplayTime = `${totalStats.totalMinutes}分`;
-  const totalDifferenceDisplay = totalStats.totalDifference >= 0 ? `+${totalStats.totalDifference}分` : `${totalStats.totalDifference}分`;
+  const _totalDisplayTime = `${totalStats.totalMinutes}分`;
+  const _totalDifferenceDisplay = totalStats.totalDifference >= 0 ? `+${totalStats.totalDifference}分` : `${totalStats.totalDifference}分`;
 
   // 各区分に達成率・割合・マイナスポイントを追加
   const timeSlotStatsWithPercentage = timeSlotStats.map((stat, index) => {

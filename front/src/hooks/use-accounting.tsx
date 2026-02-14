@@ -7,22 +7,22 @@ export function useAccountingList() {
   return { data: [] as AccountingSummary[], isLoading: false, error: null };
 }
 
-export function useAccountingById(id: string) {
+export function useAccountingById(_id: string) {
   return { data: null as AccountingSummary | null, isLoading: false, error: null };
 }
 
-export function useIncomeSlips(startDate?: string, endDate?: string) {
+export function useIncomeSlips(_startDate?: string, _endDate?: string) {
   return { data: [] as IncomeSlip[], isLoading: false, error: null };
 }
 
-export function useAccountingSummary(startDate?: string, endDate?: string) {
+export function useAccountingSummary(_startDate?: string, _endDate?: string) {
   return { data: [] as AccountingSummary[], isLoading: false, error: null };
 }
 
-export function useExpenseSlips(startDate?: string, endDate?: string) {
+export function useExpenseSlips(_startDate?: string, _endDate?: string) {
   return { data: [] as ExpenseSlip[], isLoading: false, error: null };
 }
 
-export function useSalesSlips(startDate?: string, endDate?: string) {
+export function useSalesSlips(_startDate?: string, _endDate?: string) {
   return { data: [] as SalesSlip[], isLoading: false, error: null };
 }

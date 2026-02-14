@@ -7,7 +7,7 @@ export function useCustomerPointsList() {
   return { data: [] as CustomerPoints[], isLoading: false, error: null };
 }
 
-export function useCustomerPointsById(id: string) {
+export function useCustomerPointsById(_id: string) {
   return { data: null as CustomerPoints | null, isLoading: false, error: null };
 }
 

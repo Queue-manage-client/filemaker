@@ -6,7 +6,6 @@
 import { useState, useMemo } from 'react';
 import { CourseFee, StoreLedgerTab } from '@/types';
 import { calculateCourseFeeShares } from '@/lib/utils';
-import { BasicTag } from '@/types/basic-tag';
 import {
   storeBasicInfoSampleData,
   gmDivisionSampleData,

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { sampleCastData } from '@/data/castSampleData';
-import { formatDate } from 'date-fns';
 
 // 時間軸の範囲（17:00〜翌7:00 = 14時間）
 const TIME_START_HOUR = 17;

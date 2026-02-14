@@ -17,8 +17,6 @@ import {
   Unlock,
   // Download,
   // CreditCard,
-  User,
-  Shield,
   UserCircle,
   Database,
   LogOut

@@ -121,7 +121,7 @@ export default function RT2Panel() {
 
   // フィルター状態
   const [filterManager, setFilterManager] = useState<string>('all');
-  const [filterWorkStyle, setFilterWorkStyle] = useState<string>('all');
+  const [filterWorkStyle, _setFilterWorkStyle] = useState<string>('all');
   const [filterStore, setFilterStore] = useState<string>('all');
 
   // 料金計算ポップオーバー状態
@@ -150,7 +150,7 @@ export default function RT2Panel() {
     const locationFee = locationType === 'love_hotel' ? 0 : locationType === 'city_hotel' ? 1000 : 0;
 
     // 小計
-    let subtotal = baseFee + nominationFee + transportFee + locationFee;
+    const subtotal = baseFee + nominationFee + transportFee + locationFee;
 
     // 割引計算
     let discount = 0;

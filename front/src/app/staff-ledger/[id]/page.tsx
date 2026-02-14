@@ -205,7 +205,7 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const payload: any = {
+      const payload: Record<string, unknown> = {
         sfid,
         lastName,
         firstName,
@@ -241,7 +241,7 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
         const n = Number(equipment);
         if (!Number.isNaN(n)) payload.equipment = n;
       }
-      const car: any = {};
+      const car: Record<string, unknown> = {};
       if (carType) car.carType = carType;
       if (carColor) car.color = carColor;
       if (carCapacity) {
@@ -257,14 +257,14 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
         body: JSON.stringify(payload),
       });
       if (!res.ok) {
-        toast({ title: '保存エラー', description: `保存に失敗しました（${res.status}）`, variant: 'destructive' as any });
+        toast({ title: '保存エラー', description: `保存に失敗しました（${res.status}）`, variant: 'destructive' });
         return;
       }
       toast({ title: '保存しました', description: 'スタッフ情報を更新しました。' });
       // 保存後に最新データを再取得
       window.location.reload();
     } catch {
-      toast({ title: '保存エラー', description: '通信に失敗しました。', variant: 'destructive' as any });
+      toast({ title: '保存エラー', description: '通信に失敗しました。', variant: 'destructive' });
     } finally {
       setIsSaving(false);
     }

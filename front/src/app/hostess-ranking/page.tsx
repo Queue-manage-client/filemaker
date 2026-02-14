@@ -239,12 +239,12 @@ export default function HostessRanking() {
   const [transitionTopN, setTransitionTopN] = useState<number>(5);
 
   // 期間選択（Items 33, 35）
-  const currentDate = new Date();
-  const [selectedYear, setSelectedYear] = useState<number>(currentDate.getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState<number>(currentDate.getMonth() + 1);
+  const currentDate = useMemo(() => new Date(), []);
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
   const [periodType, setPeriodType] = useState<'month' | 'range'>('month');
-  const [rangeStartMonth, setRangeStartMonth] = useState<number>(currentDate.getMonth() + 1);
-  const [rangeEndMonth, setRangeEndMonth] = useState<number>(currentDate.getMonth() + 1);
+  const [rangeStartMonth, setRangeStartMonth] = useState<number>(new Date().getMonth() + 1);
+  const [rangeEndMonth, setRangeEndMonth] = useState<number>(new Date().getMonth() + 1);
 
   // 年のオプション生成（過去3年から現在まで）
   const yearOptions = useMemo(() => {

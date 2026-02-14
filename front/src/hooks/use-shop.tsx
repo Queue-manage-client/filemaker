@@ -11,7 +11,7 @@ export function useShopList() {
   };
 }
 
-export function useShopById(id: string) {
+export function useShopById(_id: string) {
   return {
     data: null as Shop | null,
     isLoading: false,

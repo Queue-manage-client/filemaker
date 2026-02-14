@@ -12,6 +12,6 @@ export function useEmployeeById(id: string) {
   return { data: employee, isLoading: false, error: null };
 }
 
-export function useEmployeeWeeklyShifts(startDate?: string, endDate?: string) {
+export function useEmployeeWeeklyShifts(_startDate?: string, _endDate?: string) {
   return { data: sampleEmployeeWeeklyShifts, isLoading: false, error: null };
 }
