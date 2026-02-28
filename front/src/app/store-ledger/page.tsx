@@ -2607,242 +2607,205 @@ export default function StoreLedger() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 overflow-x-hidden">
-      <div className="flex h-screen overflow-hidden">
-        {/* 左側：店舗一覧 */}
-        <div className="w-[300px] bg-white border-r border-gray-200 flex flex-col">
-          {/* ヘッダー */}
-          <div className="p-4 border-b border-gray-200">
-            <div className="flex items-center gap-3 mb-4">
-              <Link href="/dashboard">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  戻る
-                </Button>
-              </Link>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Building className="w-6 h-6" />
-                <h1 className="text-xl font-bold">店舗台帳</h1>
-              </div>
-              <Button 
-                variant="default" 
+    <div className="h-screen flex flex-col bg-gray-100">
+      {/* ヘッダー */}
+      <div className="h-12 bg-white border-b border-zinc-300 flex items-center px-4 shrink-0">
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="h-8 px-3 text-sm flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ダッシュボードに戻る
+          </Button>
+        </Link>
+        <h1 className="text-lg font-bold ml-4">店舗台帳</h1>
+
+        {/* 店舗選択 */}
+        <Select value={selectedStore} onValueChange={setSelectedStore}>
+          <SelectTrigger className="w-[180px] h-8 ml-4">
+            <SelectValue placeholder="店舗を選択" />
+          </SelectTrigger>
+          <SelectContent>
+            {storeList.map((storeName) => (
+              <SelectItem key={storeName} value={storeName}>
+                {storeName}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {selectedStoreInfo && !isCreatingNewStore && (
+          <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+            selectedStoreInfo.isActive
+              ? 'bg-green-100 text-green-800'
+              : 'bg-red-100 text-red-800'
+          }`}>
+            {selectedStoreInfo.isActive ? '営業中' : '休業中'}
+          </span>
+        )}
+
+        {/* 右側ボタン */}
+        <div className="ml-auto flex items-center gap-2">
+          {isEditMode ? (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCancelEditStore}
+                className="h-8 flex items-center gap-2"
+              >
+                <X className="w-4 h-4" />
+                キャンセル
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleSaveStore}
+                className="h-8 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Save className="w-4 h-4" />
+                保存
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleEditStore}
+                className="h-8 flex items-center gap-2"
+                disabled={!canEdit}
+              >
+                <Edit className="w-4 h-4" />
+                編集
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDuplicateStore}
+                className="h-8 flex items-center gap-2"
+                disabled={!basicTag || !canEdit}
+              >
+                <Copy className="w-4 h-4" />
+                複製
+              </Button>
+              <Button
                 size="sm"
                 onClick={handleCreateNewStore}
-                className="flex items-center gap-2"
+                className="h-8 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Plus className="w-4 h-4" />
                 新規作成
               </Button>
-            </div>
-          </div>
+            </>
+          )}
+        </div>
+      </div>
 
-          {/* 店舗一覧 */}
-          <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-            <div className="p-4 pb-2 flex-shrink-0">
-              <h2 className="text-sm font-semibold text-gray-700">店舗一覧</h2>
-            </div>
-            <div className="flex-1 px-4 pb-4 overflow-hidden min-h-0">
-              <div className="h-full overflow-y-auto pr-2">
-                <div className="space-y-2 pr-2">
-                  {storeList.length === 0 ? (
-                    <div className="text-center text-gray-500 py-4">店舗データがありません</div>
-                  ) : (
-                    storeList.map((storeName) => (
-                      <button
-                        key={storeName}
-                        onClick={() => setSelectedStore(storeName)}
-                        className={`w-full text-left p-3 rounded-lg transition-colors ${
-                          selectedStore === storeName
-                            ? 'bg-blue-50 border border-blue-200 text-blue-700'
-                            : 'hover:bg-gray-50 border border-transparent'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Building className="w-4 h-4 flex-shrink-0" />
-                          <div className="min-w-0 flex-1">
-                            <div className="font-medium truncate" title={storeName}>{storeName}</div>
-                            <div className="text-xs text-gray-500 truncate">
-                              {storeBasicInfoList?.find(s => s.storeName === storeName)?.storeCode || ''}
-                            </div>
-                          </div>
-                        </div>
-                      </button>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
+      {/* メインコンテンツ */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* 左側：店舗一覧 */}
+        <div className="w-[200px] bg-white border-r border-gray-200 flex flex-col shrink-0">
+          <div className="p-3 border-b border-gray-200">
+            <h2 className="text-sm font-semibold text-gray-700">店舗一覧</h2>
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            {storeList.length === 0 ? (
+              <div className="text-center text-gray-500 py-4 text-sm">店舗データがありません</div>
+            ) : (
+              storeList.map((storeName) => (
+                <button
+                  key={storeName}
+                  onClick={() => setSelectedStore(storeName)}
+                  className={`w-full text-left px-3 py-2 text-sm border-b border-gray-100 ${
+                    selectedStore === storeName
+                      ? 'bg-blue-50 text-blue-700 font-medium'
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Building className="w-4 h-4 shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate">{storeName}</div>
+                      <div className="text-xs text-gray-500 truncate">
+                        {storeBasicInfoList?.find(s => s.storeName === storeName)?.storeCode || ''}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              ))
+            )}
           </div>
         </div>
 
         {/* 右側：タブコンテンツ */}
-        <div className="flex-1 flex flex-col min-w-0">
-          {/* 選択店舗情報ヘッダー */}
-          <div className="bg-white border-b border-gray-200 p-4 flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 flex-1">
-                <Building className="w-5 h-5 text-blue-600" />
-                {isEditMode && editFormData ? (
-                  <Input
-                    value={editFormData.storeName}
-                    onChange={(e) => {
-                      updateEditFormData({ storeName: e.target.value });
-                      // 新規作成時は店舗名を変更したら選択店舗も更新
-                      if (isCreatingNewStore) {
-                        setSelectedStore(e.target.value || '新規店舗');
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {/* タブリスト */}
+          <div
+            className="bg-white border-b border-gray-200 shrink-0 overflow-x-auto"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
+            <div className="flex" style={{ minWidth: 'max-content' }}>
+              {storeLedgerTabs.map((tab) => {
+                const IconComponent = tabIcons[tab.id];
+                const isTabAdminOnly = adminOnlyTabs.includes(tab.id);
+                const isTabDisabled = isTabAdminOnly && !isAdminMode;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      if (isTabDisabled) {
+                        alert('このタブは管理者のみ閲覧可能です。管理者モードをオンにしてください。');
+                      } else {
+                        setActiveTab(tab.id);
                       }
                     }}
-                    className="text-lg font-semibold max-w-xs"
-                    placeholder="店舗名を入力"
-                  />
-                ) : (
-                  <>
-                    <h2 className="text-lg font-semibold">{isCreatingNewStore ? '新規店舗' : selectedStore}</h2>
-                    {selectedStoreInfo && !isCreatingNewStore && (
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        selectedStoreInfo.isActive 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {selectedStoreInfo.isActive ? '営業中' : '休業中'}
-                      </span>
-                    )}
-                  </>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                {isEditMode ? (
-                  <>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleCancelEditStore}
-                      className="flex items-center gap-2"
-                    >
-                      <X className="w-4 h-4" />
-                      キャンセル
-                    </Button>
-                    <Button 
-                      variant="default" 
-                      size="sm"
-                      onClick={handleSaveStore}
-                      className="flex items-center gap-2"
-                    >
-                      <Save className="w-4 h-4" />
-                      保存
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleEditStore}
-                      className="flex items-center gap-2"
-                      disabled={!canEdit}
-                    >
-                      <Edit className="w-4 h-4" />
-                      編集
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleDuplicateStore}
-                      className="flex items-center gap-2"
-                      disabled={!basicTag || !canEdit}
-                    >
-                      <Copy className="w-4 h-4" />
-                      複製
-                    </Button>
-                  </>
-                )}
-              </div>
+                    disabled={isTabDisabled}
+                    className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 ${
+                      activeTab === tab.id
+                        ? 'border-blue-600 text-blue-600'
+                        : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                    } ${isTabDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <IconComponent className="w-4 h-4" />
+                    {tab.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* タブコンテンツ */}
-          <div className="flex-1 bg-gray-50 min-w-0 min-h-0">
-            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as StoreLedgerTab)} className="h-full flex flex-col min-w-0 min-h-0">
-              {/* タブリスト */}
-              <div 
-                className="bg-white border-b border-gray-200 w-full min-w-0 flex-shrink-0"
-                style={{ 
-                  overflowX: 'auto', 
-                  overflowY: 'auto',
-                  WebkitOverflowScrolling: 'touch'
-                }}
-              >
-                <TabsList className="flex justify-start h-auto p-1 bg-transparent" style={{ minWidth: 'max-content', width: 'max-content' }}>
-                  {storeLedgerTabs.map((tab) => {
-                    const IconComponent = tabIcons[tab.id];
-                    const isTabAdminOnly = adminOnlyTabs.includes(tab.id);
-                    const isTabDisabled = isTabAdminOnly && !isAdminMode;
-                    return (
-                      <TabsTrigger
-                        key={tab.id}
-                        value={tab.id}
-                        disabled={isTabDisabled}
-                        className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap flex-shrink-0 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 ${
-                          isTabDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
-                        onClick={() => {
-                          if (isTabDisabled) {
-                            alert('このタブは管理者のみ閲覧可能です。管理者モードをオンにしてください。');
-                          }
-                        }}
-                      >
-                        <IconComponent className="w-4 h-4" />
-                        {tab.label}
-                      </TabsTrigger>
-                    );
-                  })}
-                </TabsList>
-              </div>
+          {/* タブコンテンツエリア */}
+          <div className="flex-1 overflow-auto bg-gray-50 p-6">
+            {(() => {
+              const isTabAdminOnly = adminOnlyTabs.includes(activeTab);
+              const shouldShowContent = !isTabAdminOnly || isAdminMode;
 
-              {/* タブコンテンツエリア */}
-              <div className="flex-1 overflow-hidden overflow-x-hidden min-h-0">
-                {storeLedgerTabs.map((tab) => {
-                  const isTabAdminOnly = adminOnlyTabs.includes(tab.id);
-                  const shouldShowContent = !isTabAdminOnly || isAdminMode;
-                  
-                  return (
-                    <TabsContent key={tab.id} value={tab.id} className="h-full m-0">
-                      <div className="h-full w-full overflow-y-auto">
-                        <div className="p-6 overflow-x-hidden">
-                          {shouldShowContent ? (
-                            renderTabContent(tab.id)
-                          ) : (
-                            <div className="flex flex-col items-center justify-center h-full min-h-[400px]">
-                              <Settings className="w-16 h-16 text-yellow-500 mb-4" />
-                              <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                                管理者権限が必要です
-                              </h3>
-                              <p className="text-gray-600 mb-4">
-                                このタブを表示するには、管理者モードをオンにしてください。
-                              </p>
-                              <Button
-                                variant="default"
-                                onClick={() => setIsAdminMode(true)}
-                                className="flex items-center gap-2"
-                              >
-                                <Settings className="w-4 h-4" />
-                                管理者モードをオンにする
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </TabsContent>
-                  );
-                })}
-              </div>
-            </Tabs>
+              if (!shouldShowContent) {
+                return (
+                  <div className="flex flex-col items-center justify-center h-full min-h-[400px]">
+                    <Settings className="w-16 h-16 text-yellow-500 mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                      管理者権限が必要です
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      このタブを表示するには、管理者モードをオンにしてください。
+                    </p>
+                    <Button
+                      variant="default"
+                      onClick={() => setIsAdminMode(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <Settings className="w-4 h-4" />
+                      管理者モードをオンにする
+                    </Button>
+                  </div>
+                );
+              }
+
+              return renderTabContent(activeTab);
+            })()}
           </div>
         </div>
       </div>
