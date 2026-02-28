@@ -283,14 +283,20 @@ const dailyReportExportData = {
   tomorrowReservations: 12,
   // 明日の面接
   tomorrowInterviews: 3,
-  // 本日の無派遣
-  todayNoDispatch: 2,
-  // 本日の当欠
-  todayAbsent: 1,
-  // 本日の無欠
-  todayNoAbsent: 0,
+  // 本日の無派遣キャスト名
+  todayNoDispatchCasts: ['あいか', 'みさき'],
+  // 本日の当欠キャスト名
+  todayAbsentCasts: ['ゆうな'],
+  // 本日の無欠キャスト名
+  todayNoAbsentCasts: [] as string[],
   // 本日のバイト代
   todayPartTimePay: 14350,
+  // 面接予定
+  interviewSchedules: [
+    { name: '田中 花子', time: '14:00', type: 'ホステス', location: '本社事務所' },
+    { name: '山本 太郎', time: '16:30', type: '男子', location: '京都駅前面接ルーム' },
+    { name: '佐藤 美咲', time: '18:00', type: 'ホステス', location: '本社事務所' },
+  ],
   // 作成送信者
   creator: '管理者',
 };
@@ -387,18 +393,31 @@ export default function DailyReport() {
       </div>
 
       <div style="margin-bottom: 20px;">
-        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【本日の無派遣】</div>
-        <div style="font-size: 14px; margin-left: 15px;">${dailyReportExportData.todayNoDispatch}件</div>
+        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【本日の無派遣】${dailyReportExportData.todayNoDispatchCasts.length}名</div>
+        <div style="font-size: 14px; margin-left: 15px;">${dailyReportExportData.todayNoDispatchCasts.length > 0 ? dailyReportExportData.todayNoDispatchCasts.join('、') : 'なし'}</div>
       </div>
 
       <div style="margin-bottom: 20px;">
-        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【本日の当欠】</div>
-        <div style="font-size: 14px; margin-left: 15px;">${dailyReportExportData.todayAbsent}件</div>
+        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【本日の当欠】${dailyReportExportData.todayAbsentCasts.length}名</div>
+        <div style="font-size: 14px; margin-left: 15px;">${dailyReportExportData.todayAbsentCasts.length > 0 ? dailyReportExportData.todayAbsentCasts.join('、') : 'なし'}</div>
       </div>
 
       <div style="margin-bottom: 20px;">
-        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【本日の無欠】</div>
-        <div style="font-size: 14px; margin-left: 15px;">${dailyReportExportData.todayNoAbsent}件</div>
+        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【本日の無欠】${dailyReportExportData.todayNoAbsentCasts.length}名</div>
+        <div style="font-size: 14px; margin-left: 15px;">${dailyReportExportData.todayNoAbsentCasts.length > 0 ? dailyReportExportData.todayNoAbsentCasts.join('、') : 'なし'}</div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px;">【面接予定】${dailyReportExportData.interviewSchedules.length}件</div>
+        ${dailyReportExportData.interviewSchedules.length > 0
+          ? dailyReportExportData.interviewSchedules.map(interview =>
+            `<div style="font-size: 14px; margin-left: 15px; margin-bottom: 4px; padding: 8px; background: #f5f5f5; border-radius: 4px;">
+              <div><strong>${interview.time}</strong> - ${interview.name}</div>
+              <div style="color: #666; font-size: 12px;">${interview.type} / ${interview.location}</div>
+            </div>`
+          ).join('')
+          : '<div style="font-size: 14px; margin-left: 15px;">予定なし</div>'
+        }
       </div>
 
       <div style="margin-bottom: 20px;">
@@ -806,7 +825,7 @@ export default function DailyReport() {
               </div>
             ))}
             {/* 空の行を追加 */}
-            {[...Array(5)].map((_, idx) => (
+            {[...Array(3)].map((_, idx) => (
               <div key={`empty-${idx}`} className="flex text-xs border-b border-[#323232] h-5">
                 <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center"></div>
                 <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center"></div>
@@ -815,6 +834,77 @@ export default function DailyReport() {
                 <div className="w-10 px-px py-0.5 flex items-center"></div>
               </div>
             ))}
+          </div>
+
+          {/* 本日のキャスト状況 */}
+          <div className="border-b border-[#323232]">
+            <div className="bg-red-400 h-5 flex items-center p-0.5 border-b border-[#323232]">
+              <span className="text-xs font-bold text-white">本日のキャスト状況</span>
+            </div>
+            {/* 無派遣 */}
+            <div className="flex text-xs border-b border-[#323232]">
+              <div className="w-20 px-2 py-1 bg-red-100 border-r border-[#323232] font-semibold">無派遣</div>
+              <div className="w-8 px-1 py-1 bg-red-50 border-r border-[#323232] text-center font-bold">{dailyReportExportData.todayNoDispatchCasts.length}名</div>
+              <div className="flex-1 px-2 py-1">
+                {dailyReportExportData.todayNoDispatchCasts.length > 0
+                  ? dailyReportExportData.todayNoDispatchCasts.join('、')
+                  : <span className="text-gray-400">なし</span>
+                }
+              </div>
+            </div>
+            {/* 当欠 */}
+            <div className="flex text-xs border-b border-[#323232]">
+              <div className="w-20 px-2 py-1 bg-orange-100 border-r border-[#323232] font-semibold">当欠</div>
+              <div className="w-8 px-1 py-1 bg-orange-50 border-r border-[#323232] text-center font-bold">{dailyReportExportData.todayAbsentCasts.length}名</div>
+              <div className="flex-1 px-2 py-1">
+                {dailyReportExportData.todayAbsentCasts.length > 0
+                  ? dailyReportExportData.todayAbsentCasts.join('、')
+                  : <span className="text-gray-400">なし</span>
+                }
+              </div>
+            </div>
+            {/* 無欠 */}
+            <div className="flex text-xs">
+              <div className="w-20 px-2 py-1 bg-yellow-100 border-r border-[#323232] font-semibold">無欠</div>
+              <div className="w-8 px-1 py-1 bg-yellow-50 border-r border-[#323232] text-center font-bold">{dailyReportExportData.todayNoAbsentCasts.length}名</div>
+              <div className="flex-1 px-2 py-1">
+                {dailyReportExportData.todayNoAbsentCasts.length > 0
+                  ? dailyReportExportData.todayNoAbsentCasts.join('、')
+                  : <span className="text-gray-400">なし</span>
+                }
+              </div>
+            </div>
+          </div>
+
+          {/* 面接予定 */}
+          <div className="border-b border-[#323232]">
+            <div className="bg-green-500 h-5 flex items-center justify-between p-0.5 border-b border-[#323232]">
+              <span className="text-xs font-bold text-white">面接予定</span>
+              <span className="text-xs text-white mr-1">{dailyReportExportData.interviewSchedules.length}件</span>
+            </div>
+            {/* ヘッダー */}
+            <div className="flex text-xs bg-green-100 border-b border-[#323232] h-5 font-semibold">
+              <div className="w-14 px-1 py-0.5 border-r border-[#323232] flex items-center justify-center">時間</div>
+              <div className="flex-1 px-1 py-0.5 border-r border-[#323232] flex items-center">面接者</div>
+              <div className="w-20 px-1 py-0.5 border-r border-[#323232] flex items-center justify-center">区分</div>
+              <div className="flex-1 px-1 py-0.5 flex items-center">場所</div>
+            </div>
+            {dailyReportExportData.interviewSchedules.length > 0 ? (
+              dailyReportExportData.interviewSchedules.map((interview, idx) => (
+                <div key={idx} className="flex text-xs border-b border-[#323232] h-5 hover:bg-green-50">
+                  <div className="w-14 px-1 py-0.5 border-r border-[#323232] flex items-center justify-center font-bold">{interview.time}</div>
+                  <div className="flex-1 px-1 py-0.5 border-r border-[#323232] flex items-center">{interview.name}</div>
+                  <div className={`w-20 px-1 py-0.5 border-r border-[#323232] flex items-center justify-center font-semibold ${
+                    interview.type === 'ホステス' ? 'bg-pink-100 text-pink-800' : 'bg-blue-100 text-blue-800'
+                  }`}>{interview.type}</div>
+                  <div className="flex-1 px-1 py-0.5 flex items-center">{interview.location}</div>
+                </div>
+              ))
+            ) : (
+              <div className="flex text-xs h-5 items-center justify-center text-gray-400">
+                本日の面接予定はありません
+              </div>
+            )}
           </div>
         </div>
 

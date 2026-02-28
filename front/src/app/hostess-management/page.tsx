@@ -23,8 +23,16 @@ import {
   Upload,
   Clock,
   User,
-  Save
+  Save,
+  ArrowUpDown
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function HostessManagementPage() {
   const [activeSection, setActiveSection] = useState<string>('customer');
@@ -47,15 +55,67 @@ export default function HostessManagementPage() {
   const monthOverMonthPercent = ((monthOverMonthChange / hostessData.lastMonthEarnings) * 100).toFixed(1);
   const isPositiveChange = monthOverMonthChange >= 0;
 
-  // 接客履歴サンプルデータ
+  // 接客履歴サンプルデータ（各顧客に過去のメモ履歴を含む）
   const [customerHistory, setCustomerHistory] = useState([
-    { id: '1', customerName: '田中様', date: '2026-02-13', memo: 'ワイン好き。記念日は3月15日', rating: 5 },
-    { id: '2', customerName: '佐藤様', date: '2026-02-10', memo: '静かな席を好む', rating: 4 },
-    { id: '3', customerName: '鈴木様', date: '2026-02-08', memo: '焼酎派。話題は野球', rating: 4 },
+    {
+      id: '1',
+      memberNumber: 'M-001',
+      customerName: '田中様',
+      lastVisitDate: '2026-02-13',
+      rating: 5,
+      memoHistory: [
+        { id: 'm1-4', date: '2026-02-13 20:30', author: '私', content: 'ワイン好き。記念日は3月15日。赤ワイン（フルボディ）がお好み。' },
+        { id: 'm1-3', date: '2026-02-05 19:45', author: '私', content: '誕生日のお祝いで来店。シャンパンを注文された。' },
+        { id: 'm1-2', date: '2026-01-28 21:00', author: '私', content: '仕事の話が好き。IT企業の経営者。' },
+        { id: 'm1-1', date: '2026-01-15 18:30', author: '私', content: '初回来店。紹介での来店。落ち着いた雰囲気を好む。' },
+      ]
+    },
+    {
+      id: '2',
+      memberNumber: 'M-003',
+      customerName: '佐藤様',
+      lastVisitDate: '2026-02-10',
+      rating: 4,
+      memoHistory: [
+        { id: 'm2-3', date: '2026-02-10 20:00', author: '私', content: '静かな席を好む。奥の個室がお気に入り。' },
+        { id: 'm2-2', date: '2026-01-25 19:30', author: '私', content: '日本酒派。特に純米大吟醸がお好み。' },
+        { id: 'm2-1', date: '2026-01-10 21:15', author: '私', content: '初来店。控えめな性格。ゆっくり話を聞くスタイルが合う。' },
+      ]
+    },
+    {
+      id: '3',
+      memberNumber: 'M-002',
+      customerName: '鈴木様',
+      lastVisitDate: '2026-02-08',
+      rating: 4,
+      memoHistory: [
+        { id: 'm3-2', date: '2026-02-08 19:00', author: '私', content: '焼酎派。話題は野球。阪神ファン。' },
+        { id: 'm3-1', date: '2026-01-20 20:30', author: '私', content: '初来店。明るい性格で話しやすい。' },
+      ]
+    },
   ]);
+
+  // ソート用のstate
+  const [customerSortKey, setCustomerSortKey] = useState<'memberNumber' | 'customerName' | 'lastVisitDate'>('lastVisitDate');
+
+  // ソートされた顧客リスト
+  const sortedCustomerHistory = [...customerHistory].sort((a, b) => {
+    switch (customerSortKey) {
+      case 'memberNumber':
+        return a.memberNumber.localeCompare(b.memberNumber);
+      case 'customerName':
+        return a.customerName.localeCompare(b.customerName);
+      case 'lastVisitDate':
+        return b.lastVisitDate.localeCompare(a.lastVisitDate); // 新しい順
+      default:
+        return 0;
+    }
+  });
 
   const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null);
   const [editingMemo, setEditingMemo] = useState('');
+  const [expandedCustomerId, setExpandedCustomerId] = useState<string | null>(null);
+  const [newMemoContent, setNewMemoContent] = useState('');
 
   // 予約状況サンプルデータ
   const [reservations, setReservations] = useState([
@@ -88,11 +148,41 @@ export default function HostessManagementPage() {
   ];
 
   const handleSaveCustomerMemo = (id: string) => {
+    if (!editingMemo.trim()) return;
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     setCustomerHistory(prev => prev.map(c =>
-      c.id === id ? { ...c, memo: editingMemo } : c
+      c.id === id ? {
+        ...c,
+        memoHistory: [{
+          id: `m${id}-${Date.now()}`,
+          date: dateStr,
+          author: '私',
+          content: editingMemo
+        }, ...c.memoHistory]
+      } : c
     ));
     setEditingCustomerId(null);
     setEditingMemo('');
+  };
+
+  // 新しいメモを追加する関数
+  const handleAddNewMemo = (customerId: string) => {
+    if (!newMemoContent.trim()) return;
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    setCustomerHistory(prev => prev.map(c =>
+      c.id === customerId ? {
+        ...c,
+        memoHistory: [{
+          id: `m${customerId}-${Date.now()}`,
+          date: dateStr,
+          author: '私',
+          content: newMemoContent
+        }, ...c.memoHistory]
+      } : c
+    ));
+    setNewMemoContent('');
   };
 
   const handleAddDiary = () => {
@@ -232,10 +322,10 @@ export default function HostessManagementPage() {
               <button
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
-                className={`flex-shrink-0 h-12 lg:h-14 flex items-center gap-2 lg:gap-3 pl-0.5 lg:pl-1 pr-4 lg:pr-6 rounded-full transition-all hover:scale-[1.02] hover:shadow-xl ${
+                className={`flex-shrink-0 h-12 lg:h-14 flex items-center gap-2 lg:gap-3 pl-0.5 lg:pl-1 pr-4 lg:pr-6 rounded-full transition-all ${
                   activeSection === item.id
                     ? `bg-gradient-to-r ${item.gradient} shadow-lg`
-                    : `bg-gradient-to-r ${item.gradient} opacity-90 hover:opacity-100 shadow-md`
+                    : `bg-gradient-to-r ${item.gradient} opacity-80 hover:opacity-100 shadow-md`
                 }`}
               >
                 <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center flex-shrink-0">
@@ -255,10 +345,10 @@ export default function HostessManagementPage() {
             {/* 送迎車確認 */}
             <button
               onClick={() => setActiveSection('car')}
-              className={`flex-shrink-0 h-12 lg:h-14 flex items-center gap-2 lg:gap-3 pl-0.5 lg:pl-1 pr-4 lg:pr-6 rounded-full transition-all hover:scale-[1.02] hover:shadow-xl ${
+              className={`flex-shrink-0 h-12 lg:h-14 flex items-center gap-2 lg:gap-3 pl-0.5 lg:pl-1 pr-4 lg:pr-6 rounded-full transition-all ${
                 activeSection === 'car'
                   ? 'bg-gradient-to-r from-blue-500 to-cyan-500 shadow-lg'
-                  : 'bg-gradient-to-r from-blue-500 to-cyan-500 opacity-90 hover:opacity-100 shadow-md'
+                  : 'bg-gradient-to-r from-blue-500 to-cyan-500 opacity-80 hover:opacity-100 shadow-md'
               }`}
             >
               <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center flex-shrink-0">
@@ -286,45 +376,112 @@ export default function HostessManagementPage() {
                 {/* 顧客管理 */}
                 {activeSection === 'customer' && (
                   <div className="space-y-3 lg:space-y-4">
-                    <Button className="bg-purple-600 hover:bg-purple-700 text-sm lg:text-base">
-                      <Plus className="w-4 h-4 mr-1 lg:mr-2" />新規顧客追加
-                    </Button>
+                    <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+                      <Button className="bg-purple-600 hover:bg-purple-700 text-sm lg:text-base">
+                        <Plus className="w-4 h-4 mr-1 lg:mr-2" />新規顧客追加
+                      </Button>
+                      <div className="flex items-center gap-2">
+                        <ArrowUpDown className="w-4 h-4 text-gray-500" />
+                        <Select value={customerSortKey} onValueChange={(value: 'memberNumber' | 'customerName' | 'lastVisitDate') => setCustomerSortKey(value)}>
+                          <SelectTrigger className="w-[160px] h-9 text-sm">
+                            <SelectValue placeholder="並び替え" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="lastVisitDate">最終来店日順</SelectItem>
+                            <SelectItem value="memberNumber">会員番号順</SelectItem>
+                            <SelectItem value="customerName">名前順</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                     <div className="grid gap-3 lg:gap-4">
-                      {customerHistory.map(customer => (
-                        <div key={customer.id} className="p-3 lg:p-4 bg-gray-50 rounded-xl flex items-start justify-between gap-2 lg:gap-4">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-1 lg:mb-2">
-                              <span className="font-bold text-gray-800 text-base lg:text-lg">{customer.customerName}</span>
-                              <span className="text-gray-400 text-xs lg:text-sm">{customer.date}</span>
+                      {sortedCustomerHistory.map(customer => (
+                        <div key={customer.id} className="bg-gray-50 rounded-xl overflow-hidden">
+                          {/* 顧客ヘッダー（クリックで展開） */}
+                          <div
+                            className="p-3 lg:p-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                            onClick={() => setExpandedCustomerId(expandedCustomerId === customer.id ? null : customer.id)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                                  <User className="w-5 h-5 lg:w-6 lg:h-6 text-purple-500" />
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-bold text-gray-800 text-base lg:text-lg">{customer.customerName}</span>
+                                    <span className="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded font-mono">{customer.memberNumber}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <span>最終来店: {customer.lastVisitDate}</span>
+                                    <span className="bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded">
+                                      メモ {customer.memoHistory.length}件
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <span className={`transform transition-transform ${expandedCustomerId === customer.id ? 'rotate-180' : ''}`}>
+                                ▼
+                              </span>
                             </div>
-                            {editingCustomerId === customer.id ? (
-                              <div className="space-y-2 lg:space-y-3">
-                                <Textarea
-                                  value={editingMemo}
-                                  onChange={(e) => setEditingMemo(e.target.value)}
-                                  className="bg-white border-gray-200 text-gray-800 text-sm lg:text-base"
-                                  rows={2}
-                                />
+                            {/* 最新メモプレビュー */}
+                            {customer.memoHistory.length > 0 && expandedCustomerId !== customer.id && (
+                              <div className="mt-2 p-2 bg-white rounded-lg border border-gray-200">
+                                <div className="text-xs text-gray-400 mb-1">最新メモ ({customer.memoHistory[0].date})</div>
+                                <p className="text-gray-600 text-sm line-clamp-2">{customer.memoHistory[0].content}</p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* 展開時：過去のメモ履歴 */}
+                          {expandedCustomerId === customer.id && (
+                            <div className="border-t border-gray-200">
+                              {/* 新規メモ入力 */}
+                              <div className="p-3 lg:p-4 bg-purple-50 border-b border-gray-200">
+                                <div className="text-xs font-semibold text-purple-700 mb-2">📝 新しいメモを追加</div>
                                 <div className="flex gap-2">
-                                  <Button size="sm" onClick={() => handleSaveCustomerMemo(customer.id)} className="bg-green-600 hover:bg-green-700 text-xs lg:text-sm">
-                                    <Save className="w-3 h-3 lg:w-4 lg:h-4 mr-1" />保存
-                                  </Button>
-                                  <Button size="sm" variant="outline" onClick={() => setEditingCustomerId(null)} className="text-xs lg:text-sm">
-                                    キャンセル
+                                  <Textarea
+                                    value={newMemoContent}
+                                    onChange={(e) => setNewMemoContent(e.target.value)}
+                                    placeholder="このお客様についてのメモを入力..."
+                                    className="flex-1 bg-white border-purple-200 text-gray-800 text-sm min-h-[60px]"
+                                  />
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleAddNewMemo(customer.id)}
+                                    className="bg-purple-600 hover:bg-purple-700 h-auto"
+                                  >
+                                    <Plus className="w-4 h-4" />
                                   </Button>
                                 </div>
                               </div>
-                            ) : (
-                              <p className="text-gray-600 text-sm lg:text-base">{customer.memo}</p>
-                            )}
-                          </div>
-                          {editingCustomerId !== customer.id && (
-                            <button
-                              onClick={() => { setEditingCustomerId(customer.id); setEditingMemo(customer.memo); }}
-                              className="p-1.5 lg:p-2 rounded-lg bg-white hover:bg-gray-100 transition-colors shadow-sm flex-shrink-0"
-                            >
-                              <Edit2 className="w-4 h-4 text-gray-500" />
-                            </button>
+
+                              {/* メモ履歴一覧 */}
+                              <div className="p-3 lg:p-4">
+                                <div className="text-xs font-semibold text-gray-500 mb-3 flex items-center gap-2">
+                                  <Clock className="w-3 h-3" />
+                                  お客様との歴史（過去のメモ）
+                                </div>
+                                <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                                  {customer.memoHistory.map((memo, idx) => (
+                                    <div
+                                      key={memo.id}
+                                      className={`p-3 rounded-lg border ${idx === 0 ? 'bg-purple-50 border-purple-200' : 'bg-white border-gray-200'}`}
+                                    >
+                                      <div className="flex items-center justify-between mb-1">
+                                        <span className={`text-xs font-semibold ${idx === 0 ? 'text-purple-600' : 'text-gray-500'}`}>
+                                          {memo.date}
+                                        </span>
+                                        <span className="text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-500">
+                                          {memo.author}
+                                        </span>
+                                      </div>
+                                      <p className="text-gray-700 text-sm">{memo.content}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
                           )}
                         </div>
                       ))}

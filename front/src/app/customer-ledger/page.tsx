@@ -89,6 +89,36 @@ export default function CustomerLedger() {
     );
   };
 
+  // メモ履歴の状態管理
+  const [customerMemoHistory, setCustomerMemoHistory] = useState<Array<{
+    id: string;
+    date: string;
+    author: string;
+    content: string;
+  }>>([
+    { id: '5', date: '2025/01/26 14:30', author: '山田', content: '本日来店。前回と同様90分コース希望。お酒は控えめに。' },
+    { id: '4', date: '2025/01/20 18:45', author: '佐藤', content: '指名あり。会話が好きなタイプ。時間に余裕を持った対応を。' },
+    { id: '3', date: '2025/01/15 12:00', author: '山田', content: '誕生日プレゼントを渡した。とても喜んでいた。' },
+    { id: '2', date: '2025/01/10 20:15', author: '鈴木', content: '初めてのご利用。紹介での来店。丁寧な対応を心がける。' },
+    { id: '1', date: '2025/01/05 16:00', author: '田中', content: '新規顧客登録。仕事帰りの利用が多いとのこと。' },
+  ]);
+  const [newMemo, setNewMemo] = useState('');
+
+  // メモを追加する関数
+  const addMemo = () => {
+    if (newMemo.trim()) {
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      setCustomerMemoHistory(prev => [{
+        id: Date.now().toString(),
+        date: dateStr,
+        author: '現在のユーザー',
+        content: newMemo,
+      }, ...prev]);
+      setNewMemo('');
+    }
+  };
+
   const [usageHistory] = useState<UsageHistory[]>([
     {
       id: '1',
@@ -371,6 +401,14 @@ export default function CustomerLedger() {
             <input
               value="324"
               className="w-16 px-1 text-sm border border-gray-400 bg-white outline-none h-6"
+              onChange={() => {}}
+            />
+
+            {/* 会員番号 */}
+            <span className="text-xs ml-2 font-semibold text-blue-700">会員番号</span>
+            <input
+              value="M-2024-00324"
+              className="w-28 px-1 text-sm border-2 border-blue-400 bg-blue-50 outline-none h-6 font-bold text-blue-800"
               onChange={() => {}}
             />
 
@@ -882,6 +920,46 @@ export default function CustomerLedger() {
                     </div>
                   </div>
                   
+                  {/* お客様メモ履歴（お客様との歴史） */}
+                  <div className="p-1">
+                    <div className="border-2 border-orange-400 rounded bg-orange-50">
+                      <div className="bg-orange-400 text-white px-2 py-1 text-xs font-bold flex items-center justify-between">
+                        <span>📝 お客様メモ履歴（お客様との歴史）</span>
+                        <span className="text-orange-100">全{customerMemoHistory.length}件</span>
+                      </div>
+                      {/* メモ入力エリア */}
+                      <div className="p-2 border-b border-orange-300 bg-white">
+                        <div className="flex gap-2">
+                          <Textarea
+                            className="flex-1 min-h-[50px] text-xs border-orange-300"
+                            placeholder="新しいメモを入力..."
+                            value={newMemo}
+                            onChange={e => setNewMemo(e.target.value)}
+                          />
+                          <Button
+                            size="sm"
+                            className="h-12 px-4 text-xs bg-orange-500 hover:bg-orange-600 text-white"
+                            onClick={addMemo}
+                          >
+                            追加
+                          </Button>
+                        </div>
+                      </div>
+                      {/* メモ履歴一覧 */}
+                      <div className="max-h-[180px] overflow-y-auto">
+                        {customerMemoHistory.map((memo, idx) => (
+                          <div key={memo.id} className={`p-2 border-b border-orange-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-orange-50'}`}>
+                            <div className="flex items-center justify-between text-[10px] text-gray-500 mb-1">
+                              <span className="font-semibold text-orange-700">{memo.date}</span>
+                              <span className="bg-orange-200 px-1.5 rounded text-orange-800">記入者: {memo.author}</span>
+                            </div>
+                            <div className="text-xs text-gray-800">{memo.content}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
                   {/* プロフィール・移行 と 履歴テーブル を横並び */}
                   <div className="p-1">
                     <div className="flex gap-4">
@@ -892,39 +970,39 @@ export default function CustomerLedger() {
                           <div className="flex items-center">
                             <span className="text-xs font-semibold">プロフィール</span>
                             <span className="text-xs font-semibold ml-auto">移行</span>
-                            <Input 
+                            <Input
                               className="w-12 h-6 text-xs border-gray-500 ml-1"
                               placeholder=""
                             />
                           </div>
-                          <Textarea 
-                            className="w-full min-h-[150px] text-xs border-gray-500 mt-1"
+                          <Textarea
+                            className="w-full min-h-[100px] text-xs border-gray-500 mt-1"
                             defaultValue="マ、ブ、50代、？、？、優しい、なし、巨乳・攻め○、なし、ローション"
                           />
                         </div>
-                        
+
                         {/* 領収証宛先 */}
                         <div>
                           <Label className="text-xs font-semibold">領収証宛先</Label>
-                          <Input 
+                          <Input
                             className="h-7 text-xs border-gray-500 mt-1"
                             value={receiptForm.recipient}
                             onChange={e => handleReceiptChange('recipient', e.target.value)}
                             placeholder=""
                           />
                         </div>
-                        
+
                         {/* 領収証但書 */}
                         <div>
                           <Label className="text-xs font-semibold">領収証但書</Label>
-                          <Input 
+                          <Input
                             className="h-7 text-xs border-gray-500 mt-1"
                             value={receiptForm.note}
                             onChange={e => handleReceiptChange('note', e.target.value)}
                             placeholder=""
                           />
                         </div>
-                        
+
                         {/* 地元出張 */}
                         <div className="flex items-center gap-2">
                           <Label className="text-xs font-semibold">地元出張</Label>
@@ -941,18 +1019,19 @@ export default function CustomerLedger() {
                           </label>
                         </div>
                       </div>
-                      
-                      {/* 右側: 履歴テーブル */}
+
+                      {/* 右側: 接客履歴テーブル */}
                       <div className="flex-1">
+                        <div className="text-xs font-semibold text-blue-700 mb-1">📅 接客履歴（接客日一覧）</div>
                         <div className="border border-gray-500">
                           {/* テーブルヘッダー */}
-                          <div className="bg-gray-100 grid grid-cols-6 text-xs border-b border-gray-500">
-                            <div className="px-2 py-1 border-r border-gray-400">日付</div>
+                          <div className="bg-blue-100 grid grid-cols-6 text-xs border-b border-gray-500 font-semibold">
+                            <div className="px-2 py-1 border-r border-gray-400 text-blue-800">接客日</div>
                             <div className="px-2 py-1 border-r border-gray-400">ホステス名</div>
                             <div className="px-2 py-1 border-r border-gray-400">コース名</div>
                             <div className="px-2 py-1 border-r border-gray-400">時間</div>
                             <div className="px-2 py-1 border-r border-gray-400">延長</div>
-                            <div className="px-2 py-1">派遣場所表示</div>
+                            <div className="px-2 py-1">派遣場所</div>
                           </div>
                           {/* テーブルボディ */}
                           <div className="max-h-[300px] overflow-y-auto">

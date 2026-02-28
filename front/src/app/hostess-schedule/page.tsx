@@ -1,710 +1,665 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, Check, Plus, X } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, Trash2, Save, X, Check } from "lucide-react";
 
-// 編集中のバーデータ
-interface EditingBar {
+// スケジュールデータの型定義
+interface ScheduleEntry {
+  id: string;
   hostessId: string;
-  barId: string; // 新規の場合は 'new-{hostessId}'、既存の場合は reservation.id
+  date: string; // "YYYY-MM-DD"
+  status: 'work' | 'off';
   startTime: string;
   endTime: string;
-  isNew: boolean;
-  customerName?: string;
-  receptDate?: string;
-  location?: string;
-  status?: 'pending' | 'confirmed' | 'completed';
-  memo?: string; // 備考
-}
-
-// 予約データの型定義
-interface Reservation {
-  id: string;
-  customerName: string;
-  startTime: string; // "HH:MM" 形式
-  endTime: string;   // "HH:MM" 形式
-  receptDate: string; // 受付日時
-  location: string;
-  status: 'pending' | 'confirmed' | 'completed';
-  memo?: string; // 備考
+  comment: string;
 }
 
 // ホステスデータの型定義
-interface HostessTimelineData {
+interface HostessData {
   id: string;
-  name: string;           // 店内名
-  workType: string;       // 勤務形態
-  assignedStaff: string;  // 担当者
-  workStartTime: string;  // "HH:MM" 形式
-  workEndTime: string;    // "HH:MM" 形式
-  isOff: boolean;         // 休みかどうか
-  reservations: Reservation[];
+  name: string;
+  workType: string;
+  assignedStaff: string;
+  storeId: string;
 }
 
-// サンプルデータ
-const sampleHostessTimeline: HostessTimelineData[] = [
-  {
-    id: "1",
-    name: "すみれ",
-    workType: "正社員",
-    assignedStaff: "佐藤",
-    workStartTime: "",
-    workEndTime: "",
-    isOff: true,
-    reservations: [
-      {
-        id: "r1",
-        customerName: "鈴木一✕ 様",
-        startTime: "15:00",
-        endTime: "16:30",
-        receptDate: "01/25 11:54",
-        location: "京都デリヘル...",
-        status: "completed",
-        memo: "VIP顧客、特別対応必要"
-      }
-    ]
-  },
-  {
-    id: "2",
-    name: "瑠璃-ruri-",
-    workType: "パート",
-    assignedStaff: "高橋",
-    workStartTime: "10:00",
-    workEndTime: "21:00",
-    isOff: false,
-    reservations: [
-      {
-        id: "r2",
-        customerName: "顧客:未登録",
-        startTime: "10:15",
-        endTime: "11:35",
-        receptDate: "01/22 20:15",
-        location: "",
-        status: "completed",
-        memo: "初回利用のお客様"
-      }
-    ]
-  },
-  {
-    id: "3",
-    name: "かんな",
-    workType: "契約",
-    assignedStaff: "田中",
-    workStartTime: "10:00",
-    workEndTime: "18:30",
-    isOff: false,
-    reservations: []
-  },
-  {
-    id: "4",
-    name: "スイレン",
-    workType: "派遣",
-    assignedStaff: "山田",
-    workStartTime: "12:00",
-    workEndTime: "17:30",
-    isOff: false,
-    reservations: [
-      {
-        id: "r3",
-        customerName: "顧客:未登録",
-        startTime: "12:30",
-        endTime: "14:10",
-        receptDate: "01/13 19:48",
-        location: "",
-        status: "completed",
-        memo: "リピーター様"
-      }
-    ]
-  },
-  {
-    id: "5",
-    name: "妃-kisaki-",
-    workType: "正社員",
-    assignedStaff: "佐藤",
-    workStartTime: "14:00",
-    workEndTime: "21:00",
-    isOff: false,
-    reservations: [
-      {
-        id: "r4",
-        customerName: "顧客:未登録",
-        startTime: "14:30",
-        endTime: "16:10",
-        receptDate: "01/15 10:09",
-        location: "",
-        status: "completed",
-        memo: "時間厳守でお願いします"
-      }
-    ]
-  },
-  {
-    id: "6",
-    name: "ミイ",
-    workType: "パート",
-    assignedStaff: "鈴木",
-    workStartTime: "12:00",
-    workEndTime: "18:00",
-    isOff: false,
-    reservations: [
-      {
-        id: "r5",
-        customerName: "顧客:未登録 様",
-        startTime: "12:10",
-        endTime: "14:10",
-        receptDate: "01/20 16:16",
-        location: "京都デリヘル倶楽部",
-        status: "pending",
-        memo: "送迎必要"
-      }
-    ]
-  },
-  {
-    id: "7",
-    name: "かなの",
-    workType: "契約",
-    assignedStaff: "高橋",
-    workStartTime: "11:00",
-    workEndTime: "16:00",
-    isOff: false,
-    reservations: [
-      {
-        id: "r6",
-        customerName: "顧客:未登録",
-        startTime: "11:20",
-        endTime: "12:40",
-        receptDate: "01/24 13:11",
-        location: "",
-        status: "completed",
-        memo: "延長の可能性あり"
-      }
-    ]
-  },
-  {
-    id: "8",
-    name: "あみ",
-    workType: "派遣",
-    assignedStaff: "田中",
-    workStartTime: "16:00",
-    workEndTime: "22:00",
-    isOff: false,
-    reservations: []
-  },
-  {
-    id: "9",
-    name: "雪-yuki-",
-    workType: "正社員",
-    assignedStaff: "山田",
-    workStartTime: "13:00",
-    workEndTime: "20:30",
-    isOff: false,
-    reservations: [
-      {
-        id: "r7",
-        customerName: "顧客:未登録",
-        startTime: "15:30",
-        endTime: "17:30",
-        receptDate: "01/25 15:54",
-        location: "",
-        status: "pending",
-        memo: "電話確認済み"
-      }
-    ]
-  },
-  {
-    id: "10",
-    name: "か美-hiro-…",
-    workType: "パート",
-    assignedStaff: "佐藤",
-    workStartTime: "10:00",
-    workEndTime: "15:00",
-    isOff: false,
-    reservations: [
-      {
-        id: "r8",
-        customerName: "たつみ 様",
-        startTime: "10:20",
-        endTime: "12:40",
-        receptDate: "01/22 11:20",
-        location: "愛しいね@yeh",
-        status: "completed",
-        memo: "常連様・ドリンク好み把握済"
-      },
-      {
-        id: "r9",
-        customerName: "顧客:未登録",
-        startTime: "12:55",
-        endTime: "14:15",
-        receptDate: "01/22 17:52",
-        location: "",
-        status: "completed",
-        memo: "次回予約希望あり"
-      }
-    ]
-  },
-  {
-    id: "11",
-    name: "りあん",
-    workType: "契約",
-    assignedStaff: "鈴木",
-    workStartTime: "14:00",
-    workEndTime: "20:00",
-    isOff: false,
-    reservations: [
-      {
-        id: "r10",
-        customerName: "豊Q0501 様",
-        startTime: "14:30",
-        endTime: "16:00",
-        receptDate: "01/20 16:23",
-        location: "京都デリヘル倶楽部",
-        status: "completed",
-        memo: "駐車場確認済み"
-      }
-    ]
-  },
-  {
-    id: "12",
-    name: "あず",
-    workType: "派遣",
-    assignedStaff: "高橋",
-    workStartTime: "20:00",
-    workEndTime: "01:00",
-    isOff: false,
-    reservations: []
-  }
+// 店舗データ
+const sampleStores = [
+  { id: "store1", name: "銀座本店" },
+  { id: "store2", name: "新宿店" },
+  { id: "store3", name: "渋谷店" },
 ];
 
-// 時間軸の範囲（10:00〜翌2:00 = 16時間）
-const TIME_START_HOUR = 10;
-const TIME_END_HOUR = 26; // 翌2:00を26時として扱う
-const HOUR_WIDTH = 120; // 1時間あたりのピクセル幅
-const ROW_HEIGHT = 52; // 各行の高さ
+// サンプルホステスデータ
+const sampleHostesses: HostessData[] = [
+  { id: "1", name: "すみれ", workType: "正社員", assignedStaff: "佐藤", storeId: "store1" },
+  { id: "2", name: "瑠璃-ruri-", workType: "パート", assignedStaff: "高橋", storeId: "store1" },
+  { id: "3", name: "かんな", workType: "契約", assignedStaff: "田中", storeId: "store1" },
+  { id: "4", name: "スイレン", workType: "派遣", assignedStaff: "山田", storeId: "store1" },
+  { id: "5", name: "妃-kisaki-", workType: "正社員", assignedStaff: "佐藤", storeId: "store2" },
+  { id: "6", name: "ミイ", workType: "パート", assignedStaff: "鈴木", storeId: "store2" },
+  { id: "7", name: "かなの", workType: "契約", assignedStaff: "高橋", storeId: "store2" },
+  { id: "8", name: "あみ", workType: "派遣", assignedStaff: "田中", storeId: "store2" },
+  { id: "9", name: "雪-yuki-", workType: "正社員", assignedStaff: "山田", storeId: "store3" },
+  { id: "10", name: "か美-hiro-…", workType: "パート", assignedStaff: "佐藤", storeId: "store3" },
+  { id: "11", name: "りあん", workType: "契約", assignedStaff: "鈴木", storeId: "store3" },
+  { id: "12", name: "あず", workType: "派遣", assignedStaff: "高橋", storeId: "store3" },
+];
 
-// ソートタイプの定義
-type SortType = 'name-asc' | 'name-desc' | 'worktime-asc' | 'worktime-desc' | 'start-asc' | 'start-desc' | 'staff-asc' | 'staff-desc';
-
-// 滞在時間（勤務時間）を分単位で計算
-const calculateWorkMinutes = (hostess: HostessTimelineData): number => {
-  if (hostess.isOff || !hostess.workStartTime || !hostess.workEndTime) return 0;
-  const [startH, startM] = hostess.workStartTime.split(':').map(Number);
-  const [endH, endM] = hostess.workEndTime.split(':').map(Number);
-  const startMinutes = startH * 60 + startM;
-  let endMinutes = endH * 60 + endM;
-  // 深夜をまたぐ場合
-  if (endMinutes < startMinutes) {
-    endMinutes += 24 * 60;
-  }
-  return endMinutes - startMinutes;
+// 日付をYYYY-MM-DD形式にフォーマット
+const formatDateKey = (date: Date): string => {
+  return date.toISOString().split('T')[0];
 };
 
-// 勤務開始時間を分単位で取得
-const getStartMinutes = (hostess: HostessTimelineData): number => {
-  if (hostess.isOff || !hostess.workStartTime) return 9999;
-  const [h, m] = hostess.workStartTime.split(':').map(Number);
-  return h * 60 + m;
+// 日付を取得
+const getToday = () => new Date();
+
+// 週の開始日（月曜日）を取得
+const getWeekStart = (date: Date): Date => {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d;
 };
+
+// 月の開始日を取得
+const getMonthStart = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+};
+
+// 週の日数
+const DAY_COUNT = 7;
+const DAY_NAMES = ['月', '火', '水', '木', '金', '土', '日'];
+
+// サンプルスケジュールデータを生成
+const generateSampleSchedules = (): ScheduleEntry[] => {
+  const schedules: ScheduleEntry[] = [];
+  const today = getToday();
+  const weekStart = getWeekStart(today);
+
+  sampleHostesses.forEach((hostess, hostessIndex) => {
+    // 週の各日に対してサンプルデータを作成
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(weekStart);
+      date.setDate(weekStart.getDate() + i);
+      const dateStr = formatDateKey(date);
+
+      // ランダムに出勤/休みを決定
+      const isOff = (hostessIndex + i) % 4 === 0;
+
+      schedules.push({
+        id: `${hostess.id}-${dateStr}`,
+        hostessId: hostess.id,
+        date: dateStr,
+        status: isOff ? 'off' : 'work',
+        startTime: isOff ? '' : `${10 + (hostessIndex % 5)}:00`,
+        endTime: isOff ? '' : `${18 + (hostessIndex % 4)}:00`,
+        comment: '',
+      });
+    }
+
+    // 月間のデータも追加（今月分）
+    const monthStart = getMonthStart(today);
+    const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+
+    for (let i = 0; i < daysInMonth; i++) {
+      const date = new Date(monthStart);
+      date.setDate(monthStart.getDate() + i);
+      const dateStr = formatDateKey(date);
+
+      // 既に週間データがある場合はスキップ
+      if (schedules.find(s => s.hostessId === hostess.id && s.date === dateStr)) {
+        continue;
+      }
+
+      const isOff = (hostessIndex + i) % 4 === 0;
+
+      schedules.push({
+        id: `${hostess.id}-${dateStr}`,
+        hostessId: hostess.id,
+        date: dateStr,
+        status: isOff ? 'off' : 'work',
+        startTime: isOff ? '' : `${10 + (hostessIndex % 5)}:00`,
+        endTime: isOff ? '' : `${18 + (hostessIndex % 4)}:00`,
+        comment: '',
+      });
+    }
+  });
+
+  return schedules;
+};
+
+type ViewTab = 'daily' | 'weekly' | 'monthly';
 
 export default function HostessSchedule() {
   React.useEffect(() => {
     document.title = 'ホステススケジュール管理 - Dispatch Harmony Hub';
   }, []);
 
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [hostessData] = useState<HostessTimelineData[]>(sampleHostessTimeline);
-  const [sortType, setSortType] = useState<SortType>('name-asc');
+  const [currentDate, setCurrentDate] = useState(getToday());
+  const [activeTab, setActiveTab] = useState<ViewTab>('daily');
+  const [hostesses] = useState<HostessData[]>(sampleHostesses);
+  const [stores] = useState(sampleStores);
+  const [selectedStoreId, setSelectedStoreId] = useState<string>(sampleStores[0].id);
+  const [schedules, setSchedules] = useState<ScheduleEntry[]>(generateSampleSchedules);
+  const [originalSchedules, setOriginalSchedules] = useState<ScheduleEntry[]>(generateSampleSchedules);
   const [searchText, setSearchText] = useState('');
   const [staffFilter, setStaffFilter] = useState<string>('');
+  const [selectedHostessId, setSelectedHostessId] = useState<string | null>(null);
 
-  // 編集中のバー管理 (キーは barId)
-  const [editingBars, setEditingBars] = useState<Map<string, EditingBar>>(new Map());
-  // 現在編集モードのバーID
-  const [activeEditBarId, setActiveEditBarId] = useState<string | null>(null);
-  // 保存確認モーダル
-  const [showSaveConfirm, setShowSaveConfirm] = useState<string | null>(null); // barId
-  // 一括保存モーダル
-  const [showBulkSaveModal, setShowBulkSaveModal] = useState(false);
+  // 変更追跡用
+  const [changedHostessIds, setChangedHostessIds] = useState<Set<string>>(new Set());
+
+  // 保存モーダル用
+  const [showSaveModal, setShowSaveModal] = useState(false);
   const [selectedForSave, setSelectedForSave] = useState<Set<string>>(new Set());
 
-  // ドラッグ状態
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragType, setDragType] = useState<'move' | 'resize-left' | 'resize-right' | null>(null);
-  const [dragBarId, setDragBarId] = useState<string | null>(null);
-  const [dragStartX, setDragStartX] = useState(0);
-  const [dragStartBarLeft, setDragStartBarLeft] = useState(0);
-  const [dragStartBarWidth, setDragStartBarWidth] = useState(0);
+  // スクロール同期用のref
+  const leftPanelRef = useRef<HTMLDivElement>(null);
+  const rightPanelRef = useRef<HTMLDivElement>(null);
+  const isScrollingSyncRef = useRef(false);
+
+  // 左パネルのスクロールを右に同期
+  const handleLeftScroll = useCallback(() => {
+    if (isScrollingSyncRef.current) return;
+    if (leftPanelRef.current && rightPanelRef.current) {
+      isScrollingSyncRef.current = true;
+      rightPanelRef.current.scrollTop = leftPanelRef.current.scrollTop;
+      requestAnimationFrame(() => {
+        isScrollingSyncRef.current = false;
+      });
+    }
+  }, []);
+
+  // 右パネルのスクロールを左に同期
+  const handleRightScroll = useCallback(() => {
+    if (isScrollingSyncRef.current) return;
+    if (leftPanelRef.current && rightPanelRef.current) {
+      isScrollingSyncRef.current = true;
+      leftPanelRef.current.scrollTop = rightPanelRef.current.scrollTop;
+      requestAnimationFrame(() => {
+        isScrollingSyncRef.current = false;
+      });
+    }
+  }, []);
+
+  // スケジュールを更新
+  const updateSchedule = useCallback((hostessId: string, dateStr: string, updates: Partial<ScheduleEntry>) => {
+    setSchedules(prev => {
+      const index = prev.findIndex(s => s.hostessId === hostessId && s.date === dateStr);
+      if (index >= 0) {
+        const newSchedules = [...prev];
+        newSchedules[index] = { ...newSchedules[index], ...updates };
+        return newSchedules;
+      } else {
+        // 新規作成
+        return [...prev, {
+          id: `${hostessId}-${dateStr}`,
+          hostessId,
+          date: dateStr,
+          status: 'work' as const,
+          startTime: '',
+          endTime: '',
+          comment: '',
+          ...updates,
+        }];
+      }
+    });
+    // 変更されたホステスを追跡
+    setChangedHostessIds(prev => new Set(prev).add(hostessId));
+  }, []);
+
+  // 変更があるホステスの情報を取得
+  const changedHostesses = useMemo(() => {
+    return hostesses.filter(h => changedHostessIds.has(h.id));
+  }, [hostesses, changedHostessIds]);
+
+  // 保存モーダルを開く
+  const openSaveModal = useCallback(() => {
+    setSelectedForSave(new Set(changedHostessIds));
+    setShowSaveModal(true);
+  }, [changedHostessIds]);
+
+  // 保存実行
+  const handleSave = useCallback(() => {
+    // 選択されていないホステスの変更を元に戻す
+    const hostsToRevert = Array.from(changedHostessIds).filter(id => !selectedForSave.has(id));
+
+    if (hostsToRevert.length > 0) {
+      setSchedules(prev => {
+        const newSchedules = prev.map(schedule => {
+          if (hostsToRevert.includes(schedule.hostessId)) {
+            // 元のスケジュールに戻す
+            const original = originalSchedules.find(
+              o => o.hostessId === schedule.hostessId && o.date === schedule.date
+            );
+            return original || schedule;
+          }
+          return schedule;
+        });
+        return newSchedules;
+      });
+    }
+
+    // 保存されたスケジュールを新しい「元」として設定
+    setSchedules(current => {
+      const savedSchedules = current.filter(s => selectedForSave.has(s.hostessId) || !changedHostessIds.has(s.hostessId));
+      setOriginalSchedules([...current]);
+      return current;
+    });
+
+    // 変更追跡をリセット（保存されたもののみ）
+    setChangedHostessIds(new Set());
+    setShowSaveModal(false);
+
+    // 保存完了の通知（実際のAPIコールはここで行う）
+    alert(`${selectedForSave.size}名のスケジュールを保存しました`);
+  }, [changedHostessIds, selectedForSave, originalSchedules]);
+
+  // 保存選択のトグル
+  const toggleSaveSelection = useCallback((hostessId: string) => {
+    setSelectedForSave(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(hostessId)) {
+        newSet.delete(hostessId);
+      } else {
+        newSet.add(hostessId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  // 全選択/全解除
+  const toggleSelectAll = useCallback(() => {
+    if (selectedForSave.size === changedHostessIds.size) {
+      setSelectedForSave(new Set());
+    } else {
+      setSelectedForSave(new Set(changedHostessIds));
+    }
+  }, [changedHostessIds, selectedForSave.size]);
+
+  // ドラッグ操作用のstate
+  const [dragState, setDragState] = useState<{
+    hostessId: string;
+    dateStr: string;
+    mode: 'create' | 'move' | 'resize-start' | 'resize-end';
+    startX: number;
+    initialStartTime: string;
+    initialEndTime: string;
+  } | null>(null);
+
+  // X座標から時間を計算
+  const xToTime = useCallback((x: number, containerWidth: number): string => {
+    const totalMinutes = Math.round((x / containerWidth) * 36 * 60);
+    const clampedMinutes = Math.max(0, Math.min(36 * 60 - 1, totalMinutes));
+    const hours = Math.floor(clampedMinutes / 60);
+    const minutes = Math.round((clampedMinutes % 60) / 15) * 15; // 15分単位
+    return `${hours.toString().padStart(2, '0')}:${(minutes % 60).toString().padStart(2, '0')}`;
+  }, []);
+
+  // 時間を分に変換
+  const timeToMinutes = useCallback((time: string): number => {
+    if (!time) return 0;
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + (minutes || 0);
+  }, []);
+
+  // 分を時間文字列に変換
+  const minutesToTime = useCallback((totalMinutes: number): string => {
+    const clampedMinutes = Math.max(0, Math.min(36 * 60 - 1, totalMinutes));
+    const hours = Math.floor(clampedMinutes / 60);
+    const minutes = clampedMinutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  }, []);
+
+  // タイムラインでのマウスダウン（新規作成開始）
+  const handleTimelineMouseDown = useCallback((
+    e: React.MouseEvent<HTMLDivElement>,
+    hostessId: string,
+    dateStr: string,
+    hasExistingBar: boolean
+  ) => {
+    if (hasExistingBar) return; // 既存バーがある場合は新規作成しない
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const time = xToTime(x, rect.width);
+
+    setDragState({
+      hostessId,
+      dateStr,
+      mode: 'create',
+      startX: x,
+      initialStartTime: time,
+      initialEndTime: time,
+    });
+
+    updateSchedule(hostessId, dateStr, {
+      status: 'work',
+      startTime: time,
+      endTime: time,
+    });
+  }, [xToTime, updateSchedule]);
+
+  // バーのマウスダウン（移動開始）
+  const handleBarMouseDown = useCallback((
+    e: React.MouseEvent<HTMLDivElement>,
+    hostessId: string,
+    dateStr: string,
+    startTime: string,
+    endTime: string
+  ) => {
+    e.stopPropagation();
+
+    setDragState({
+      hostessId,
+      dateStr,
+      mode: 'move',
+      startX: e.clientX,
+      initialStartTime: startTime,
+      initialEndTime: endTime,
+    });
+  }, []);
+
+  // リサイズハンドルのマウスダウン
+  const handleResizeMouseDown = useCallback((
+    e: React.MouseEvent<HTMLDivElement>,
+    hostessId: string,
+    dateStr: string,
+    startTime: string,
+    endTime: string,
+    edge: 'start' | 'end'
+  ) => {
+    e.stopPropagation();
+
+    setDragState({
+      hostessId,
+      dateStr,
+      mode: edge === 'start' ? 'resize-start' : 'resize-end',
+      startX: e.clientX,
+      initialStartTime: startTime,
+      initialEndTime: endTime,
+    });
+  }, []);
+
+  // マウス移動処理
+  React.useEffect(() => {
+    if (!dragState) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const timelineElements = document.querySelectorAll('[data-timeline]');
+      let containerWidth = 800; // デフォルト
+
+      timelineElements.forEach((el) => {
+        if (el.getAttribute('data-hostess-id') === dragState.hostessId) {
+          containerWidth = el.getBoundingClientRect().width;
+        }
+      });
+
+      const deltaX = e.clientX - dragState.startX;
+      const deltaMinutes = Math.round((deltaX / containerWidth) * 36 * 60 / 15) * 15; // 15分単位
+
+      if (dragState.mode === 'create') {
+        const startMinutes = timeToMinutes(dragState.initialStartTime);
+        const currentX = dragState.startX + deltaX;
+        const currentTime = xToTime(currentX, containerWidth);
+        const currentMinutes = timeToMinutes(currentTime);
+
+        if (currentMinutes >= startMinutes) {
+          updateSchedule(dragState.hostessId, dragState.dateStr, {
+            startTime: dragState.initialStartTime,
+            endTime: currentTime,
+          });
+        } else {
+          updateSchedule(dragState.hostessId, dragState.dateStr, {
+            startTime: currentTime,
+            endTime: dragState.initialStartTime,
+          });
+        }
+      } else if (dragState.mode === 'move') {
+        const startMinutes = timeToMinutes(dragState.initialStartTime) + deltaMinutes;
+        const endMinutes = timeToMinutes(dragState.initialEndTime) + deltaMinutes;
+        const duration = timeToMinutes(dragState.initialEndTime) - timeToMinutes(dragState.initialStartTime);
+
+        // 範囲チェック
+        if (startMinutes >= 0 && endMinutes <= 36 * 60) {
+          updateSchedule(dragState.hostessId, dragState.dateStr, {
+            startTime: minutesToTime(startMinutes),
+            endTime: minutesToTime(endMinutes),
+          });
+        }
+      } else if (dragState.mode === 'resize-start') {
+        const newStartMinutes = timeToMinutes(dragState.initialStartTime) + deltaMinutes;
+        const endMinutes = timeToMinutes(dragState.initialEndTime);
+
+        if (newStartMinutes >= 0 && newStartMinutes < endMinutes - 15) {
+          updateSchedule(dragState.hostessId, dragState.dateStr, {
+            startTime: minutesToTime(newStartMinutes),
+          });
+        }
+      } else if (dragState.mode === 'resize-end') {
+        const startMinutes = timeToMinutes(dragState.initialStartTime);
+        const newEndMinutes = timeToMinutes(dragState.initialEndTime) + deltaMinutes;
+
+        if (newEndMinutes <= 36 * 60 && newEndMinutes > startMinutes + 15) {
+          updateSchedule(dragState.hostessId, dragState.dateStr, {
+            endTime: minutesToTime(newEndMinutes),
+          });
+        }
+      }
+    };
+
+    const handleMouseUp = () => {
+      setDragState(null);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [dragState, timeToMinutes, minutesToTime, xToTime, updateSchedule]);
 
   // 担当者リストを抽出
   const staffList = useMemo(() => {
     const staffSet = new Set<string>();
-    hostessData.forEach(h => {
+    hostesses.forEach(h => {
       if (h.assignedStaff) staffSet.add(h.assignedStaff);
     });
     return Array.from(staffSet).sort((a, b) => a.localeCompare(b, 'ja'));
-  }, [hostessData]);
+  }, [hostesses]);
 
-  // フィルタ・ソート済みホステスリスト
-  const hostesses = useMemo(() => {
-    let filtered = [...hostessData];
-
-    // キャスト名で検索
+  // フィルタされたホステス
+  const filteredHostesses = useMemo(() => {
+    let filtered = [...hostesses];
+    // 店舗でフィルタ
+    filtered = filtered.filter(h => h.storeId === selectedStoreId);
     if (searchText.trim()) {
       filtered = filtered.filter(h =>
         h.name.toLowerCase().includes(searchText.toLowerCase())
       );
     }
-
-    // 担当者でフィルター
     if (staffFilter) {
       filtered = filtered.filter(h => h.assignedStaff === staffFilter);
     }
+    return filtered;
+  }, [hostesses, selectedStoreId, searchText, staffFilter]);
 
-    // ソート
-    switch (sortType) {
-      case 'name-asc':
-        return filtered.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
-      case 'name-desc':
-        return filtered.sort((a, b) => b.name.localeCompare(a.name, 'ja'));
-      case 'worktime-desc':
-        return filtered.sort((a, b) => calculateWorkMinutes(b) - calculateWorkMinutes(a));
-      case 'worktime-asc':
-        return filtered.sort((a, b) => calculateWorkMinutes(a) - calculateWorkMinutes(b));
-      case 'start-asc':
-        return filtered.sort((a, b) => getStartMinutes(a) - getStartMinutes(b));
-      case 'start-desc':
-        return filtered.sort((a, b) => getStartMinutes(b) - getStartMinutes(a));
-      case 'staff-asc':
-        return filtered.sort((a, b) => a.assignedStaff.localeCompare(b.assignedStaff, 'ja'));
-      case 'staff-desc':
-        return filtered.sort((a, b) => b.assignedStaff.localeCompare(a.assignedStaff, 'ja'));
-      default:
-        return filtered;
-    }
-  }, [hostessData, sortType, searchText, staffFilter]);
-
-  // スクロール同期用のref
-  const leftPanelRef = useRef<HTMLDivElement>(null);
-  const timelineBodyRef = useRef<HTMLDivElement>(null);
-  const timeHeaderRef = useRef<HTMLDivElement>(null);
-
-  // 日付ナビゲーション
-  const navigateDate = (direction: 'prev' | 'next') => {
+  // ナビゲーション
+  const navigate = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() + (direction === 'next' ? 1 : -1));
+    if (activeTab === 'daily') {
+      newDate.setDate(currentDate.getDate() + (direction === 'next' ? 1 : -1));
+    } else if (activeTab === 'weekly') {
+      newDate.setDate(currentDate.getDate() + (direction === 'next' ? 7 : -7));
+    } else {
+      newDate.setMonth(currentDate.getMonth() + (direction === 'next' ? 1 : -1));
+    }
     setCurrentDate(newDate);
   };
 
-  const formatDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
-    const dayOfWeek = dayNames[date.getDay()];
-    return `${year}/${month}/${day}(${dayOfWeek})`;
-  };
-
-  // 時間をピクセル位置に変換
-  const timeToPosition = (time: string): number => {
-    const [hours, minutes] = time.split(':').map(Number);
-    let adjustedHours = hours;
-    // 深夜0時以降は24時以降として扱う
-    if (hours < TIME_START_HOUR) {
-      adjustedHours = hours + 24;
-    }
-    const totalMinutes = adjustedHours * 60 + minutes - TIME_START_HOUR * 60;
-    return (totalMinutes / 60) * HOUR_WIDTH;
-  };
-
-  // 予約バーの幅を計算
-  const getBarWidth = (startTime: string, endTime: string): number => {
-    const startPos = timeToPosition(startTime);
-    const endPos = timeToPosition(endTime);
-    return endPos - startPos;
-  };
-
-  // 時間軸の時間リストを生成
-  const timeSlots = useMemo(() => {
-    const slots = [];
-    for (let hour = TIME_START_HOUR; hour <= TIME_END_HOUR; hour++) {
-      const displayHour = hour >= 24 ? hour - 24 : hour;
-      slots.push({
-        hour,
-        display: `${displayHour}:00`
-      });
-    }
-    return slots;
-  }, []);
-
-  // 垂直スクロール同期
-  const handleTimelineScroll = useCallback(() => {
-    if (timelineBodyRef.current && leftPanelRef.current && timeHeaderRef.current) {
-      leftPanelRef.current.scrollTop = timelineBodyRef.current.scrollTop;
-      timeHeaderRef.current.scrollLeft = timelineBodyRef.current.scrollLeft;
-    }
-  }, []);
-
-  const handleLeftPanelScroll = useCallback(() => {
-    if (timelineBodyRef.current && leftPanelRef.current) {
-      timelineBodyRef.current.scrollTop = leftPanelRef.current.scrollTop;
-    }
-  }, []);
-
-  // ピクセル位置を時間に変換（ドラッグ時は30分単位）
-  const positionToTime = (position: number): string => {
-    const totalMinutes = (position / HOUR_WIDTH) * 60 + TIME_START_HOUR * 60;
-    let hours = Math.floor(totalMinutes / 60);
-    const minutes = Math.round(totalMinutes % 60 / 30) * 30; // 30分単位に丸める
-    if (minutes >= 60) {
-      hours += 1;
-    }
-    const adjustedMinutes = minutes % 60;
-    if (hours >= 24) hours -= 24;
-    return `${String(hours).padStart(2, '0')}:${String(adjustedMinutes).padStart(2, '0')}`;
-  };
-
-  // 時間の時と分を分離
-  const parseTime = (time: string): { hours: number; minutes: number } => {
-    const [h, m] = time.split(':').map(Number);
-    return { hours: h, minutes: m };
-  };
-
-  // 時間を組み立て
-  const buildTime = (hours: number, minutes: number): string => {
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-  };
-
-  // 時間オプション（0-23、深夜は24-26も含む）
-  const hourOptions = Array.from({ length: 27 }, (_, i) => i);
-  // 分オプション（10分単位）
-  const minuteOptions = [0, 10, 20, 30, 40, 50];
-
-  // 新しいバーを作成
-  const handleCreateBar = (hostessId: string) => {
-    const barId = `new-${hostessId}`;
-    const newBar: EditingBar = {
-      hostessId,
-      barId,
-      startTime: '12:00',
-      endTime: '14:00',
-      isNew: true,
-      customerName: '新規予約',
-      status: 'pending'
-    };
-    setEditingBars(new Map(editingBars.set(barId, newBar)));
-    setActiveEditBarId(barId);
-  };
-
-  // バーを削除（編集キャンセル）
-  const handleCancelEdit = (barId: string) => {
-    const newMap = new Map(editingBars);
-    newMap.delete(barId);
-    setEditingBars(newMap);
-    if (activeEditBarId === barId) {
-      setActiveEditBarId(null);
-    }
-  };
-
-  // 既存バーをタップして編集モードに
-  const handleBarClick = (hostessId: string, reservation: Reservation) => {
-    const barId = reservation.id;
-    // 既に編集中なら編集解除
-    if (activeEditBarId === barId) {
-      setActiveEditBarId(null);
-      return;
-    }
-    // まだ編集バーとして登録されていなければ登録
-    if (!editingBars.has(barId)) {
-      const editBar: EditingBar = {
-        hostessId,
-        barId,
-        startTime: reservation.startTime,
-        endTime: reservation.endTime,
-        isNew: false,
-        customerName: reservation.customerName,
-        receptDate: reservation.receptDate,
-        location: reservation.location,
-        status: reservation.status,
-        memo: reservation.memo
-      };
-      setEditingBars(new Map(editingBars.set(barId, editBar)));
-    }
-    setActiveEditBarId(barId);
-  };
-
-  // 新規バーが存在するかチェック
-  const hasNewBar = (hostessId: string) => {
-    return editingBars.has(`new-${hostessId}`);
-  };
-
-  // 手動で時間を更新
-  // 時間変更（時または分）
-  const handleTimeChange = (barId: string, field: 'startTime' | 'endTime', value: string) => {
-    const bar = editingBars.get(barId);
-    if (bar) {
-      const updatedBar = { ...bar, [field]: value };
-      setEditingBars(new Map(editingBars.set(barId, updatedBar)));
-    }
-  };
-
-  // 時のみ変更
-  const handleHourChange = (barId: string, field: 'startTime' | 'endTime', newHour: number) => {
-    const bar = editingBars.get(barId);
-    if (bar) {
-      const currentTime = field === 'startTime' ? bar.startTime : bar.endTime;
-      const { minutes } = parseTime(currentTime);
-      const newTime = buildTime(newHour, minutes);
-      handleTimeChange(barId, field, newTime);
-    }
-  };
-
-  // 分のみ変更
-  const handleMinuteChange = (barId: string, field: 'startTime' | 'endTime', newMinute: number) => {
-    const bar = editingBars.get(barId);
-    if (bar) {
-      const currentTime = field === 'startTime' ? bar.startTime : bar.endTime;
-      const { hours } = parseTime(currentTime);
-      const newTime = buildTime(hours, newMinute);
-      handleTimeChange(barId, field, newTime);
-    }
-  };
-
-  // 備考を変更
-  const handleMemoChange = (barId: string, memo: string) => {
-    const bar = editingBars.get(barId);
-    if (bar) {
-      const updatedBar = { ...bar, memo };
-      setEditingBars(new Map(editingBars.set(barId, updatedBar)));
-    }
-  };
-
-  // 保存確認モーダルを開く
-  const openSaveConfirm = (barId: string) => {
-    setShowSaveConfirm(barId);
-  };
-
-  // 保存を実行
-  const handleConfirmSave = () => {
-    if (showSaveConfirm) {
-      const bar = editingBars.get(showSaveConfirm);
-      if (bar) {
-        // ここで実際のAPI保存処理を行う（今は状態管理のみ）
-        // console.log('保存:', bar);
-        // 保存後は編集状態を解除
-        const newMap = new Map(editingBars);
-        newMap.delete(showSaveConfirm);
-        setEditingBars(newMap);
-        if (activeEditBarId === showSaveConfirm) {
-          setActiveEditBarId(null);
-        }
-      }
-      setShowSaveConfirm(null);
-    }
-  };
-
-  // 一括保存モーダルを開く
-  const openBulkSaveModal = () => {
-    // 全ての編集中のバーを選択状態にする
-    const allBarIds = new Set(editingBars.keys());
-    setSelectedForSave(allBarIds);
-    setShowBulkSaveModal(true);
-  };
-
-  // チェックボックスの切り替え
-  const toggleSaveSelection = (barId: string) => {
-    const newSet = new Set(selectedForSave);
-    if (newSet.has(barId)) {
-      newSet.delete(barId);
+  // 日付表示フォーマット
+  const formatDateDisplay = () => {
+    if (activeTab === 'daily') {
+      return `${currentDate.getFullYear()}年${currentDate.getMonth() + 1}月${currentDate.getDate()}日(${['日', '月', '火', '水', '木', '金', '土'][currentDate.getDay()]})`;
+    } else if (activeTab === 'weekly') {
+      const start = getWeekStart(currentDate);
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      return `${start.getFullYear()}年 ${start.getMonth() + 1}/${start.getDate()}〜${end.getMonth() + 1}/${end.getDate()}`;
     } else {
-      newSet.add(barId);
+      return `${currentDate.getFullYear()}年${currentDate.getMonth() + 1}月`;
     }
-    setSelectedForSave(newSet);
   };
 
-  // 一括保存を実行
-  const handleBulkSave = () => {
-    const newMap = new Map(editingBars);
-    selectedForSave.forEach(barId => {
-      // ここで実際のAPI保存処理を行う（今は状態管理のみ）
-      newMap.delete(barId);
-      if (activeEditBarId === barId) {
-        setActiveEditBarId(null);
-      }
+  // 週の日付リストを生成
+  const weekDays = useMemo(() => {
+    const start = getWeekStart(currentDate);
+    return Array.from({ length: DAY_COUNT }, (_, i) => {
+      const date = new Date(start);
+      date.setDate(start.getDate() + i);
+      const dayOfWeek = date.getDay();
+      return {
+        date,
+        dateStr: formatDateKey(date),
+        dayIndex: i,
+        dayName: DAY_NAMES[i],
+        displayDate: `${date.getDate()}(${['日', '月', '火', '水', '木', '金', '土'][dayOfWeek]})`,
+        isWeekend: dayOfWeek === 0 || dayOfWeek === 6,
+      };
     });
-    setEditingBars(newMap);
-    setShowBulkSaveModal(false);
-    setSelectedForSave(new Set());
-  };
+  }, [currentDate]);
 
-  // ホステス名を取得
-  const getHostessName = (hostessId: string): string => {
-    const hostess = hostessData.find(h => h.id === hostessId);
-    return hostess?.name || '不明';
-  };
+  // 月の日付リストを生成
+  const monthDays = useMemo(() => {
+    const start = getMonthStart(currentDate);
+    const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+    return Array.from({ length: daysInMonth }, (_, i) => {
+      const date = new Date(start);
+      date.setDate(start.getDate() + i);
+      const dayOfWeek = date.getDay();
+      return {
+        date,
+        dateStr: formatDateKey(date),
+        dayIndex: i,
+        dayName: ['日', '月', '火', '水', '木', '金', '土'][dayOfWeek],
+        displayDate: `${date.getDate()}(${['日', '月', '火', '水', '木', '金', '土'][dayOfWeek]})`,
+        isWeekend: dayOfWeek === 0 || dayOfWeek === 6,
+      };
+    });
+  }, [currentDate]);
 
-  // ドラッグ開始
-  const handleDragStart = (
-    e: React.MouseEvent,
-    barId: string,
-    type: 'move' | 'resize-left' | 'resize-right'
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const bar = editingBars.get(barId);
-    if (!bar) return;
+  // 月間カレンダー用の週別データを生成（月〜日の7列）
+  const monthCalendarWeeks = useMemo(() => {
+    const start = getMonthStart(currentDate);
+    const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+    const firstDayOfWeek = start.getDay(); // 0=日, 1=月, ..., 6=土
+    // 月曜始まりに変換 (月=0, 火=1, ..., 日=6)
+    const firstDayOffset = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
 
-    setIsDragging(true);
-    setDragType(type);
-    setDragBarId(barId);
-    setDragStartX(e.clientX);
-    setDragStartBarLeft(timeToPosition(bar.startTime));
-    setDragStartBarWidth(getBarWidth(bar.startTime, bar.endTime));
-  };
+    const weeks: Array<Array<{
+      date: Date | null;
+      dateStr: string;
+      dayOfMonth: number;
+      dayName: string;
+      isWeekend: boolean;
+      isCurrentMonth: boolean;
+    } | null>> = [];
 
-  // ドラッグ中
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging || !dragBarId || !dragType) return;
+    let currentWeek: typeof weeks[0] = [];
 
-      const deltaX = e.clientX - dragStartX;
-      const bar = editingBars.get(dragBarId);
-      if (!bar) return;
-
-      let newStartPos = dragStartBarLeft;
-      let newEndPos = dragStartBarLeft + dragStartBarWidth;
-
-      if (dragType === 'move') {
-        newStartPos = Math.max(0, dragStartBarLeft + deltaX);
-        newEndPos = newStartPos + dragStartBarWidth;
-      } else if (dragType === 'resize-left') {
-        newStartPos = Math.max(0, Math.min(dragStartBarLeft + deltaX, newEndPos - 30));
-      } else if (dragType === 'resize-right') {
-        newEndPos = Math.max(newStartPos + 30, dragStartBarLeft + dragStartBarWidth + deltaX);
-      }
-
-      const newStartTime = positionToTime(newStartPos);
-      const newEndTime = positionToTime(newEndPos);
-
-      const updatedBar = { ...bar, startTime: newStartTime, endTime: newEndTime };
-      setEditingBars(new Map(editingBars.set(dragBarId, updatedBar)));
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      setDragType(null);
-      setDragBarId(null);
-    };
-
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+    // 月初の空白セル
+    for (let i = 0; i < firstDayOffset; i++) {
+      currentWeek.push(null);
     }
 
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, dragType, dragBarId, dragStartX, dragStartBarLeft, dragStartBarWidth, editingBars]);
+    // 月の日付を埋める
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+      const dayOfWeek = date.getDay();
+      const dayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 月曜始まりのインデックス
+
+      currentWeek.push({
+        date,
+        dateStr: formatDateKey(date),
+        dayOfMonth: day,
+        dayName: ['日', '月', '火', '水', '木', '金', '土'][dayOfWeek],
+        isWeekend: dayOfWeek === 0 || dayOfWeek === 6,
+        isCurrentMonth: true,
+      });
+
+      // 週の終わり（日曜日）または月末
+      if (dayIndex === 6 || day === daysInMonth) {
+        // 週末の空白セル
+        while (currentWeek.length < 7) {
+          currentWeek.push(null);
+        }
+        weeks.push(currentWeek);
+        currentWeek = [];
+      }
+    }
+
+    return weeks;
+  }, [currentDate]);
+
+  // 選択中のホステス
+  const selectedHostess = useMemo(() => {
+    if (!selectedHostessId) return null;
+    return hostesses.find(h => h.id === selectedHostessId) || null;
+  }, [selectedHostessId, hostesses]);
+
+  // 月間タブ時、店舗変更時に自動的に最初のホステスを選択
+  React.useEffect(() => {
+    if (activeTab === 'monthly' && filteredHostesses.length > 0) {
+      // 現在選択中のホステスが表示中のリストにいなければ、最初のホステスを選択
+      const isSelectedInList = filteredHostesses.some(h => h.id === selectedHostessId);
+      if (!isSelectedInList) {
+        setSelectedHostessId(filteredHostesses[0].id);
+      }
+    }
+  }, [activeTab, filteredHostesses, selectedHostessId]);
+
+  // 特定のホステスと日付のスケジュールを取得
+  const getSchedule = (hostessId: string, dateStr: string): ScheduleEntry | undefined => {
+    return schedules.find(s => s.hostessId === hostessId && s.date === dateStr);
+  };
+
+  // 日の出勤者数を取得
+  const getWorkCountForDate = (dateStr: string): number => {
+    return schedules.filter(s =>
+      s.date === dateStr &&
+      s.status === 'work' &&
+      filteredHostesses.some(h => h.id === s.hostessId)
+    ).length;
+  };
+
+  // 時間をパーセントに変換（0-36時間対応）
+  const timeToPercent = (time: string): number => {
+    if (!time) return 0;
+    const [hours, minutes] = time.split(':').map(Number);
+    const totalMinutes = hours * 60 + (minutes || 0);
+    return (totalMinutes / (36 * 60)) * 100; // 0-36時間の範囲
+  };
+
+  // バーの幅を計算
+  const getBarWidth = (startTime: string, endTime: string): number => {
+    if (!startTime || !endTime) return 0;
+    const startPercent = timeToPercent(startTime);
+    let endPercent = timeToPercent(endTime);
+    // 翌日の場合
+    if (endPercent < startPercent) {
+      endPercent += (24 * 60) / (36 * 60) * 100;
+    }
+    return Math.max(endPercent - startPercent, 2);
+  };
+
+  // 時間軸の目盛り（0-36時間）
+  const hourMarkers = Array.from({ length: 37 }, (_, i) => i);
 
   return (
     <div className="h-screen bg-gray-100 flex flex-col overflow-hidden">
@@ -721,8 +676,55 @@ export default function HostessSchedule() {
             </Button>
           </Link>
 
-          <div className="flex-1 flex items-center justify-center gap-2">
-            <h1 className="text-lg font-bold mr-2">ホステススケジュール</h1>
+          <div className="flex-1 flex items-center justify-center gap-4">
+            <h1 className="text-lg font-bold">ホステススケジュール</h1>
+
+            {/* 店舗選択 */}
+            <select
+              value={selectedStoreId}
+              onChange={(e) => setSelectedStoreId(e.target.value)}
+              className="h-8 px-3 text-sm font-medium border border-pink-300 rounded bg-pink-50 text-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-400"
+            >
+              {stores.map(store => (
+                <option key={store.id} value={store.id}>
+                  {store.name}
+                </option>
+              ))}
+            </select>
+
+            {/* タブ切り替え */}
+            <div className="flex bg-gray-200 rounded-lg p-1">
+              <button
+                onClick={() => setActiveTab('daily')}
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                  activeTab === 'daily'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                当日
+              </button>
+              <button
+                onClick={() => setActiveTab('weekly')}
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                  activeTab === 'weekly'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                週間
+              </button>
+              <button
+                onClick={() => setActiveTab('monthly')}
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                  activeTab === 'monthly'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                月間
+              </button>
+            </div>
 
             {/* 日付ナビゲーション */}
             <div className="flex items-center">
@@ -730,91 +732,60 @@ export default function HostessSchedule() {
                 variant="outline"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => navigateDate('prev')}
+                onClick={() => navigate('prev')}
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <div className="text-sm font-mono bg-gray-500 text-white px-3 py-1 min-w-[140px] text-center">
-                {formatDate(currentDate)}
+              <div className="text-sm font-mono bg-gray-500 text-white px-3 py-1 min-w-[180px] text-center">
+                {formatDateDisplay()}
               </div>
               <Button
                 variant="outline"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => navigateDate('next')}
+                onClick={() => navigate('next')}
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
+
+            {/* 保存ボタン */}
+            <Button
+              onClick={openSaveModal}
+              disabled={changedHostessIds.size === 0}
+              className={`h-8 px-4 text-sm flex items-center gap-2 ${
+                changedHostessIds.size > 0
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              <Save className="w-4 h-4" />
+              保存
+              {changedHostessIds.size > 0 && (
+                <span className="bg-white text-blue-600 text-xs px-1.5 py-0.5 rounded-full">
+                  {changedHostessIds.size}
+                </span>
+              )}
+            </Button>
           </div>
         </div>
       </div>
 
-      {/* ソートボタン・検索・フィルター */}
+      {/* フィルター */}
       <div className="h-[36px] bg-white border-b border-zinc-300 flex items-center px-3 flex-shrink-0">
-        {/* 左側: 担当者フィルター・ソートボタン */}
         <div className="flex items-center gap-2">
-        {/* 担当者フィルター */}
-        <span className="text-xs text-gray-600 font-medium">担当者:</span>
-        <select
-          value={staffFilter}
-          onChange={(e) => setStaffFilter(e.target.value)}
-          className="h-7 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-pink-400"
-        >
-          <option value="">全員</option>
-          {staffList.map(staff => (
-            <option key={staff} value={staff}>{staff}</option>
-          ))}
-        </select>
-
-        <div className="w-px h-5 bg-gray-300 mx-1" />
-
-        {/* ソートボタン */}
-        <span className="text-xs text-gray-600 font-medium">並び替え:</span>
-        <button
-          onClick={() => setSortType(sortType === 'name-asc' ? 'name-desc' : 'name-asc')}
-          className={`px-2 py-1 text-xs rounded border ${
-            sortType === 'name-asc' || sortType === 'name-desc'
-              ? 'bg-pink-500 text-white border-pink-500'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          五十音順 {sortType === 'name-asc' ? '▲' : sortType === 'name-desc' ? '▼' : ''}
-        </button>
-        <button
-          onClick={() => setSortType(sortType === 'worktime-desc' ? 'worktime-asc' : 'worktime-desc')}
-          className={`px-2 py-1 text-xs rounded border ${
-            sortType === 'worktime-desc' || sortType === 'worktime-asc'
-              ? 'bg-pink-500 text-white border-pink-500'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          滞在時間 {sortType === 'worktime-desc' ? '▼多' : sortType === 'worktime-asc' ? '▲少' : ''}
-        </button>
-        <button
-          onClick={() => setSortType(sortType === 'start-asc' ? 'start-desc' : 'start-asc')}
-          className={`px-2 py-1 text-xs rounded border ${
-            sortType === 'start-asc' || sortType === 'start-desc'
-              ? 'bg-pink-500 text-white border-pink-500'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          出勤時間 {sortType === 'start-asc' ? '▲早' : sortType === 'start-desc' ? '▼遅' : ''}
-        </button>
-        <button
-          onClick={() => setSortType(sortType === 'staff-asc' ? 'staff-desc' : 'staff-asc')}
-          className={`px-2 py-1 text-xs rounded border ${
-            sortType === 'staff-asc' || sortType === 'staff-desc'
-              ? 'bg-pink-500 text-white border-pink-500'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          担当者 {sortType === 'staff-asc' ? '▲' : sortType === 'staff-desc' ? '▼' : ''}
-        </button>
-        </div>
-
-        {/* キャスト検索 */}
-        <div className="ml-8 flex items-center gap-2">
+          <span className="text-xs text-gray-600 font-medium">担当者:</span>
+          <select
+            value={staffFilter}
+            onChange={(e) => setStaffFilter(e.target.value)}
+            className="h-7 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-pink-400"
+          >
+            <option value="">全員</option>
+            {staffList.map(staff => (
+              <option key={staff} value={staff}>{staff}</option>
+            ))}
+          </select>
+          <div className="w-px h-5 bg-gray-300 mx-1" />
           <span className="text-xs text-gray-600 font-medium">検索:</span>
           <input
             type="text"
@@ -824,31 +795,16 @@ export default function HostessSchedule() {
             className="w-[180px] h-7 px-3 text-xs border border-gray-500 rounded-full focus:outline-none focus:ring-1 focus:ring-pink-400"
           />
         </div>
-
-        {/* 一括保存ボタン（編集中のバーがある場合のみ表示） */}
-        {editingBars.size > 0 && (
-          <div className="ml-auto flex items-center gap-2">
-            <span className="text-xs text-orange-600 font-medium">
-              {editingBars.size}件の変更あり
-            </span>
-            <button
-              onClick={openBulkSaveModal}
-              className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 font-medium"
-            >
-              一括保存
-            </button>
-          </div>
-        )}
       </div>
 
       {/* メインコンテンツ */}
       <div className="flex-1 flex overflow-hidden">
-        {/* 左側パネル - ホステスリスト（3カラム） */}
+        {/* 左側パネル - ホステスリスト（4カラム） */}
         <div className="flex-shrink-0 flex flex-col bg-pink-100 border-r border-pink-300">
           {/* ヘッダー行 */}
-          <div className="h-[30px] border-b border-pink-300 flex-shrink-0 flex">
+          <div className="h-[40px] border-b border-pink-300 flex-shrink-0 flex">
             <div className="w-[100px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
-              店内名
+              名前
             </div>
             <div className="w-[60px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
               勤務形態
@@ -857,36 +813,35 @@ export default function HostessSchedule() {
               担当者
             </div>
             <div className="w-[50px] flex items-center justify-center text-xs font-bold text-gray-700">
-              作成
+              {activeTab === 'daily' ? '日' : activeTab === 'weekly' ? '週' : '月'}
             </div>
           </div>
 
           {/* ホステスリスト */}
           <div
             ref={leftPanelRef}
-            className="flex-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden"
-            onScroll={handleLeftPanelScroll}
-            style={{ scrollbarWidth: 'none' }}
+            onScroll={handleLeftScroll}
+            className="flex-1 overflow-y-auto"
           >
-            {hostesses.map((hostess) => (
+            {filteredHostesses.map((hostess) => (
               <div
                 key={hostess.id}
-                className="border-b border-pink-300 flex"
-                style={{ height: `${ROW_HEIGHT}px` }}
+                className={`border-b border-pink-300 flex ${
+                  activeTab === 'monthly' ? 'cursor-pointer hover:bg-pink-200' : ''
+                } ${activeTab === 'monthly' && selectedHostessId === hostess.id ? 'bg-pink-300' : ''}`}
+                style={{ height: activeTab === 'monthly' ? '40px' : '100px' }}
+                onClick={() => {
+                  if (activeTab === 'monthly') {
+                    setSelectedHostessId(hostess.id);
+                  }
+                }}
               >
-                {/* 店内名 */}
+                {/* 名前 */}
                 <div className="w-[100px] border-r border-pink-300 flex items-center px-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1">
                       <span className="text-sm font-medium truncate">{hostess.name}</span>
                       <ChevronDown className="w-3 h-3 text-gray-500 flex-shrink-0" />
-                    </div>
-                    <div className="text-xs text-gray-600">
-                      {hostess.isOff ? (
-                        <span className="text-red-500 font-medium">休み</span>
-                      ) : (
-                        `${hostess.workStartTime}-${hostess.workEndTime}`
-                      )}
                     </div>
                   </div>
                 </div>
@@ -898,531 +853,507 @@ export default function HostessSchedule() {
                 <div className="w-[50px] border-r border-pink-300 flex items-center justify-center">
                   <span className="text-xs text-gray-700">{hostess.assignedStaff}</span>
                 </div>
-                {/* 作成ボタン */}
+                {/* 週/日/月 */}
                 <div className="w-[50px] flex items-center justify-center">
-                  {hasNewBar(hostess.id) ? (
-                    <button
-                      onClick={() => handleCancelEdit(`new-${hostess.id}`)}
-                      className="w-7 h-7 rounded bg-red-500 hover:bg-red-600 text-white flex items-center justify-center"
-                      title="キャンセル"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleCreateBar(hostess.id)}
-                      className="w-7 h-7 rounded bg-blue-400 hover:bg-blue-500 text-white flex items-center justify-center"
-                      title="バーを作成"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  )}
+                  <span className="text-[10px] text-gray-400">
+                    {activeTab === 'daily' ? '日スケ' : activeTab === 'weekly' ? '週スケ' : '月スケ'}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* 右側パネル - タイムライン */}
+        {/* 右側パネル - スケジュール表示 */}
         <div className="flex-1 overflow-hidden flex flex-col">
-          {/* 時間軸ヘッダー */}
-          <div
-            ref={timeHeaderRef}
-            className="h-[30px] bg-gray-50 border-b border-gray-300 flex-shrink-0 overflow-x-hidden"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
+          {/* 当日タブ */}
+          {activeTab === 'daily' && (
             <div
-              className="flex"
-              style={{ width: `${(TIME_END_HOUR - TIME_START_HOUR + 1) * HOUR_WIDTH}px` }}
+              ref={rightPanelRef}
+              onScroll={handleRightScroll}
+              className="flex-1 overflow-auto"
             >
-              {timeSlots.map((slot) => (
-                <div
-                  key={slot.hour}
-                  className="flex-shrink-0 border-r border-gray-300 flex items-center justify-center text-sm text-gray-600 font-medium"
-                  style={{ width: `${HOUR_WIDTH}px` }}
-                >
-                  {slot.display}
-                </div>
-              ))}
-            </div>
-          </div>
+              {filteredHostesses.map((hostess, index) => {
+                const todayStr = formatDateKey(currentDate);
+                const schedule = getSchedule(hostess.id, todayStr);
+                const isWork = schedule?.status === 'work';
+                const startTime = schedule?.startTime || '';
+                const endTime = schedule?.endTime || '';
+                const comment = schedule?.comment || '';
 
-          {/* タイムラインボディ */}
-          <div
-            ref={timelineBodyRef}
-            className="flex-1 overflow-auto"
-            onScroll={handleTimelineScroll}
-          >
-            <div
-              style={{
-                width: `${(TIME_END_HOUR - TIME_START_HOUR + 1) * HOUR_WIDTH}px`,
-                minHeight: '100%'
-              }}
-            >
-              {hostesses.map((hostess, index) => (
-                <div
-                  key={hostess.id}
-                  className="relative border-b border-gray-200"
-                  style={{
-                    height: `${ROW_HEIGHT}px`,
-                    backgroundColor: index % 2 === 0 ? '#fafafa' : '#ffffff'
-                  }}
-                >
-                  {/* 時間のグリッド線 */}
-                  {timeSlots.map((slot) => (
-                    <div
-                      key={slot.hour}
-                      className="absolute top-0 bottom-0 border-r border-gray-200"
-                      style={{ left: `${(slot.hour - TIME_START_HOUR) * HOUR_WIDTH}px` }}
-                    />
-                  ))}
-
-                  {/* 勤務時間の背景 */}
-                  {!hostess.isOff && hostess.workStartTime && hostess.workEndTime && (
-                    <div
-                      className="absolute top-0 bottom-0"
-                      style={{
-                        left: `${timeToPosition(hostess.workStartTime)}px`,
-                        width: `${getBarWidth(hostess.workStartTime, hostess.workEndTime)}px`,
-                        backgroundColor: 'rgba(255, 182, 193, 0.2)'
-                      }}
-                    />
-                  )}
-
-                  {/* 予約バー（既存） */}
-                  {hostess.reservations.map((reservation) => {
-                    const barId = reservation.id;
-                    const _isEditing = editingBars.has(barId);
-                    const isActiveEdit = activeEditBarId === barId;
-                    const editBar = editingBars.get(barId);
-
-                    // 編集中なら編集バーの時間を使う
-                    const displayStartTime = editBar?.startTime ?? reservation.startTime;
-                    const displayEndTime = editBar?.endTime ?? reservation.endTime;
-                    const isPending = (editBar?.status ?? reservation.status) === 'pending';
-                    const displayMemo = editBar?.memo ?? reservation.memo;
-
-                    const barLeft = timeToPosition(displayStartTime);
-                    const barWidth = getBarWidth(displayStartTime, displayEndTime);
-
-                    return (
-                      <div
-                        key={reservation.id}
-                        className="group absolute top-[4px] bottom-[4px]"
-                        style={{
-                          left: `${barLeft}px`,
-                          width: `${barWidth}px`,
-                          minWidth: '60px',
-                          zIndex: isActiveEdit ? 10 : 1
-                        }}
-                      >
-                        {/* 備考ツールチップ（ホバー時表示） */}
-                        {displayMemo && (
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                            <div className="font-medium mb-1">備考:</div>
-                            <div>{displayMemo}</div>
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
-                          </div>
-                        )}
-
-                        {/* バー本体 */}
-                        <div
-                          className={`absolute inset-0 rounded-full flex items-center px-2 shadow-sm overflow-hidden ${
-                            isActiveEdit ? 'cursor-move ring-2 ring-blue-400 ring-offset-1' : 'cursor-pointer'
+                return (
+                  <div
+                    key={hostess.id}
+                    className="h-[100px] border-b border-gray-200"
+                    style={{ backgroundColor: index % 2 === 0 ? '#f8fafc' : '#ffffff' }}
+                  >
+                    {/* 上段: 入力コントロール */}
+                    <div className="h-[40px] flex items-center px-2 border-b border-gray-100">
+                      {/* 出勤/休みセレクト */}
+                      <div className="relative flex-shrink-0">
+                        <select
+                          value={schedule?.status || 'work'}
+                          onChange={(e) => updateSchedule(hostess.id, todayStr, {
+                            status: e.target.value as 'work' | 'off',
+                            startTime: e.target.value === 'off' ? '' : startTime,
+                            endTime: e.target.value === 'off' ? '' : endTime,
+                          })}
+                          className={`h-7 px-2 pr-6 text-sm font-medium rounded border-none appearance-none cursor-pointer ${
+                            isWork
+                              ? 'bg-blue-100 text-blue-600'
+                              : 'bg-pink-100 text-pink-500'
                           }`}
-                          style={{
-                            background: isPending
-                              ? 'linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #9333ea 100%)'
-                              : 'linear-gradient(135deg, #d4d4d4 0%, #a3a3a3 50%, #737373 100%)'
-                          }}
-                          onClick={() => handleBarClick(hostess.id, reservation)}
-                          onMouseDown={(e) => {
-                            if (isActiveEdit) {
-                              handleDragStart(e, barId, 'move');
-                            }
-                          }}
                         >
-
-                        {/* 左リサイズハンドル（編集モード時のみ） */}
-                        {isActiveEdit && (
-                          <div
-                            className="absolute left-0 top-0 bottom-0 w-4 cursor-ew-resize rounded-l-full flex items-center justify-center hover:bg-black/20"
-                            onMouseDown={(e) => {
-                              e.stopPropagation();
-                              handleDragStart(e, barId, 'resize-left');
-                            }}
-                          >
-                            <div className="w-0.5 h-4 bg-white/70 rounded" />
-                          </div>
-                        )}
-
-                        {/* 出勤日時表示 */}
-                        <div className={`text-[10px] mr-1 flex-shrink-0 ${isPending ? 'text-purple-200' : 'text-gray-500'}`}>
-                          出勤日時
-                        </div>
-                        <div className="flex flex-col justify-center mr-2 text-[11px] leading-tight flex-shrink-0 font-medium">
-                          <span className={isPending ? 'text-white' : 'text-gray-700'}>
-                            {displayStartTime}
-                          </span>
-                          <span className={isPending ? 'text-white' : 'text-gray-700'}>
-                            {displayEndTime}
-                          </span>
-                        </div>
-
-                        {/* スペーサー */}
-                        <div className="flex-1" />
-
-                        {/* 完了マーク */}
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ml-1 ${
-                          isPending ? 'bg-white/30' : 'bg-white/50'
-                        }`}>
-                          <Check className={`w-3 h-3 ${isPending ? 'text-white' : 'text-gray-600'}`} />
-                        </div>
-
-                        {/* ステータステキスト */}
-                        <div className="text-[10px] ml-1 text-white whitespace-nowrap">
-                          完了
-                        </div>
-
-                        {/* 右リサイズハンドル（編集モード時のみ） */}
-                        {isActiveEdit && (
-                          <div
-                            className="absolute right-0 top-0 bottom-0 w-4 cursor-ew-resize rounded-r-full flex items-center justify-center hover:bg-black/20"
-                            onMouseDown={(e) => {
-                              e.stopPropagation();
-                              handleDragStart(e, barId, 'resize-right');
-                            }}
-                          >
-                            <div className="w-0.5 h-4 bg-white/70 rounded" />
-                          </div>
-                        )}
-                        </div>
-
-                        {/* 時間入力フィールド（編集モード時のみ） - バー外に配置 */}
-                        {isActiveEdit && (() => {
-                          const startParsed = parseTime(displayStartTime);
-                          const endParsed = parseTime(displayEndTime);
-                          const currentMemo = editBar?.memo ?? reservation.memo ?? '';
-                          return (
-                          <div
-                            className="absolute -top-[72px] left-0 bg-white rounded shadow-lg border border-gray-300 px-2 py-2 z-50"
-                            onClick={(e) => e.stopPropagation()}
-                            onMouseDown={(e) => e.stopPropagation()}
-                          >
-                            {/* 時間入力行 */}
-                            <div className="flex items-center gap-1 mb-2">
-                              <select
-                                value={startParsed.hours}
-                                onChange={(e) => handleHourChange(barId, 'startTime', Number(e.target.value))}
-                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                              >
-                                {hourOptions.map(h => (
-                                  <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
-                                ))}
-                              </select>
-                              <span className="text-xs text-gray-500">:</span>
-                              <select
-                                value={startParsed.minutes}
-                                onChange={(e) => handleMinuteChange(barId, 'startTime', Number(e.target.value))}
-                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                              >
-                                {minuteOptions.map(m => (
-                                  <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
-                                ))}
-                              </select>
-                              <span className="text-xs text-gray-500">〜</span>
-                              <select
-                                value={endParsed.hours}
-                                onChange={(e) => handleHourChange(barId, 'endTime', Number(e.target.value))}
-                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                              >
-                                {hourOptions.map(h => (
-                                  <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
-                                ))}
-                              </select>
-                              <span className="text-xs text-gray-500">:</span>
-                              <select
-                                value={endParsed.minutes}
-                                onChange={(e) => handleMinuteChange(barId, 'endTime', Number(e.target.value))}
-                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                              >
-                                {minuteOptions.map(m => (
-                                  <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
-                                ))}
-                              </select>
-                              <button
-                                onClick={() => openSaveConfirm(barId)}
-                                className="ml-2 px-3 py-0.5 bg-blue-400 hover:bg-blue-500 text-white text-xs rounded whitespace-nowrap"
-                              >
-                                保存
-                              </button>
-                            </div>
-                            {/* 備考入力行 */}
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs text-gray-500">備考:</span>
-                              <input
-                                type="text"
-                                value={currentMemo}
-                                onChange={(e) => handleMemoChange(barId, e.target.value)}
-                                placeholder="備考を入力"
-                                className="flex-1 text-xs border border-gray-300 rounded px-2 py-0.5 min-w-[200px]"
-                              />
-                            </div>
-                          </div>
-                          );
-                        })()}
+                          <option value="work">出勤</option>
+                          <option value="off">休み</option>
+                        </select>
+                        <ChevronDown className="absolute right-1 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-400" />
                       </div>
-                    );
-                  })}
 
-                  {/* 新規作成バー */}
-                  {hasNewBar(hostess.id) && (() => {
-                    const barId = `new-${hostess.id}`;
-                    const bar = editingBars.get(barId)!;
-                    const isActiveEdit = activeEditBarId === barId;
-                    const barLeft = timeToPosition(bar.startTime);
-                    const barWidth = getBarWidth(bar.startTime, bar.endTime);
+                      {/* 時間表示 */}
+                      <div className="flex-1 flex items-center justify-center gap-2">
+                        {isWork ? (
+                          <>
+                            <input
+                              type="time"
+                              value={startTime}
+                              onChange={(e) => updateSchedule(hostess.id, todayStr, { startTime: e.target.value })}
+                              className="h-7 px-2 text-sm border-none bg-transparent text-center"
+                            />
+                            <span className="text-gray-500">〜</span>
+                            <input
+                              type="time"
+                              value={endTime}
+                              onChange={(e) => updateSchedule(hostess.id, todayStr, { endTime: e.target.value })}
+                              className="h-7 px-2 text-sm border-none bg-transparent text-center"
+                            />
+                          </>
+                        ) : (
+                          <span className="text-pink-400 text-sm">休み</span>
+                        )}
+                      </div>
 
-                    return (
-                      <div
-                        className={`absolute top-[4px] bottom-[4px] rounded-full flex items-center px-2 shadow-sm ${
-                          isActiveEdit ? 'cursor-move ring-2 ring-blue-400 ring-offset-1' : 'cursor-pointer'
-                        }`}
-                        style={{
-                          left: `${barLeft}px`,
-                          width: `${Math.max(barWidth, 120)}px`,
-                          minWidth: '120px',
-                          background: 'linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #9333ea 100%)',
-                          zIndex: isActiveEdit ? 10 : 1
-                        }}
-                        onClick={() => setActiveEditBarId(isActiveEdit ? null : barId)}
-                        onMouseDown={(e) => {
-                          if (isActiveEdit) {
-                            handleDragStart(e, barId, 'move');
-                          }
-                        }}
+                      {/* コメント入力 */}
+                      <input
+                        type="text"
+                        placeholder="コメントを入力"
+                        value={comment}
+                        onChange={(e) => updateSchedule(hostess.id, todayStr, { comment: e.target.value })}
+                        className="w-[180px] h-7 px-3 text-sm border border-gray-300 rounded flex-shrink-0"
+                      />
+
+                      {/* 削除ボタン */}
+                      <button
+                        onClick={() => updateSchedule(hostess.id, todayStr, {
+                          status: 'work',
+                          startTime: '',
+                          endTime: '',
+                          comment: '',
+                        })}
+                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded ml-2 flex-shrink-0"
                       >
-                        {/* 左リサイズハンドル（編集モード時のみ） */}
-                        {isActiveEdit && (
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* 下段: タイムライン */}
+                    <div
+                      className="h-[60px] relative cursor-crosshair select-none"
+                      data-timeline
+                      data-hostess-id={hostess.id}
+                      onMouseDown={(e) => handleTimelineMouseDown(e, hostess.id, todayStr, !!(isWork && startTime && endTime))}
+                    >
+                      {/* 時間目盛り */}
+                      {hourMarkers.map((hour) => (
+                        <div
+                          key={hour}
+                          className="absolute top-0 bottom-0 border-l border-gray-200 flex flex-col pointer-events-none"
+                          style={{ left: `${(hour / 36) * 100}%`, width: `${100 / 36}%` }}
+                        >
+                          <span className="text-[10px] text-gray-400 pl-0.5">
+                            {hour <= 24 ? hour : hour - 24}
+                          </span>
+                        </div>
+                      ))}
+
+                      {/* 勤務バー */}
+                      {isWork && startTime && endTime && (
+                        <div
+                          className="absolute top-4 bottom-2 rounded cursor-move group"
+                          style={{
+                            left: `${timeToPercent(startTime)}%`,
+                            width: `${getBarWidth(startTime, endTime)}%`,
+                            background: 'linear-gradient(to right, #93c5fd, #3b82f6)',
+                          }}
+                          onMouseDown={(e) => handleBarMouseDown(e, hostess.id, todayStr, startTime, endTime)}
+                        >
+                          {/* 左リサイズハンドル */}
                           <div
-                            className="absolute left-0 top-0 bottom-0 w-4 cursor-ew-resize rounded-l-full flex items-center justify-center hover:bg-black/20"
-                            onMouseDown={(e) => {
-                              e.stopPropagation();
-                              handleDragStart(e, barId, 'resize-left');
-                            }}
-                          >
-                            <div className="w-0.5 h-4 bg-white/70 rounded" />
-                          </div>
-                        )}
-
-                        {/* 時間表示 */}
-                        <div className="flex flex-col justify-center mr-2 text-[11px] leading-tight flex-shrink-0 font-medium">
-                          <span className="text-white">{bar.startTime}</span>
-                          <span className="text-white">{bar.endTime}</span>
-                        </div>
-
-                        {/* 予約情報 */}
-                        <div className="flex-1 min-w-0 overflow-hidden">
-                          <div className="text-[11px] font-medium truncate leading-tight text-white">
-                            {bar.customerName || '新規予約'}
-                          </div>
-                          <div className="text-[10px] truncate leading-tight text-purple-200">
-                            新規作成
-                          </div>
-                        </div>
-
-                        {/* 完了マーク */}
-                        <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ml-1 bg-white/30">
-                          <Check className="w-3 h-3 text-white" />
-                        </div>
-
-                        {/* ステータステキスト */}
-                        <div className="text-[10px] ml-1 flex-shrink-0 text-purple-200">
-                          新規
-                        </div>
-
-                        {/* 右リサイズハンドル（編集モード時のみ） */}
-                        {isActiveEdit && (
+                            className="absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-blue-700/50 rounded-l"
+                            onMouseDown={(e) => handleResizeMouseDown(e, hostess.id, todayStr, startTime, endTime, 'start')}
+                          />
+                          {/* 右リサイズハンドル */}
                           <div
-                            className="absolute right-0 top-0 bottom-0 w-4 cursor-ew-resize rounded-r-full flex items-center justify-center hover:bg-black/20"
-                            onMouseDown={(e) => {
-                              e.stopPropagation();
-                              handleDragStart(e, barId, 'resize-right');
-                            }}
-                          >
-                            <div className="w-0.5 h-4 bg-white/70 rounded" />
-                          </div>
-                        )}
+                            className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-blue-700/50 rounded-r"
+                            onMouseDown={(e) => handleResizeMouseDown(e, hostess.id, todayStr, startTime, endTime, 'end')}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
-                        {/* 時間入力フィールド（編集モード時のみ） */}
-                        {isActiveEdit && (() => {
-                          const startParsed = parseTime(bar.startTime);
-                          const endParsed = parseTime(bar.endTime);
-                          const currentMemo = bar.memo ?? '';
-                          return (
-                          <div
-                            className="absolute -top-[72px] left-0 bg-white rounded shadow-lg border border-gray-300 px-2 py-2 z-50"
-                            onClick={(e) => e.stopPropagation()}
-                            onMouseDown={(e) => e.stopPropagation()}
-                          >
-                            {/* 時間入力行 */}
-                            <div className="flex items-center gap-1 mb-2">
-                              <select
-                                value={startParsed.hours}
-                                onChange={(e) => handleHourChange(barId, 'startTime', Number(e.target.value))}
-                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                              >
-                                {hourOptions.map(h => (
-                                  <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
-                                ))}
-                              </select>
-                              <span className="text-xs text-gray-500">:</span>
-                              <select
-                                value={startParsed.minutes}
-                                onChange={(e) => handleMinuteChange(barId, 'startTime', Number(e.target.value))}
-                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                              >
-                                {minuteOptions.map(m => (
-                                  <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
-                                ))}
-                              </select>
-                              <span className="text-xs text-gray-500">〜</span>
-                              <select
-                                value={endParsed.hours}
-                                onChange={(e) => handleHourChange(barId, 'endTime', Number(e.target.value))}
-                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                              >
-                                {hourOptions.map(h => (
-                                  <option key={h} value={h}>{String(h).padStart(2, '0')}</option>
-                                ))}
-                              </select>
-                              <span className="text-xs text-gray-500">:</span>
-                              <select
-                                value={endParsed.minutes}
-                                onChange={(e) => handleMinuteChange(barId, 'endTime', Number(e.target.value))}
-                                className="w-[50px] text-xs border border-gray-300 rounded px-1 py-0.5"
-                              >
-                                {minuteOptions.map(m => (
-                                  <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
-                                ))}
-                              </select>
-                              <button
-                                onClick={() => openSaveConfirm(barId)}
-                                className="ml-2 px-3 py-0.5 bg-blue-400 hover:bg-blue-500 text-white text-xs rounded whitespace-nowrap"
-                              >
-                                保存
-                              </button>
-                            </div>
-                            {/* 備考入力行 */}
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs text-gray-500">備考:</span>
+          {/* 週間タブ */}
+          {activeTab === 'weekly' && (
+            <>
+              {/* 曜日ヘッダー */}
+              <div className="h-[40px] bg-gray-50 border-b border-gray-300 flex-shrink-0 flex">
+                {weekDays.map((day) => (
+                  <div
+                    key={day.dayIndex}
+                    className={`flex-1 border-r border-gray-300 flex items-center justify-center gap-2 ${
+                      day.isWeekend ? (day.dayName === '土' ? 'bg-blue-50' : 'bg-red-50') : ''
+                    }`}
+                  >
+                    <span className={`text-sm font-medium ${
+                      day.dayName === '土' ? 'text-blue-600' :
+                      day.dayName === '日' ? 'text-red-600' : 'text-gray-700'
+                    }`}>
+                      {day.displayDate}
+                    </span>
+                    <span className="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">
+                      {getWorkCountForDate(day.dateStr)}名
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* スケジュールボディ */}
+              <div
+                ref={rightPanelRef}
+                onScroll={handleRightScroll}
+                className="flex-1 overflow-auto"
+              >
+                {filteredHostesses.map((hostess, index) => (
+                  <div
+                    key={hostess.id}
+                    className="h-[100px] flex border-b border-gray-200"
+                    style={{ backgroundColor: index % 2 === 0 ? '#f8fafc' : '#ffffff' }}
+                  >
+                    {weekDays.map((day) => {
+                      const schedule = getSchedule(hostess.id, day.dateStr);
+                      const isWork = schedule?.status === 'work';
+                      const startTime = schedule?.startTime || '';
+                      const endTime = schedule?.endTime || '';
+                      const comment = schedule?.comment || '';
+
+                      return (
+                        <div
+                          key={day.dayIndex}
+                          className={`flex-1 border-r border-gray-200 p-2 ${
+                            day.isWeekend ? (day.dayName === '土' ? 'bg-blue-50/30' : 'bg-red-50/30') : ''
+                          }`}
+                        >
+                          {/* 出勤/休みセレクト */}
+                          <div className="relative mb-1">
+                            <select
+                              value={schedule?.status || 'work'}
+                              onChange={(e) => updateSchedule(hostess.id, day.dateStr, {
+                                status: e.target.value as 'work' | 'off',
+                                startTime: e.target.value === 'off' ? '' : startTime,
+                                endTime: e.target.value === 'off' ? '' : endTime,
+                              })}
+                              className={`w-full h-6 px-2 pr-6 text-xs font-medium rounded border-none appearance-none cursor-pointer ${
+                                isWork
+                                  ? 'bg-blue-100 text-blue-600'
+                                  : 'bg-pink-100 text-pink-500'
+                              }`}
+                            >
+                              <option value="work">出勤</option>
+                              <option value="off">休み</option>
+                            </select>
+                            <ChevronDown className="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-gray-400" />
+                          </div>
+
+                          {/* 時間表示 */}
+                          {isWork && (
+                            <div className="flex items-center gap-1 mb-1">
                               <input
-                                type="text"
-                                value={currentMemo}
-                                onChange={(e) => handleMemoChange(barId, e.target.value)}
-                                placeholder="備考を入力"
-                                className="flex-1 text-xs border border-gray-300 rounded px-2 py-0.5 min-w-[200px]"
+                                type="time"
+                                value={startTime}
+                                onChange={(e) => updateSchedule(hostess.id, day.dateStr, { startTime: e.target.value })}
+                                className="w-[70px] h-5 px-1 text-xs border border-gray-300 rounded"
+                              />
+                              <span className="text-xs text-gray-400">〜</span>
+                              <input
+                                type="time"
+                                value={endTime}
+                                onChange={(e) => updateSchedule(hostess.id, day.dateStr, { endTime: e.target.value })}
+                                className="w-[70px] h-5 px-1 text-xs border border-gray-300 rounded"
                               />
                             </div>
-                          </div>
+                          )}
+
+                          {/* コメント入力 */}
+                          <input
+                            type="text"
+                            placeholder="コメントを入力"
+                            value={comment}
+                            onChange={(e) => updateSchedule(hostess.id, day.dateStr, { comment: e.target.value })}
+                            className="w-full h-5 px-2 text-xs text-pink-400 placeholder-pink-300 border-none bg-transparent focus:outline-none focus:bg-pink-50 rounded"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* 月間タブ */}
+          {activeTab === 'monthly' && (
+            <>
+              {selectedHostess ? (
+                <>
+                  {/* 選択中のホステス名 */}
+                  <div className="h-[40px] bg-pink-100 border-b border-pink-300 flex items-center px-4">
+                    <span className="text-lg font-bold text-pink-700">{selectedHostess.name}</span>
+                    <span className="ml-2 text-sm text-gray-600">の月間スケジュール</span>
+                  </div>
+
+                  {/* 曜日ヘッダー（週間と同じ7列） */}
+                  <div className="h-[40px] bg-gray-50 border-b border-gray-300 flex-shrink-0 flex">
+                    {DAY_NAMES.map((dayName, index) => {
+                      const isWeekend = index === 5 || index === 6; // 土=5, 日=6
+                      return (
+                        <div
+                          key={index}
+                          className={`flex-1 border-r border-gray-300 flex items-center justify-center ${
+                            isWeekend ? (index === 5 ? 'bg-blue-50' : 'bg-red-50') : ''
+                          }`}
+                        >
+                          <span className={`text-sm font-medium ${
+                            index === 5 ? 'text-blue-600' :
+                            index === 6 ? 'text-red-600' : 'text-gray-700'
+                          }`}>
+                            {dayName}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* カレンダーボディ */}
+                  <div className="flex-1 overflow-auto">
+                    {monthCalendarWeeks.map((week, weekIndex) => (
+                      <div
+                        key={weekIndex}
+                        className="flex border-b border-gray-200"
+                        style={{ minHeight: '120px' }}
+                      >
+                        {week.map((day, dayIndex) => {
+                          if (!day) {
+                            // 空白セル
+                            return (
+                              <div
+                                key={dayIndex}
+                                className="flex-1 border-r border-gray-200 bg-gray-100"
+                              />
+                            );
+                          }
+
+                          const schedule = getSchedule(selectedHostess.id, day.dateStr);
+                          const isWork = schedule?.status === 'work';
+                          const startTime = schedule?.startTime || '';
+                          const endTime = schedule?.endTime || '';
+                          const comment = schedule?.comment || '';
+
+                          return (
+                            <div
+                              key={dayIndex}
+                              className={`flex-1 border-r border-gray-200 p-2 ${
+                                day.isWeekend ? (day.dayName === '土' ? 'bg-blue-50/30' : 'bg-red-50/30') : 'bg-white'
+                              }`}
+                            >
+                              {/* 日付 */}
+                              <div className={`text-sm font-bold mb-2 ${
+                                day.dayName === '土' ? 'text-blue-600' :
+                                day.dayName === '日' ? 'text-red-600' : 'text-gray-700'
+                              }`}>
+                                {day.dayOfMonth}
+                              </div>
+
+                              {/* 出勤/休みセレクト */}
+                              <div className="relative mb-1">
+                                <select
+                                  value={schedule?.status || 'work'}
+                                  onChange={(e) => updateSchedule(selectedHostess.id, day.dateStr, {
+                                    status: e.target.value as 'work' | 'off',
+                                    startTime: e.target.value === 'off' ? '' : startTime,
+                                    endTime: e.target.value === 'off' ? '' : endTime,
+                                  })}
+                                  className={`w-full h-6 px-2 pr-6 text-xs font-medium rounded border-none appearance-none cursor-pointer ${
+                                    isWork
+                                      ? 'bg-blue-100 text-blue-600'
+                                      : 'bg-pink-100 text-pink-500'
+                                  }`}
+                                >
+                                  <option value="work">出勤</option>
+                                  <option value="off">休み</option>
+                                </select>
+                                <ChevronDown className="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-gray-400" />
+                              </div>
+
+                              {/* 時間表示 */}
+                              {isWork && (
+                                <div className="flex flex-col gap-1 mb-1">
+                                  <input
+                                    type="time"
+                                    value={startTime}
+                                    onChange={(e) => updateSchedule(selectedHostess.id, day.dateStr, { startTime: e.target.value })}
+                                    className="w-full h-5 px-1 text-xs border border-gray-300 rounded"
+                                  />
+                                  <input
+                                    type="time"
+                                    value={endTime}
+                                    onChange={(e) => updateSchedule(selectedHostess.id, day.dateStr, { endTime: e.target.value })}
+                                    className="w-full h-5 px-1 text-xs border border-gray-300 rounded"
+                                  />
+                                </div>
+                              )}
+
+                              {/* コメント入力 */}
+                              <input
+                                type="text"
+                                placeholder="コメント"
+                                value={comment}
+                                onChange={(e) => updateSchedule(selectedHostess.id, day.dateStr, { comment: e.target.value })}
+                                className="w-full h-5 px-2 text-xs text-pink-400 placeholder-pink-300 border border-gray-200 bg-transparent focus:outline-none focus:bg-pink-50 rounded"
+                              />
+                            </div>
                           );
-                        })()}
+                        })}
                       </div>
-                    );
-                  })()}
+                    ))}
+                  </div>
+                </>
+              ) : (
+                // ホステス未選択時
+                <div className="flex-1 flex items-center justify-center bg-gray-50">
+                  <div className="text-center text-gray-500">
+                    <p className="text-lg font-medium">左のリストからホステスを選択してください</p>
+                    <p className="text-sm mt-1">選択したホステスの月間カレンダーが表示されます</p>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              )}
+            </>
+          )}
         </div>
       </div>
 
       {/* 保存確認モーダル */}
-      {showSaveConfirm && (
+      {showSaveModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-[320px]">
-            <h3 className="text-lg font-bold mb-4">確認</h3>
-            <p className="text-sm text-gray-600 mb-6">本当に保存しますか？</p>
-            <div className="flex gap-2">
+          <div className="bg-white rounded-lg shadow-xl w-[500px] max-h-[80vh] flex flex-col">
+            {/* モーダルヘッダー */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+              <h2 className="text-lg font-bold text-gray-800">スケジュールを保存</h2>
               <button
-                onClick={() => setShowSaveConfirm(null)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 text-sm font-medium"
+                onClick={() => setShowSaveModal(false)}
+                className="p-1 hover:bg-gray-100 rounded"
               >
-                キャンセル
-              </button>
-              <button
-                onClick={handleConfirmSave}
-                className="flex-1 px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 text-sm font-medium"
-              >
-                保存する
+                <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* 一括保存モーダル */}
-      {showBulkSaveModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-[450px] max-h-[80vh] flex flex-col">
-            <h3 className="text-lg font-bold mb-2">一括保存</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              保存する変更にチェックを入れてください。チェックを外すと保存されません。
-            </p>
+            {/* モーダルコンテンツ */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <p className="text-sm text-gray-600 mb-4">
+                以下の{changedHostesses.length}名のスケジュールが変更されています。保存する人を選択してください。
+              </p>
 
-            {/* 変更リスト */}
-            <div className="flex-1 overflow-y-auto border border-gray-200 rounded mb-4">
-              {Array.from(editingBars.entries()).map(([barId, bar]) => (
-                <label
-                  key={barId}
-                  className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer"
+              {/* 全選択/全解除 */}
+              <div className="mb-3 pb-3 border-b border-gray-200">
+                <button
+                  onClick={toggleSelectAll}
+                  className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-2"
                 >
-                  <input
-                    type="checkbox"
-                    checked={selectedForSave.has(barId)}
-                    onChange={() => toggleSaveSelection(barId)}
-                    className="w-4 h-4 text-blue-500 rounded border-gray-300 focus:ring-blue-400"
-                  />
-                  <div className="flex-1">
-                    <div className="text-sm font-medium text-gray-800">
-                      {getHostessName(bar.hostessId)}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {bar.startTime} 〜 {bar.endTime}
-                      {bar.isNew && <span className="ml-2 text-purple-500">（新規）</span>}
-                    </div>
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                    selectedForSave.size === changedHostessIds.size
+                      ? 'bg-blue-600 border-blue-600'
+                      : 'border-gray-300'
+                  }`}>
+                    {selectedForSave.size === changedHostessIds.size && (
+                      <Check className="w-3 h-3 text-white" />
+                    )}
                   </div>
-                </label>
-              ))}
+                  {selectedForSave.size === changedHostessIds.size ? '全て解除' : '全て選択'}
+                </button>
+              </div>
+
+              {/* ホステスリスト */}
+              <div className="space-y-2">
+                {changedHostesses.map(hostess => {
+                  const isSelected = selectedForSave.has(hostess.id);
+                  return (
+                    <div
+                      key={hostess.id}
+                      onClick={() => toggleSaveSelection(hostess.id)}
+                      className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                        isSelected
+                          ? 'bg-blue-50 border border-blue-200'
+                          : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
+                      }`}
+                    >
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                        isSelected
+                          ? 'bg-blue-600 border-blue-600'
+                          : 'border-gray-300'
+                      }`}>
+                        {isSelected && <Check className="w-3 h-3 text-white" />}
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-800">{hostess.name}</div>
+                        <div className="text-xs text-gray-500">
+                          {hostess.workType} / 担当: {hostess.assignedStaff}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* 選択数表示 */}
-            <div className="text-sm text-gray-600 mb-4">
-              {selectedForSave.size} / {editingBars.size} 件を保存
-            </div>
-
-            {/* ボタン */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  setShowBulkSaveModal(false);
-                  setSelectedForSave(new Set());
-                }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 text-sm font-medium"
-              >
-                キャンセル
-              </button>
-              <button
-                onClick={handleBulkSave}
-                disabled={selectedForSave.size === 0}
-                className={`flex-1 px-4 py-2 rounded text-sm font-medium ${
-                  selectedForSave.size > 0
-                    ? 'bg-blue-500 text-white hover:bg-blue-600'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                保存する
-              </button>
+            {/* モーダルフッター */}
+            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+              <div className="text-sm text-gray-600">
+                {selectedForSave.size}名を保存
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowSaveModal(false)}
+                  className="px-4"
+                >
+                  キャンセル
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  disabled={selectedForSave.size === 0}
+                  className={`px-4 ${
+                    selectedForSave.size > 0
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  保存する
+                </Button>
+              </div>
             </div>
           </div>
         </div>
