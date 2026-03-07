@@ -102,6 +102,7 @@ export default function HostessManagementPage() {
   const [customerHistory, setCustomerHistory] = useState([
     {
       id: '1',
+      customerNumber: 'C-0001',
       memberNumber: 'M-001',
       customerName: '田中様',
       nickname: 'たなちゃん',
@@ -117,6 +118,7 @@ export default function HostessManagementPage() {
     },
     {
       id: '2',
+      customerNumber: 'C-0003',
       memberNumber: 'M-003',
       customerName: '佐藤様',
       nickname: 'さとさん',
@@ -131,6 +133,7 @@ export default function HostessManagementPage() {
     },
     {
       id: '3',
+      customerNumber: 'C-0002',
       memberNumber: 'M-002',
       customerName: '鈴木様',
       nickname: '',
@@ -144,6 +147,7 @@ export default function HostessManagementPage() {
     },
     {
       id: '4',
+      customerNumber: 'C-0004',
       memberNumber: 'M-004',
       customerName: '高橋様',
       nickname: 'タカさん',
@@ -160,7 +164,7 @@ export default function HostessManagementPage() {
   const [customerSearchQuery, setCustomerSearchQuery] = useState('');
 
   // ソート用のstate
-  const [customerSortKey, setCustomerSortKey] = useState<'memberNumber' | 'customerName' | 'lastVisitDate' | 'latestMemoDate'>('lastVisitDate');
+  const [customerSortKey, setCustomerSortKey] = useState<'customerNumber' | 'memberNumber' | 'customerName' | 'lastVisitDate' | 'latestMemoDate'>('lastVisitDate');
 
   // 検索とソートを適用した顧客リスト
   const filteredAndSortedCustomerHistory = [...customerHistory]
@@ -186,6 +190,8 @@ export default function HostessManagementPage() {
       if (customer.customerName.toLowerCase().includes(query)) return true;
       // あだ名で検索
       if (customer.nickname && customer.nickname.toLowerCase().includes(query)) return true;
+      // 顧客番号で検索
+      if (customer.customerNumber.toLowerCase().includes(query)) return true;
       // 会員番号で検索
       if (customer.memberNumber.toLowerCase().includes(query)) return true;
       // 来店日で検索
@@ -200,6 +206,8 @@ export default function HostessManagementPage() {
     // ソート
     .sort((a, b) => {
       switch (customerSortKey) {
+        case 'customerNumber':
+          return a.customerNumber.localeCompare(b.customerNumber);
         case 'memberNumber':
           return a.memberNumber.localeCompare(b.memberNumber);
         case 'customerName':
@@ -730,13 +738,13 @@ export default function HostessManagementPage() {
         {/* メイン：大カテゴリ + コンテンツ */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
           {/* 左サイド：大カテゴリメニュー（2.png風ピルボタン） */}
-          {/* モバイル：横スクロール / PC：縦並び */}
-          <div className="flex lg:flex-col gap-2 lg:gap-4 overflow-x-auto pb-2 lg:pb-0 lg:space-y-0 -mx-4 px-4 lg:mx-0 lg:px-0">
+          {/* モバイル・PC共に縦並び */}
+          <div className="flex flex-col gap-2 lg:gap-4">
             {mainMenuItems.map(item => (
               <button
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
-                className={`flex-shrink-0 h-12 lg:h-14 flex items-center gap-2 lg:gap-3 pl-0.5 lg:pl-1 pr-4 lg:pr-6 rounded-full transition-all relative ${
+                className={`w-full h-12 lg:h-14 flex items-center gap-2 lg:gap-3 pl-0.5 lg:pl-1 pr-4 lg:pr-6 rounded-full transition-all relative ${
                   activeSection === item.id
                     ? `bg-gradient-to-r ${item.gradient} shadow-lg`
                     : `bg-gradient-to-r ${item.gradient} opacity-80 hover:opacity-100 shadow-md`
@@ -768,7 +776,7 @@ export default function HostessManagementPage() {
             {/* 送迎車確認 */}
             <button
               onClick={() => setActiveSection('car')}
-              className={`flex-shrink-0 h-12 lg:h-14 flex items-center gap-2 lg:gap-3 pl-0.5 lg:pl-1 pr-4 lg:pr-6 rounded-full transition-all ${
+              className={`w-full h-12 lg:h-14 flex items-center gap-2 lg:gap-3 pl-0.5 lg:pl-1 pr-4 lg:pr-6 rounded-full transition-all ${
                 activeSection === 'car'
                   ? 'bg-gradient-to-r from-blue-500 to-cyan-500 shadow-lg'
                   : 'bg-gradient-to-r from-blue-500 to-cyan-500 opacity-80 hover:opacity-100 shadow-md'
@@ -1072,13 +1080,14 @@ export default function HostessManagementPage() {
                         </Button>
                         <div className="flex items-center gap-2">
                           <ArrowUpDown className="w-4 h-4 text-gray-500" />
-                          <Select value={customerSortKey} onValueChange={(value: 'memberNumber' | 'customerName' | 'lastVisitDate' | 'latestMemoDate') => setCustomerSortKey(value)}>
+                          <Select value={customerSortKey} onValueChange={(value: 'customerNumber' | 'memberNumber' | 'customerName' | 'lastVisitDate' | 'latestMemoDate') => setCustomerSortKey(value)}>
                             <SelectTrigger className="w-[180px] h-9 text-sm">
                               <SelectValue placeholder="並び替え" />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="lastVisitDate">最終来店日順</SelectItem>
                               <SelectItem value="latestMemoDate">最新メモ日付順</SelectItem>
+                              <SelectItem value="customerNumber">顧客番号順</SelectItem>
                               <SelectItem value="memberNumber">会員番号順</SelectItem>
                               <SelectItem value="customerName">名前順</SelectItem>
                             </SelectContent>
@@ -1191,6 +1200,7 @@ export default function HostessManagementPage() {
                                         <Plus className="w-3 h-3" />あだ名
                                       </button>
                                     )}
+                                    <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded font-mono font-semibold">{customer.customerNumber}</span>
                                     <span className="text-xs bg-purple-600 text-white px-2 py-0.5 rounded font-mono font-semibold">{customer.memberNumber}</span>
                                   </div>
                                   <div className="flex items-center gap-2 text-xs text-gray-500 flex-wrap mt-1">
