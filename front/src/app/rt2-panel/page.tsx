@@ -128,9 +128,10 @@ export default function RT2Panel() {
   const [pricePopoverCastId, setPricePopoverCastId] = useState<string | null>(null);
   const [pricePopoverPosition, setPricePopoverPosition] = useState<{ top: number; left: number } | null>(null);
   const [nominationType, setNominationType] = useState<'free' | 'panel' | 'honshimei'>('free');
-  const [transportFee, setTransportFee] = useState<number>(2000);
-  const [locationType, setLocationType] = useState<'love_hotel' | 'city_hotel' | 'home'>('love_hotel');
-  const [discountType, setDiscountType] = useState<'none' | '1000off' | '2000off' | '10percent'>('none');
+  const [transportFeeInput, setTransportFeeInput] = useState<string>('2');  // 1000円単位（表示値）
+  const [specialNominationFee, setSpecialNominationFee] = useState<string>(''); // 特別指名料
+  const [otherFees, setOtherFees] = useState<{ label: string; amount: string }[]>([]); // その他費用
+  const [discounts, setDiscounts] = useState<{ type: string; amount: string }[]>([{ type: 'none', amount: '' }]); // 動的割引
 
   // 選択されたキャストを取得
   const selectedCastForPrice = useMemo(() => {
@@ -146,27 +147,39 @@ export default function RT2Panel() {
     // 指名料金
     const nominationFee = nominationType === 'free' ? 0 : nominationType === 'panel' ? 1000 : 2000;
 
-    // 場所料金
-    const locationFee = locationType === 'love_hotel' ? 0 : locationType === 'city_hotel' ? 1000 : 0;
+    // 交通費（1000円単位）
+    const transportFee = (parseInt(transportFeeInput) || 0) * 1000;
+
+    // 特別指名料
+    const specialNomination = parseInt(specialNominationFee) || 0;
+
+    // その他費用合計
+    const otherFeesTotal = otherFees.reduce((sum, fee) => sum + (parseInt(fee.amount) || 0), 0);
 
     // 小計
-    const subtotal = baseFee + nominationFee + transportFee + locationFee;
+    const subtotal = baseFee + nominationFee + transportFee + specialNomination + otherFeesTotal;
 
-    // 割引計算
-    let discount = 0;
-    if (discountType === '1000off') discount = 1000;
-    else if (discountType === '2000off') discount = 2000;
-    else if (discountType === '10percent') discount = Math.floor(subtotal * 0.1);
+    // 割引計算（複数の割引を合計）
+    let totalDiscount = 0;
+    discounts.forEach(d => {
+      if (d.type === '1000off') totalDiscount += 1000;
+      else if (d.type === '2000off') totalDiscount += 2000;
+      else if (d.type === '3000off') totalDiscount += 3000;
+      else if (d.type === '5000off') totalDiscount += 5000;
+      else if (d.type === '10percent') totalDiscount += Math.floor(subtotal * 0.1);
+      else if (d.type === 'custom' && d.amount) totalDiscount += parseInt(d.amount) || 0;
+    });
 
     return {
       baseFee,
       nominationFee,
       transportFee,
-      locationFee,
-      discount,
-      total: subtotal - discount
+      specialNomination,
+      otherFeesTotal,
+      discount: totalDiscount,
+      total: subtotal - totalDiscount
     };
-  }, [nominationType, transportFee, locationType, discountType]);
+  }, [nominationType, transportFeeInput, specialNominationFee, otherFees, discounts]);
 
   // ポップオーバーを開く時に状態をリセット
   const openPricePopover = useCallback((castId: string) => {
@@ -180,9 +193,10 @@ export default function RT2Panel() {
       });
     }
     setNominationType('free');
-    setTransportFee(2000);
-    setLocationType('love_hotel');
-    setDiscountType('none');
+    setTransportFeeInput('2');
+    setSpecialNominationFee('');
+    setOtherFees([]);
+    setDiscounts([{ type: 'none', amount: '' }]);
     setPricePopoverCastId(castId);
   }, []);
 
@@ -914,13 +928,13 @@ export default function RT2Panel() {
           />
           {/* ポップオーバー本体 */}
           <div
-            className="fixed z-50 w-72 bg-white rounded-md shadow-lg border"
+            className="fixed z-50 w-80 bg-white rounded-md shadow-lg border max-h-[90vh] overflow-y-auto"
             style={{
-              top: `${pricePopoverPosition.top}px`,
+              top: `${Math.min(pricePopoverPosition.top, window.innerHeight - 500)}px`,
               left: `${pricePopoverPosition.left}px`
             }}
           >
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-2 flex items-center justify-between rounded-t-md">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-2 flex items-center justify-between rounded-t-md sticky top-0">
               <span className="font-bold text-sm">料金計算 - {selectedCastForPrice.name}</span>
               <button onClick={closePricePopover} className="hover:bg-blue-500 rounded p-0.5">
                 <X className="w-4 h-4" />
@@ -946,53 +960,189 @@ export default function RT2Panel() {
                 </RadioGroup>
               </div>
 
-              {/* 交通費 */}
+              {/* 交通費（1000円単位） */}
               <div>
-                <Label className="text-xs font-bold text-gray-700 mb-1.5 block">交通費</Label>
+                <Label className="text-xs font-bold text-gray-700 mb-1.5 block">交通費（1000円単位）</Label>
                 <div className="flex items-center gap-2">
                   <Input
-                    type="number"
-                    value={transportFee}
-                    onChange={(e) => setTransportFee(Number(e.target.value))}
-                    className="h-7 text-xs w-24"
+                    type="text"
+                    inputMode="numeric"
+                    value={transportFeeInput}
+                    onFocus={(e) => {
+                      if (e.target.value === '0') {
+                        setTransportFeeInput('');
+                      }
+                    }}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      setTransportFeeInput(val);
+                    }}
+                    className="h-7 text-xs w-16 text-right"
+                    placeholder="0"
+                  />
+                  <span className="text-xs text-gray-600">× 1,000円 = ¥{((parseInt(transportFeeInput) || 0) * 1000).toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* 特別指名料 */}
+              <div>
+                <Label className="text-xs font-bold text-gray-700 mb-1.5 block">特別指名料</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    value={specialNominationFee}
+                    onFocus={(e) => {
+                      if (e.target.value === '0') {
+                        setSpecialNominationFee('');
+                      }
+                    }}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      setSpecialNominationFee(val);
+                    }}
+                    className="h-7 text-xs w-24 text-right"
+                    placeholder="0"
                   />
                   <span className="text-xs text-gray-600">円</span>
                 </div>
               </div>
 
-              {/* 場所選択 */}
+              {/* その他費用 */}
               <div>
-                <Label className="text-xs font-bold text-gray-700 mb-1.5 block">場所</Label>
-                <RadioGroup value={locationType} onValueChange={(v) => setLocationType(v as typeof locationType)} className="flex flex-wrap gap-2">
-                  <div className="flex items-center">
-                    <RadioGroupItem value="love_hotel" id="price-love" className="w-3 h-3" />
-                    <Label htmlFor="price-love" className="text-xs ml-1 cursor-pointer">ラブホテル</Label>
-                  </div>
-                  <div className="flex items-center">
-                    <RadioGroupItem value="city_hotel" id="price-city" className="w-3 h-3" />
-                    <Label htmlFor="price-city" className="text-xs ml-1 cursor-pointer">シティホテル</Label>
-                  </div>
-                  <div className="flex items-center">
-                    <RadioGroupItem value="home" id="price-home" className="w-3 h-3" />
-                    <Label htmlFor="price-home" className="text-xs ml-1 cursor-pointer">自宅</Label>
-                  </div>
-                </RadioGroup>
+                <Label className="text-xs font-bold text-gray-700 mb-1.5 block">その他（キャンセル料等）</Label>
+                <div className="space-y-2">
+                  {otherFees.map((fee, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input
+                        type="text"
+                        value={fee.label}
+                        onChange={(e) => {
+                          const newFees = [...otherFees];
+                          newFees[index].label = e.target.value;
+                          setOtherFees(newFees);
+                        }}
+                        className="h-7 text-xs flex-1"
+                        placeholder="項目名"
+                      />
+                      <Input
+                        type="text"
+                        inputMode="numeric"
+                        value={fee.amount}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            const newFees = [...otherFees];
+                            newFees[index].amount = '';
+                            setOtherFees(newFees);
+                          }
+                        }}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/[^0-9]/g, '');
+                          const newFees = [...otherFees];
+                          newFees[index].amount = val;
+                          setOtherFees(newFees);
+                        }}
+                        className="h-7 text-xs w-20 text-right"
+                        placeholder="金額"
+                      />
+                      <span className="text-xs text-gray-600">円</span>
+                      <button
+                        onClick={() => {
+                          const newFees = otherFees.filter((_, i) => i !== index);
+                          setOtherFees(newFees);
+                        }}
+                        className="text-red-500 hover:text-red-700 p-1"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-6 text-xs w-full"
+                    onClick={() => setOtherFees([...otherFees, { label: '', amount: '' }])}
+                  >
+                    + その他費用を追加
+                  </Button>
+                </div>
               </div>
 
-              {/* 割引 */}
+              {/* 割引（動的に増える） */}
               <div>
                 <Label className="text-xs font-bold text-gray-700 mb-1.5 block">割引</Label>
-                <Select value={discountType} onValueChange={(v) => setDiscountType(v as typeof discountType)}>
-                  <SelectTrigger className="h-7 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">割引なし</SelectItem>
-                    <SelectItem value="1000off">1,000円引き</SelectItem>
-                    <SelectItem value="2000off">2,000円引き</SelectItem>
-                    <SelectItem value="10percent">10%OFF</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  {discounts.map((discount, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Select
+                        value={discount.type}
+                        onValueChange={(v) => {
+                          const newDiscounts = [...discounts];
+                          newDiscounts[index].type = v;
+                          newDiscounts[index].amount = '';
+                          // 割引が選択されたら次の割引欄を追加
+                          if (v !== 'none' && index === discounts.length - 1) {
+                            newDiscounts.push({ type: 'none', amount: '' });
+                          }
+                          setDiscounts(newDiscounts);
+                        }}
+                      >
+                        <SelectTrigger className="h-7 text-xs flex-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">割引なし</SelectItem>
+                          <SelectItem value="1000off">1,000円引き</SelectItem>
+                          <SelectItem value="2000off">2,000円引き</SelectItem>
+                          <SelectItem value="3000off">3,000円引き</SelectItem>
+                          <SelectItem value="5000off">5,000円引き</SelectItem>
+                          <SelectItem value="10percent">10%OFF</SelectItem>
+                          <SelectItem value="custom">金額入力</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {discount.type === 'custom' && (
+                        <div className="flex items-center gap-1">
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            value={discount.amount}
+                            onFocus={(e) => {
+                              if (e.target.value === '0') {
+                                const newDiscounts = [...discounts];
+                                newDiscounts[index].amount = '';
+                                setDiscounts(newDiscounts);
+                              }
+                            }}
+                            onChange={(e) => {
+                              const val = e.target.value.replace(/[^0-9]/g, '');
+                              const newDiscounts = [...discounts];
+                              newDiscounts[index].amount = val;
+                              // 金額が入力されたら次の割引欄を追加
+                              if (val && index === discounts.length - 1) {
+                                newDiscounts.push({ type: 'none', amount: '' });
+                              }
+                              setDiscounts(newDiscounts);
+                            }}
+                            className="h-7 text-xs w-20 text-right"
+                            placeholder="0"
+                          />
+                          <span className="text-xs text-gray-600">円</span>
+                        </div>
+                      )}
+                      {index > 0 && (
+                        <button
+                          onClick={() => {
+                            const newDiscounts = discounts.filter((_, i) => i !== index);
+                            setDiscounts(newDiscounts);
+                          }}
+                          className="text-red-500 hover:text-red-700 p-1"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* 料金明細 */}
@@ -1009,10 +1159,16 @@ export default function RT2Panel() {
                   <span>交通費</span>
                   <span>¥{calculateTotal.transportFee.toLocaleString()}</span>
                 </div>
-                {calculateTotal.locationFee > 0 && (
+                {calculateTotal.specialNomination > 0 && (
                   <div className="flex justify-between text-xs text-gray-600">
-                    <span>場所料金</span>
-                    <span>¥{calculateTotal.locationFee.toLocaleString()}</span>
+                    <span>特別指名料</span>
+                    <span>¥{calculateTotal.specialNomination.toLocaleString()}</span>
+                  </div>
+                )}
+                {calculateTotal.otherFeesTotal > 0 && (
+                  <div className="flex justify-between text-xs text-gray-600">
+                    <span>その他</span>
+                    <span>¥{calculateTotal.otherFeesTotal.toLocaleString()}</span>
                   </div>
                 )}
                 {calculateTotal.discount > 0 && (
@@ -1026,6 +1182,18 @@ export default function RT2Panel() {
                   <span className="text-blue-600">¥{calculateTotal.total.toLocaleString()}</span>
                 </div>
               </div>
+
+              {/* 起票ボタン */}
+              <Button
+                className="w-full h-12 text-lg font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg"
+                onClick={() => {
+                  // 起票処理（将来的に実装）
+                  alert(`起票完了\n総額: ¥${calculateTotal.total.toLocaleString()}`);
+                  closePricePopover();
+                }}
+              >
+                起票する
+              </Button>
             </div>
           </div>
         </>
