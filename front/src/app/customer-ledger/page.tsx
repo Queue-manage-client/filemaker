@@ -272,7 +272,7 @@ export default function CustomerLedger() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-0.5">
+    <div className="min-h-screen bg-pink-100 p-0.5">
       {/* ヘッダー */}
       <div className="bg-white p-1 mb-0">
         <div>
@@ -464,21 +464,6 @@ export default function CustomerLedger() {
             {/* ヘブンネット */}
             <div className="w-28 h-6 px-1 text-xs flex items-center border border-gray-400 bg-white">ヘブンネット</div>
 
-            {/* VIP Gold Platinum チェックボックス */}
-            <div className="flex items-center gap-2 text-xs">
-              <label className="flex items-center gap-1">
-                <input type="checkbox" className="w-3 h-3" />
-                <span>VIP</span>
-              </label>
-              <label className="flex items-center gap-1">
-                <input type="checkbox" className="w-3 h-3" />
-                <span>Gold</span>
-              </label>
-              <label className="flex items-center gap-1">
-                <input type="checkbox" className="w-3 h-3" />
-                <span>Platinum</span>
-              </label>
-            </div>
 
             {/* 空白フィールド（長い） */}
             <div className="w-32 h-6 border border-gray-400 bg-white"></div>
@@ -522,19 +507,19 @@ export default function CustomerLedger() {
             </TabsList>
             
             {/* 基本情報タブ */}
-            <TabsContent value="basic-info" className="mt-0 p-2 border border-gray-400 border-t-0 text-xs">
-              <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.3fr_1fr] gap-0">
+            <TabsContent value="basic-info" className="mt-0 p-2 border border-gray-400 border-t-0 text-xs bg-pink-50">
+              <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.4fr_1fr] gap-2">
                 
                 {/* 左カラム - 基本情報入力エリア */}
-                <div className="space-y-0">
-                  
+                <div className="space-y-0 bg-white rounded p-2 border border-gray-300">
+
                   {/* 電話番号（複数欄） */}
                   <div className="p-1 space-y-1">
                     <div className="flex items-center gap-2">
-                      <Label className="text-xs font-semibold whitespace-nowrap">電話番号</Label>
-                      <Input 
-                        placeholder="080-1234-5678" 
-                        className="flex-1 h-7 text-xs border-gray-500"
+                      <Label className="text-xs font-semibold whitespace-nowrap w-16">電話番号</Label>
+                      <Input
+                        placeholder="080-1234-5678"
+                        className="w-36 h-7 text-xs border-gray-500 bg-white"
                       />
                       <Button variant="outline" size="sm" className="h-7 text-xs whitespace-nowrap">
                         同一電話番号登録G1
@@ -542,10 +527,10 @@ export default function CustomerLedger() {
                       <span className="text-xs">0件</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-12"></div>
-                      <Input 
-                        placeholder="050-1234-5678" 
-                        className="flex-1 h-7 text-xs border-gray-500"
+                      <div className="w-16"></div>
+                      <Input
+                        placeholder="050-1234-5678"
+                        className="w-36 h-7 text-xs border-gray-500 bg-white"
                       />
                       <Button variant="outline" size="sm" className="h-7 text-xs whitespace-nowrap">
                         同一電話番号登録G2
@@ -553,10 +538,10 @@ export default function CustomerLedger() {
                       <span className="text-xs">0件</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-12"></div>
-                      <Input 
-                        placeholder="050-1234-5678" 
-                        className="flex-1 h-7 text-xs border-gray-500"
+                      <div className="w-16"></div>
+                      <Input
+                        placeholder="050-1234-5678"
+                        className="w-36 h-7 text-xs border-gray-500 bg-white"
                       />
                       <span className="text-green-600 text-xs cursor-pointer">🔄 同一電話番号</span>
                       <span className="text-xs">0件</span>
@@ -567,7 +552,7 @@ export default function CustomerLedger() {
                   <div className="p-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-16">Webmail</Label>
-                      <Input className="flex-1 h-7 text-xs border-gray-500" type="email" placeholder="" />
+                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" type="email" placeholder="" />
                       <label className="flex items-center gap-1 text-xs whitespace-nowrap">
                         <input type="checkbox" className="w-3 h-3" />
                         Web登録
@@ -575,11 +560,11 @@ export default function CustomerLedger() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-16">携帯メール</Label>
-                      <Input className="flex-1 h-7 text-xs border-gray-500" type="email" placeholder="" />
+                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" type="email" placeholder="" />
                     </div>
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-16">PCメール</Label>
-                      <Input className="flex-1 h-7 text-xs border-gray-500" type="email" placeholder="" />
+                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" type="email" placeholder="" />
                     </div>
                   </div>
 
@@ -610,46 +595,46 @@ export default function CustomerLedger() {
                   <div className="p-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-16">郵便番号</Label>
-                      <Input className="w-24 h-7 text-xs border-gray-500" placeholder="" />
+                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
                       <Button variant="outline" size="sm" className="h-7 text-xs">
                         住所検索
                       </Button>
                     </div>
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-16">市区町村</Label>
-                      <Input className="flex-1 h-7 text-xs border-gray-500" placeholder="" />
+                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
                     </div>
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-16">町丁番地</Label>
-                      <Input className="flex-1 h-7 text-xs border-gray-500" placeholder="" />
+                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
                     </div>
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-16">番地</Label>
-                      <Input className="flex-1 h-7 text-xs border-gray-500" placeholder="" />
+                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
                     </div>
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-16">建物名他</Label>
-                      <Input className="flex-1 h-7 text-xs border-gray-500" placeholder="" />
+                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
                       <Label className="text-xs font-semibold">号室</Label>
-                      <Input className="w-16 h-7 text-xs border-gray-500" placeholder="" />
+                      <Input className="w-16 h-7 text-xs border-gray-500 bg-white" placeholder="" />
                     </div>
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-16">京都市内住所</Label>
-                      <Input className="flex-1 h-7 text-xs border-gray-500" placeholder="" />
+                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
                     </div>
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-16">住所ふりがな</Label>
-                      <Input className="flex-1 h-7 text-xs border-gray-500" placeholder="" />
+                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
                     </div>
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-16">町ふりがな</Label>
-                      <Input className="flex-1 h-7 text-xs border-gray-500" placeholder="" />
+                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
                     </div>
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold w-16">住所備考</Label>
                     </div>
-                    <Textarea 
-                      className="min-h-[60px] text-xs border-gray-500"
+                    <Textarea
+                      className="min-h-[60px] text-xs border-gray-500 bg-white"
                       placeholder=""
                     />
                   </div>
@@ -657,10 +642,10 @@ export default function CustomerLedger() {
                   {/* 地区区分 */}
                   <div className="p-1 space-y-1">
                     <div className="flex items-center gap-2">
-                      <Label className="text-xs font-semibold">地域区分</Label>
-                      <Input className="w-16 h-7 text-xs border-gray-500" placeholder="滋賀" />
-                      <Input className="w-12 h-7 text-xs border-gray-500" placeholder="21" />
-                      <Input className="w-16 h-7 text-xs border-gray-500" placeholder="栗東" />
+                      <Label className="text-xs font-semibold w-16">地域区分</Label>
+                      <Input className="w-16 h-7 text-xs border-gray-500 bg-white" placeholder="滋賀" />
+                      <Input className="w-12 h-7 text-xs border-gray-500 bg-white" placeholder="21" />
+                      <Input className="w-16 h-7 text-xs border-gray-500 bg-white" placeholder="栗東" />
                     </div>
                   </div>
 
@@ -685,22 +670,22 @@ export default function CustomerLedger() {
                   {/* 交通費・利用場所 */}
                   <div className="p-1 space-y-1">
                     <div className="flex items-center gap-2">
-                      <Label className="text-xs font-semibold w-20">交通費</Label>
-                      <Input className="w-20 h-7 text-xs border-gray-500" type="number" placeholder="0" />
-                      <Label className="text-xs font-semibold">主な利用場所</Label>
-                      <Input className="flex-1 h-7 text-xs border-gray-500" placeholder="シティホテル" />
+                      <Label className="text-xs font-semibold w-16">交通費</Label>
+                      <Input className="w-20 h-7 text-xs border-gray-500 bg-white" type="number" placeholder="0" />
+                      <Label className="text-xs font-semibold">利用場所</Label>
+                      <Input className="w-24 h-7 text-xs border-gray-500 bg-white" placeholder="シティホテル" />
                     </div>
                     <div className="flex items-center gap-2">
-                      <Label className="text-xs font-semibold w-20">北緯</Label>
-                      <Input className="w-24 h-7 text-xs border-gray-500" type="number" step="0.0001" placeholder="" />
+                      <Label className="text-xs font-semibold w-16">北緯</Label>
+                      <Input className="w-24 h-7 text-xs border-gray-500 bg-white" type="number" step="0.0001" placeholder="" />
                       <Label className="text-xs font-semibold">東経</Label>
-                      <Input className="w-24 h-7 text-xs border-gray-500" type="number" step="0.0001" placeholder="" />
+                      <Input className="w-24 h-7 text-xs border-gray-500 bg-white" type="number" step="0.0001" placeholder="" />
                     </div>
                     <div className="flex items-center gap-2">
-                      <Label className="text-xs font-semibold w-20">ホテル備考</Label>
+                      <Label className="text-xs font-semibold w-16">ホテル備考</Label>
                     </div>
-                    <Textarea 
-                      className="min-h-[60px] text-xs border-gray-500"
+                    <Textarea
+                      className="min-h-[60px] text-xs border-gray-500 bg-white"
                       placeholder=""
                     />
                   </div>
@@ -808,7 +793,48 @@ export default function CustomerLedger() {
                 </div>
 
                 {/* 中央カラム - 好み情報 */}
-                <div className="space-y-0">
+                <div className="space-y-0 bg-white rounded p-2 border border-gray-300">
+
+                  {/* お客様メモ履歴（お客様との歴史） - 中央上部に配置 */}
+                  <div className="p-1 mb-3">
+                    <div className="border-2 border-orange-400 rounded bg-orange-50">
+                      <div className="bg-orange-400 text-white px-2 py-1 text-xs font-bold flex items-center justify-between">
+                        <span>📝 お客様メモ履歴（お客様との歴史）</span>
+                        <span className="text-orange-100">全{customerMemoHistory.length}件</span>
+                      </div>
+                      {/* メモ入力エリア */}
+                      <div className="p-2 border-b border-orange-300 bg-white">
+                        <div className="flex gap-2">
+                          <Textarea
+                            className="flex-1 min-h-[50px] text-xs border-orange-300 bg-white"
+                            placeholder="新しいメモを入力..."
+                            value={newMemo}
+                            onChange={e => setNewMemo(e.target.value)}
+                          />
+                          <Button
+                            size="sm"
+                            className="h-12 px-4 text-xs bg-orange-500 hover:bg-orange-600 text-white"
+                            onClick={addMemo}
+                          >
+                            追加
+                          </Button>
+                        </div>
+                      </div>
+                      {/* メモ履歴一覧 */}
+                      <div className="max-h-[200px] overflow-y-auto">
+                        {customerMemoHistory.map((memo, idx) => (
+                          <div key={memo.id} className={`p-2 border-b border-orange-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-orange-50'}`}>
+                            <div className="flex items-center justify-between text-[10px] text-gray-500 mb-1">
+                              <span className="font-semibold text-orange-700">{memo.date}</span>
+                              <span className="bg-orange-200 px-1.5 rounded text-orange-800">記入者: {memo.author}</span>
+                            </div>
+                            <div className="text-xs text-gray-800">{memo.content}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
                   {/* ペット */}
                   <div className="p-1 space-y-1">
                     <div className="flex items-center gap-4">
@@ -831,7 +857,7 @@ export default function CustomerLedger() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="h-7 text-xs"
+                      className="h-7 text-xs bg-white"
                       onClick={() => setShowCustomerStats(!showCustomerStats)}
                     >
                       顧客の統計
@@ -873,30 +899,12 @@ export default function CustomerLedger() {
                     )}
                   </div>
 
-                  {/* 履歴対象 */}
-                  <div className="p-1 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold">履歴対象:</span>
-                      <span className="text-xs">京都デリヘル俱楽部</span>
-                      <Button size="sm" variant="outline" className="h-6 text-xs ml-auto">全履歴表示</Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-6 text-xs"
-                        onClick={openPointHistoryWindow}
-                      >
-                        ポイント履歴
-                      </Button>
-                      <Button size="sm" variant="outline" className="h-6 text-xs">初期ポイント入力</Button>
-                    </div>
-                  </div>
-
                   {/* 好みタイプ・話し方・嫌いタイプ */}
                   <div className="p-1 space-y-1">
                     <div className="flex items-center gap-4">
                       <Label className="text-xs font-semibold">好みタイプ</Label>
                       <Input
-                        className="flex-1 h-7 text-xs border-gray-500"
+                        className="flex-1 h-7 text-xs border-gray-500 bg-white"
                         value={preferenceForm.favoriteType}
                         onChange={e => handlePreferenceChange('favoriteType', e.target.value)}
                         placeholder="巨乳"
@@ -904,66 +912,82 @@ export default function CustomerLedger() {
                     </div>
                     <div className="flex items-center gap-4">
                       <Label className="text-xs font-semibold">話し方</Label>
-                      <Input 
-                        className="w-20 h-7 text-xs border-gray-500" 
+                      <Input
+                        className="w-20 h-7 text-xs border-gray-500 bg-white"
                         value={preferenceForm.speakingStyle}
                         onChange={e => handlePreferenceChange('speakingStyle', e.target.value)}
                         placeholder="常連"
                       />
                       <Label className="text-xs font-semibold">嫌いタイプ</Label>
-                      <Input 
-                        className="flex-1 h-7 text-xs border-gray-500" 
+                      <Input
+                        className="flex-1 h-7 text-xs border-gray-500 bg-white"
                         value={preferenceForm.dislikedType}
                         onChange={e => handlePreferenceChange('dislikedType', e.target.value)}
                         placeholder=""
                       />
                     </div>
                   </div>
-                  
-                  {/* お客様メモ履歴（お客様との歴史） */}
-                  <div className="p-1">
-                    <div className="border-2 border-orange-400 rounded bg-orange-50">
-                      <div className="bg-orange-400 text-white px-2 py-1 text-xs font-bold flex items-center justify-between">
-                        <span>📝 お客様メモ履歴（お客様との歴史）</span>
-                        <span className="text-orange-100">全{customerMemoHistory.length}件</span>
+
+                  {/* 履歴対象ボタン - 接客履歴の上に配置 */}
+                  <div className="p-1 space-y-1 mb-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-semibold">履歴対象:</span>
+                      <span className="text-xs">京都デリヘル俱楽部</span>
+                      <div className="flex gap-1 ml-auto">
+                        <Button size="sm" variant="outline" className="h-7 text-xs bg-blue-100 border-blue-400 text-blue-800 hover:bg-blue-200">
+                          全履歴表示
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-xs bg-green-100 border-green-400 text-green-800 hover:bg-green-200"
+                          onClick={openPointHistoryWindow}
+                        >
+                          ポイント履歴
+                        </Button>
+                        <Button size="sm" variant="outline" className="h-7 text-xs bg-purple-100 border-purple-400 text-purple-800 hover:bg-purple-200">
+                          初期ポイント入力
+                        </Button>
                       </div>
-                      {/* メモ入力エリア */}
-                      <div className="p-2 border-b border-orange-300 bg-white">
-                        <div className="flex gap-2">
-                          <Textarea
-                            className="flex-1 min-h-[50px] text-xs border-orange-300"
-                            placeholder="新しいメモを入力..."
-                            value={newMemo}
-                            onChange={e => setNewMemo(e.target.value)}
-                          />
-                          <Button
-                            size="sm"
-                            className="h-12 px-4 text-xs bg-orange-500 hover:bg-orange-600 text-white"
-                            onClick={addMemo}
-                          >
-                            追加
-                          </Button>
-                        </div>
+                    </div>
+                  </div>
+
+                  {/* 接客履歴テーブル - 大きく表示 */}
+                  <div className="p-1 mb-3">
+                    <div className="text-sm font-semibold text-blue-700 mb-2 flex items-center gap-2">
+                      <span>📅 接客履歴（接客日一覧）</span>
+                      <span className="text-xs font-normal text-gray-500">全{filteredHistory.length}件</span>
+                    </div>
+                    <div className="border-2 border-blue-400 rounded overflow-hidden">
+                      {/* テーブルヘッダー */}
+                      <div className="bg-blue-500 text-white grid grid-cols-6 text-xs border-b border-blue-400 font-semibold">
+                        <div className="px-3 py-2 border-r border-blue-400">接客日</div>
+                        <div className="px-3 py-2 border-r border-blue-400">ホステス名</div>
+                        <div className="px-3 py-2 border-r border-blue-400">コース名</div>
+                        <div className="px-3 py-2 border-r border-blue-400">時間</div>
+                        <div className="px-3 py-2 border-r border-blue-400">延長</div>
+                        <div className="px-3 py-2">派遣場所</div>
                       </div>
-                      {/* メモ履歴一覧 */}
-                      <div className="max-h-[180px] overflow-y-auto">
-                        {customerMemoHistory.map((memo, idx) => (
-                          <div key={memo.id} className={`p-2 border-b border-orange-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-orange-50'}`}>
-                            <div className="flex items-center justify-between text-[10px] text-gray-500 mb-1">
-                              <span className="font-semibold text-orange-700">{memo.date}</span>
-                              <span className="bg-orange-200 px-1.5 rounded text-orange-800">記入者: {memo.author}</span>
-                            </div>
-                            <div className="text-xs text-gray-800">{memo.content}</div>
+                      {/* テーブルボディ - 大きく表示 */}
+                      <div className="max-h-[400px] overflow-y-auto bg-white">
+                        {filteredHistory.map((history, idx) => (
+                          <div key={history.id} className={`grid grid-cols-6 text-sm border-b border-gray-200 hover:bg-blue-50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                            <div className="px-3 py-2 border-r border-gray-200 font-medium">{history.date}</div>
+                            <div className="px-3 py-2 border-r border-gray-200">{history.staffName}</div>
+                            <div className="px-3 py-2 border-r border-gray-200">{history.category}</div>
+                            <div className="px-3 py-2 border-r border-gray-200">{history.startTime}</div>
+                            <div className="px-3 py-2 border-r border-gray-200">{history.endTime || '-'}</div>
+                            <div className="px-3 py-2">{history.storeName}</div>
                           </div>
                         ))}
                       </div>
                     </div>
                   </div>
 
-                  {/* プロフィール・移行 と 履歴テーブル を横並び */}
+                  {/* プロフィール・移行 と 領収証 を横並び */}
                   <div className="p-1">
                     <div className="flex gap-4">
-                      {/* 左側: プロフィール・移行・領収証・地元出張 */}
+                      {/* 左側: プロフィール・移行 */}
                       <div className="w-56 space-y-3">
                         {/* プロフィール・移行 */}
                         <div>
@@ -971,12 +995,12 @@ export default function CustomerLedger() {
                             <span className="text-xs font-semibold">プロフィール</span>
                             <span className="text-xs font-semibold ml-auto">移行</span>
                             <Input
-                              className="w-12 h-6 text-xs border-gray-500 ml-1"
+                              className="w-12 h-6 text-xs border-gray-500 bg-white ml-1"
                               placeholder=""
                             />
                           </div>
                           <Textarea
-                            className="w-full min-h-[100px] text-xs border-gray-500 mt-1"
+                            className="w-full min-h-[100px] text-xs border-gray-500 mt-1 bg-white"
                             defaultValue="マ、ブ、50代、？、？、優しい、なし、巨乳・攻め○、なし、ローション"
                           />
                         </div>
@@ -985,7 +1009,7 @@ export default function CustomerLedger() {
                         <div>
                           <Label className="text-xs font-semibold">領収証宛先</Label>
                           <Input
-                            className="h-7 text-xs border-gray-500 mt-1"
+                            className="h-7 text-xs border-gray-500 mt-1 bg-white"
                             value={receiptForm.recipient}
                             onChange={e => handleReceiptChange('recipient', e.target.value)}
                             placeholder=""
@@ -996,7 +1020,7 @@ export default function CustomerLedger() {
                         <div>
                           <Label className="text-xs font-semibold">領収証但書</Label>
                           <Input
-                            className="h-7 text-xs border-gray-500 mt-1"
+                            className="h-7 text-xs border-gray-500 mt-1 bg-white"
                             value={receiptForm.note}
                             onChange={e => handleReceiptChange('note', e.target.value)}
                             placeholder=""
@@ -1019,38 +1043,6 @@ export default function CustomerLedger() {
                           </label>
                         </div>
                       </div>
-
-                      {/* 右側: 接客履歴テーブル */}
-                      <div className="flex-1">
-                        <div className="text-xs font-semibold text-blue-700 mb-1">📅 接客履歴（接客日一覧）</div>
-                        <div className="border border-gray-500">
-                          {/* テーブルヘッダー */}
-                          <div className="bg-blue-100 grid grid-cols-6 text-xs border-b border-gray-500 font-semibold">
-                            <div className="px-2 py-1 border-r border-gray-400 text-blue-800">接客日</div>
-                            <div className="px-2 py-1 border-r border-gray-400">ホステス名</div>
-                            <div className="px-2 py-1 border-r border-gray-400">コース名</div>
-                            <div className="px-2 py-1 border-r border-gray-400">時間</div>
-                            <div className="px-2 py-1 border-r border-gray-400">延長</div>
-                            <div className="px-2 py-1">派遣場所</div>
-                          </div>
-                          {/* テーブルボディ */}
-                          <div className="max-h-[300px] overflow-y-auto">
-                            {filteredHistory.map((history) => (
-                              <div key={history.id} className="grid grid-cols-6 text-xs border-b border-gray-300 hover:bg-gray-50">
-                                <div className="px-2 py-1 border-r border-gray-300">{history.date}</div>
-                                <div className="px-2 py-1 border-r border-gray-300">{history.staffName}</div>
-                                <div className="px-2 py-1 border-r border-gray-300">{history.category}</div>
-                                <div className="px-2 py-1 border-r border-gray-300">{history.startTime}</div>
-                                <div className="px-2 py-1 border-r border-gray-300">{history.endTime}</div>
-                                <div className="px-2 py-1">{history.storeName}</div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="text-red-600 text-xs font-semibold mt-1">
-                          ※ 2017年以降の履歴になります。
-                        </div>
-                      </div>
                     </div>
                   </div>
 
@@ -1066,78 +1058,99 @@ export default function CustomerLedger() {
                     </div>
                   </div>
 
-                  {/* ホステス→顧客NG / 顧客→ホステスNG / アドレス交換 */}
-                  <div className="p-1">
-                    <div className="flex gap-2">
+                  {/* ホステス→顧客NG / 顧客→ホステスNG / アドレス交換 - 27インチディスプレイ最適化 */}
+                  <div className="p-1 mt-4">
+                    <div className="grid grid-cols-3 gap-3">
                       {/* 左側：ホステス→顧客NG */}
-                      <div className="flex-1">
-                        <div className="text-xs font-semibold text-center mb-1 border-b border-gray-400 pb-1">ホステス→顧客NG</div>
-                        <div className="flex border border-gray-400">
-                          <div className="flex-1 flex flex-col">
-                            {/* 白とピンクの交互行 */}
-                            <div className="h-6 bg-white border-b border-gray-300"></div>
-                            <div className="h-6 bg-pink-200 border-b border-gray-300"></div>
-                            <div className="h-6 bg-white border-b border-gray-300"></div>
-                            <div className="h-6 bg-pink-200 border-b border-gray-300"></div>
-                            <div className="h-6 bg-white border-b border-gray-300"></div>
-                            <div className="h-6 bg-yellow-100"></div>
-                          </div>
-                          {/* スクロールバー */}
-                          <div className="w-4 border-l border-gray-300 flex flex-col bg-gray-100">
-                            <div className="h-4 flex items-center justify-center text-xs bg-gray-200 border-b border-gray-300">▲</div>
-                            <div className="flex-1"></div>
-                            <div className="h-4 flex items-center justify-center text-xs bg-gray-200 border-t border-gray-300">▼</div>
-                          </div>
+                      <div className="border-2 border-pink-400 rounded overflow-hidden">
+                        <div className="bg-pink-500 text-white text-sm font-bold text-center py-2">
+                          🚫 ホステス→顧客NG
+                        </div>
+                        <div className="max-h-[250px] overflow-y-auto bg-white">
+                          {/* サンプルNGデータ */}
+                          {[
+                            { name: 'あみ', reason: '接客態度の問題', date: '2025/01/20' },
+                            { name: '彩羽', reason: '時間厳守できず', date: '2025/01/15' },
+                            { name: 'さち', reason: '顧客クレーム', date: '2025/01/10' },
+                          ].map((ng, idx) => (
+                            <div key={idx} className={`p-2 border-b border-pink-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-pink-50'}`}>
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-pink-700">{ng.name}</span>
+                                <span className="text-xs text-gray-500">{ng.date}</span>
+                              </div>
+                              <div className="text-xs text-gray-600 mt-1">{ng.reason}</div>
+                            </div>
+                          ))}
+                          {/* 空行 */}
+                          <div className="h-8 bg-pink-50 border-b border-pink-200"></div>
+                          <div className="h-8 bg-white border-b border-pink-200"></div>
+                          <div className="h-8 bg-pink-50"></div>
+                        </div>
+                        <div className="bg-pink-100 p-1 text-center">
+                          <Button size="sm" variant="outline" className="h-6 text-xs border-pink-400 text-pink-700">
+                            + NG追加
+                          </Button>
                         </div>
                       </div>
-                      
+
                       {/* 中央：顧客→ホステスNG */}
-                      <div className="flex-1">
-                        <div className="flex items-center justify-center mb-1 border-b border-gray-400 pb-1">
-                          <span className="text-xs font-semibold flex-1 text-center">顧客→ホステスNG</span>
-                          <span className="text-xs">く非</span>
+                      <div className="border-2 border-yellow-400 rounded overflow-hidden">
+                        <div className="bg-yellow-500 text-white text-sm font-bold text-center py-2 flex items-center justify-center gap-2">
+                          <span>⚠️ 顧客→ホステスNG</span>
+                          <span className="text-xs bg-yellow-600 px-1 rounded">非表示</span>
                         </div>
-                        <div className="flex border border-gray-400">
-                          <div className="flex-1 flex flex-col">
-                            {/* 白と黄色の交互行 */}
-                            <div className="h-6 bg-white border-b border-gray-300"></div>
-                            <div className="h-6 bg-yellow-100 border-b border-gray-300"></div>
-                            <div className="h-6 bg-white border-b border-gray-300"></div>
-                            <div className="h-6 bg-yellow-100 border-b border-gray-300"></div>
-                            <div className="h-6 bg-white border-b border-gray-300"></div>
-                            <div className="h-6 bg-yellow-100"></div>
-                          </div>
-                          {/* スクロールバー */}
-                          <div className="w-4 border-l border-gray-300 flex flex-col bg-gray-100">
-                            <div className="h-4 flex items-center justify-center text-xs bg-gray-200 border-b border-gray-300">▲</div>
-                            <div className="flex-1"></div>
-                            <div className="h-4 flex items-center justify-center text-xs bg-gray-200 border-t border-gray-300">▼</div>
-                          </div>
+                        <div className="max-h-[250px] overflow-y-auto bg-white">
+                          {/* サンプルNGデータ */}
+                          {[
+                            { name: 'あいめ', reason: '指名拒否希望', date: '2025/01/22' },
+                            { name: 'かきな', reason: '相性が合わない', date: '2025/01/18' },
+                          ].map((ng, idx) => (
+                            <div key={idx} className={`p-2 border-b border-yellow-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-yellow-50'}`}>
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-yellow-700">{ng.name}</span>
+                                <span className="text-xs text-gray-500">{ng.date}</span>
+                              </div>
+                              <div className="text-xs text-gray-600 mt-1">{ng.reason}</div>
+                            </div>
+                          ))}
+                          {/* 空行 */}
+                          <div className="h-8 bg-yellow-50 border-b border-yellow-200"></div>
+                          <div className="h-8 bg-white border-b border-yellow-200"></div>
+                          <div className="h-8 bg-yellow-50 border-b border-yellow-200"></div>
+                          <div className="h-8 bg-white"></div>
+                        </div>
+                        <div className="bg-yellow-100 p-1 text-center">
+                          <Button size="sm" variant="outline" className="h-6 text-xs border-yellow-400 text-yellow-700">
+                            + NG追加
+                          </Button>
                         </div>
                       </div>
-                      
+
                       {/* 右側：アドレス交換 */}
-                      <div className="w-40">
-                        <div className="text-xs font-semibold mb-1">アドレス交換</div>
-                        <div className="flex items-center gap-1 mb-1">
-                          <div className="w-16 h-6 bg-cyan-200 border border-gray-400"></div>
-                          <span className="text-xs">&lt;</span>
+                      <div className="border-2 border-cyan-400 rounded overflow-hidden">
+                        <div className="bg-cyan-500 text-white text-sm font-bold text-center py-2">
+                          📧 アドレス交換
                         </div>
-                        <div className="flex border border-gray-400">
-                          <div className="flex-1 flex flex-col">
-                            <div className="h-6 bg-white border-b border-gray-300"></div>
-                            <div className="h-6 bg-white border-b border-gray-300"></div>
-                            <div className="h-6 bg-white border-b border-gray-300"></div>
-                            <div className="h-6 bg-white border-b border-gray-300"></div>
-                            <div className="h-6 bg-white border-b border-gray-300"></div>
-                            <div className="h-6 bg-white"></div>
-                          </div>
-                          {/* スクロールバー */}
-                          <div className="w-4 border-l border-gray-300 flex flex-col bg-gray-100">
-                            <div className="h-4 flex items-center justify-center text-xs bg-gray-200 border-b border-gray-300">▲</div>
-                            <div className="flex-1"></div>
-                            <div className="h-4 flex items-center justify-center text-xs bg-gray-200 border-t border-gray-300">▼</div>
-                          </div>
+                        <div className="p-2 bg-cyan-50 border-b border-cyan-200">
+                          <Input className="h-7 text-xs bg-white border-cyan-300" placeholder="検索..." />
+                        </div>
+                        <div className="max-h-[200px] overflow-y-auto bg-white">
+                          {/* サンプルアドレス交換データ */}
+                          {[
+                            { name: 'あみ', exchangeDate: '2025/01/25' },
+                            { name: '彩羽', exchangeDate: '2025/01/20' },
+                          ].map((addr, idx) => (
+                            <div key={idx} className={`p-2 border-b border-cyan-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-cyan-50'}`}>
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium">{addr.name}</span>
+                                <span className="text-xs text-gray-500">{addr.exchangeDate}</span>
+                              </div>
+                            </div>
+                          ))}
+                          {/* 空行 */}
+                          <div className="h-8 bg-cyan-50 border-b border-cyan-200"></div>
+                          <div className="h-8 bg-white border-b border-cyan-200"></div>
+                          <div className="h-8 bg-cyan-50"></div>
                         </div>
                       </div>
                     </div>
@@ -1168,9 +1181,6 @@ export default function CustomerLedger() {
                       </Button>
                       <Label className="text-xs font-semibold">出勤予定日:</Label>
                       <Input className="flex-1 h-7 text-xs border-gray-500" placeholder="2025年08月27日" />
-                    </div>
-                    <div className="text-red-600 text-xs font-semibold">
-                      ※ 2017年以降の履歴になります。
                     </div>
                     <div className="flex items-center gap-2">
                       <Button size="sm" variant="outline" className="h-7 text-xs bg-green-100 border-green-400">
