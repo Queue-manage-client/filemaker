@@ -28,7 +28,7 @@ export default function PointHistoryWindow() {
     pointAcquired: '680',
     pointUsed: '',
     remarks: '',
-    expirationOption: '1year' as 'unlimited' | '6months' | '1year' | '2years' | 'custom',
+    expirationOption: '1year' as 'unlimited' | '3months' | '6months' | '1year' | 'custom',
     expirationDate: ''
   });
 
@@ -395,6 +395,17 @@ export default function PointHistoryWindow() {
                       <input
                         type="radio"
                         name="expiration"
+                        value="3months"
+                        checked={formData.expirationOption === '3months'}
+                        onChange={() => handleFormChange('expirationOption', '3months')}
+                        className="w-4 h-4"
+                      />
+                      3ヶ月
+                    </label>
+                    <label className="flex items-center gap-1 text-sm">
+                      <input
+                        type="radio"
+                        name="expiration"
                         value="6months"
                         checked={formData.expirationOption === '6months'}
                         onChange={() => handleFormChange('expirationOption', '6months')}
@@ -412,17 +423,6 @@ export default function PointHistoryWindow() {
                         className="w-4 h-4"
                       />
                       1年
-                    </label>
-                    <label className="flex items-center gap-1 text-sm">
-                      <input
-                        type="radio"
-                        name="expiration"
-                        value="2years"
-                        checked={formData.expirationOption === '2years'}
-                        onChange={() => handleFormChange('expirationOption', '2years')}
-                        className="w-4 h-4"
-                      />
-                      2年
                     </label>
                     <label className="flex items-center gap-1 text-sm">
                       <input

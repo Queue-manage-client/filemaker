@@ -440,7 +440,7 @@ export default function CustomerLedger() {
             <span className="text-xs ml-2">京都ホテル俱楽部</span>
 
             {/* L */}
-            <div className="w-6 h-6 bg-black text-white text-xs font-bold flex items-center justify-center border border-gray-400">L</div>
+            <div className="w-8 h-8 bg-purple-600 text-white text-sm font-bold flex items-center justify-center border border-purple-800 rounded">L</div>
 
             {/* 空白フィールド */}
             <div className="w-48 border border-gray-400 bg-white h-6"></div>
