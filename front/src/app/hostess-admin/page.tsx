@@ -18,6 +18,7 @@ import {
   Trash2,
   Settings,
   MessageSquare,
+  Mail,
   User,
   Store,
   Calendar,
@@ -97,7 +98,8 @@ export default function HostessAdminPage() {
       thisMonthSales: 850000,
       nominations: 15,
       rank: 3,
-      lineNotification: true,
+      lineNotification: false,
+      emailNotification: true,
       lastLogin: '2026-02-14 10:30',
     },
     {
@@ -110,7 +112,8 @@ export default function HostessAdminPage() {
       thisMonthSales: 920000,
       nominations: 18,
       rank: 1,
-      lineNotification: true,
+      lineNotification: false,
+      emailNotification: true,
       lastLogin: '2026-02-14 09:15',
     },
     {
@@ -124,6 +127,7 @@ export default function HostessAdminPage() {
       nominations: 12,
       rank: 5,
       lineNotification: false,
+      emailNotification: false,
       lastLogin: '2026-02-13 22:00',
     },
     {
@@ -136,7 +140,8 @@ export default function HostessAdminPage() {
       thisMonthSales: 450000,
       nominations: 8,
       rank: 12,
-      lineNotification: true,
+      lineNotification: false,
+      emailNotification: true,
       lastLogin: '2026-02-10 18:30',
     },
     {
@@ -149,7 +154,8 @@ export default function HostessAdminPage() {
       thisMonthSales: 680000,
       nominations: 10,
       rank: 7,
-      lineNotification: true,
+      lineNotification: false,
+      emailNotification: true,
       lastLogin: '2026-02-14 08:00',
     },
   ]);
@@ -218,6 +224,13 @@ export default function HostessAdminPage() {
   const toggleLineNotification = (castId: string) => {
     setCastList(prev => prev.map(cast =>
       cast.id === castId ? { ...cast, lineNotification: !cast.lineNotification } : cast
+    ));
+  };
+
+  // メール通知トグル
+  const toggleEmailNotification = (castId: string) => {
+    setCastList(prev => prev.map(cast =>
+      cast.id === castId ? { ...cast, emailNotification: !cast.emailNotification } : cast
     ));
   };
 
@@ -377,14 +390,26 @@ export default function HostessAdminPage() {
 
                       {/* アクションボタン */}
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        {/* LINE通知トグル */}
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg">
-                          <MessageSquare className="w-4 h-4 text-green-500" />
-                          <span className="text-xs text-gray-600 hidden sm:inline">LINE通知</span>
-                          <Switch
-                            checked={cast.lineNotification}
-                            onCheckedChange={() => toggleLineNotification(cast.id)}
-                          />
+                        {/* 通知トグル */}
+                        <div className="flex items-center gap-3 px-3 py-1.5 bg-gray-50 rounded-lg">
+                          {/* LINE通知 */}
+                          <div className="flex items-center gap-1.5">
+                            <MessageSquare className="w-4 h-4 text-green-500" />
+                            <span className="text-xs text-gray-600 hidden sm:inline">LINE</span>
+                            <Switch
+                              checked={cast.lineNotification}
+                              onCheckedChange={() => toggleLineNotification(cast.id)}
+                            />
+                          </div>
+                          {/* メール通知 */}
+                          <div className="flex items-center gap-1.5">
+                            <Mail className="w-4 h-4 text-blue-500" />
+                            <span className="text-xs text-gray-600 hidden sm:inline">メール</span>
+                            <Switch
+                              checked={cast.emailNotification}
+                              onCheckedChange={() => toggleEmailNotification(cast.id)}
+                            />
+                          </div>
                         </div>
 
                         {/* URLコピー */}
@@ -608,9 +633,45 @@ export default function HostessAdminPage() {
         {/* 設定 */}
         {activeTab === 'settings' && (
           <div className="space-y-4">
+            {/* 新規キャストのデフォルト設定 */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">LINE通知設定</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  新規キャストのデフォルト設定
+                  <span className="text-xs bg-amber-200 text-amber-700 px-2 py-0.5 rounded font-bold">初期値</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-amber-50 rounded-lg border border-amber-200">
+                  <div className="flex items-center gap-3">
+                    <MessageSquare className="w-5 h-5 text-green-500" />
+                    <div>
+                      <div className="font-medium">LINE通知</div>
+                      <div className="text-sm text-gray-500">新規登録時のLINE通知初期値（OFFを推奨）</div>
+                    </div>
+                  </div>
+                  <Switch defaultChecked={false} />
+                </div>
+                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-5 h-5 text-blue-500" />
+                    <div>
+                      <div className="font-medium">メール通知</div>
+                      <div className="text-sm text-gray-500">新規登録時のメール通知初期値</div>
+                    </div>
+                  </div>
+                  <Switch defaultChecked={false} />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* LINE通知設定 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-green-500" />
+                  LINE通知設定
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
@@ -632,7 +693,47 @@ export default function HostessAdminPage() {
                     <div className="font-medium">出勤確認リマインド</div>
                     <div className="text-sm text-gray-500">出勤日の朝に確認リマインドを送信</div>
                   </div>
-                  <Switch />
+                  <Switch defaultChecked={false} />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* メール通知設定 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Mail className="w-5 h-5 text-blue-500" />
+                  メール通知設定
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <div className="font-medium">予約通知</div>
+                    <div className="text-sm text-gray-500">新規予約が入った際にメールで通知</div>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <div className="font-medium">キャンセル通知</div>
+                    <div className="text-sm text-gray-500">予約がキャンセルされた際にメールで通知</div>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <div className="font-medium">出勤確認リマインド</div>
+                    <div className="text-sm text-gray-500">出勤日の朝に確認リマインドを送信</div>
+                  </div>
+                  <Switch defaultChecked={false} />
+                </div>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <div className="font-medium">給与明細通知</div>
+                    <div className="text-sm text-gray-500">給与明細が発行された際にメールで通知</div>
+                  </div>
+                  <Switch defaultChecked />
                 </div>
               </CardContent>
             </Card>

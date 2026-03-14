@@ -150,11 +150,11 @@ export default function Original() {
     </div>
 
   {/* INドラ未定予約リスト */}
-  <div className="w-10 h-4 left-[693px] top-[78px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">オプション</div>
-  <div className="w-10 h-4 left-[677px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">カード</div>
-  <div className="w-10 h-4 left-[661px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">着TEL</div>
-  <div className="w-10 h-4 left-[645px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">待合せ</div>
-  <div className="w-10 h-4 left-[629px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">領収書</div>
+  <div className="left-[705px] top-[58px] absolute text-center text-black text-[8px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>オプション</div>
+  <div className="left-[689px] top-[68px] absolute text-center text-black text-[8px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>カード</div>
+  <div className="left-[673px] top-[68px] absolute text-center text-black text-[8px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>着TEL</div>
+  <div className="left-[657px] top-[68px] absolute text-center text-black text-[8px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>待合せ</div>
+  <div className="left-[641px] top-[68px] absolute text-center text-black text-[8px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>領収書</div>
   <div className="w-10 left-[603px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">時間計</div>
   <div className="w-8 left-[441px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">迎え場所</div>
   <div className="w-[42px] left-[361px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">案内時間</div>
@@ -276,11 +276,11 @@ export default function Original() {
   <div className="w-16 left-[1147px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">地域</div>
   <div className="w-10 left-[1211px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">INドラ</div>
   <div className="w-10 left-[1251px] top-[95px] absolute text-center justify-end text-black text-[8px] font-normal font-['Inter']">OUTドラ</div>
-  <div className="w-10 h-4 left-[1355px] top-[78px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">オプション</div>
-  <div className="w-10 h-4 left-[1336px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">カード</div>
-  <div className="w-10 h-4 left-[1317px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">着TEL</div>
-  <div className="w-10 h-4 left-[1298px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">待合せ</div>
-  <div className="w-10 h-4 left-[1279px] top-[85px] absolute text-center justify-center text-black text-[8px] font-normal font-['Inter'] rotate-90">領収書</div>
+  <div className="left-[1367px] top-[58px] absolute text-center text-black text-[8px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>オプション</div>
+  <div className="left-[1348px] top-[68px] absolute text-center text-black text-[8px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>カード</div>
+  <div className="left-[1329px] top-[68px] absolute text-center text-black text-[8px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>着TEL</div>
+  <div className="left-[1310px] top-[68px] absolute text-center text-black text-[8px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>待合せ</div>
+  <div className="left-[1291px] top-[68px] absolute text-center text-black text-[8px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>領収書</div>
   <div className="w-[663px] h-[960px] left-[729px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-y-auto">
     {outDriverUndecidedSampleData.map((item: OutDriverUndecided, index: number) => (
       <div key={item.id} className={`w-[657px] h-6 left-0 absolute ${index % 2 === 1 ? 'bg-zinc-200' : 'bg-white'} ${index === 0 ? 'border-t border-zinc-300' : ''}`} style={{ top: `${index * 24}px` }}>

@@ -2595,6 +2595,246 @@ export default function StoreLedger() {
           </div>
         );
       
+      case 'customer-points':
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">顧客ポイント設定</h3>
+            </div>
+
+            {/* ポイント基本設定 */}
+            <div className="bg-white rounded-lg border p-4">
+              <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <Gift className="w-5 h-5 text-purple-500" />
+                ポイント基本設定
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">ポイント初期値（前半）</label>
+                  <div className="p-2 bg-gray-50 rounded border">
+                    {localBasicTag?.customerPointInitialValueFirstHalf || 0}pt
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">ポイント初期値（後半）</label>
+                  <div className="p-2 bg-gray-50 rounded border">
+                    {localBasicTag?.customerPointInitialValueSecondHalf || 0}%
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ポイント有効期限設定 */}
+            <div className="bg-white rounded-lg border p-4">
+              <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-blue-500" />
+                ポイント有効期限設定
+              </h4>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">デフォルト有効期限</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'unlimited', label: '無期限' },
+                      { value: '6months', label: '6ヶ月' },
+                      { value: '1year', label: '1年' },
+                      { value: '2years', label: '2年' },
+                    ].map(option => (
+                      <label key={option.value} className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border cursor-pointer hover:bg-gray-100">
+                        <input type="radio" name="defaultExpiration" value={option.value} defaultChecked={option.value === '1year'} />
+                        <span className="text-sm">{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <p className="text-sm text-blue-800">
+                    💡 ポイント付与時に、この設定がデフォルトの有効期限として適用されます。
+                    個別に有効期限を変更することも可能です。
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 日別ポイント倍率設定（イベント用） */}
+            <div className="bg-white rounded-lg border p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h4 className="font-semibold text-gray-800 flex items-center gap-2">
+                  <Percent className="w-5 h-5 text-green-500" />
+                  日別ポイント倍率設定（イベント）
+                </h4>
+                <Button size="sm" className="flex items-center gap-2">
+                  <Plus className="w-4 h-4" />
+                  イベント追加
+                </Button>
+              </div>
+
+              {/* イベントポイント倍率一覧 */}
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead className="bg-gray-50 border-b">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-700">日付</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-700">イベント名</th>
+                      <th className="px-4 py-2 text-center text-xs font-medium text-gray-700">ポイント倍率</th>
+                      <th className="px-4 py-2 text-center text-xs font-medium text-gray-700">状態</th>
+                      <th className="px-4 py-2 text-center text-xs font-medium text-gray-700">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-4 py-2 text-sm">2025/02/14</td>
+                      <td className="px-4 py-2 text-sm font-medium text-pink-600">バレンタインデー</td>
+                      <td className="px-4 py-2 text-center">
+                        <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
+                          ×2.0
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        <span className="inline-flex items-center px-2 py-1 bg-green-500 text-white rounded-full text-xs">有効</span>
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        <div className="flex justify-center gap-1">
+                          <Button variant="outline" size="sm" className="h-7 px-2">
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                          <Button variant="destructive" size="sm" className="h-7 px-2">
+                            <Minus className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-4 py-2 text-sm">2025/03/03</td>
+                      <td className="px-4 py-2 text-sm font-medium text-purple-600">ひな祭り</td>
+                      <td className="px-4 py-2 text-center">
+                        <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
+                          ×1.5
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        <span className="inline-flex items-center px-2 py-1 bg-green-500 text-white rounded-full text-xs">有効</span>
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        <div className="flex justify-center gap-1">
+                          <Button variant="outline" size="sm" className="h-7 px-2">
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                          <Button variant="destructive" size="sm" className="h-7 px-2">
+                            <Minus className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-4 py-2 text-sm">2025/03/14</td>
+                      <td className="px-4 py-2 text-sm font-medium text-blue-600">ホワイトデー</td>
+                      <td className="px-4 py-2 text-center">
+                        <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
+                          ×2.0
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        <span className="inline-flex items-center px-2 py-1 bg-green-500 text-white rounded-full text-xs">有効</span>
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        <div className="flex justify-center gap-1">
+                          <Button variant="outline" size="sm" className="h-7 px-2">
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                          <Button variant="destructive" size="sm" className="h-7 px-2">
+                            <Minus className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-4 py-2 text-sm">2025/05/05</td>
+                      <td className="px-4 py-2 text-sm font-medium text-red-600">GW特別キャンペーン</td>
+                      <td className="px-4 py-2 text-center">
+                        <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
+                          ×3.0
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        <span className="inline-flex items-center px-2 py-1 bg-green-500 text-white rounded-full text-xs">有効</span>
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        <div className="flex justify-center gap-1">
+                          <Button variant="outline" size="sm" className="h-7 px-2">
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                          <Button variant="destructive" size="sm" className="h-7 px-2">
+                            <Minus className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                <p className="text-sm text-amber-800">
+                  ⚡ 本日のポイント倍率: <span className="font-bold">×1.0（通常）</span>
+                  <br />
+                  <span className="text-xs">イベント日には自動的に設定した倍率が適用されます</span>
+                </p>
+              </div>
+            </div>
+
+            {/* ポイント付与ルール */}
+            <div className="bg-white rounded-lg border p-4">
+              <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <Settings className="w-5 h-5 text-gray-500" />
+                ポイント付与ルール
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">付与率（売上に対して）</label>
+                  <div className="flex items-center gap-2">
+                    <Input type="number" defaultValue="1" className="w-20" />
+                    <span className="text-gray-600">%</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">最低付与ポイント</label>
+                  <div className="flex items-center gap-2">
+                    <Input type="number" defaultValue="10" className="w-20" />
+                    <span className="text-gray-600">pt</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">端数処理</label>
+                  <Select defaultValue="floor">
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="floor">切り捨て</SelectItem>
+                      <SelectItem value="round">四捨五入</SelectItem>
+                      <SelectItem value="ceil">切り上げ</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">ポイント使用可能タイミング</label>
+                  <Select defaultValue="next">
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="immediate">即時使用可能</SelectItem>
+                      <SelectItem value="next">次回来店から使用可能</SelectItem>
+                      <SelectItem value="nextday">翌日から使用可能</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
       default:
         return (
           <div className="text-center text-gray-500 py-8">

@@ -38,7 +38,8 @@ import {
   History,
   PartyPopper,
   Sparkles,
-  Gift
+  Gift,
+  Crown
 } from "lucide-react";
 import {
   Select,
@@ -76,6 +77,8 @@ export default function HostessManagementPage() {
     stageName: 'はなこ',
     thisMonthEarnings: 850000,
     lastMonthEarnings: 780000,
+    influencerLevel: 'ゴールド', // インフルエンサーレベル
+    influencerFollowers: 15000, // フォロワー数
   };
 
   const monthOverMonthChange = hostessData.thisMonthEarnings - hostessData.lastMonthEarnings;
@@ -485,12 +488,15 @@ export default function HostessManagementPage() {
     ],
   };
 
-  // 送迎車サンプルデータ
+  // 送迎車サンプルデータ（社番・送り担当ドライバー情報を追加）
   const availableCars = [
-    { id: '1', name: '1号車', driver: '山田ドライバー', eta: '18:30' },
-    { id: '2', name: '2号車', driver: '田中ドライバー', eta: '18:45' },
-    { id: '3', name: '3号車', driver: '佐藤ドライバー', eta: '19:00' },
+    { id: '1', name: '1号車', vehicleNumber: '品川 500 あ 12-34', driver: '山田ドライバー', sendDriver: '鈴木ドライバー', eta: '18:30' },
+    { id: '2', name: '2号車', vehicleNumber: '品川 500 い 56-78', driver: '田中ドライバー', sendDriver: '高橋ドライバー', eta: '18:45' },
+    { id: '3', name: '3号車', vehicleNumber: '品川 500 う 90-12', driver: '佐藤ドライバー', sendDriver: '伊藤ドライバー', eta: '19:00' },
   ];
+
+  // 迎え完了状態の管理
+  const [pickupCompleted, setPickupCompleted] = useState(false);
 
   const handleSaveCustomerMemo = (id: string) => {
     if (!editingMemo.trim()) return;
@@ -607,8 +613,19 @@ export default function HostessManagementPage() {
               <User className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
             </div>
             <div className="text-white hidden sm:block">
-              <div className="font-bold text-base lg:text-lg">{hostessData.stageName}</div>
-              <div className="text-white/70 text-xs lg:text-sm">{hostessData.name}</div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-base lg:text-lg">{hostessData.stageName}</span>
+                {/* インフルエンサーレベル表示 */}
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full text-[10px] font-bold text-amber-900">
+                  <Crown className="w-3 h-3" />
+                  {hostessData.influencerLevel}
+                </span>
+              </div>
+              <div className="text-white/70 text-xs lg:text-sm flex items-center gap-2">
+                <span>{hostessData.name}</span>
+                <span className="text-white/50">|</span>
+                <span>{hostessData.influencerFollowers.toLocaleString()}フォロワー</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1823,7 +1840,34 @@ export default function HostessManagementPage() {
                 {/* 送迎車選択 */}
                 {activeSection === 'car' && (
                   <div className="space-y-3 lg:space-y-4">
-                    <p className="text-gray-500 mb-3 lg:mb-4 text-sm lg:text-base">出勤時に利用する送迎車を選択してください</p>
+                    {/* 迎え/送り切り替えタブ */}
+                    <div className="flex gap-2 p-1 bg-gray-100 rounded-lg">
+                      <button
+                        onClick={() => setPickupCompleted(false)}
+                        className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+                          !pickupCompleted
+                            ? 'bg-blue-500 text-white shadow-sm'
+                            : 'text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        迎え
+                      </button>
+                      <button
+                        onClick={() => setPickupCompleted(true)}
+                        className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+                          pickupCompleted
+                            ? 'bg-green-500 text-white shadow-sm'
+                            : 'text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        送り
+                      </button>
+                    </div>
+
+                    <p className="text-gray-500 mb-3 lg:mb-4 text-sm lg:text-base">
+                      {pickupCompleted ? '送り担当のドライバー情報' : '出勤時に利用する送迎車を選択してください'}
+                    </p>
+
                     <div className="grid gap-2 lg:gap-3">
                       {availableCars.map(car => (
                         <button
@@ -1831,26 +1875,33 @@ export default function HostessManagementPage() {
                           onClick={() => setSelectedCarId(car.id)}
                           className={`w-full p-3 lg:p-4 rounded-xl transition-all flex items-center gap-3 lg:gap-4 ${
                             selectedCarId === car.id
-                              ? 'bg-gradient-to-r from-blue-500 to-cyan-500 shadow-lg shadow-blue-500/30'
+                              ? pickupCompleted
+                                ? 'bg-gradient-to-r from-green-500 to-emerald-500 shadow-lg shadow-green-500/30'
+                                : 'bg-gradient-to-r from-blue-500 to-cyan-500 shadow-lg shadow-blue-500/30'
                               : 'bg-gray-50 hover:bg-gray-100'
                           }`}
                         >
                           <div className={`w-10 h-10 lg:w-14 lg:h-14 rounded-full flex items-center justify-center flex-shrink-0 ${
-                            selectedCarId === car.id ? 'bg-white/20' : 'bg-blue-100'
+                            selectedCarId === car.id ? 'bg-white/20' : pickupCompleted ? 'bg-green-100' : 'bg-blue-100'
                           }`}>
-                            <Car className={`w-5 h-5 lg:w-7 lg:h-7 ${selectedCarId === car.id ? 'text-white' : 'text-blue-500'}`} />
+                            <Car className={`w-5 h-5 lg:w-7 lg:h-7 ${selectedCarId === car.id ? 'text-white' : pickupCompleted ? 'text-green-500' : 'text-blue-500'}`} />
                           </div>
                           <div className="flex-1 text-left min-w-0">
                             <div className={`font-bold text-base lg:text-lg ${selectedCarId === car.id ? 'text-white' : 'text-gray-800'}`}>
                               {car.name}
                             </div>
+                            {/* 社番表示 */}
+                            <div className={`text-[10px] lg:text-xs font-mono ${selectedCarId === car.id ? 'text-white/60' : 'text-gray-400'}`}>
+                              社番: {car.vehicleNumber}
+                            </div>
+                            {/* 迎え/送りに応じてドライバー名を切り替え */}
                             <div className={`text-xs lg:text-sm ${selectedCarId === car.id ? 'text-white/70' : 'text-gray-500'}`}>
-                              {car.driver}
+                              {pickupCompleted ? `送り: ${car.sendDriver}` : `迎え: ${car.driver}`}
                             </div>
                           </div>
                           <div className="text-right flex-shrink-0">
                             <div className={`text-[10px] lg:text-xs ${selectedCarId === car.id ? 'text-white/60' : 'text-gray-400'}`}>
-                              到着予定
+                              {pickupCompleted ? '送り予定' : '到着予定'}
                             </div>
                             <div className={`font-bold text-lg lg:text-xl ${selectedCarId === car.id ? 'text-white' : 'text-gray-800'}`}>
                               {car.eta}
@@ -1859,13 +1910,28 @@ export default function HostessManagementPage() {
                         </button>
                       ))}
                     </div>
-                    {selectedCarId && (
-                      <Button className="w-full h-10 lg:h-12 text-sm lg:text-lg bg-blue-600 hover:bg-blue-700 mt-3 lg:mt-4">
-                        この車両で確定する
+                    {selectedCarId && !pickupCompleted && (
+                      <Button
+                        className="w-full h-10 lg:h-12 text-sm lg:text-lg bg-blue-600 hover:bg-blue-700 mt-3 lg:mt-4"
+                        onClick={() => {
+                          setPickupCompleted(true);
+                          alert('迎え完了！送り担当ドライバー情報に切り替わりました');
+                        }}
+                      >
+                        迎え完了（送りドライバーに切り替え）
                       </Button>
+                    )}
+                    {selectedCarId && pickupCompleted && (
+                      <div className="p-4 bg-green-50 rounded-xl border border-green-200">
+                        <div className="text-green-700 font-medium text-sm">✓ 送り担当ドライバーが割り当てられています</div>
+                        <div className="text-green-600 text-xs mt-1">
+                          お仕事終了後、送りドライバーがお迎えに参ります
+                        </div>
+                      </div>
                     )}
                   </div>
                 )}
+
               </CardContent>
             </Card>
           </div>

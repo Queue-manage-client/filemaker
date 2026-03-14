@@ -420,6 +420,10 @@ export default function CustomerLedger() {
               className="w-20 px-1 text-sm font-bold border border-gray-400 bg-white outline-none h-6"
               onChange={() => {}}
             />
+            {/* キャストNG表示 - 名前の横に配置して視認性向上 */}
+            <span className="ml-1 px-2 py-0.5 bg-red-600 text-white text-xs font-bold rounded animate-pulse">
+              NG 3件
+            </span>
 
             {/* 氏名ふりがな */}
             <span className="text-xs ml-2">氏名ふりがな</span>
@@ -508,7 +512,7 @@ export default function CustomerLedger() {
             
             {/* 基本情報タブ */}
             <TabsContent value="basic-info" className="mt-0 p-2 border border-gray-400 border-t-0 text-xs bg-pink-50">
-              <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.4fr_1fr] gap-2">
+              <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr_1.2fr] gap-2">
                 
                 {/* 左カラム - 基本情報入力エリア */}
                 <div className="space-y-0 bg-white rounded p-2 border border-gray-300">
@@ -1058,115 +1062,11 @@ export default function CustomerLedger() {
                     </div>
                   </div>
 
-                  {/* ホステス→顧客NG / 顧客→ホステスNG / アドレス交換 - 27インチディスプレイ最適化 */}
-                  <div className="p-1 mt-4">
-                    <div className="grid grid-cols-3 gap-3">
-                      {/* 左側：ホステス→顧客NG */}
-                      <div className="border-2 border-pink-400 rounded overflow-hidden">
-                        <div className="bg-pink-500 text-white text-sm font-bold text-center py-2">
-                          🚫 ホステス→顧客NG
-                        </div>
-                        <div className="max-h-[250px] overflow-y-auto bg-white">
-                          {/* サンプルNGデータ */}
-                          {[
-                            { name: 'あみ', reason: '接客態度の問題', date: '2025/01/20' },
-                            { name: '彩羽', reason: '時間厳守できず', date: '2025/01/15' },
-                            { name: 'さち', reason: '顧客クレーム', date: '2025/01/10' },
-                          ].map((ng, idx) => (
-                            <div key={idx} className={`p-2 border-b border-pink-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-pink-50'}`}>
-                              <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-pink-700">{ng.name}</span>
-                                <span className="text-xs text-gray-500">{ng.date}</span>
-                              </div>
-                              <div className="text-xs text-gray-600 mt-1">{ng.reason}</div>
-                            </div>
-                          ))}
-                          {/* 空行 */}
-                          <div className="h-8 bg-pink-50 border-b border-pink-200"></div>
-                          <div className="h-8 bg-white border-b border-pink-200"></div>
-                          <div className="h-8 bg-pink-50"></div>
-                        </div>
-                        <div className="bg-pink-100 p-1 text-center">
-                          <Button size="sm" variant="outline" className="h-6 text-xs border-pink-400 text-pink-700">
-                            + NG追加
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* 中央：顧客→ホステスNG */}
-                      <div className="border-2 border-yellow-400 rounded overflow-hidden">
-                        <div className="bg-yellow-500 text-white text-sm font-bold text-center py-2 flex items-center justify-center gap-2">
-                          <span>⚠️ 顧客→ホステスNG</span>
-                          <span className="text-xs bg-yellow-600 px-1 rounded">非表示</span>
-                        </div>
-                        <div className="max-h-[250px] overflow-y-auto bg-white">
-                          {/* サンプルNGデータ */}
-                          {[
-                            { name: 'あいめ', reason: '指名拒否希望', date: '2025/01/22' },
-                            { name: 'かきな', reason: '相性が合わない', date: '2025/01/18' },
-                          ].map((ng, idx) => (
-                            <div key={idx} className={`p-2 border-b border-yellow-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-yellow-50'}`}>
-                              <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-yellow-700">{ng.name}</span>
-                                <span className="text-xs text-gray-500">{ng.date}</span>
-                              </div>
-                              <div className="text-xs text-gray-600 mt-1">{ng.reason}</div>
-                            </div>
-                          ))}
-                          {/* 空行 */}
-                          <div className="h-8 bg-yellow-50 border-b border-yellow-200"></div>
-                          <div className="h-8 bg-white border-b border-yellow-200"></div>
-                          <div className="h-8 bg-yellow-50 border-b border-yellow-200"></div>
-                          <div className="h-8 bg-white"></div>
-                        </div>
-                        <div className="bg-yellow-100 p-1 text-center">
-                          <Button size="sm" variant="outline" className="h-6 text-xs border-yellow-400 text-yellow-700">
-                            + NG追加
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* 右側：アドレス交換 */}
-                      <div className="border-2 border-cyan-400 rounded overflow-hidden">
-                        <div className="bg-cyan-500 text-white text-sm font-bold text-center py-2">
-                          📧 アドレス交換
-                        </div>
-                        <div className="p-2 bg-cyan-50 border-b border-cyan-200">
-                          <Input className="h-7 text-xs bg-white border-cyan-300" placeholder="検索..." />
-                        </div>
-                        <div className="max-h-[200px] overflow-y-auto bg-white">
-                          {/* サンプルアドレス交換データ */}
-                          {[
-                            { name: 'あみ', exchangeDate: '2025/01/25' },
-                            { name: '彩羽', exchangeDate: '2025/01/20' },
-                          ].map((addr, idx) => (
-                            <div key={idx} className={`p-2 border-b border-cyan-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-cyan-50'}`}>
-                              <div className="flex items-center justify-between">
-                                <span className="text-sm font-medium">{addr.name}</span>
-                                <span className="text-xs text-gray-500">{addr.exchangeDate}</span>
-                              </div>
-                            </div>
-                          ))}
-                          {/* 空行 */}
-                          <div className="h-8 bg-cyan-50 border-b border-cyan-200"></div>
-                          <div className="h-8 bg-white border-b border-cyan-200"></div>
-                          <div className="h-8 bg-cyan-50"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* メディア名・旧備考 */}
-                  <div className="p-1 space-y-1">
+                  {/* メディア名 */}
+                  <div className="p-1">
                     <div className="flex items-center gap-2">
                       <Label className="text-xs font-semibold">メディア名</Label>
                       <Input className="flex-1 h-7 text-xs border-gray-500" placeholder="" />
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Label className="text-xs font-semibold">旧備考</Label>
-                      <div className="flex-1 text-xs text-red-600 min-h-[40px]">
-                        巨乳好きの50分だが利用頻度は○。なんせ乳が無い千は×。 Bランク
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -1181,11 +1081,6 @@ export default function CustomerLedger() {
                       </Button>
                       <Label className="text-xs font-semibold">出勤予定日:</Label>
                       <Input className="flex-1 h-7 text-xs border-gray-500" placeholder="2025年08月27日" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button size="sm" variant="outline" className="h-7 text-xs bg-green-100 border-green-400">
-                        裏店舗出勤
-                      </Button>
                     </div>
                   </div>
 
@@ -1301,6 +1196,97 @@ export default function CustomerLedger() {
                           <div className="px-1 py-0.5">{hostess.time3}</div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* ホステス→顧客NG / 顧客→ホステスNG / アドレス交換 - ホステス一覧の下に配置 */}
+                  <div className="p-1 mt-2">
+                    <div className="grid grid-cols-3 gap-2">
+                      {/* 左側：ホステス→顧客NG */}
+                      <div className="border-2 border-pink-400 rounded overflow-hidden">
+                        <div className="bg-pink-500 text-white text-xs font-bold text-center py-1">
+                          🚫 ホステス→顧客NG
+                        </div>
+                        <div className="max-h-[120px] overflow-y-auto bg-white">
+                          {[
+                            { name: 'あみ', reason: '接客態度の問題', date: '2025/01/20' },
+                            { name: '彩羽', reason: '時間厳守できず', date: '2025/01/15' },
+                            { name: 'さち', reason: '顧客クレーム', date: '2025/01/10' },
+                          ].map((ng, idx) => (
+                            <div key={idx} className={`p-1 border-b border-pink-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-pink-50'}`}>
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold text-pink-700">{ng.name}</span>
+                                <span className="text-[10px] text-gray-500">{ng.date}</span>
+                              </div>
+                              <div className="text-[10px] text-gray-600">{ng.reason}</div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="bg-pink-100 p-1 text-center">
+                          <Button size="sm" variant="outline" className="h-5 text-[10px] border-pink-400 text-pink-700">
+                            + NG追加
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* 中央：顧客→ホステスNG */}
+                      <div className="border-2 border-yellow-400 rounded overflow-hidden">
+                        <div className="bg-yellow-500 text-white text-xs font-bold text-center py-1 flex items-center justify-center gap-1">
+                          <span>⚠️ 顧客→ホステスNG</span>
+                          <span className="text-[10px] bg-yellow-600 px-1 rounded">非表示</span>
+                        </div>
+                        <div className="max-h-[120px] overflow-y-auto bg-white">
+                          {[
+                            { name: 'あいめ', reason: '指名拒否希望', date: '2025/01/22' },
+                            { name: 'かきな', reason: '相性が合わない', date: '2025/01/18' },
+                          ].map((ng, idx) => (
+                            <div key={idx} className={`p-1 border-b border-yellow-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-yellow-50'}`}>
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold text-yellow-700">{ng.name}</span>
+                                <span className="text-[10px] text-gray-500">{ng.date}</span>
+                              </div>
+                              <div className="text-[10px] text-gray-600">{ng.reason}</div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="bg-yellow-100 p-1 text-center">
+                          <Button size="sm" variant="outline" className="h-5 text-[10px] border-yellow-400 text-yellow-700">
+                            + NG追加
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* 右側：アドレス交換 + 旧備考 */}
+                      <div className="flex flex-col">
+                        <div className="border-2 border-cyan-400 rounded overflow-hidden">
+                          <div className="bg-cyan-500 text-white text-xs font-bold text-center py-1">
+                            📧 アドレス交換
+                          </div>
+                          <div className="p-1 bg-cyan-50 border-b border-cyan-200">
+                            <Input className="h-5 text-[10px] bg-white border-cyan-300" placeholder="検索..." />
+                          </div>
+                          <div className="max-h-[80px] overflow-y-auto bg-white">
+                            {[
+                              { name: 'あみ', exchangeDate: '2025/01/25' },
+                              { name: '彩羽', exchangeDate: '2025/01/20' },
+                            ].map((addr, idx) => (
+                              <div key={idx} className={`p-1 border-b border-cyan-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-cyan-50'}`}>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs font-medium">{addr.name}</span>
+                                  <span className="text-[10px] text-gray-500">{addr.exchangeDate}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        {/* 旧備考（アドレス交換の下） */}
+                        <div className="mt-1 p-1 bg-red-50 border-2 border-red-300 rounded">
+                          <Label className="text-[10px] font-semibold text-red-700">旧備考</Label>
+                          <div className="text-[10px] text-red-600">
+                            巨乳好きの50分だが利用頻度は○。なんせ乳が無い千は×。 Bランク
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 

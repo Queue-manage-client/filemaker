@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Plus, Pencil, Trash2, Calendar, Clock, Infinity } from "lucide-react";
+import Link from 'next/link';
+import { X, Plus, Pencil, Trash2, Calendar, Clock, Infinity, ExternalLink, Gift } from "lucide-react";
 
 export default function PointHistoryWindow() {
   React.useEffect(() => {
@@ -10,6 +11,10 @@ export default function PointHistoryWindow() {
 
   // モーダル状態
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  // ※ポイント倍率設定は店舗台帳の顧客ポイントタブで管理
+  // ここでは参照用として本日の倍率を表示（実際はAPIから取得）
+  const todayRate = 1.0; // 通常倍率（店舗台帳から取得）
 
   // フォーム状態
   const [formData, setFormData] = useState({
@@ -28,38 +33,39 @@ export default function PointHistoryWindow() {
   });
 
   // ポイント履歴データ（有効期限付き）
-  // expiration: null = 無期限、日付 = 有効期限
+  // date = ポイント取得日、validityPeriod = 有効期間（1年、6ヶ月、無期限など）、expiration = ポイント有効期限
+  // used（利用）の場合はvalidityPeriod = null, expiration = null
   const pointHistory = [
-    { id: '1', date: '2023/10/13', acquired: 180, used: null, balance: 40710, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', expiration: '2024/10/13' },
-    { id: '2', date: '2023/10/18', acquired: 570, used: null, balance: 41280, storeName: '京都デリヘル俱楽部', hostessName: '二葉ー', expiration: '2024/10/18' },
-    { id: '3', date: '2023/11/21', acquired: 600, used: null, balance: 41880, storeName: '京都デリヘル俱楽部', hostessName: '二葉ー', expiration: '2024/11/21' },
-    { id: '4', date: '2023/12/05', acquired: 450, used: null, balance: 42330, storeName: '京都デリヘル俱楽部', hostessName: 'みさき', expiration: null },
-    { id: '5', date: '2023/12/15', acquired: null, used: 1000, balance: 41330, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', expiration: null },
-    { id: '6', date: '2024/01/08', acquired: 720, used: null, balance: 42050, storeName: '京都デリヘル俱楽部', hostessName: 'さくら', expiration: '2025/01/08' },
-    { id: '7', date: '2024/01/22', acquired: 380, used: null, balance: 42430, storeName: '京都デリヘル俱楽部', hostessName: 'りな', expiration: '2025/01/22' },
-    { id: '8', date: '2024/02/14', acquired: 850, used: null, balance: 43280, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', expiration: null },
-    { id: '9', date: '2024/02/28', acquired: null, used: 2000, balance: 41280, storeName: '京都デリヘル俱楽部', hostessName: 'みさき', expiration: null },
-    { id: '10', date: '2024/03/10', acquired: 620, used: null, balance: 41900, storeName: '京都デリヘル俱楽部', hostessName: '二葉ー', expiration: '2025/03/10' },
-    { id: '11', date: '2024/03/25', acquired: 490, used: null, balance: 42390, storeName: '京都デリヘル俱楽部', hostessName: 'ゆき', expiration: '2025/03/25' },
-    { id: '12', date: '2024/04/05', acquired: 750, used: null, balance: 43140, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', expiration: null },
-    { id: '13', date: '2024/04/20', acquired: null, used: 500, balance: 42640, storeName: '京都デリヘル俱楽部', hostessName: 'りな', expiration: null },
-    { id: '14', date: '2024/05/08', acquired: 680, used: null, balance: 43320, storeName: '京都デリヘル俱楽部', hostessName: 'さくら', expiration: '2025/05/08' },
-    { id: '15', date: '2024/05/22', acquired: 920, used: null, balance: 44240, storeName: '京都デリヘル俱楽部', hostessName: 'みさき', expiration: '2025/05/22' },
-    { id: '16', date: '2024/06/10', acquired: 550, used: null, balance: 44790, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', expiration: null },
-    { id: '17', date: '2024/06/28', acquired: null, used: 3000, balance: 41790, storeName: '京都デリヘル俱楽部', hostessName: '二葉ー', expiration: null },
-    { id: '18', date: '2024/07/15', acquired: 800, used: null, balance: 42590, storeName: '京都デリヘル俱楽部', hostessName: 'ゆき', expiration: '2025/07/15' },
-    { id: '19', date: '2024/08/03', acquired: 430, used: null, balance: 43020, storeName: '京都デリヘル俱楽部', hostessName: 'りな', expiration: '2025/08/03' },
-    { id: '20', date: '2024/08/20', acquired: 670, used: null, balance: 43690, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', expiration: null },
-    { id: '21', date: '2024/09/05', acquired: null, used: 1500, balance: 42190, storeName: '京都デリヘル俱楽部', hostessName: 'さくら', expiration: null },
-    { id: '22', date: '2024/09/18', acquired: 580, used: null, balance: 42770, storeName: '京都デリヘル俱楽部', hostessName: 'みさき', expiration: '2025/09/18' },
-    { id: '23', date: '2024/10/02', acquired: 890, used: null, balance: 43660, storeName: '京都デリヘル俱楽部', hostessName: '二葉ー', expiration: '2025/10/02' },
-    { id: '24', date: '2024/10/20', acquired: 340, used: null, balance: 44000, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', expiration: null },
-    { id: '25', date: '2024/11/08', acquired: null, used: 2500, balance: 41500, storeName: '京都デリヘル俱楽部', hostessName: 'ゆき', expiration: null },
-    { id: '26', date: '2024/11/25', acquired: 760, used: null, balance: 42260, storeName: '京都デリヘル俱楽部', hostessName: 'りな', expiration: '2025/11/25' },
-    { id: '27', date: '2024/12/10', acquired: 510, used: null, balance: 42770, storeName: '京都デリヘル俱楽部', hostessName: 'さくら', expiration: '2025/12/10' },
-    { id: '28', date: '2024/12/28', acquired: 640, used: null, balance: 43410, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', expiration: null },
-    { id: '29', date: '2025/01/12', acquired: 820, used: null, balance: 44230, storeName: '京都デリヘル俱楽部', hostessName: 'みさき', expiration: '2026/01/12' },
-    { id: '30', date: '2025/01/26', acquired: null, used: 5000, balance: 39230, storeName: '京都デリヘル俱楽部', hostessName: '二葉ー', expiration: null },
+    { id: '1', date: '2023/10/13', acquired: 180, used: null, balance: 40710, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', validityPeriod: '1年', expiration: '2024/10/13' },
+    { id: '2', date: '2023/10/18', acquired: 570, used: null, balance: 41280, storeName: '京都デリヘル俱楽部', hostessName: '二葉ー', validityPeriod: '1年', expiration: '2024/10/18' },
+    { id: '3', date: '2023/11/21', acquired: 600, used: null, balance: 41880, storeName: '京都デリヘル俱楽部', hostessName: '二葉ー', validityPeriod: '1年', expiration: '2024/11/21' },
+    { id: '4', date: '2023/12/05', acquired: 450, used: null, balance: 42330, storeName: '京都デリヘル俱楽部', hostessName: 'みさき', validityPeriod: '1年', expiration: '2024/12/05' },
+    { id: '5', date: '2023/12/15', acquired: null, used: 1000, balance: 41330, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', validityPeriod: null, expiration: null },
+    { id: '6', date: '2024/01/08', acquired: 720, used: null, balance: 42050, storeName: '京都デリヘル俱楽部', hostessName: 'さくら', validityPeriod: '1年', expiration: '2025/01/08' },
+    { id: '7', date: '2024/01/22', acquired: 380, used: null, balance: 42430, storeName: '京都デリヘル俱楽部', hostessName: 'りな', validityPeriod: '6ヶ月', expiration: '2024/07/22' },
+    { id: '8', date: '2024/02/14', acquired: 850, used: null, balance: 43280, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', validityPeriod: '1年', expiration: '2025/02/14' },
+    { id: '9', date: '2024/02/28', acquired: null, used: 2000, balance: 41280, storeName: '京都デリヘル俱楽部', hostessName: 'みさき', validityPeriod: null, expiration: null },
+    { id: '10', date: '2024/03/10', acquired: 620, used: null, balance: 41900, storeName: '京都デリヘル俱楽部', hostessName: '二葉ー', validityPeriod: '1年', expiration: '2025/03/10' },
+    { id: '11', date: '2024/03/25', acquired: 490, used: null, balance: 42390, storeName: '京都デリヘル俱楽部', hostessName: 'ゆき', validityPeriod: '無期限', expiration: null },
+    { id: '12', date: '2024/04/05', acquired: 750, used: null, balance: 43140, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', validityPeriod: '1年', expiration: '2025/04/05' },
+    { id: '13', date: '2024/04/20', acquired: null, used: 500, balance: 42640, storeName: '京都デリヘル俱楽部', hostessName: 'りな', validityPeriod: null, expiration: null },
+    { id: '14', date: '2024/05/08', acquired: 680, used: null, balance: 43320, storeName: '京都デリヘル俱楽部', hostessName: 'さくら', validityPeriod: '1年', expiration: '2025/05/08' },
+    { id: '15', date: '2024/05/22', acquired: 920, used: null, balance: 44240, storeName: '京都デリヘル俱楽部', hostessName: 'みさき', validityPeriod: '2年', expiration: '2026/05/22' },
+    { id: '16', date: '2024/06/10', acquired: 550, used: null, balance: 44790, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', validityPeriod: '1年', expiration: '2025/06/10' },
+    { id: '17', date: '2024/06/28', acquired: null, used: 3000, balance: 41790, storeName: '京都デリヘル俱楽部', hostessName: '二葉ー', validityPeriod: null, expiration: null },
+    { id: '18', date: '2024/07/15', acquired: 800, used: null, balance: 42590, storeName: '京都デリヘル俱楽部', hostessName: 'ゆき', validityPeriod: '1年', expiration: '2025/07/15' },
+    { id: '19', date: '2024/08/03', acquired: 430, used: null, balance: 43020, storeName: '京都デリヘル俱楽部', hostessName: 'りな', validityPeriod: '6ヶ月', expiration: '2025/02/03' },
+    { id: '20', date: '2024/08/20', acquired: 670, used: null, balance: 43690, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', validityPeriod: '1年', expiration: '2025/08/20' },
+    { id: '21', date: '2024/09/05', acquired: null, used: 1500, balance: 42190, storeName: '京都デリヘル俱楽部', hostessName: 'さくら', validityPeriod: null, expiration: null },
+    { id: '22', date: '2024/09/18', acquired: 580, used: null, balance: 42770, storeName: '京都デリヘル俱楽部', hostessName: 'みさき', validityPeriod: '1年', expiration: '2025/09/18' },
+    { id: '23', date: '2024/10/02', acquired: 890, used: null, balance: 43660, storeName: '京都デリヘル俱楽部', hostessName: '二葉ー', validityPeriod: '1年', expiration: '2025/10/02' },
+    { id: '24', date: '2024/10/20', acquired: 340, used: null, balance: 44000, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', validityPeriod: '無期限', expiration: null },
+    { id: '25', date: '2024/11/08', acquired: null, used: 2500, balance: 41500, storeName: '京都デリヘル俱楽部', hostessName: 'ゆき', validityPeriod: null, expiration: null },
+    { id: '26', date: '2024/11/25', acquired: 760, used: null, balance: 42260, storeName: '京都デリヘル俱楽部', hostessName: 'りな', validityPeriod: '1年', expiration: '2025/11/25' },
+    { id: '27', date: '2024/12/10', acquired: 510, used: null, balance: 42770, storeName: '京都デリヘル俱楽部', hostessName: 'さくら', validityPeriod: '1年', expiration: '2025/12/10' },
+    { id: '28', date: '2024/12/28', acquired: 640, used: null, balance: 43410, storeName: '京都デリヘル俱楽部', hostessName: 'あやか', validityPeriod: '1年', expiration: '2025/12/28' },
+    { id: '29', date: '2025/01/12', acquired: 820, used: null, balance: 44230, storeName: '京都デリヘル俱楽部', hostessName: 'みさき', validityPeriod: '1年', expiration: '2026/01/12' },
+    { id: '30', date: '2025/01/26', acquired: null, used: 5000, balance: 39230, storeName: '京都デリヘル俱楽部', hostessName: '二葉ー', validityPeriod: null, expiration: null },
   ];
 
   // 有効期限が近いかどうかを判定（30日以内）
@@ -145,24 +151,43 @@ export default function PointHistoryWindow() {
               <span className="text-gray-400 text-sm">顧客名</span>
               <span className="text-white text-lg">フクダ</span>
             </div>
+            {/* ポイント倍率表示 */}
+            {todayRate > 1.0 && (
+              <div className="flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 px-3 py-1 rounded-lg">
+                <Gift className="w-4 h-4 text-white" />
+                <span className="text-white font-bold">本日 {todayRate}倍</span>
+              </div>
+            )}
           </div>
 
-          <button
-            onClick={handleAddModalOpen}
-            className="w-10 h-10 bg-gray-700 border-2 border-gray-500 rounded flex items-center justify-center hover:bg-gray-600 transition-colors"
-          >
-            <Plus className="w-6 h-6 text-white" />
-          </button>
+          <div className="flex items-center gap-2">
+            {/* 店舗台帳への案内リンク */}
+            <Link
+              href="/store-ledger"
+              className="h-8 px-3 bg-purple-600 border border-purple-400 rounded flex items-center gap-1.5 hover:bg-purple-500 transition-colors text-white text-xs"
+              title="ポイント倍率は店舗台帳で設定"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              倍率設定
+            </Link>
+            <button
+              onClick={handleAddModalOpen}
+              className="w-10 h-10 bg-gray-700 border-2 border-gray-500 rounded flex items-center justify-center hover:bg-gray-600 transition-colors"
+            >
+              <Plus className="w-6 h-6 text-white" />
+            </button>
+          </div>
         </div>
 
         {/* テーブルヘッダー */}
-        <div className="grid grid-cols-[100px_80px_80px_100px_1fr_100px_100px_60px] bg-gray-700 border-t border-gray-600 text-sm">
+        <div className="grid grid-cols-[100px_80px_80px_100px_1fr_100px_80px_100px_60px] bg-gray-700 border-t border-gray-600 text-sm">
           <div className="px-3 py-2 text-gray-300 border-r border-gray-600">日付</div>
           <div className="px-3 py-2 text-gray-300 border-r border-gray-600">取得</div>
           <div className="px-3 py-2 text-gray-300 border-r border-gray-600">利用</div>
           <div className="px-3 py-2 text-gray-300 border-r border-gray-600">残高</div>
           <div className="px-3 py-2 text-gray-300 border-r border-gray-600">売上店舗</div>
           <div className="px-3 py-2 text-gray-300 border-r border-gray-600">ホステス名</div>
+          <div className="px-3 py-2 text-gray-300 border-r border-gray-600">有効期間</div>
           <div className="px-3 py-2 text-gray-300 border-r border-gray-600 flex items-center gap-1">
             <Clock className="w-3 h-3" />
             有効期限
@@ -176,7 +201,7 @@ export default function PointHistoryWindow() {
         {pointHistory.map((item, index) => (
           <div
             key={item.id}
-            className={`grid grid-cols-[100px_80px_80px_100px_1fr_100px_100px_60px] text-sm border-b border-gray-300 ${
+            className={`grid grid-cols-[100px_80px_80px_100px_1fr_100px_80px_100px_60px] text-sm border-b border-gray-300 ${
               index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
             } hover:bg-blue-50`}
           >
@@ -192,6 +217,20 @@ export default function PointHistoryWindow() {
             </div>
             <div className="px-3 py-2 border-r border-gray-200">{item.storeName}</div>
             <div className="px-3 py-2 border-r border-gray-200">{item.hostessName}</div>
+            <div className="px-3 py-2 border-r border-gray-200 text-xs text-center">
+              {item.validityPeriod ? (
+                <span className={`px-1.5 py-0.5 rounded ${
+                  item.validityPeriod === '無期限' ? 'bg-green-100 text-green-700' :
+                  item.validityPeriod === '6ヶ月' ? 'bg-yellow-100 text-yellow-700' :
+                  item.validityPeriod === '2年' ? 'bg-blue-100 text-blue-700' :
+                  'bg-gray-100 text-gray-700'
+                }`}>
+                  {item.validityPeriod}
+                </span>
+              ) : (
+                <span className="text-gray-400">-</span>
+              )}
+            </div>
             <div className={`px-3 py-2 border-r border-gray-200 text-xs flex items-center gap-1 ${
               isExpired(item.expiration) ? 'text-red-600 bg-red-50' :
               isExpirationNear(item.expiration) ? 'text-orange-600 bg-orange-50' : ''
