@@ -309,30 +309,275 @@ export default function HostessManagementPage() {
     location: '',
   });
 
-  // マイ実績サンプルデータ（月別）
-  const [selectedPerformanceMonth, setSelectedPerformanceMonth] = useState('2026-02');
-  const performanceHistory = {
-    '2026-02': { totalSales: 850000, nominations: 15, newCustomers: 3, repeatRate: 78 },
-    '2026-01': { totalSales: 780000, nominations: 12, newCustomers: 5, repeatRate: 72 },
-    '2025-12': { totalSales: 920000, nominations: 18, newCustomers: 4, repeatRate: 80 },
-    '2025-11': { totalSales: 650000, nominations: 10, newCustomers: 2, repeatRate: 68 },
-    '2025-10': { totalSales: 700000, nominations: 11, newCustomers: 3, repeatRate: 70 },
-    '2025-09': { totalSales: 720000, nominations: 13, newCustomers: 4, repeatRate: 75 },
+  // ========================================
+  // 評価基準の定義
+  // ========================================
+
+  // 合計PVポイント
+  const totalPVCriteria = [
+    { threshold: 90000, score: 15, label: 'S' },
+    { threshold: 45000, score: 13, label: '80' },
+    { threshold: 20000, score: 11, label: 'A(70)' },
+    { threshold: 15000, score: 9, label: '60' },
+    { threshold: 12000, score: 7, label: 'B(50)' },
+    { threshold: 9000, score: 6, label: '40' },
+    { threshold: 6000, score: 4, label: 'C(30)' },
+    { threshold: 3000, score: 2, label: '20' },
+    { threshold: 1500, score: 1, label: 'D(10)' },
+    { threshold: 0, score: 0, label: '0' },
+  ];
+
+  // 出勤日平均PVポイント（NEW）
+  const avgPVCriteria = [
+    { threshold: 4000, score: 10, label: '4000PV' },
+    { threshold: 2000, score: 9, label: '2000PV' },
+    { threshold: 1500, score: 8, label: '1500PV' },
+    { threshold: 1200, score: 7, label: '1200PV' },
+    { threshold: 900, score: 6, label: '900PV' },
+    { threshold: 600, score: 5, label: '600PV' },
+    { threshold: 300, score: 4, label: '300PV' },
+    { threshold: 100, score: 2, label: '100PV' },
+    { threshold: 50, score: 1, label: '50PV' },
+    { threshold: 0, score: 0, label: '左記未満' },
+  ];
+
+  // マイガール人数ポイント
+  const myGirlCountCriteria = [
+    { threshold: 15000, score: 8, label: '15000人' },
+    { threshold: 5000, score: 7, label: '5000人' },
+    { threshold: 2000, score: 6, label: '2000人' },
+    { threshold: 1000, score: 5, label: '1000人' },
+    { threshold: 500, score: 3, label: '500人' },
+    { threshold: 200, score: 1, label: '200人' },
+    { threshold: 0, score: 0, label: '左記未満' },
+  ];
+
+  // マイガール増加ポイント（NEW）
+  const myGirlIncreaseCriteria = [
+    { threshold: 600, score: 7, label: '600人増' },
+    { threshold: 400, score: 6, label: '400人増' },
+    { threshold: 200, score: 5, label: '200人増' },
+    { threshold: 100, score: 3, label: '100人増' },
+    { threshold: 50, score: 2, label: '50人増' },
+    { threshold: 20, score: 1, label: '20人増' },
+    { threshold: 0, score: 0, label: '左記未満' },
+  ];
+
+  // WEB予約ポイント
+  const webReservationCriteria = [
+    { threshold: 40, score: 15, label: '40本' },
+    { threshold: 35, score: 13, label: '35本' },
+    { threshold: 30, score: 11, label: '30本' },
+    { threshold: 25, score: 9, label: '25本' },
+    { threshold: 20, score: 7, label: '20本' },
+    { threshold: 15, score: 6, label: '15本' },
+    { threshold: 10, score: 4, label: '10本' },
+    { threshold: 5, score: 2, label: '5本' },
+    { threshold: 1, score: 1, label: '1本' },
+    { threshold: 0, score: 0, label: '左記未満' },
+  ];
+
+  // 姫デコログインポイント
+  const himeDecoLoginCriteria = [
+    { threshold: 1, score: 2, label: 'SPログイン' },
+    { threshold: 0, score: 0, label: '未ログイン' },
+  ];
+
+  // 写メ日記ポイント
+  const photoDiaryCriteria = [
+    { threshold: 100, score: 5, label: '100本' },
+    { threshold: 70, score: 4, label: '70本' },
+    { threshold: 50, score: 3, label: '50本' },
+    { threshold: 30, score: 2, label: '30本' },
+    { threshold: 15, score: 1, label: '15本' },
+    { threshold: 0, score: 0, label: '左記未満' },
+  ];
+
+  // 日記ポイント
+  const diaryCriteria = [
+    { threshold: 40, score: 5, label: '40本' },
+    { threshold: 30, score: 4, label: '30本' },
+    { threshold: 20, score: 3, label: '20本' },
+    { threshold: 10, score: 2, label: '10本' },
+    { threshold: 5, score: 1, label: '5本' },
+    { threshold: 0, score: 0, label: '左記未満' },
+  ];
+
+  // 動画日記ポイント
+  const videoDiaryCriteria = [
+    { threshold: 20, score: 5, label: '20本' },
+    { threshold: 10, score: 4, label: '10本' },
+    { threshold: 5, score: 3, label: '5本' },
+    { threshold: 3, score: 2, label: '3本' },
+    { threshold: 1, score: 1, label: '1本' },
+    { threshold: 0, score: 0, label: '左記未満' },
+  ];
+
+  // キテネポイント
+  const kiteneCriteria = [
+    { threshold: 400, score: 5, label: '400回' },
+    { threshold: 300, score: 4, label: '300回' },
+    { threshold: 200, score: 3, label: '200回' },
+    { threshold: 100, score: 2, label: '100回' },
+    { threshold: 50, score: 1, label: '50回' },
+    { threshold: 0, score: 0, label: '左記未満' },
+  ];
+
+  // 口コミポイント
+  const reviewCriteria = [
+    { threshold: 10, score: 8, label: '10件' },
+    { threshold: 5, score: 6, label: '5件' },
+    { threshold: 3, score: 4, label: '3件' },
+    { threshold: 2, score: 3, label: '2件' },
+    { threshold: 1, score: 2, label: '1件' },
+    { threshold: 0, score: 0, label: '左記未満' },
+  ];
+
+  // オキニトーク送信ポイント
+  const okiniSendCriteria = [
+    { threshold: 200, score: 8, label: '200回' },
+    { threshold: 150, score: 6, label: '150回' },
+    { threshold: 80, score: 4, label: '80回' },
+    { threshold: 30, score: 2, label: '30回' },
+    { threshold: 10, score: 1, label: '10回' },
+    { threshold: 0, score: 0, label: '左記未満' },
+  ];
+
+  // オキニトーク返信ポイント（NEW）
+  const okiniReplyCriteria = [
+    { threshold: 50, score: 7, label: '50人' },
+    { threshold: 40, score: 5, label: '40人' },
+    { threshold: 20, score: 3, label: '20人' },
+    { threshold: 10, score: 2, label: '10人' },
+    { threshold: 5, score: 1, label: '5人' },
+    { threshold: 0, score: 0, label: '左記未満' },
+  ];
+
+  // スコアを計算する関数
+  const calculateScore = (value: number, criteria: { threshold: number; score: number; label: string }[]) => {
+    for (const c of criteria) {
+      if (value >= c.threshold) {
+        return { score: c.score, label: c.label, maxScore: criteria[0].score };
+      }
+    }
+    return { score: 0, label: '該当なし', maxScore: criteria[0].score };
   };
+
+  // 評価ランクを計算する関数（最大100点）
+  const calculateRank = (totalScore: number) => {
+    if (totalScore >= 80) return { rank: 'S', color: 'text-yellow-500', bgColor: 'bg-gradient-to-r from-yellow-400 to-amber-500', borderColor: 'border-yellow-400' };
+    if (totalScore >= 60) return { rank: 'A', color: 'text-red-500', bgColor: 'bg-gradient-to-r from-red-400 to-rose-500', borderColor: 'border-red-400' };
+    if (totalScore >= 40) return { rank: 'B', color: 'text-blue-500', bgColor: 'bg-gradient-to-r from-blue-400 to-indigo-500', borderColor: 'border-blue-400' };
+    if (totalScore >= 20) return { rank: 'C', color: 'text-green-500', bgColor: 'bg-gradient-to-r from-green-400 to-emerald-500', borderColor: 'border-green-400' };
+    return { rank: 'D', color: 'text-gray-500', bgColor: 'bg-gradient-to-r from-gray-400 to-slate-500', borderColor: 'border-gray-400' };
+  };
+
+  // マイ実績サンプルデータ（月別）- 詳細版
+  const [selectedPerformanceMonth, setSelectedPerformanceMonth] = useState('2026-02');
+  const performanceHistory: Record<string, {
+    totalPV: number;
+    workDays: number;
+    myGirlCount: number;
+    myGirlIncrease: number;
+    webReservation: number;
+    himeDecoLogin: boolean;
+    photoDiary: number;
+    diary: number;
+    videoDiary: number;
+    kitene: number;
+    reviews: number;
+    okiniSend: number;
+    okiniReply: number;
+    totalIncome: number;
+    dispatchCount: number;
+    nominationCount: number;
+    groupRank: number;
+    storeRank: number;
+    nominationRate: number;
+  }> = {
+    '2026-02': {
+      totalPV: 52000, workDays: 22, myGirlCount: 1850, myGirlIncrease: 120,
+      webReservation: 28, himeDecoLogin: true, photoDiary: 65, diary: 25,
+      videoDiary: 8, kitene: 180, reviews: 4, okiniSend: 95, okiniReply: 28,
+      totalIncome: 850000, dispatchCount: 45, nominationCount: 28,
+      groupRank: 8, storeRank: 3, nominationRate: 62.2
+    },
+    '2026-01': {
+      totalPV: 48000, workDays: 20, myGirlCount: 1730, myGirlIncrease: 95,
+      webReservation: 25, himeDecoLogin: true, photoDiary: 58, diary: 22,
+      videoDiary: 6, kitene: 150, reviews: 3, okiniSend: 80, okiniReply: 22,
+      totalIncome: 780000, dispatchCount: 42, nominationCount: 25,
+      groupRank: 12, storeRank: 4, nominationRate: 59.5
+    },
+    '2025-12': {
+      totalPV: 68000, workDays: 24, myGirlCount: 1635, myGirlIncrease: 150,
+      webReservation: 32, himeDecoLogin: true, photoDiary: 80, diary: 35,
+      videoDiary: 12, kitene: 250, reviews: 6, okiniSend: 120, okiniReply: 35,
+      totalIncome: 920000, dispatchCount: 52, nominationCount: 35,
+      groupRank: 5, storeRank: 2, nominationRate: 67.3
+    },
+    '2025-11': {
+      totalPV: 35000, workDays: 18, myGirlCount: 1485, myGirlIncrease: 70,
+      webReservation: 18, himeDecoLogin: false, photoDiary: 42, diary: 15,
+      videoDiary: 3, kitene: 95, reviews: 2, okiniSend: 50, okiniReply: 12,
+      totalIncome: 650000, dispatchCount: 35, nominationCount: 19,
+      groupRank: 18, storeRank: 6, nominationRate: 54.3
+    },
+    '2025-10': {
+      totalPV: 38000, workDays: 19, myGirlCount: 1415, myGirlIncrease: 80,
+      webReservation: 20, himeDecoLogin: true, photoDiary: 48, diary: 18,
+      videoDiary: 4, kitene: 110, reviews: 2, okiniSend: 60, okiniReply: 15,
+      totalIncome: 700000, dispatchCount: 38, nominationCount: 21,
+      groupRank: 15, storeRank: 5, nominationRate: 55.3
+    },
+    '2025-09': {
+      totalPV: 42000, workDays: 20, myGirlCount: 1335, myGirlIncrease: 90,
+      webReservation: 22, himeDecoLogin: true, photoDiary: 52, diary: 20,
+      videoDiary: 5, kitene: 130, reviews: 3, okiniSend: 70, okiniReply: 18,
+      totalIncome: 720000, dispatchCount: 40, nominationCount: 23,
+      groupRank: 14, storeRank: 4, nominationRate: 57.5
+    },
+  };
+
   const currentPerformance = performanceHistory[selectedPerformanceMonth as keyof typeof performanceHistory] || performanceHistory['2026-02'];
-  const prevMonth = Object.keys(performanceHistory).find((_, idx, arr) =>
-    arr[idx - 1] === selectedPerformanceMonth
-  );
-  const prevPerformance = prevMonth ? performanceHistory[prevMonth as keyof typeof performanceHistory] : null;
+
+  // 出勤日平均PV
+  const avgPVPerDay = currentPerformance.workDays > 0
+    ? Math.round(currentPerformance.totalPV / currentPerformance.workDays)
+    : 0;
+
+  // 各項目のスコア計算
+  const scores = {
+    totalPV: calculateScore(currentPerformance.totalPV, totalPVCriteria),
+    avgPV: calculateScore(avgPVPerDay, avgPVCriteria),
+    myGirlCount: calculateScore(currentPerformance.myGirlCount, myGirlCountCriteria),
+    myGirlIncrease: calculateScore(currentPerformance.myGirlIncrease, myGirlIncreaseCriteria),
+    webReservation: calculateScore(currentPerformance.webReservation, webReservationCriteria),
+    himeDecoLogin: calculateScore(currentPerformance.himeDecoLogin ? 1 : 0, himeDecoLoginCriteria),
+    photoDiary: calculateScore(currentPerformance.photoDiary, photoDiaryCriteria),
+    diary: calculateScore(currentPerformance.diary, diaryCriteria),
+    videoDiary: calculateScore(currentPerformance.videoDiary, videoDiaryCriteria),
+    kitene: calculateScore(currentPerformance.kitene, kiteneCriteria),
+    reviews: calculateScore(currentPerformance.reviews, reviewCriteria),
+    okiniSend: calculateScore(currentPerformance.okiniSend, okiniSendCriteria),
+    okiniReply: calculateScore(currentPerformance.okiniReply, okiniReplyCriteria),
+  };
+
+  const totalScore = scores.totalPV.score + scores.avgPV.score + scores.myGirlCount.score +
+    scores.myGirlIncrease.score + scores.webReservation.score + scores.himeDecoLogin.score +
+    scores.photoDiary.score + scores.diary.score + scores.videoDiary.score +
+    scores.kitene.score + scores.reviews.score + scores.okiniSend.score + scores.okiniReply.score;
+
+  const rankInfo = calculateRank(totalScore);
 
   // 総所得計算
-  const totalEarnings = Object.values(performanceHistory).reduce((sum, month) => sum + month.totalSales, 0);
+  const totalEarnings = Object.values(performanceHistory).reduce((sum, month) => sum + month.totalIncome, 0);
 
   // グループ・店舗順位
   const rankingData = {
-    groupRank: 8,
+    groupRank: currentPerformance.groupRank,
     groupTotal: 150,
-    storeRank: 3,
+    storeRank: currentPerformance.storeRank,
     storeTotal: 25,
     storeName: '本店',
   };
@@ -1497,67 +1742,315 @@ export default function HostessManagementPage() {
                       </div>
                     </div>
 
-                    {/* 総所得 */}
-                    <div className="p-4 lg:p-6 bg-gradient-to-r from-amber-400 to-orange-500 rounded-2xl">
-                      <div className="text-white/80 text-xs lg:text-sm mb-1">累計総所得</div>
-                      <div className="text-2xl lg:text-4xl font-bold text-white">
-                        ¥{totalEarnings.toLocaleString()}
+                    {/* 総合評価カード */}
+                    <div className={`p-4 lg:p-6 ${rankInfo.bgColor} rounded-2xl border-2 ${rankInfo.borderColor}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-16 h-16 lg:w-24 lg:h-24 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                            <span className="text-4xl lg:text-6xl font-bold text-white">{rankInfo.rank}</span>
+                          </div>
+                          <div>
+                            <div className="text-white/80 text-xs lg:text-sm">総合評価</div>
+                            <div className="text-2xl lg:text-4xl font-bold text-white">
+                              {totalScore}<span className="text-lg lg:text-xl text-white/70">/100点</span>
+                            </div>
+                            <div className="w-24 lg:w-32 h-2 bg-white/30 rounded-full mt-2">
+                              <div
+                                className="h-full bg-white rounded-full transition-all"
+                                style={{ width: `${totalScore}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right text-white">
+                          <div className="text-xs lg:text-sm text-white/70">指名率</div>
+                          <div className="text-xl lg:text-2xl font-bold">{currentPerformance.nominationRate}%</div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* 順位（グループ・店舗） */}
-                    <div className="grid grid-cols-2 gap-3 lg:gap-4">
-                      <div className="p-4 lg:p-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl text-center">
+                    {/* 総所得・順位 */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4">
+                      <div className="p-4 lg:p-5 bg-gradient-to-r from-amber-400 to-orange-500 rounded-2xl">
+                        <div className="text-white/80 text-xs lg:text-sm mb-1">当月所得</div>
+                        <div className="text-xl lg:text-2xl font-bold text-white">
+                          ¥{currentPerformance.totalIncome.toLocaleString()}
+                        </div>
+                        <div className="text-white/60 text-xs mt-1">
+                          累計: ¥{totalEarnings.toLocaleString()}
+                        </div>
+                      </div>
+                      <div className="p-4 lg:p-5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl text-center">
                         <div className="text-white/80 text-xs lg:text-sm mb-1">グループ順位</div>
-                        <div className="text-3xl lg:text-5xl font-bold text-white mb-1">{rankingData.groupRank}位</div>
-                        <div className="text-white/70 text-sm">/ {rankingData.groupTotal}人中</div>
+                        <div className="text-2xl lg:text-3xl font-bold text-white">{rankingData.groupRank}位</div>
+                        <div className="text-white/60 text-xs">/ {rankingData.groupTotal}人中</div>
                       </div>
-                      <div className="p-4 lg:p-6 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-2xl text-center">
+                      <div className="p-4 lg:p-5 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-2xl text-center">
                         <div className="text-white/80 text-xs lg:text-sm mb-1">{rankingData.storeName}順位</div>
-                        <div className="text-3xl lg:text-5xl font-bold text-white mb-1">{rankingData.storeRank}位</div>
-                        <div className="text-white/70 text-sm">/ {rankingData.storeTotal}人中</div>
+                        <div className="text-2xl lg:text-3xl font-bold text-white">{rankingData.storeRank}位</div>
+                        <div className="text-white/60 text-xs">/ {rankingData.storeTotal}人中</div>
                       </div>
                     </div>
 
-                    {/* 月別実績 */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4">
-                      <div className="p-3 lg:p-5 bg-gray-50 rounded-xl text-center">
-                        <div className="text-gray-500 text-xs lg:text-sm mb-1 lg:mb-2">売上</div>
-                        <div className="text-lg lg:text-2xl font-bold text-gray-800">¥{currentPerformance.totalSales.toLocaleString()}</div>
-                        {prevPerformance && (
-                          <div className={`text-xs lg:text-sm mt-1 ${currentPerformance.totalSales >= prevPerformance.totalSales ? 'text-green-500' : 'text-red-500'}`}>
-                            {currentPerformance.totalSales >= prevPerformance.totalSales ? '+' : ''}
-                            {((currentPerformance.totalSales - prevPerformance.totalSales) / prevPerformance.totalSales * 100).toFixed(1)}%
-                          </div>
-                        )}
+                    {/* 派遣・指名サマリー */}
+                    <div className="grid grid-cols-3 gap-2 lg:gap-4">
+                      <div className="p-3 lg:p-4 bg-pink-50 rounded-xl text-center">
+                        <div className="text-xl lg:text-2xl font-bold text-pink-600">{currentPerformance.dispatchCount}</div>
+                        <div className="text-xs text-gray-600">派遣数</div>
                       </div>
-                      <div className="p-3 lg:p-5 bg-gray-50 rounded-xl text-center">
-                        <div className="text-gray-500 text-xs lg:text-sm mb-1 lg:mb-2">指名数</div>
-                        <div className="text-lg lg:text-2xl font-bold text-gray-800">{currentPerformance.nominations}件</div>
-                        {prevPerformance && (
-                          <div className={`text-xs lg:text-sm mt-1 ${currentPerformance.nominations >= prevPerformance.nominations ? 'text-green-500' : 'text-red-500'}`}>
-                            {currentPerformance.nominations >= prevPerformance.nominations ? '+' : ''}
-                            {currentPerformance.nominations - prevPerformance.nominations}件
-                          </div>
-                        )}
+                      <div className="p-3 lg:p-4 bg-purple-50 rounded-xl text-center">
+                        <div className="text-xl lg:text-2xl font-bold text-purple-600">{currentPerformance.nominationCount}</div>
+                        <div className="text-xs text-gray-600">指名数</div>
                       </div>
-                      <div className="p-3 lg:p-5 bg-gray-50 rounded-xl text-center">
-                        <div className="text-gray-500 text-xs lg:text-sm mb-1 lg:mb-2">新規顧客</div>
-                        <div className="text-lg lg:text-2xl font-bold text-gray-800">{currentPerformance.newCustomers}人</div>
-                      </div>
-                      <div className="p-3 lg:p-5 bg-gray-50 rounded-xl text-center">
-                        <div className="text-gray-500 text-xs lg:text-sm mb-1 lg:mb-2">リピート率</div>
-                        <div className="text-lg lg:text-2xl font-bold text-gray-800">{currentPerformance.repeatRate}%</div>
+                      <div className="p-3 lg:p-4 bg-blue-50 rounded-xl text-center">
+                        <div className="text-xl lg:text-2xl font-bold text-blue-600">{currentPerformance.workDays}日</div>
+                        <div className="text-xs text-gray-600">出勤日数</div>
                       </div>
                     </div>
 
-                    {/* 過去実績グラフ（簡易版） */}
+                    {/* 評価項目詳細 */}
+                    <div className="bg-gray-50 rounded-xl p-3 lg:p-4">
+                      <div className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-cyan-500" />
+                        評価項目詳細
+                      </div>
+                      <div className="space-y-2">
+                        {/* 合計PVポイント */}
+                        <div className="flex items-center justify-between p-2 bg-white rounded-lg">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700">合計PVポイント</div>
+                            <div className="text-xs text-gray-500">{currentPerformance.totalPV.toLocaleString()} PV</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">{scores.totalPV.label}</Badge>
+                            <div className="w-12 text-right font-bold text-pink-600">{scores.totalPV.score}/{scores.totalPV.maxScore}</div>
+                          </div>
+                        </div>
+
+                        {/* 出勤日平均PVポイント（NEW） */}
+                        <div className="flex items-center justify-between p-2 bg-yellow-50 rounded-lg border border-yellow-200">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                              出勤日平均PVポイント
+                              <Badge className="bg-yellow-500 text-white text-[10px] px-1">NEW</Badge>
+                            </div>
+                            <div className="text-xs text-gray-500">{avgPVPerDay.toLocaleString()} PV/日</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">{scores.avgPV.label}</Badge>
+                            <div className="w-12 text-right font-bold text-pink-600">{scores.avgPV.score}/{scores.avgPV.maxScore}</div>
+                          </div>
+                        </div>
+
+                        {/* マイガール人数ポイント */}
+                        <div className="flex items-center justify-between p-2 bg-white rounded-lg">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700">マイガール人数ポイント</div>
+                            <div className="text-xs text-gray-500">{currentPerformance.myGirlCount.toLocaleString()}人</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">{scores.myGirlCount.label}</Badge>
+                            <div className="w-12 text-right font-bold text-pink-600">{scores.myGirlCount.score}/{scores.myGirlCount.maxScore}</div>
+                          </div>
+                        </div>
+
+                        {/* マイガール増加ポイント（NEW） */}
+                        <div className="flex items-center justify-between p-2 bg-yellow-50 rounded-lg border border-yellow-200">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                              マイガール増加ポイント
+                              <Badge className="bg-yellow-500 text-white text-[10px] px-1">NEW</Badge>
+                            </div>
+                            <div className="text-xs text-gray-500">+{currentPerformance.myGirlIncrease}人</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">{scores.myGirlIncrease.label}</Badge>
+                            <div className="w-12 text-right font-bold text-pink-600">{scores.myGirlIncrease.score}/{scores.myGirlIncrease.maxScore}</div>
+                          </div>
+                        </div>
+
+                        {/* WEB予約ポイント */}
+                        <div className="flex items-center justify-between p-2 bg-white rounded-lg">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700">WEB予約ポイント</div>
+                            <div className="text-xs text-gray-500">{currentPerformance.webReservation}本</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">{scores.webReservation.label}</Badge>
+                            <div className="w-12 text-right font-bold text-pink-600">{scores.webReservation.score}/{scores.webReservation.maxScore}</div>
+                          </div>
+                        </div>
+
+                        {/* 姫デコログインポイント */}
+                        <div className="flex items-center justify-between p-2 bg-white rounded-lg">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700">姫デコログインポイント</div>
+                            <div className="text-xs text-gray-500">{currentPerformance.himeDecoLogin ? 'SPログイン済' : '未ログイン'}</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className={`text-xs ${currentPerformance.himeDecoLogin ? 'border-green-500 text-green-600' : ''}`}>
+                              {scores.himeDecoLogin.label}
+                            </Badge>
+                            <div className="w-12 text-right font-bold text-pink-600">{scores.himeDecoLogin.score}/{scores.himeDecoLogin.maxScore}</div>
+                          </div>
+                        </div>
+
+                        {/* 写メ日記ポイント */}
+                        <div className="flex items-center justify-between p-2 bg-white rounded-lg">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700">写メ日記ポイント</div>
+                            <div className="text-xs text-gray-500">{currentPerformance.photoDiary}本</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">{scores.photoDiary.label}</Badge>
+                            <div className="w-12 text-right font-bold text-pink-600">{scores.photoDiary.score}/{scores.photoDiary.maxScore}</div>
+                          </div>
+                        </div>
+
+                        {/* 日記ポイント */}
+                        <div className="flex items-center justify-between p-2 bg-white rounded-lg">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700">日記ポイント</div>
+                            <div className="text-xs text-gray-500">{currentPerformance.diary}本</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">{scores.diary.label}</Badge>
+                            <div className="w-12 text-right font-bold text-pink-600">{scores.diary.score}/{scores.diary.maxScore}</div>
+                          </div>
+                        </div>
+
+                        {/* 動画日記ポイント */}
+                        <div className="flex items-center justify-between p-2 bg-white rounded-lg">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700">動画日記ポイント</div>
+                            <div className="text-xs text-gray-500">{currentPerformance.videoDiary}本</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">{scores.videoDiary.label}</Badge>
+                            <div className="w-12 text-right font-bold text-pink-600">{scores.videoDiary.score}/{scores.videoDiary.maxScore}</div>
+                          </div>
+                        </div>
+
+                        {/* キテネポイント */}
+                        <div className="flex items-center justify-between p-2 bg-white rounded-lg">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700">キテネポイント</div>
+                            <div className="text-xs text-gray-500">{currentPerformance.kitene}回</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">{scores.kitene.label}</Badge>
+                            <div className="w-12 text-right font-bold text-pink-600">{scores.kitene.score}/{scores.kitene.maxScore}</div>
+                          </div>
+                        </div>
+
+                        {/* 口コミポイント */}
+                        <div className="flex items-center justify-between p-2 bg-white rounded-lg">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700">口コミポイント</div>
+                            <div className="text-xs text-gray-500">{currentPerformance.reviews}件</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">{scores.reviews.label}</Badge>
+                            <div className="w-12 text-right font-bold text-pink-600">{scores.reviews.score}/{scores.reviews.maxScore}</div>
+                          </div>
+                        </div>
+
+                        {/* オキニトーク送信ポイント */}
+                        <div className="flex items-center justify-between p-2 bg-white rounded-lg">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700">オキニトーク送信ポイント</div>
+                            <div className="text-xs text-gray-500">{currentPerformance.okiniSend}回</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">{scores.okiniSend.label}</Badge>
+                            <div className="w-12 text-right font-bold text-pink-600">{scores.okiniSend.score}/{scores.okiniSend.maxScore}</div>
+                          </div>
+                        </div>
+
+                        {/* オキニトーク返信ポイント（NEW） */}
+                        <div className="flex items-center justify-between p-2 bg-yellow-50 rounded-lg border border-yellow-200">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                              オキニトーク返信ポイント
+                              <Badge className="bg-yellow-500 text-white text-[10px] px-1">NEW</Badge>
+                            </div>
+                            <div className="text-xs text-gray-500">{currentPerformance.okiniReply}人</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">{scores.okiniReply.label}</Badge>
+                            <div className="w-12 text-right font-bold text-pink-600">{scores.okiniReply.score}/{scores.okiniReply.maxScore}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 過去実績履歴 */}
+                    <div className="bg-gray-50 rounded-xl p-3 lg:p-4">
+                      <div className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <History className="w-4 h-4 text-cyan-500" />
+                        過去の実績履歴
+                      </div>
+                      <div className="space-y-2">
+                        {Object.entries(performanceHistory)
+                          .sort(([a], [b]) => b.localeCompare(a))
+                          .map(([monthKey, data]) => {
+                            const [year, month] = monthKey.split('-');
+                            // 各月のスコア計算
+                            const monthAvgPV = data.workDays > 0 ? Math.round(data.totalPV / data.workDays) : 0;
+                            const monthTotalScore =
+                              calculateScore(data.totalPV, totalPVCriteria).score +
+                              calculateScore(monthAvgPV, avgPVCriteria).score +
+                              calculateScore(data.myGirlCount, myGirlCountCriteria).score +
+                              calculateScore(data.myGirlIncrease, myGirlIncreaseCriteria).score +
+                              calculateScore(data.webReservation, webReservationCriteria).score +
+                              calculateScore(data.himeDecoLogin ? 1 : 0, himeDecoLoginCriteria).score +
+                              calculateScore(data.photoDiary, photoDiaryCriteria).score +
+                              calculateScore(data.diary, diaryCriteria).score +
+                              calculateScore(data.videoDiary, videoDiaryCriteria).score +
+                              calculateScore(data.kitene, kiteneCriteria).score +
+                              calculateScore(data.reviews, reviewCriteria).score +
+                              calculateScore(data.okiniSend, okiniSendCriteria).score +
+                              calculateScore(data.okiniReply, okiniReplyCriteria).score;
+                            const monthRankInfo = calculateRank(monthTotalScore);
+                            const isSelected = monthKey === selectedPerformanceMonth;
+                            return (
+                              <div
+                                key={monthKey}
+                                className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
+                                  isSelected ? 'bg-pink-100 border-2 border-pink-300' : 'bg-white hover:bg-gray-100'
+                                }`}
+                                onClick={() => setSelectedPerformanceMonth(monthKey)}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-10 h-10 ${monthRankInfo.bgColor} rounded-full flex items-center justify-center`}>
+                                    <span className="text-lg font-bold text-white">{monthRankInfo.rank}</span>
+                                  </div>
+                                  <div>
+                                    <div className="font-semibold text-gray-800">{year}年{Number(month)}月</div>
+                                    <div className="text-xs text-gray-500">
+                                      グループ{data.groupRank}位 / 店舗{data.storeRank}位
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="font-bold text-green-600">¥{data.totalIncome.toLocaleString()}</div>
+                                  <div className="text-xs text-gray-500">
+                                    {monthTotalScore}点 / 指名率{data.nominationRate}%
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+
+                    {/* 過去6ヶ月の所得推移グラフ */}
                     <div className="p-4 bg-gray-50 rounded-xl">
-                      <div className="text-sm font-semibold text-gray-600 mb-3">過去6ヶ月の売上推移</div>
+                      <div className="text-sm font-semibold text-gray-600 mb-3">過去6ヶ月の所得推移</div>
                       <div className="flex items-end gap-2 h-24">
                         {Object.entries(performanceHistory).reverse().map(([month, data]) => {
-                          const maxSales = Math.max(...Object.values(performanceHistory).map(d => d.totalSales));
-                          const height = (data.totalSales / maxSales) * 100;
+                          const maxIncome = Math.max(...Object.values(performanceHistory).map(d => d.totalIncome));
+                          const height = (data.totalIncome / maxIncome) * 100;
                           return (
                             <div key={month} className="flex-1 flex flex-col items-center">
                               <div

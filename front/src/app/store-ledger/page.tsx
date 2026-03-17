@@ -81,7 +81,46 @@ export default function StoreLedger() {
   
   // basicTagのローカルコピーを管理（編集後に反映するため）
   const [localBasicTag, setLocalBasicTag] = React.useState<BasicTag | null>(null);
-  
+
+  // イベント追加モーダルの状態管理
+  const [isEventModalOpen, setIsEventModalOpen] = React.useState(false);
+  const [eventList, setEventList] = React.useState([
+    { id: '1', date: '2025/02/14', name: 'バレンタインデー', rate: 2.0, color: 'pink', active: true },
+    { id: '2', date: '2025/03/03', name: 'ひな祭り', rate: 1.5, color: 'purple', active: true },
+    { id: '3', date: '2025/03/14', name: 'ホワイトデー', rate: 2.0, color: 'blue', active: true },
+    { id: '4', date: '2025/05/05', name: 'GW特別キャンペーン', rate: 3.0, color: 'red', active: true },
+  ]);
+  const [newEvent, setNewEvent] = React.useState({
+    date: '',
+    name: '',
+    rate: '1.5',
+  });
+
+  // イベント追加関数
+  const handleAddEvent = () => {
+    if (!newEvent.date || !newEvent.name) {
+      alert('日付とイベント名は必須です');
+      return;
+    }
+    const colors = ['pink', 'purple', 'blue', 'red', 'green', 'orange'];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    setEventList(prev => [...prev, {
+      id: Date.now().toString(),
+      date: newEvent.date,
+      name: newEvent.name,
+      rate: parseFloat(newEvent.rate),
+      color: randomColor,
+      active: true,
+    }]);
+    setNewEvent({ date: '', name: '', rate: '1.5' });
+    setIsEventModalOpen(false);
+  };
+
+  // イベント削除関数
+  const handleDeleteEvent = (id: string) => {
+    setEventList(prev => prev.filter(e => e.id !== id));
+  };
+
   // カスタムフックを使用してデータと操作を管理
   const {
     selectedStore,
@@ -2636,9 +2675,9 @@ export default function StoreLedger() {
                   <div className="flex flex-wrap gap-2">
                     {[
                       { value: 'unlimited', label: '無期限' },
+                      { value: '3months', label: '3ヶ月' },
                       { value: '6months', label: '6ヶ月' },
                       { value: '1year', label: '1年' },
-                      { value: '2years', label: '2年' },
                     ].map(option => (
                       <label key={option.value} className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border cursor-pointer hover:bg-gray-100">
                         <input type="radio" name="defaultExpiration" value={option.value} defaultChecked={option.value === '1year'} />
@@ -2663,7 +2702,7 @@ export default function StoreLedger() {
                   <Percent className="w-5 h-5 text-green-500" />
                   日別ポイント倍率設定（イベント）
                 </h4>
-                <Button size="sm" className="flex items-center gap-2">
+                <Button size="sm" className="flex items-center gap-2" onClick={() => setIsEventModalOpen(true)}>
                   <Plus className="w-4 h-4" />
                   イベント追加
                 </Button>
@@ -2682,94 +2721,32 @@ export default function StoreLedger() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-4 py-2 text-sm">2025/02/14</td>
-                      <td className="px-4 py-2 text-sm font-medium text-pink-600">バレンタインデー</td>
-                      <td className="px-4 py-2 text-center">
-                        <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
-                          ×2.0
-                        </span>
-                      </td>
-                      <td className="px-4 py-2 text-center">
-                        <span className="inline-flex items-center px-2 py-1 bg-green-500 text-white rounded-full text-xs">有効</span>
-                      </td>
-                      <td className="px-4 py-2 text-center">
-                        <div className="flex justify-center gap-1">
-                          <Button variant="outline" size="sm" className="h-7 px-2">
-                            <Edit className="w-3 h-3" />
-                          </Button>
-                          <Button variant="destructive" size="sm" className="h-7 px-2">
-                            <Minus className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-4 py-2 text-sm">2025/03/03</td>
-                      <td className="px-4 py-2 text-sm font-medium text-purple-600">ひな祭り</td>
-                      <td className="px-4 py-2 text-center">
-                        <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
-                          ×1.5
-                        </span>
-                      </td>
-                      <td className="px-4 py-2 text-center">
-                        <span className="inline-flex items-center px-2 py-1 bg-green-500 text-white rounded-full text-xs">有効</span>
-                      </td>
-                      <td className="px-4 py-2 text-center">
-                        <div className="flex justify-center gap-1">
-                          <Button variant="outline" size="sm" className="h-7 px-2">
-                            <Edit className="w-3 h-3" />
-                          </Button>
-                          <Button variant="destructive" size="sm" className="h-7 px-2">
-                            <Minus className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-4 py-2 text-sm">2025/03/14</td>
-                      <td className="px-4 py-2 text-sm font-medium text-blue-600">ホワイトデー</td>
-                      <td className="px-4 py-2 text-center">
-                        <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
-                          ×2.0
-                        </span>
-                      </td>
-                      <td className="px-4 py-2 text-center">
-                        <span className="inline-flex items-center px-2 py-1 bg-green-500 text-white rounded-full text-xs">有効</span>
-                      </td>
-                      <td className="px-4 py-2 text-center">
-                        <div className="flex justify-center gap-1">
-                          <Button variant="outline" size="sm" className="h-7 px-2">
-                            <Edit className="w-3 h-3" />
-                          </Button>
-                          <Button variant="destructive" size="sm" className="h-7 px-2">
-                            <Minus className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-4 py-2 text-sm">2025/05/05</td>
-                      <td className="px-4 py-2 text-sm font-medium text-red-600">GW特別キャンペーン</td>
-                      <td className="px-4 py-2 text-center">
-                        <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
-                          ×3.0
-                        </span>
-                      </td>
-                      <td className="px-4 py-2 text-center">
-                        <span className="inline-flex items-center px-2 py-1 bg-green-500 text-white rounded-full text-xs">有効</span>
-                      </td>
-                      <td className="px-4 py-2 text-center">
-                        <div className="flex justify-center gap-1">
-                          <Button variant="outline" size="sm" className="h-7 px-2">
-                            <Edit className="w-3 h-3" />
-                          </Button>
-                          <Button variant="destructive" size="sm" className="h-7 px-2">
-                            <Minus className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
+                    {eventList.map(event => (
+                      <tr key={event.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-2 text-sm">{event.date}</td>
+                        <td className={`px-4 py-2 text-sm font-medium text-${event.color}-600`}>{event.name}</td>
+                        <td className="px-4 py-2 text-center">
+                          <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
+                            ×{event.rate.toFixed(1)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2 text-center">
+                          <span className={`inline-flex items-center px-2 py-1 ${event.active ? 'bg-green-500' : 'bg-gray-400'} text-white rounded-full text-xs`}>
+                            {event.active ? '有効' : '無効'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2 text-center">
+                          <div className="flex justify-center gap-1">
+                            <Button variant="outline" size="sm" className="h-7 px-2">
+                              <Edit className="w-3 h-3" />
+                            </Button>
+                            <Button variant="destructive" size="sm" className="h-7 px-2" onClick={() => handleDeleteEvent(event.id)}>
+                              <Minus className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -2782,6 +2759,66 @@ export default function StoreLedger() {
                 </p>
               </div>
             </div>
+
+            {/* イベント追加モーダル */}
+            {isEventModalOpen && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl w-[400px] overflow-hidden">
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-3 flex items-center justify-between">
+                    <h3 className="text-white font-bold">イベント追加</h3>
+                    <button
+                      onClick={() => setIsEventModalOpen(false)}
+                      className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors"
+                    >
+                      <X className="w-4 h-4 text-white" />
+                    </button>
+                  </div>
+                  <div className="p-4 space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">日付 <span className="text-red-500">*</span></label>
+                      <input
+                        type="date"
+                        value={newEvent.date}
+                        onChange={(e) => setNewEvent(prev => ({ ...prev, date: e.target.value }))}
+                        className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">イベント名 <span className="text-red-500">*</span></label>
+                      <input
+                        type="text"
+                        value={newEvent.name}
+                        onChange={(e) => setNewEvent(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="例: バレンタインデー"
+                        className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">ポイント倍率</label>
+                      <select
+                        value={newEvent.rate}
+                        onChange={(e) => setNewEvent(prev => ({ ...prev, rate: e.target.value }))}
+                        className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      >
+                        <option value="1.5">×1.5</option>
+                        <option value="2.0">×2.0</option>
+                        <option value="2.5">×2.5</option>
+                        <option value="3.0">×3.0</option>
+                        <option value="5.0">×5.0</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 px-4 py-3 flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => setIsEventModalOpen(false)}>
+                      キャンセル
+                    </Button>
+                    <Button onClick={handleAddEvent} className="bg-green-600 hover:bg-green-700">
+                      追加
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* ポイント付与ルール */}
             <div className="bg-white rounded-lg border p-4">
