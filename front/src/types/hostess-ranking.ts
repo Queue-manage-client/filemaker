@@ -8,6 +8,7 @@ export type SortKey =
   | 'panelNominationCount'
   | 'freeNominationCount'
   | 'totalNominationCount' // 本指名数（Item 36）
+  | 'honShimeiCount' // 本指名数カテゴリー（Item 38）
   | 'nominationRevenue'
   | 'averageCustomerSpending'
   | 'repeatCustomerRate'
@@ -27,7 +28,8 @@ export const SORT_OPTIONS: SortOption[] = [
   { value: 'monthlyEarnings', label: '月間収入' },
   { value: 'nominationRevenue', label: '指名売上' },
   { value: 'totalCustomers', label: '総客数' },
-  { value: 'totalNominationCount', label: '本指名数' }, // Item 36
+  { value: 'honShimeiCount', label: '本指名数' }, // Item 38
+  { value: 'totalNominationCount', label: '総指名数' }, // Item 36
   { value: 'regularNominationCount', label: '通常指名数' },
   { value: 'panelNominationCount', label: 'パネル指名数' },
   { value: 'freeNominationCount', label: 'フリー指名数' },

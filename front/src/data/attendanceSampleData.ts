@@ -649,6 +649,7 @@ export const attendingHostessSampleList: AttendingHostess[] = [
     store: '本店',
     todaySales: 85000,
     notes: '新規顧客獲得',
+    luggageDetails: '紙袋1、ポーチ1',
   },
   {
     id: 'hostess002',
@@ -658,6 +659,7 @@ export const attendingHostessSampleList: AttendingHostess[] = [
     status: '休憩中',
     store: 'VIPルーム',
     todaySales: 120000,
+    luggageDetails: 'キャリーバッグ1',
   },
   {
     id: 'hostess003',
@@ -677,6 +679,7 @@ export const attendingHostessSampleList: AttendingHostess[] = [
     store: '2F店舗',
     todaySales: 67000,
     notes: '体調不良のため早退',
+    luggageDetails: '衣装袋2、靴箱1',
   },
   {
     id: 'hostess005',

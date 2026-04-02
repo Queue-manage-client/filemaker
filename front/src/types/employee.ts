@@ -110,6 +110,9 @@ export interface DailyShift {
   notes?: string; // 備考
 }
 
+// 従業員カテゴリ
+export type EmployeeCategory = 'staff' | 'part_time';
+
 // 従業員週間シフトデータ
 export interface EmployeeWeeklyShift {
   id: string;
@@ -118,6 +121,7 @@ export interface EmployeeWeeklyShift {
   name: string;
   position: string;
   department: string;
+  category: EmployeeCategory;
 
   // 1週間分のシフトデータ
   weeklySchedule: {

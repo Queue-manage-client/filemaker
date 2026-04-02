@@ -135,6 +135,9 @@ export const sampleCastData: TodayCastData[] = [
     deliverCount: "4",
     storeColor: "#dcfce7",
     isNewbie: true,
+    newbieStartDate: "2026-03-25",
+    hasGuarantee: true,
+    guaranteeRemaining: 45000,
     weeklyRemarks: "研修期間中",
     workStyle: "新人",
     manager: "鈴木",
@@ -373,6 +376,9 @@ export const sampleCastData: TodayCastData[] = [
     deliverCount: "1",
     storeColor: "#bbf7d0",
     isNewbie: true,
+    newbieStartDate: "2026-03-28",
+    hasGuarantee: false,
+    guaranteeRemaining: 0,
     weeklyRemarks: "研修中のため軽い案件のみ",
     workStyle: "新人",
     manager: "小林",
@@ -630,7 +636,11 @@ export const sampleCastData: TodayCastData[] = [
     mode: "自動",
     ranking: "8",
     concurrent: "",
-    deliverCount: "4"
+    deliverCount: "4",
+    isNewbie: true,
+    newbieStartDate: "2026-03-30",
+    hasGuarantee: true,
+    guaranteeRemaining: 28000
   },
   {
     id: "020",
@@ -826,7 +836,11 @@ export const sampleCastData: TodayCastData[] = [
     mode: "手動",
     ranking: "15",
     concurrent: "",
-    deliverCount: "1"
+    deliverCount: "1",
+    isNewbie: true,
+    newbieStartDate: "2026-04-01",
+    hasGuarantee: true,
+    guaranteeRemaining: 60000
   },
   {
     id: "027",

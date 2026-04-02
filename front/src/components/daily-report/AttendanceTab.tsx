@@ -83,15 +83,6 @@ function AttendingStaffItem({ data }: AttendingStaffItemProps) {
       {/* 数字2 */}
       <td className="px-2 py-2 text-center font-mono text-gray-600">{data.number2}</td>
       
-      {/* バスタオル(青・赤・黒) */}
-      <td className="px-2 py-2 text-center">
-        <div className="flex justify-center gap-1">
-          <span className="text-blue-600 font-mono text-xs">{data.bathTowel.blue}</span>
-          <span className="text-red-600 font-mono text-xs">{data.bathTowel.red}</span>
-          <span className="text-gray-800 font-mono text-xs">{data.bathTowel.black}</span>
-        </div>
-      </td>
-      
       {/* 備品(青・赤・黒) */}
       <td className="px-2 py-2 text-center">
         <div className="flex justify-center gap-1">
@@ -153,7 +144,7 @@ function AttendingHostessItem({ data }: AttendingHostessItemProps) {
   };
 
   return (
-    <div className={`grid grid-cols-12 gap-1 text-xs py-1 border-b border-gray-200 hover:brightness-95 ${getRowBgColor()}`}>
+    <div className={`gap-1 text-xs py-1 border-b border-gray-200 hover:brightness-95 ${getRowBgColor()}`} style={{ display: 'grid', gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}>
       {/* ホステス名 */}
       <div className="font-medium text-gray-900 truncate">{data.hostessName}</div>
 
@@ -204,6 +195,11 @@ function AttendingHostessItem({ data }: AttendingHostessItemProps) {
           onChange={() => {}}
           className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 rounded"
         />
+      </div>
+
+      {/* 預り荷物 */}
+      <div className={`text-left truncate ${data.luggageDetails ? 'text-orange-600 font-medium' : 'text-gray-500'}`}>
+        {data.luggageDetails || '-'}
       </div>
 
       {/* 備考 */}
@@ -264,7 +260,6 @@ export default function AttendanceTab({ staffList, hostessList }: AttendanceTabP
                     <th className="w-18 px-2 py-3 text-xs font-semibold text-gray-700 text-right border-b">調整額</th>
                     <th className="w-20 px-2 py-3 text-xs font-semibold text-gray-700 text-right border-b">差引精算額</th>
                     <th className="w-12 px-2 py-3 text-xs font-semibold text-gray-700 text-center border-b">数字</th>
-                    <th className="w-20 px-2 py-3 text-xs font-semibold text-gray-700 text-center border-b">バスタオル<br/><span className="text-xs text-gray-500">(青/赤/黒)</span></th>
                     <th className="w-20 px-2 py-3 text-xs font-semibold text-gray-700 text-center border-b">備品<br/><span className="text-xs text-gray-500">(青/赤/黒)</span></th>
                     <th className="w-12 px-2 py-3 text-xs font-semibold text-gray-700 text-center border-b">数字</th>
                     <th className="w-12 px-2 py-3 text-xs font-semibold text-gray-700 text-center border-b">数字</th>
@@ -283,7 +278,7 @@ export default function AttendanceTab({ staffList, hostessList }: AttendanceTabP
         ) : (
           <div className="space-y-1">
             {/* ホステス用ヘッダー行 (Item 72: 新項目追加) */}
-            <div className="grid grid-cols-12 gap-1 text-xs font-semibold text-gray-700 pb-1 border-b-2 border-gray-300">
+            <div className="grid grid-cols-13 gap-1 text-xs font-semibold text-gray-700 pb-1 border-b-2 border-gray-300" style={{ gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}>
               <div className="text-left">ホステス名</div>
               <div className="text-center">出勤</div>
               <div className="text-center">退勤予定</div>
@@ -295,6 +290,7 @@ export default function AttendanceTab({ staffList, hostessList }: AttendanceTabP
               <div className="text-right">預り</div>
               <div className="text-right">支払額</div>
               <div className="text-center">済</div>
+              <div className="text-left">預り荷物</div>
               <div className="text-center">備考</div>
             </div>
             {/* 凡例 (Item 71) */}

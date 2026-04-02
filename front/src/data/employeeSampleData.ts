@@ -1,6 +1,6 @@
 // 従業員関連のサンプルデータ
 
-import { EmployeeSalary, PartTimeSalary, EmployeeSchedule, StaffLedger, EmployeeWeeklyShift, DailyShift } from '@/types/employee';
+import { EmployeeSalary, PartTimeSalary, EmployeeSchedule, StaffLedger, EmployeeWeeklyShift, DailyShift, EmployeeCategory } from '@/types/employee';
 
 // 従業員給与サンプルデータ
 export const sampleEmployeeSalaries: EmployeeSalary[] = [
@@ -335,6 +335,7 @@ export const sampleEmployeeWeeklyShifts: EmployeeWeeklyShift[] = [
     name: "田中一郎",
     position: "運行管理部長",
     department: "運行管理部",
+    category: "staff" as EmployeeCategory,
     weeklySchedule: {
       monday: { isWorkDay: true, shiftType: 'day', startTime: "09:00", endTime: "18:00", breakTime: 60, workHours: 8, location: "本社", notes: "" },
       tuesday: { isWorkDay: true, shiftType: 'day', startTime: "09:00", endTime: "18:00", breakTime: 60, workHours: 8, location: "本社", notes: "" },
@@ -356,6 +357,7 @@ export const sampleEmployeeWeeklyShifts: EmployeeWeeklyShift[] = [
     name: "佐藤花子",
     position: "ドライバー",
     department: "配車部",
+    category: "staff" as EmployeeCategory,
     weeklySchedule: {
       monday: { isWorkDay: true, shiftType: 'day', startTime: "08:00", endTime: "17:00", breakTime: 60, workHours: 8, location: "銀座エリア", notes: "" },
       tuesday: { isWorkDay: true, shiftType: 'night', startTime: "20:00", endTime: "05:00", breakTime: 60, workHours: 8, location: "銀座エリア", notes: "深夜シフト" },
@@ -377,6 +379,7 @@ export const sampleEmployeeWeeklyShifts: EmployeeWeeklyShift[] = [
     name: "山田次郎",
     position: "オペレーター",
     department: "配車部",
+    category: "part_time" as EmployeeCategory,
     weeklySchedule: {
       monday: { isWorkDay: true, shiftType: 'morning', startTime: "06:00", endTime: "15:00", breakTime: 60, workHours: 8, location: "コールセンター", notes: "早朝シフト" },
       tuesday: { isWorkDay: true, shiftType: 'day', startTime: "14:00", endTime: "22:00", breakTime: 60, workHours: 7, location: "コールセンター", notes: "" },
@@ -398,6 +401,7 @@ export const sampleEmployeeWeeklyShifts: EmployeeWeeklyShift[] = [
     name: "鈴木太郎",
     position: "ドライバー",
     department: "配車部",
+    category: "staff" as EmployeeCategory,
     weeklySchedule: {
       monday: { isWorkDay: true, shiftType: 'day', startTime: "10:00", endTime: "19:00", breakTime: 60, workHours: 8, location: "新宿エリア", notes: "" },
       tuesday: { isWorkDay: true, shiftType: 'day', startTime: "10:00", endTime: "19:00", breakTime: 60, workHours: 8, location: "新宿エリア", notes: "" },
@@ -419,6 +423,7 @@ export const sampleEmployeeWeeklyShifts: EmployeeWeeklyShift[] = [
     name: "高橋美咲",
     position: "事務",
     department: "総務部",
+    category: "staff" as EmployeeCategory,
     weeklySchedule: {
       monday: { isWorkDay: true, shiftType: 'day', startTime: "09:00", endTime: "17:00", breakTime: 60, workHours: 7, location: "本社", notes: "" },
       tuesday: { isWorkDay: true, shiftType: 'day', startTime: "09:00", endTime: "17:00", breakTime: 60, workHours: 7, location: "本社", notes: "" },
@@ -440,6 +445,7 @@ export const sampleEmployeeWeeklyShifts: EmployeeWeeklyShift[] = [
     name: "伊藤健一",
     position: "ドライバー",
     department: "配車部",
+    category: "staff" as EmployeeCategory,
     weeklySchedule: {
       monday: { isWorkDay: true, shiftType: 'night', startTime: "21:00", endTime: "06:00", breakTime: 60, workHours: 8, location: "六本木エリア", notes: "" },
       tuesday: { isWorkDay: true, shiftType: 'night', startTime: "21:00", endTime: "06:00", breakTime: 60, workHours: 8, location: "六本木エリア", notes: "" },
@@ -461,6 +467,7 @@ export const sampleEmployeeWeeklyShifts: EmployeeWeeklyShift[] = [
     name: "渡辺さくら",
     position: "経理",
     department: "経理部",
+    category: "staff" as EmployeeCategory,
     weeklySchedule: {
       monday: { isWorkDay: true, shiftType: 'day', startTime: "09:30", endTime: "18:30", breakTime: 60, workHours: 8, location: "本社", notes: "" },
       tuesday: { isWorkDay: true, shiftType: 'day', startTime: "09:30", endTime: "18:30", breakTime: 60, workHours: 8, location: "本社", notes: "" },
@@ -482,6 +489,7 @@ export const sampleEmployeeWeeklyShifts: EmployeeWeeklyShift[] = [
     name: "小林雅也",
     position: "ドライバー",
     department: "配車部",
+    category: "staff" as EmployeeCategory,
     weeklySchedule: {
       monday: createEmptyDailyShift(),
       tuesday: { isWorkDay: true, shiftType: 'day', startTime: "08:00", endTime: "17:00", breakTime: 60, workHours: 8, location: "渋谷エリア", notes: "" },
@@ -503,6 +511,7 @@ export const sampleEmployeeWeeklyShifts: EmployeeWeeklyShift[] = [
     name: "加藤りな",
     position: "オペレーター",
     department: "配車部",
+    category: "part_time" as EmployeeCategory,
     weeklySchedule: {
       monday: { isWorkDay: true, shiftType: 'evening', startTime: "17:00", endTime: "22:00", breakTime: 30, workHours: 4.5, location: "コールセンター", notes: "" },
       tuesday: { isWorkDay: true, shiftType: 'evening', startTime: "17:00", endTime: "22:00", breakTime: 30, workHours: 4.5, location: "コールセンター", notes: "" },
@@ -524,6 +533,7 @@ export const sampleEmployeeWeeklyShifts: EmployeeWeeklyShift[] = [
     name: "中村大輔",
     position: "マネージャー",
     department: "配車部",
+    category: "staff" as EmployeeCategory,
     weeklySchedule: {
       monday: { isWorkDay: true, shiftType: 'day', startTime: "08:00", endTime: "18:00", breakTime: 60, workHours: 9, location: "本社", notes: "" },
       tuesday: { isWorkDay: true, shiftType: 'day', startTime: "08:00", endTime: "18:00", breakTime: 60, workHours: 9, location: "本社", notes: "" },
@@ -534,6 +544,72 @@ export const sampleEmployeeWeeklyShifts: EmployeeWeeklyShift[] = [
       sunday: createEmptyDailyShift()
     },
     weeklyStats: { totalWorkDays: 5, totalWorkHours: 45, totalBreakTime: 300, regularHours: 40, overtimeHours: 5, nightHours: 0, holidayHours: 0 },
+    weekStartDate: "2025-01-27",
+    weekEndDate: "2025-02-02",
+    lastUpdated: "2025-01-25T10:00:00Z"
+  },
+  {
+    id: "weekly_shift_011",
+    employeeId: "emp011",
+    employeeNumber: "P-003",
+    name: "松本健太",
+    position: "アルバイトドライバー",
+    department: "配車部",
+    category: "part_time" as EmployeeCategory,
+    weeklySchedule: {
+      monday: createEmptyDailyShift(),
+      tuesday: { isWorkDay: true, shiftType: 'evening', startTime: "18:00", endTime: "00:00", breakTime: 30, workHours: 5.5, location: "銀座エリア", notes: "" },
+      wednesday: { isWorkDay: true, shiftType: 'evening', startTime: "18:00", endTime: "00:00", breakTime: 30, workHours: 5.5, location: "銀座エリア", notes: "" },
+      thursday: createEmptyDailyShift(),
+      friday: { isWorkDay: true, shiftType: 'night', startTime: "21:00", endTime: "05:00", breakTime: 60, workHours: 7, location: "銀座エリア", notes: "深夜シフト" },
+      saturday: { isWorkDay: true, shiftType: 'night', startTime: "21:00", endTime: "05:00", breakTime: 60, workHours: 7, location: "銀座エリア", notes: "深夜シフト" },
+      sunday: createEmptyDailyShift()
+    },
+    weeklyStats: { totalWorkDays: 4, totalWorkHours: 25, totalBreakTime: 180, regularHours: 11, overtimeHours: 0, nightHours: 14, holidayHours: 0 },
+    weekStartDate: "2025-01-27",
+    weekEndDate: "2025-02-02",
+    lastUpdated: "2025-01-25T10:00:00Z"
+  },
+  {
+    id: "weekly_shift_012",
+    employeeId: "emp012",
+    employeeNumber: "P-004",
+    name: "西村友美",
+    position: "アルバイト内勤",
+    department: "総務部",
+    category: "part_time" as EmployeeCategory,
+    weeklySchedule: {
+      monday: { isWorkDay: true, shiftType: 'day', startTime: "10:00", endTime: "15:00", breakTime: 30, workHours: 4.5, location: "本社", notes: "" },
+      tuesday: { isWorkDay: true, shiftType: 'day', startTime: "10:00", endTime: "15:00", breakTime: 30, workHours: 4.5, location: "本社", notes: "" },
+      wednesday: createEmptyDailyShift(),
+      thursday: { isWorkDay: true, shiftType: 'day', startTime: "10:00", endTime: "15:00", breakTime: 30, workHours: 4.5, location: "本社", notes: "" },
+      friday: { isWorkDay: true, shiftType: 'day', startTime: "10:00", endTime: "15:00", breakTime: 30, workHours: 4.5, location: "本社", notes: "" },
+      saturday: createEmptyDailyShift(),
+      sunday: createEmptyDailyShift()
+    },
+    weeklyStats: { totalWorkDays: 4, totalWorkHours: 18, totalBreakTime: 120, regularHours: 18, overtimeHours: 0, nightHours: 0, holidayHours: 0 },
+    weekStartDate: "2025-01-27",
+    weekEndDate: "2025-02-02",
+    lastUpdated: "2025-01-25T10:00:00Z"
+  },
+  {
+    id: "weekly_shift_013",
+    employeeId: "emp013",
+    employeeNumber: "P-005",
+    name: "藤田翔太",
+    position: "アルバイト広報",
+    department: "広報部",
+    category: "part_time" as EmployeeCategory,
+    weeklySchedule: {
+      monday: createEmptyDailyShift(),
+      tuesday: createEmptyDailyShift(),
+      wednesday: { isWorkDay: true, shiftType: 'day', startTime: "13:00", endTime: "20:00", breakTime: 60, workHours: 6, location: "本社", notes: "" },
+      thursday: { isWorkDay: true, shiftType: 'day', startTime: "13:00", endTime: "20:00", breakTime: 60, workHours: 6, location: "本社", notes: "" },
+      friday: { isWorkDay: true, shiftType: 'day', startTime: "13:00", endTime: "20:00", breakTime: 60, workHours: 6, location: "本社", notes: "" },
+      saturday: { isWorkDay: true, shiftType: 'day', startTime: "10:00", endTime: "18:00", breakTime: 60, workHours: 7, location: "本社", notes: "" },
+      sunday: createEmptyDailyShift()
+    },
+    weeklyStats: { totalWorkDays: 4, totalWorkHours: 25, totalBreakTime: 240, regularHours: 25, overtimeHours: 0, nightHours: 0, holidayHours: 0 },
     weekStartDate: "2025-01-27",
     weekEndDate: "2025-02-02",
     lastUpdated: "2025-01-25T10:00:00Z"

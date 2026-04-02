@@ -113,4 +113,6 @@ export interface AttendingHostess {
   isSettled?: boolean;
   /** 送信済み (Item 71) */
   isSent?: boolean;
+  /** 預り荷物の詳細 */
+  luggageDetails?: string;
 }

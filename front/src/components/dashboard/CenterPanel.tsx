@@ -27,7 +27,7 @@ export const CenterPanel = () => {
         { name: "ホステス台帳", icon: Users, href: "/hostess-ledger" },
         { name: "スタッフ台帳", icon: Users, href: "/staff-ledger" },
         { name: "週間ホステス出勤", icon: Calendar, href: "/weekly-hostess-attendance" },
-        { name: "地域区分", icon: Map, href: "/area-division" },
+        { name: "地域区分・交通費", icon: Map, href: "/area-division" },
         { name: "ホテル", icon: Hotel, href: "/hotel" },
         { name: "有料道路", icon: MapPin, href: "/toll-road" }
       ]
@@ -35,8 +35,7 @@ export const CenterPanel = () => {
     {
       title: "E",
       items: [
-        { name: "メディア管理", icon: Database, href: "/media-management" },
-        { name: "交通費設定", icon: Map, href: "/transportation-fee-settings" }
+        { name: "メディア管理", icon: Database, href: "/media-management" }
       ]
     }
   ];

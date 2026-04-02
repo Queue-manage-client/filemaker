@@ -310,6 +310,9 @@ export default function DailyReport() {
   const [blankSlipCount, setBlankSlipCount] = useState<string>('1');
   const [blankSlips, setBlankSlips] = useState<Array<{ id: number; category: string; name: string; amount: number }>>([]);
 
+  // クレジットカード詳細表示トグル
+  const [showCreditDetail, setShowCreditDetail] = useState(false);
+
   useEffect(() => {
     document.title = '日報 - Dispatch Harmony Hub';
   }, []);
@@ -470,42 +473,42 @@ export default function DailyReport() {
   return (
     <div className="w-[1920px] h-[1080px] relative bg-white font-['Inter'] flex flex-col text-xs">
       {/* ヘッダー - dispatch-panel-2dと同じスタイル */}
-      <div className="w-full h-[50px] bg-white">
-        <div className="flex items-center h-full px-2">
+      <div className="w-full h-[28px] bg-white">
+        <div className="flex items-center h-full px-1">
           {/* ダッシュボードに戻る - 左端 */}
           <Link href="/dashboard">
             <Button
               variant="outline"
-              className="h-8 px-3 text-xs flex items-center gap-2 border-[#323232]"
+              className="h-6 px-2 text-[10px] flex items-center gap-1 border-[#323232]"
             >
-              <ArrowLeft className="w-4 h-4" />
-              ダッシュボードに戻る
+              <ArrowLeft className="w-3 h-3" />
+              戻る
             </Button>
           </Link>
 
           {/* 中央配置のボタン群 */}
-          <div className="flex-1 flex items-center justify-center gap-2">
+          <div className="flex-1 flex items-center justify-center gap-1">
             {/* 日報タイトル */}
-            <h1 className="text-lg font-bold mr-2">日報</h1>
+            <h1 className="text-xs font-bold mr-1">日報</h1>
 
             {/* 日付移動ボタン（前日） */}
             <Button
               variant="outline"
               size="sm"
-              className="h-8 w-8 p-0 border-[#323232]"
+              className="h-6 w-6 p-0 border-[#323232]"
               onClick={goToPreviousDay}
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3 h-3" />
             </Button>
 
-            {/* カレンダーから日付選択 */}
+            {/* カレンダーから日付選択 (#80) */}
             <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="h-8 px-3 text-xs border-[#323232] flex items-center gap-2"
+                  className="h-6 px-2 text-[10px] border-[#323232] flex items-center gap-1"
                 >
-                  <CalendarIcon className="w-4 h-4" />
+                  <CalendarIcon className="w-3 h-3" />
                   {format(currentDate, 'yyyy年MM月dd日(E)', { locale: ja })}
                 </Button>
               </PopoverTrigger>
@@ -528,24 +531,24 @@ export default function DailyReport() {
             <Button
               variant="outline"
               size="sm"
-              className="h-8 w-8 p-0 border-[#323232] mr-2"
+              className="h-6 w-6 p-0 border-[#323232] mr-1"
               onClick={goToNextDay}
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3 h-3" />
             </Button>
 
             {/* 日報出力 */}
             <Button
-              className="h-8 px-4 text-xs bg-orange-400 hover:bg-orange-500 text-black border border-[#323232] flex items-center gap-1"
+              className="h-6 px-2 text-[10px] bg-orange-400 hover:bg-orange-500 text-black border border-[#323232] flex items-center gap-1"
               onClick={generateDailyReportPDF}
             >
-              <FileText className="w-4 h-4" />
+              <FileText className="w-3 h-3" />
               日報出力
             </Button>
 
             {/* 印刷 */}
             <Button
-              className="h-8 px-4 text-xs bg-lime-400 hover:bg-lime-500 text-black border border-[#323232]"
+              className="h-6 px-2 text-[10px] bg-lime-400 hover:bg-lime-500 text-black border border-[#323232]"
               onClick={() => {}}
             >
               印刷
@@ -553,7 +556,7 @@ export default function DailyReport() {
 
             {/* 売上確定 */}
             <Button
-              className="h-8 px-4 text-xs bg-cyan-300 hover:bg-cyan-400 text-black border border-[#323232]"
+              className="h-6 px-2 text-[10px] bg-cyan-300 hover:bg-cyan-400 text-black border border-[#323232]"
               onClick={() => {}}
             >
               売上確定
@@ -561,7 +564,7 @@ export default function DailyReport() {
 
             {/* 日報承認 */}
             <Button
-              className="h-8 px-4 text-xs bg-purple-400 hover:bg-purple-500 text-black border border-[#323232]"
+              className="h-6 px-2 text-[10px] bg-purple-400 hover:bg-purple-500 text-black border border-[#323232]"
               onClick={() => {}}
             >
               日報承認
@@ -570,7 +573,7 @@ export default function DailyReport() {
             {/* Menu */}
             <Button
               variant="outline"
-              className="h-8 px-4 text-xs border-[#323232]"
+              className="h-6 px-2 text-[10px] border-[#323232]"
               onClick={() => {}}
             >
               Menu
@@ -579,85 +582,85 @@ export default function DailyReport() {
         </div>
       </div>
 
-      {/* メインコンテンツ - グリッドレイアウト */}
-      <div className="flex-1 grid mt-1 overflow-hidden" style={{ gridTemplateColumns: '25% 27% 48%', gridTemplateRows: '1fr' }}>
+      {/* メインコンテンツ - グリッドレイアウト (#82: モニター1枚に収める) */}
+      <div className="flex-1 grid overflow-hidden" style={{ gridTemplateColumns: '25% 27% 48%', gridTemplateRows: '1fr' }}>
         {/* 左側セクション - 売上リスト */}
         <div className="h-full overflow-y-scroll border-r border-[#323232] bg-white scrollbar-visible" style={{ scrollbarWidth: 'thin', scrollbarColor: '#888 #e5e5e5' }}>
         {salesListData.map((store, index) => (
           <div key={store.id} className="border-b border-[#323232]">
             {/* 店舗ヘッダー */}
-            <div className={`bg-cyan-200 h-5 flex items-center px-0.5 border-b border-[#323232] ${index === 0 ? 'border-t' : ''}`}>
-              <span className="text-xs font-bold text-black">{store.id} {store.label} 売上リスト</span>
-              <span className="text-xs font-bold ml-0.5 text-black">{store.storeName}</span>
+            <div className={`bg-cyan-200 h-4 flex items-center px-0.5 border-b border-[#323232] ${index === 0 ? 'border-t' : ''}`}>
+              <span className="text-[10px] font-bold text-black">{store.id} {store.label} 売上リスト</span>
+              <span className="text-[10px] font-bold ml-0.5 text-black">{store.storeName}</span>
             </div>
             {/* 売上詳細 - 3列レイアウト */}
-            <div className="text-xs bg-white">
+            <div className="text-[10px] bg-white">
               {/* 行1: 店売上現金計 / (空白) / 給料日計 */}
-              <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 px-1 py-0.5 flex items-center">店売上現金計</div>
-                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.storeCashSales)}</div>
-                <div className="flex-1 px-1 py-0.5 flex items-center"></div>
-                <div className="flex-1 px-1 py-0.5 flex items-center">給料日計</div>
-                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.payrollDaily)}</div>
+              <div className="flex h-4 border-b border-[#323232]">
+                <div className="flex-1 px-0.5 flex items-center">店売上現金計</div>
+                <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.storeCashSales)}</div>
+                <div className="flex-1 px-0.5 flex items-center"></div>
+                <div className="flex-1 px-0.5 flex items-center">給料日計</div>
+                <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.payrollDaily)}</div>
               </div>
               {/* 行2: 店売上カード計 / 領収証発行 / 派遣回数日計 */}
-              <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 px-1 py-0.5 flex items-center">店売上カード計</div>
-                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.storeCardSales)} {store.storeCardCount > 0 ? `${store.storeCardCount}件` : ''}</div>
-                <div className="flex-1 px-1 py-0.5 flex items-center">領収証発行</div>
-                <div className="w-8 text-right px-1 py-0.5 flex items-center justify-end">{store.receiptCount}件</div>
-                <div className="flex-1 px-1 py-0.5 flex items-center">派遣回数日計</div>
-                <div className="w-8 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.dispatchDaily)}</div>
+              <div className="flex h-4 border-b border-[#323232]">
+                <div className="flex-1 px-0.5 flex items-center">店売上カード計</div>
+                <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.storeCardSales)} {store.storeCardCount > 0 ? `${store.storeCardCount}件` : ''}</div>
+                <div className="flex-1 px-0.5 flex items-center">領収証発行</div>
+                <div className="w-8 text-right px-0.5 flex items-center justify-end">{store.receiptCount}件</div>
+                <div className="flex-1 px-0.5 flex items-center">派遣回数日計</div>
+                <div className="w-8 text-right px-0.5 flex items-center justify-end">{formatNumber(store.dispatchDaily)}</div>
               </div>
               {/* 行3: 店売上計 / 割引チケット利用 / 指名回数日計 */}
-              <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 px-1 py-0.5 flex items-center">店売上計</div>
-                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.storeTotalSales)}</div>
-                <div className="flex-1 px-1 py-0.5 flex items-center">割引チケット</div>
-                <div className="w-8 text-right px-1 py-0.5 flex items-center justify-end">{store.discountTicketCount}件</div>
-                <div className="flex-1 px-1 py-0.5 flex items-center">指名回数日計</div>
-                <div className="w-8 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.nominationDaily)}</div>
+              <div className="flex h-4 border-b border-[#323232]">
+                <div className="flex-1 px-0.5 flex items-center">店売上計</div>
+                <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.storeTotalSales)}</div>
+                <div className="flex-1 px-0.5 flex items-center">割引チケット</div>
+                <div className="w-8 text-right px-0.5 flex items-center justify-end">{store.discountTicketCount}件</div>
+                <div className="flex-1 px-0.5 flex items-center">指名回数日計</div>
+                <div className="w-8 text-right px-0.5 flex items-center justify-end">{formatNumber(store.nominationDaily)}</div>
               </div>
               {/* 行4: カード請求計 / 未回収売掛金額計 / HF指名回数日計 */}
-              <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 px-1 py-0.5 flex items-center">カード請求計</div>
-                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.cardBilling)}</div>
-                <div className="flex-1 px-1 py-0.5 flex items-center">未回収売掛</div>
-                <div className="w-8 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.uncollectedAmount)}</div>
-                <div className="flex-1 px-1 py-0.5 flex items-center">HF指名日計</div>
-                <div className="w-8 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.hfNominationDaily)}</div>
+              <div className="flex h-4 border-b border-[#323232]">
+                <div className="flex-1 px-0.5 flex items-center">カード請求計</div>
+                <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.cardBilling)}</div>
+                <div className="flex-1 px-0.5 flex items-center">未回収売掛</div>
+                <div className="w-8 text-right px-0.5 flex items-center justify-end">{formatNumber(store.uncollectedAmount)}</div>
+                <div className="flex-1 px-0.5 flex items-center">HF指名日計</div>
+                <div className="w-8 text-right px-0.5 flex items-center justify-end">{formatNumber(store.hfNominationDaily)}</div>
               </div>
               {/* 行5: カード加算金額計 / (空白) / (空白) */}
-              <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 px-1 py-0.5 flex items-center">カード加算金額計</div>
-                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.cardAddFee)}</div>
-                <div className="flex-1 px-1 py-0.5 flex items-center"></div>
-                <div className="flex-1 px-1 py-0.5 flex items-center"></div>
+              <div className="flex h-4 border-b border-[#323232]">
+                <div className="flex-1 px-0.5 flex items-center">カード加算金額計</div>
+                <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.cardAddFee)}</div>
+                <div className="flex-1 px-0.5 flex items-center"></div>
+                <div className="flex-1 px-0.5 flex items-center"></div>
               </div>
               {/* 行6: その他売上計 / 入金計 / 出金計 */}
-              <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 min-w-[90px] px-1 py-0.5 flex items-center">その他売上計</div>
-                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.otherSales)}</div>
-                <div className="flex-1 px-1 py-0.5 flex items-center">入金計</div>
-                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.deposit)}</div>
-                <div className="flex-1 px-1 py-0.5 flex items-center">出金計</div>
-                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.withdrawal)}</div>
+              <div className="flex h-4 border-b border-[#323232]">
+                <div className="flex-1 px-0.5 flex items-center">その他売上計</div>
+                <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.otherSales)}</div>
+                <div className="flex-1 px-0.5 flex items-center">入金計</div>
+                <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.deposit)}</div>
+                <div className="flex-1 px-0.5 flex items-center">出金計</div>
+                <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.withdrawal)}</div>
               </div>
               {/* 行7: 現金収入計 / 報告金額 / 旧現金収入計 */}
-              <div className="flex h-5 border-b border-[#323232]">
-                <div className="flex-1 px-1 py-0.5 flex items-center">現金収入計</div>
-                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.cashRevenue)}</div>
-                <div className="flex-1 px-1 py-0.5 flex items-center font-bold">報告金額</div>
-                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end font-bold">{formatNumber(store.reportedAmount)}</div>
-                <div className="flex-1 min-w-[90px] px-1 py-0.5 flex items-center">旧現金収入計</div>
-                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.oldCashRevenue)}</div>
+              <div className="flex h-4 border-b border-[#323232]">
+                <div className="flex-1 px-0.5 flex items-center">現金収入計</div>
+                <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.cashRevenue)}</div>
+                <div className="flex-1 px-0.5 flex items-center font-bold">報告金額</div>
+                <div className="flex-1 text-right px-0.5 flex items-center justify-end font-bold">{formatNumber(store.reportedAmount)}</div>
+                <div className="flex-1 px-0.5 flex items-center">旧現金収入計</div>
+                <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.oldCashRevenue)}</div>
               </div>
               {/* 行8: (空白) / (空白) / 旧報告金額 */}
-              <div className="flex h-5 bg-cyan-50">
-                <div className="flex-[2] px-1 py-0.5 flex items-center"></div>
-                <div className="flex-1 px-1 py-0.5 flex items-center"></div>
-                <div className="flex-1 px-1 py-0.5 flex items-center">旧報告金額</div>
-                <div className="flex-1 text-right px-1 py-0.5 flex items-center justify-end">{formatNumber(store.oldReportedAmount)}</div>
+              <div className="flex h-4 bg-cyan-50">
+                <div className="flex-[2] px-0.5 flex items-center"></div>
+                <div className="flex-1 px-0.5 flex items-center"></div>
+                <div className="flex-1 px-0.5 flex items-center">旧報告金額</div>
+                <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.oldReportedAmount)}</div>
               </div>
             </div>
           </div>
@@ -667,74 +670,74 @@ export default function DailyReport() {
         {/* 中央左セクション - 集計結果 + 入出金 + クレジット */}
         <div className="h-full border-r border-[#323232] overflow-y-auto">
           {/* 集計結果 */}
-        <div className="text-xs">
-          <div className="flex h-5 border-t border-b border-[#323232]">
-            <div className="flex-1 p-0.5 bg-zinc-200 border-r border-[#323232] flex items-center">現金収入計</div>
-            <div className="w-20 text-right px-px py-0.5 border-r border-[#323232] flex items-center justify-end font-bold">860,655</div>
-            <div className="flex-1 p-0.5 bg-zinc-200 border-r border-[#323232] flex items-center">ドライバ回収額計</div>
-            <div className="w-20 text-right px-px py-0.5 flex items-center justify-end font-bold">865,670</div>
+        <div className="text-[10px]">
+          <div className="flex h-4 border-t border-b border-[#323232]">
+            <div className="flex-1 px-px bg-zinc-200 border-r border-[#323232] flex items-center">現金収入計</div>
+            <div className="w-18 text-right px-px border-r border-[#323232] flex items-center justify-end font-bold">860,655</div>
+            <div className="flex-1 px-px bg-zinc-200 border-r border-[#323232] flex items-center">ドライバ回収額計</div>
+            <div className="w-18 text-right px-px flex items-center justify-end font-bold">865,670</div>
           </div>
-          <div className="flex h-5 border-b border-[#323232]">
-            <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center">店舗売上計カード</div>
-            <div className="w-20 text-right px-px py-0.5 border-r border-[#323232] flex items-center justify-end">49,280</div>
-            <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center">ホステス支払計</div>
-            <div className="w-20 text-right px-px py-0.5 flex items-center justify-end">1,724,940</div>
+          <div className="flex h-4 border-b border-[#323232]">
+            <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center">店舗売上計カード</div>
+            <div className="w-18 text-right px-px border-r border-[#323232] flex items-center justify-end">49,280</div>
+            <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center">ホステス支払計</div>
+            <div className="w-18 text-right px-px flex items-center justify-end">1,724,940</div>
           </div>
-          <div className="flex h-5 border-b border-[#323232]">
-            <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center">売上計</div>
-            <div className="w-20 text-right px-px py-0.5 border-r border-[#323232] flex items-center justify-end">909,600</div>
-            <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center">入金計</div>
-            <div className="w-20 text-right px-px py-0.5 flex items-center justify-end">402,455</div>
+          <div className="flex h-4 border-b border-[#323232]">
+            <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center">売上計</div>
+            <div className="w-18 text-right px-px border-r border-[#323232] flex items-center justify-end">909,600</div>
+            <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center">入金計</div>
+            <div className="w-18 text-right px-px flex items-center justify-end">402,455</div>
           </div>
-          <div className="flex h-5 border-b border-[#323232]">
-            <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center">店舗売上計現金</div>
-            <div className="w-20 text-right px-px py-0.5 border-r border-[#323232] flex items-center justify-end">892,070</div>
-            <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center">出金計</div>
-            <div className="w-20 text-right px-px py-0.5 flex items-center justify-end">128,733</div>
+          <div className="flex h-4 border-b border-[#323232]">
+            <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center">店舗売上計現金</div>
+            <div className="w-18 text-right px-px border-r border-[#323232] flex items-center justify-end">892,070</div>
+            <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center">出金計</div>
+            <div className="w-18 text-right px-px flex items-center justify-end">128,733</div>
           </div>
-          <div className="flex h-5 border-b border-[#323232]">
-            <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center"></div>
-            <div className="w-20 text-right px-px py-0.5 border-r border-[#323232] flex items-center justify-end"></div>
-            <div className="flex-1 p-0.5 bg-zinc-100 border-r border-[#323232] flex items-center">収支計</div>
-            <div className="w-20 text-right px-px py-0.5 flex items-center justify-end">273,722</div>
+          <div className="flex h-4 border-b border-[#323232]">
+            <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center"></div>
+            <div className="w-18 text-right px-px border-r border-[#323232] flex items-center justify-end"></div>
+            <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center">収支計</div>
+            <div className="w-18 text-right px-px flex items-center justify-end">273,722</div>
           </div>
-          <div className="flex h-5 border-b border-[#323232] bg-yellow-100">
-            <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center"></div>
-            <div className="w-20 text-right px-px py-0.5 border-r border-[#323232] flex items-center justify-end"></div>
-            <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center font-bold">現金残高</div>
-            <div className="w-20 text-right px-px py-0.5 flex items-center justify-end font-bold">16,664,454</div>
+          <div className="flex h-4 border-b border-[#323232] bg-yellow-100">
+            <div className="flex-1 px-px border-r border-[#323232] flex items-center"></div>
+            <div className="w-18 text-right px-px border-r border-[#323232] flex items-center justify-end"></div>
+            <div className="flex-1 px-px border-r border-[#323232] flex items-center font-bold">現金残高</div>
+            <div className="w-18 text-right px-px flex items-center justify-end font-bold">16,664,454</div>
           </div>
         </div>
 
-        {/* 入金・出金エリア */}
-        <div className="flex border-b border-[#323232] h-[500px]">
+        {/* 入金・出金エリア (#73: 全て閲覧可能) */}
+        <div className="flex border-b border-[#323232]">
           {/* 入金 */}
           <div className="w-1/2 border-r border-[#323232]">
-            <div className="bg-red-300 h-5 flex items-center justify-center border-b border-[#323232]">
-              <span className="text-xs font-bold">入金</span>
+            <div className="bg-red-300 h-4 flex items-center justify-center border-b border-[#323232]">
+              <span className="text-[10px] font-bold">入金</span>
             </div>
-            <div className="overflow-y-auto h-[456px]">
+            <div>
               {depositData.map((item, idx) => (
-                <div key={idx} className="flex text-xs border-b border-[#323232] h-5">
-                  <div className="flex-1 px-1 py-0.5 border-r border-[#323232] flex items-center truncate">{`${item.category} ${item.name}`}</div>
-                  <div className="w-16 flex-shrink-0 text-right px-1 py-0.5 flex items-end justify-end">{item.amount > 0 ? formatNumber(item.amount) : ''}</div>
+                <div key={idx} className="flex text-[10px] border-b border-[#323232] h-4">
+                  <div className="flex-1 px-0.5 border-r border-[#323232] flex items-center truncate">{`${item.category} ${item.name}`}</div>
+                  <div className="w-16 flex-shrink-0 text-right px-0.5 flex items-center justify-end">{item.amount > 0 ? formatNumber(item.amount) : ''}</div>
                 </div>
               ))}
             </div>
-            <div className="flex text-xs bg-zinc-200 border-t border-[#323232] h-5">
-              <div className="flex-1 px-1 font-bold flex items-center">入金計</div>
-              <div className="w-16 flex-shrink-0 text-right px-1 py-0.5 flex items-end justify-end font-bold">402,455</div>
+            <div className="flex text-[10px] bg-zinc-200 border-t border-[#323232] h-4">
+              <div className="flex-1 px-0.5 font-bold flex items-center">入金計</div>
+              <div className="w-16 flex-shrink-0 text-right px-0.5 flex items-center justify-end font-bold">402,455</div>
             </div>
           </div>
 
           {/* 出金 */}
           <div className="w-1/2">
-            <div className="bg-blue-300 h-8 flex items-center justify-between px-2 border-b border-[#323232]">
-              <span className="text-xs font-bold">出金</span>
+            <div className="bg-blue-300 h-4 flex items-center justify-between px-1 border-b border-[#323232]">
+              <span className="text-[10px] font-bold">出金</span>
               {/* 空伝票起票ボタン */}
               <div className="flex items-center gap-1">
                 <Select value={blankSlipCount} onValueChange={setBlankSlipCount}>
-                  <SelectTrigger className="h-5 w-12 text-[10px] bg-white border-gray-400">
+                  <SelectTrigger className="h-4 w-12 text-[10px] bg-white border-gray-400">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -747,7 +750,7 @@ export default function DailyReport() {
                 </Select>
                 <Button
                   size="sm"
-                  className="h-5 px-2 text-[10px] bg-yellow-400 hover:bg-yellow-500 text-black border border-gray-600"
+                  className="h-4 px-1 text-[10px] bg-yellow-400 hover:bg-yellow-500 text-black border border-gray-600"
                   onClick={createBlankSlips}
                 >
                   <Plus className="w-3 h-3 mr-1" />
@@ -755,17 +758,17 @@ export default function DailyReport() {
                 </Button>
               </div>
             </div>
-            <div className="overflow-y-auto h-[453px]">
+            <div>
               {/* 既存の出金データ */}
               {withdrawalData.map((item, idx) => (
-                <div key={idx} className="flex text-xs border-b border-[#323232] h-5">
-                  <div className="flex-1 px-1 py-0.5 border-r border-[#323232] flex items-center truncate">{`${item.category} ${item.name}`}</div>
-                  <div className="w-16 flex-shrink-0 text-right px-1 py-0.5 flex items-end justify-end">{item.amount > 0 ? formatNumber(item.amount) : ''}</div>
+                <div key={idx} className="flex text-[10px] border-b border-[#323232] h-4">
+                  <div className="flex-1 px-0.5 border-r border-[#323232] flex items-center truncate">{`${item.category} ${item.name}`}</div>
+                  <div className="w-16 flex-shrink-0 text-right px-0.5 flex items-center justify-end">{item.amount > 0 ? formatNumber(item.amount) : ''}</div>
                 </div>
               ))}
               {/* 空伝票（編集可能） */}
               {blankSlips.map((slip, idx) => (
-                <div key={slip.id} className="flex text-xs border-b border-[#323232] h-5 bg-yellow-50">
+                <div key={slip.id} className="flex text-[10px] border-b border-[#323232] h-4 bg-yellow-50">
                   <div className="flex-1 px-1 py-0.5 border-r border-[#323232] flex items-center">
                     <input
                       type="text"
@@ -795,57 +798,67 @@ export default function DailyReport() {
                 </div>
               ))}
             </div>
-            <div className="flex text-xs bg-zinc-200 border-t border-[#323232] h-5">
-              <div className="flex-1 px-1 font-bold flex items-center">出金計</div>
-              <div className="w-16 flex-shrink-0 text-right px-1 py-0.5 flex items-end justify-end font-bold">128,733</div>
+            <div className="flex text-[10px] bg-zinc-200 border-t border-[#323232] h-4">
+              <div className="flex-1 px-0.5 font-bold flex items-center">出金計</div>
+              <div className="w-16 flex-shrink-0 text-right px-0.5 flex items-center justify-end font-bold">128,733</div>
             </div>
           </div>
         </div>
 
-        {/* クレジットカード */}
+        {/* クレジットカード - 簡易表示 (#72) */}
           <div className="border-b border-[#323232]">
-            <div className="bg-purple-300 h-5 flex items-center p-0.5 border-b border-[#323232]">
-              <span className="text-xs font-bold">クレジットカード 店舗</span>
+            <div className="bg-purple-300 h-4 flex items-center justify-between p-0.5 border-b border-[#323232]">
+              <span className="text-[10px] font-bold">クレジットカード</span>
+              <button
+                onClick={() => setShowCreditDetail(prev => !prev)}
+                className="text-[9px] px-1 py-0 bg-white border border-purple-500 rounded text-purple-700 hover:bg-purple-50 leading-tight"
+              >
+                {showCreditDetail ? '簡易表示' : '詳細表示'}
+              </button>
             </div>
             {/* ヘッダー */}
-            <div className="flex text-xs bg-zinc-100 border-b border-[#323232] h-5">
-              <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">店舗</div>
-              <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">コース</div>
-              <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">ホステス名</div>
-              <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">請求金額</div>
-              <div className="w-10 px-px py-0.5 flex items-center justify-center"></div>
+            <div className="flex text-[10px] bg-zinc-100 border-b border-[#323232] h-4">
+              <div className="w-12 px-px border-r border-[#323232] flex items-center justify-center">店舗名</div>
+              <div className="w-20 px-px border-r border-[#323232] flex items-center justify-center">コース</div>
+              <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-center">キャスト名</div>
+              <div className="w-16 px-px flex items-center justify-center">請求金額</div>
+              {showCreditDetail && (
+                <>
+                  <div className="w-16 px-px border-l border-[#323232] flex items-center justify-center">カード会社</div>
+                  <div className="w-16 px-px border-l border-[#323232] flex items-center justify-center">承認番号</div>
+                  <div className="w-14 px-px border-l border-[#323232] flex items-center justify-center">決済日</div>
+                  <div className="w-16 px-px border-l border-[#323232] flex items-center justify-center">備考</div>
+                </>
+              )}
             </div>
             {creditCardData.map((card, idx) => (
-              <div key={idx} className="flex text-xs border-b border-[#323232] h-5 cursor-pointer hover:bg-purple-50">
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center truncate">{card.store}</div>
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center truncate">{card.course}</div>
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center truncate">{card.hostessName}</div>
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(card.billAmount)}</div>
-                <div className="w-10 px-px py-0.5 flex items-center justify-center"></div>
-              </div>
-            ))}
-            {/* 空の行を追加 */}
-            {[...Array(3)].map((_, idx) => (
-              <div key={`empty-${idx}`} className="flex text-xs border-b border-[#323232] h-5">
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center"></div>
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center"></div>
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center"></div>
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center"></div>
-                <div className="w-10 px-px py-0.5 flex items-center"></div>
+              <div key={idx} className="flex text-[10px] border-b border-[#323232] h-4 hover:bg-purple-50">
+                <div className="w-12 px-px border-r border-[#323232] flex items-center truncate">{card.store}</div>
+                <div className="w-20 px-px border-r border-[#323232] flex items-center truncate">{card.course}</div>
+                <div className="flex-1 px-px border-r border-[#323232] flex items-center truncate">{card.hostessName}</div>
+                <div className="w-16 px-px flex items-center justify-end">{formatNumber(card.billAmount)}</div>
+                {showCreditDetail && (
+                  <>
+                    <div className="w-16 px-px border-l border-[#323232] flex items-center truncate">-</div>
+                    <div className="w-16 px-px border-l border-[#323232] flex items-center truncate">-</div>
+                    <div className="w-14 px-px border-l border-[#323232] flex items-center truncate">-</div>
+                    <div className="w-16 px-px border-l border-[#323232] flex items-center truncate">-</div>
+                  </>
+                )}
               </div>
             ))}
           </div>
 
           {/* 本日のキャスト状況 */}
           <div className="border-b border-[#323232]">
-            <div className="bg-red-400 h-5 flex items-center p-0.5 border-b border-[#323232]">
-              <span className="text-xs font-bold text-white">本日のキャスト状況</span>
+            <div className="bg-red-400 h-4 flex items-center p-0.5 border-b border-[#323232]">
+              <span className="text-[10px] font-bold text-white">本日のキャスト状況</span>
             </div>
             {/* 無派遣 */}
-            <div className="flex text-xs border-b border-[#323232]">
-              <div className="w-20 px-2 py-1 bg-red-100 border-r border-[#323232] font-semibold">無派遣</div>
-              <div className="w-8 px-1 py-1 bg-red-50 border-r border-[#323232] text-center font-bold">{dailyReportExportData.todayNoDispatchCasts.length}名</div>
-              <div className="flex-1 px-2 py-1">
+            <div className="flex text-[10px] border-b border-[#323232] h-4">
+              <div className="w-14 px-1 bg-red-100 border-r border-[#323232] font-semibold flex items-center">無派遣</div>
+              <div className="w-6 px-px bg-red-50 border-r border-[#323232] text-center font-bold flex items-center justify-center">{dailyReportExportData.todayNoDispatchCasts.length}名</div>
+              <div className="flex-1 px-1 flex items-center truncate">
                 {dailyReportExportData.todayNoDispatchCasts.length > 0
                   ? dailyReportExportData.todayNoDispatchCasts.join('、')
                   : <span className="text-gray-400">なし</span>
@@ -853,10 +866,10 @@ export default function DailyReport() {
               </div>
             </div>
             {/* 当欠 */}
-            <div className="flex text-xs border-b border-[#323232]">
-              <div className="w-20 px-2 py-1 bg-orange-100 border-r border-[#323232] font-semibold">当欠</div>
-              <div className="w-8 px-1 py-1 bg-orange-50 border-r border-[#323232] text-center font-bold">{dailyReportExportData.todayAbsentCasts.length}名</div>
-              <div className="flex-1 px-2 py-1">
+            <div className="flex text-[10px] border-b border-[#323232] h-4">
+              <div className="w-14 px-1 bg-orange-100 border-r border-[#323232] font-semibold flex items-center">当欠</div>
+              <div className="w-6 px-px bg-orange-50 border-r border-[#323232] text-center font-bold flex items-center justify-center">{dailyReportExportData.todayAbsentCasts.length}名</div>
+              <div className="flex-1 px-1 flex items-center truncate">
                 {dailyReportExportData.todayAbsentCasts.length > 0
                   ? dailyReportExportData.todayAbsentCasts.join('、')
                   : <span className="text-gray-400">なし</span>
@@ -864,10 +877,10 @@ export default function DailyReport() {
               </div>
             </div>
             {/* 無欠 */}
-            <div className="flex text-xs">
-              <div className="w-20 px-2 py-1 bg-yellow-100 border-r border-[#323232] font-semibold">無欠</div>
-              <div className="w-8 px-1 py-1 bg-yellow-50 border-r border-[#323232] text-center font-bold">{dailyReportExportData.todayNoAbsentCasts.length}名</div>
-              <div className="flex-1 px-2 py-1">
+            <div className="flex text-[10px] h-4">
+              <div className="w-14 px-1 bg-yellow-100 border-r border-[#323232] font-semibold flex items-center">無欠</div>
+              <div className="w-6 px-px bg-yellow-50 border-r border-[#323232] text-center font-bold flex items-center justify-center">{dailyReportExportData.todayNoAbsentCasts.length}名</div>
+              <div className="flex-1 px-1 flex items-center truncate">
                 {dailyReportExportData.todayNoAbsentCasts.length > 0
                   ? dailyReportExportData.todayNoAbsentCasts.join('、')
                   : <span className="text-gray-400">なし</span>
@@ -878,31 +891,31 @@ export default function DailyReport() {
 
           {/* 面接予定 */}
           <div className="border-b border-[#323232]">
-            <div className="bg-green-500 h-5 flex items-center justify-between p-0.5 border-b border-[#323232]">
-              <span className="text-xs font-bold text-white">面接予定</span>
-              <span className="text-xs text-white mr-1">{dailyReportExportData.interviewSchedules.length}件</span>
+            <div className="bg-green-500 h-4 flex items-center justify-between p-0.5 border-b border-[#323232]">
+              <span className="text-[10px] font-bold text-white">面接予定</span>
+              <span className="text-[10px] text-white mr-1">{dailyReportExportData.interviewSchedules.length}件</span>
             </div>
             {/* ヘッダー */}
-            <div className="flex text-xs bg-green-100 border-b border-[#323232] h-5 font-semibold">
-              <div className="w-14 px-1 py-0.5 border-r border-[#323232] flex items-center justify-center">時間</div>
-              <div className="flex-1 px-1 py-0.5 border-r border-[#323232] flex items-center">面接者</div>
-              <div className="w-20 px-1 py-0.5 border-r border-[#323232] flex items-center justify-center">区分</div>
-              <div className="flex-1 px-1 py-0.5 flex items-center">場所</div>
+            <div className="flex text-[10px] bg-green-100 border-b border-[#323232] h-4 font-semibold">
+              <div className="w-12 px-px border-r border-[#323232] flex items-center justify-center">時間</div>
+              <div className="flex-1 px-px border-r border-[#323232] flex items-center">面接者</div>
+              <div className="w-16 px-px border-r border-[#323232] flex items-center justify-center">区分</div>
+              <div className="flex-1 px-px flex items-center">場所</div>
             </div>
             {dailyReportExportData.interviewSchedules.length > 0 ? (
               dailyReportExportData.interviewSchedules.map((interview, idx) => (
-                <div key={idx} className="flex text-xs border-b border-[#323232] h-5 hover:bg-green-50">
-                  <div className="w-14 px-1 py-0.5 border-r border-[#323232] flex items-center justify-center font-bold">{interview.time}</div>
-                  <div className="flex-1 px-1 py-0.5 border-r border-[#323232] flex items-center">{interview.name}</div>
-                  <div className={`w-20 px-1 py-0.5 border-r border-[#323232] flex items-center justify-center font-semibold ${
+                <div key={idx} className="flex text-[10px] border-b border-[#323232] h-4 hover:bg-green-50">
+                  <div className="w-12 px-px border-r border-[#323232] flex items-center justify-center font-bold">{interview.time}</div>
+                  <div className="flex-1 px-px border-r border-[#323232] flex items-center truncate">{interview.name}</div>
+                  <div className={`w-16 px-px border-r border-[#323232] flex items-center justify-center font-semibold ${
                     interview.type === 'ホステス' ? 'bg-pink-100 text-pink-800' : 'bg-blue-100 text-blue-800'
                   }`}>{interview.type}</div>
-                  <div className="flex-1 px-1 py-0.5 flex items-center">{interview.location}</div>
+                  <div className="flex-1 px-px flex items-center truncate">{interview.location}</div>
                 </div>
               ))
             ) : (
-              <div className="flex text-xs h-5 items-center justify-center text-gray-400">
-                本日の面接予定はありません
+              <div className="flex text-[10px] h-4 items-center justify-center text-gray-400">
+                面接予定なし
               </div>
             )}
           </div>
@@ -914,7 +927,7 @@ export default function DailyReport() {
           <div className="flex border-t border-b border-[#323232]">
             <button
               onClick={() => setActiveTab('staff')}
-              className={`flex-1 h-5 flex items-center justify-center text-xs font-bold border-r border-[#323232] ${
+              className={`flex-1 h-4 flex items-center justify-center text-[10px] font-bold border-r border-[#323232] ${
                 activeTab === 'staff' ? 'bg-purple-400 text-white' : 'bg-purple-200 text-black'
               }`}
             >
@@ -922,7 +935,7 @@ export default function DailyReport() {
             </button>
             <button
               onClick={() => setActiveTab('hostess')}
-              className={`flex-1 h-5 flex items-center justify-center text-xs font-bold ${
+              className={`flex-1 h-4 flex items-center justify-center text-[10px] font-bold ${
                 activeTab === 'hostess' ? 'bg-cyan-400 text-white' : 'bg-cyan-200 text-black'
               }`}
             >
@@ -934,25 +947,24 @@ export default function DailyReport() {
           {activeTab === 'staff' && (
             <>
               {/* スタッフヘッダー - 画像に基づく列構成 */}
-              <div className="flex text-xs bg-zinc-100 border-b border-[#323232] h-5">
-                <div className="w-7 px-px py-0.5 border-r border-[#323232] flex items-center justify-center"></div>
-                <div className="w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-center"></div>
-                <div className="flex-[2] px-px py-0.5 border-r border-[#323232] flex items-center justify-center"></div>
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">給与</div>
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">回収額</div>
-                <div className="flex-[1.3] px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">ホステス預</div>
-                <div className="flex-[1.3] px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">ホステス返金</div>
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">高速等</div>
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">調整額</div>
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">差引清算額</div>
-                <div className="w-20 px-px py-0.5 border-r border-[#323232] flex items-center justify-center bg-cyan-100 text-[10px]">バスタオル</div>
-                <div className="w-12 px-px py-0.5 border-r border-[#323232] flex items-center justify-center bg-green-100 text-[10px]">備品</div>
-                <div className="w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">割引利用カード</div>
-                <div className="w-16 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-[10px]">管理者確認</div>
-                <div className="w-8 px-px py-0.5 flex items-center justify-center"></div>
+              <div className="flex text-[10px] bg-zinc-100 border-b border-[#323232] h-4">
+                <div className="w-7 px-px border-r border-[#323232] flex items-center justify-center"></div>
+                <div className="w-14 px-px border-r border-[#323232] flex items-center justify-center"></div>
+                <div className="flex-[2] px-px border-r border-[#323232] flex items-center justify-center"></div>
+                <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-center">給与</div>
+                <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-center">回収額</div>
+                <div className="flex-[1.3] px-px border-r border-[#323232] flex items-center justify-center">ホステス預</div>
+                <div className="flex-[1.3] px-px border-r border-[#323232] flex items-center justify-center">ホステス返金</div>
+                <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-center">高速等</div>
+                <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-center">調整額</div>
+                <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-center">差引清算額</div>
+                <div className="w-12 px-px border-r border-[#323232] flex items-center justify-center bg-green-100">備品</div>
+                <div className="w-14 px-px border-r border-[#323232] flex items-center justify-center">割引利用カード</div>
+                <div className="w-16 px-px border-r border-[#323232] flex items-center justify-center">管理者確認</div>
+                <div className="w-8 px-px flex items-center justify-center"></div>
               </div>
               {/* スタッフリスト */}
-              <div className="overflow-y-auto flex-1">
+              <div>
                 {staffData.map((staff) => {
                   // 行の背景色を決定
                   let rowBgClass = staff.type === '社員' ? 'bg-blue-50' : 'bg-pink-50';
@@ -968,32 +980,26 @@ export default function DailyReport() {
                   return (
                     <div
                       key={staff.id}
-                      className={`flex text-xs border-b border-[#323232] h-5 ${rowBgClass}`}
+                      className={`flex text-[10px] border-b border-[#323232] h-4 ${rowBgClass}`}
                     >
-                      <div className="w-7 px-px py-0.5 border-r border-[#323232] flex items-center justify-center bg-yellow-100">{staff.id}</div>
-                      <div className={`w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-center ${staff.type === '社員' ? 'bg-blue-200' : 'bg-pink-200'}`}>
+                      <div className="w-7 px-px border-r border-[#323232] flex items-center justify-center bg-yellow-100">{staff.id}</div>
+                      <div className={`w-14 px-px border-r border-[#323232] flex items-center justify-center ${staff.type === '社員' ? 'bg-blue-200' : 'bg-pink-200'}`}>
                         {staff.type}
                       </div>
-                      <div className="flex-[2] px-px py-0.5 border-r border-[#323232] flex items-center truncate">
+                      <div className="flex-[2] px-px border-r border-[#323232] flex items-center truncate">
                         {staff.name} {staff.status}{staff.statusNum ? ` ${staff.statusNum}` : ''}
                       </div>
-                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.salary)}</div>
-                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.collection)}</div>
-                      <div className="flex-[1.3] px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.deposit)}</div>
-                      <div className="flex-[1.3] px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.refund)}</div>
-                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.express)}</div>
-                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.adjust)}</div>
-                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{netDisplay}</div>
-                      {/* バスタオル 3列 */}
-                      <div className="w-20 flex border-r border-[#323232] bg-cyan-50">
-                        <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">{staff.bath1 || ''}</div>
-                        <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">{staff.bath2 || ''}</div>
-                        <div className="flex-1 px-px py-0.5 flex items-center justify-center">{staff.bath3 || ''}</div>
-                      </div>
-                      <div className="w-12 px-px py-0.5 border-r border-[#323232] flex items-center justify-center bg-green-50">{staff.equip || ''}</div>
-                      <div className="w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">{staff.discountCard || ''}</div>
-                      <div className="w-16 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">{staff.managerCheck || ''}</div>
-                      <div className="w-8 px-px py-0.5 flex items-center justify-center">
+                      <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.salary)}</div>
+                      <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.collection)}</div>
+                      <div className="flex-[1.3] px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.deposit)}</div>
+                      <div className="flex-[1.3] px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.refund)}</div>
+                      <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.express)}</div>
+                      <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.adjust)}</div>
+                      <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-end">{netDisplay}</div>
+                      <div className="w-12 px-px border-r border-[#323232] flex items-center justify-center bg-green-50">{staff.equip || ''}</div>
+                      <div className="w-14 px-px border-r border-[#323232] flex items-center justify-center">{staff.discountCard || ''}</div>
+                      <div className="w-16 px-px border-r border-[#323232] flex items-center justify-center">{staff.managerCheck || ''}</div>
+                      <div className="w-8 px-px flex items-center justify-center">
                         {staff.settlementStatus === 'completed' ? '済' : ''}
                       </div>
                     </div>
@@ -1007,21 +1013,21 @@ export default function DailyReport() {
           {activeTab === 'hostess' && (
             <>
               {/* ホステスヘッダー */}
-              <div className="flex text-xs bg-zinc-100 border-b border-[#323232] h-6">
-                <div className="w-5 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">番</div>
-                <div className="w-16 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">送り場所</div>
-                <div className="w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">交通費</div>
-                <div className="w-12 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">雑費</div>
-                <div className="w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">預り</div>
-                <div className="w-16 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">支払額</div>
-                <div className="w-10 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-center leading-tight">支払<br/>済</div>
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">回収額</div>
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center text-center leading-tight">ホステス<br/>報酬</div>
-                <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">調整</div>
-                <div className="w-10 px-px py-0.5 flex items-center justify-center text-center leading-tight">確認</div>
+              <div className="flex text-[10px] bg-zinc-100 border-b border-[#323232] h-4">
+                <div className="w-5 px-px border-r border-[#323232] flex items-center justify-center">番</div>
+                <div className="w-16 px-px border-r border-[#323232] flex items-center justify-center">送り場所</div>
+                <div className="w-14 px-px border-r border-[#323232] flex items-center justify-center">交通費</div>
+                <div className="w-12 px-px border-r border-[#323232] flex items-center justify-center">雑費</div>
+                <div className="w-14 px-px border-r border-[#323232] flex items-center justify-center">預り</div>
+                <div className="w-16 px-px border-r border-[#323232] flex items-center justify-center">支払額</div>
+                <div className="w-10 px-px border-r border-[#323232] flex items-center justify-center">支払済</div>
+                <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-center">回収額</div>
+                <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-center">報酬</div>
+                <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-center">調整</div>
+                <div className="w-10 px-px flex items-center justify-center">確認</div>
               </div>
               {/* ホステスリスト */}
-              <div className="overflow-y-auto flex-1">
+              <div>
                 {hostessDisplayData.map((staff) => {
                   // 色分け: 未精算=赤, 未送信=白, 完了=灰
                   let rowBgClass = 'bg-white'; // 未送信（デフォルト）
@@ -1034,21 +1040,21 @@ export default function DailyReport() {
                   return (
                     <div
                       key={staff.id}
-                      className={`flex text-xs border-b border-[#323232] h-5 ${rowBgClass} cursor-pointer hover:brightness-95`}
+                      className={`flex text-[10px] border-b border-[#323232] h-4 ${rowBgClass} cursor-pointer hover:brightness-95`}
                     >
-                      <div className="w-5 px-px py-0.5 border-r border-[#323232] flex items-center justify-center bg-blue-100">{staff.rowNum}</div>
-                      <div className="w-16 px-px py-0.5 border-r border-[#323232] flex items-center truncate">{staff.sendLocation}</div>
-                      <div className="w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.transportFee)}</div>
-                      <div className="w-12 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.miscFee)}</div>
-                      <div className="w-14 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.hostessDeposit)}</div>
-                      <div className="w-16 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.paymentAmount)}</div>
-                      <div className="w-10 px-px py-0.5 border-r border-[#323232] flex items-center justify-center">
+                      <div className="w-5 px-px border-r border-[#323232] flex items-center justify-center bg-blue-100">{staff.rowNum}</div>
+                      <div className="w-16 px-px border-r border-[#323232] flex items-center truncate">{staff.sendLocation}</div>
+                      <div className="w-14 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.transportFee)}</div>
+                      <div className="w-12 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.miscFee)}</div>
+                      <div className="w-14 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.hostessDeposit)}</div>
+                      <div className="w-16 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.paymentAmount)}</div>
+                      <div className="w-10 px-px border-r border-[#323232] flex items-center justify-center">
                         <input type="checkbox" className="w-3 h-3" checked={staff.isPaid} readOnly />
                       </div>
-                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.collection)}</div>
-                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.salary)}</div>
-                      <div className="flex-1 px-px py-0.5 border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.adjust)}</div>
-                      <div className="w-10 px-px py-0.5 flex items-center justify-center">
+                      <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.collection)}</div>
+                      <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.salary)}</div>
+                      <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.adjust)}</div>
+                      <div className="w-10 px-px flex items-center justify-center">
                         <input type="checkbox" className="w-3 h-3" checked={staff.approval} readOnly />
                       </div>
                     </div>

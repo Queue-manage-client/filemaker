@@ -1,12 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { z } from 'zod';
 import {
   Select,
@@ -45,6 +55,38 @@ type BasicDaySchedule = {
 
 type BasicSchedule = Record<Day, BasicDaySchedule>;
 
+type AttendanceRecord = {
+  date: string;
+  checkIn: string;
+  checkOut: string;
+  workMinutes: number;
+  note: string;
+};
+
+const SAMPLE_ATTENDANCE: AttendanceRecord[] = [
+  { date: '2026-03-26', checkIn: '09:02', checkOut: '18:15', workMinutes: 553, note: '' },
+  { date: '2026-03-25', checkIn: '08:55', checkOut: '18:00', workMinutes: 545, note: '' },
+  { date: '2026-03-24', checkIn: '09:10', checkOut: '19:05', workMinutes: 595, note: '残業' },
+  { date: '2026-03-21', checkIn: '08:58', checkOut: '18:02', workMinutes: 544, note: '' },
+  { date: '2026-03-20', checkIn: '09:05', checkOut: '18:10', workMinutes: 545, note: '' },
+  { date: '2026-03-19', checkIn: '09:00', checkOut: '17:45', workMinutes: 525, note: '早退' },
+  { date: '2026-03-18', checkIn: '09:03', checkOut: '18:20', workMinutes: 557, note: '' },
+  { date: '2026-03-17', checkIn: '08:50', checkOut: '18:00', workMinutes: 550, note: '' },
+  { date: '2026-03-14', checkIn: '09:15', checkOut: '18:30', workMinutes: 555, note: '' },
+  { date: '2026-03-13', checkIn: '09:00', checkOut: '18:00', workMinutes: 540, note: '' },
+  { date: '2026-03-12', checkIn: '09:05', checkOut: '18:45', workMinutes: 580, note: '残業' },
+  { date: '2026-03-11', checkIn: '08:55', checkOut: '18:05', workMinutes: 550, note: '' },
+  { date: '2026-03-10', checkIn: '09:00', checkOut: '18:00', workMinutes: 540, note: '' },
+  { date: '2026-03-07', checkIn: '09:10', checkOut: '18:15', workMinutes: 545, note: '' },
+  { date: '2026-03-06', checkIn: '09:02', checkOut: '18:00', workMinutes: 538, note: '' },
+];
+
+function formatWorkTime(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${h}h${m.toString().padStart(2, '0')}m`;
+}
+
 export default function StaffDetailPage({ params }: StaffDetailPageProps) {
   const { id } = React.use(params);
 
@@ -71,6 +113,27 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
   const [equipment, setEquipment] = useState<string>('');
   const [remarks, setRemarks] = useState<string>('');
 
+  // 追加フィールド: 生年月日・入社日
+  const [dateOfBirth, setDateOfBirth] = useState<string>('1985-04-15');
+  const [hireDate, setHireDate] = useState<string>('2020-04-01');
+
+  // 緊急連絡先
+  const [emergencyName, setEmergencyName] = useState<string>('山田 花子');
+  const [emergencyRelation, setEmergencyRelation] = useState<string>('配偶者');
+  const [emergencyPhone, setEmergencyPhone] = useState<string>('090-1234-5678');
+
+  // 銀行口座情報
+  const [bankName, setBankName] = useState<string>('三菱UFJ銀行');
+  const [bankBranch, setBankBranch] = useState<string>('新宿支店');
+  const [bankAccountType, setBankAccountType] = useState<string>('普通');
+  const [bankAccountNumber, setBankAccountNumber] = useState<string>('1234567');
+  const [bankAccountHolder, setBankAccountHolder] = useState<string>('ヤマダ タロウ');
+
+  // 資格・免許
+  const [qualifications, setQualifications] = useState<string>(
+    '普通自動車免許, 大型自動車免許, フォークリフト運転技能講習修了証'
+  );
+
   const [employmentStatus, setEmploymentStatus] = useState<'active' | 'inactive'>('active');
   const [employmentDate, setEmploymentDate] = useState<string>('');
   const [employmentType, setEmploymentType] = useState<'employee' | 'part_time' | 'outsourced'>('employee');
@@ -81,13 +144,14 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
   const [device, setDevice] = useState<'mobile' | 'iphone' | 'pc'>('mobile');
   const [hostessContactAllowed, setHostessContactAllowed] = useState<'yes' | 'no'>('yes');
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [assignedCasts, setAssignedCasts] = useState<{ id: string; name: string }[]>([]);
 
   const [schedule, setSchedule] = useState<BasicSchedule>({
-    mon: { work: false, start: '09:00', end: '18:00' },
-    tue: { work: false, start: '09:00', end: '18:00' },
-    wed: { work: false, start: '09:00', end: '18:00' },
-    thu: { work: false, start: '09:00', end: '18:00' },
-    fri: { work: false, start: '09:00', end: '18:00' },
+    mon: { work: true,  start: '09:00', end: '18:00' },
+    tue: { work: true,  start: '09:00', end: '18:00' },
+    wed: { work: true,  start: '09:00', end: '18:00' },
+    thu: { work: true,  start: '09:00', end: '18:00' },
+    fri: { work: true,  start: '09:00', end: '18:00' },
     sat: { work: false, start: '09:00', end: '18:00' },
     sun: { work: false, start: '09:00', end: '18:00' },
   });
@@ -132,6 +196,10 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
         number: z.number().nullable().optional(),
       }).nullable().optional(),
       schedule: z.record(DayScheduleSchema).optional().default({}),
+      assignedCasts: z.array(z.object({
+        id: z.string(),
+        name: z.string(),
+      })).optional().default([]),
     });
 
     const fetchDetail = async () => {
@@ -178,6 +246,8 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
           setCarCapacity('');
           setCarNumber('');
         }
+
+        setAssignedCasts(data.assignedCasts ?? []);
 
         const applySchedule: BasicSchedule = {
           mon: { work: false, start: '09:00', end: '18:00' },
@@ -338,6 +408,17 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
     }));
   };
 
+  // 出勤データ集計
+  const totalWorkDays = SAMPLE_ATTENDANCE.length;
+  const totalWorkMinutes = SAMPLE_ATTENDANCE.reduce((sum, r) => sum + r.workMinutes, 0);
+  const avgWorkMinutes = Math.round(totalWorkMinutes / totalWorkDays);
+
+  // 資格・免許をカンマ区切りで配列化して表示
+  const qualificationList = qualifications
+    .split(',')
+    .map((q) => q.trim())
+    .filter((q) => q.length > 0);
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-6xl mx-auto flex items-center justify-between mb-4">
@@ -374,6 +455,23 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
                 <Input className="col-span-4" placeholder="例: やまだ" value={lastNameKana} onChange={(e) => setLastNameKana(e.target.value)} />
                 <Label className="col-span-2 text-xs">名かな</Label>
                 <Input className="col-span-4" placeholder="例: たろう" value={firstNameKana} onChange={(e) => setFirstNameKana(e.target.value)} />
+              </div>
+
+              <div className="grid grid-cols-12 gap-3 items-center">
+                <Label className="col-span-2 text-xs">生年月日</Label>
+                <Input
+                  className="col-span-4"
+                  type="date"
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                />
+                <Label className="col-span-2 text-xs">入社日</Label>
+                <Input
+                  className="col-span-4"
+                  type="date"
+                  value={hireDate}
+                  onChange={(e) => setHireDate(e.target.value)}
+                />
               </div>
 
               <div className="grid grid-cols-12 gap-3 items-center">
@@ -527,6 +625,36 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
                   </RadioGroup>
                 </div>
               </div>
+
+              <Separator />
+              <p className="text-xs font-medium text-gray-600">緊急連絡先</p>
+
+              <div className="grid grid-cols-12 gap-3 items-center">
+                <Label className="col-span-2 text-xs">氏名</Label>
+                <Input
+                  className="col-span-4"
+                  placeholder="例: 山田 花子"
+                  value={emergencyName}
+                  onChange={(e) => setEmergencyName(e.target.value)}
+                />
+                <Label className="col-span-2 text-xs">続柄</Label>
+                <Input
+                  className="col-span-4"
+                  placeholder="例: 配偶者"
+                  value={emergencyRelation}
+                  onChange={(e) => setEmergencyRelation(e.target.value)}
+                />
+              </div>
+
+              <div className="grid grid-cols-12 gap-3 items-center">
+                <Label className="col-span-2 text-xs">電話番号</Label>
+                <Input
+                  className="col-span-4"
+                  placeholder="090-XXXX-XXXX"
+                  value={emergencyPhone}
+                  onChange={(e) => setEmergencyPhone(e.target.value)}
+                />
+              </div>
             </CardContent>
           </Card>
 
@@ -582,15 +710,118 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
 
           <Card>
             <CardHeader className="pb-2">
+              <h2 className="font-semibold">銀行口座情報</h2>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-12 gap-3 items-center">
+                <Label className="col-span-2 text-xs">銀行名</Label>
+                <Input
+                  className="col-span-4"
+                  placeholder="例: 三菱UFJ銀行"
+                  value={bankName}
+                  onChange={(e) => setBankName(e.target.value)}
+                />
+                <Label className="col-span-2 text-xs">支店名</Label>
+                <Input
+                  className="col-span-4"
+                  placeholder="例: 新宿支店"
+                  value={bankBranch}
+                  onChange={(e) => setBankBranch(e.target.value)}
+                />
+              </div>
+
+              <div className="grid grid-cols-12 gap-3 items-center">
+                <Label className="col-span-2 text-xs">口座種別</Label>
+                <div className="col-span-4">
+                  <RadioGroup
+                    className="flex gap-4"
+                    value={bankAccountType}
+                    onValueChange={(v) => setBankAccountType(v)}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem id="bank-futsu" value="普通" />
+                      <Label htmlFor="bank-futsu" className="text-xs">普通</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem id="bank-toza" value="当座" />
+                      <Label htmlFor="bank-toza" className="text-xs">当座</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                <Label className="col-span-2 text-xs">口座番号</Label>
+                <Input
+                  className="col-span-4"
+                  placeholder="例: 1234567"
+                  value={bankAccountNumber}
+                  onChange={(e) => setBankAccountNumber(e.target.value)}
+                />
+              </div>
+
+              <div className="grid grid-cols-12 gap-3 items-center">
+                <Label className="col-span-2 text-xs">口座名義</Label>
+                <Input
+                  className="col-span-10"
+                  placeholder="例: ヤマダ タロウ（カタカナ）"
+                  value={bankAccountHolder}
+                  onChange={(e) => setBankAccountHolder(e.target.value)}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <h2 className="font-semibold">資格・免許</h2>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                {qualificationList.map((q, i) => (
+                  <Badge key={i} variant="secondary">{q}</Badge>
+                ))}
+              </div>
+              <Textarea
+                rows={2}
+                placeholder="資格・免許をカンマ区切りで入力（例: 普通自動車免許, 大型自動車免許）"
+                value={qualifications}
+                onChange={(e) => setQualifications(e.target.value)}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
               <h2 className="font-semibold">備考</h2>
             </CardHeader>
             <CardContent>
-              <Textarea 
-                rows={4} 
-                placeholder="備考を入力" 
+              <Textarea
+                rows={4}
+                placeholder="備考を入力"
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
               />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <h2 className="font-semibold">担当キャスト</h2>
+            </CardHeader>
+            <CardContent>
+              {assignedCasts.length === 0 ? (
+                <p className="text-xs text-gray-400">担当キャストなし</p>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {assignedCasts.map((cast) => (
+                    <Link
+                      key={cast.id}
+                      href={`/hostess-ledger?id=${cast.id}`}
+                      className="text-blue-600 underline hover:text-blue-800 cursor-pointer text-sm"
+                    >
+                      {cast.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -741,8 +972,63 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
             </div>
           </CardContent>
         </Card>
+
+        {/* 出勤データ (#53) */}
+        <Card>
+          <CardHeader className="pb-2">
+            <h2 className="font-semibold">出勤データ（過去30日）</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* サマリー */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="rounded-lg border bg-white p-4 text-center">
+                <p className="text-xs text-gray-500 mb-1">出勤日数</p>
+                <p className="text-2xl font-bold">{totalWorkDays}<span className="text-sm font-normal ml-1">日</span></p>
+              </div>
+              <div className="rounded-lg border bg-white p-4 text-center">
+                <p className="text-xs text-gray-500 mb-1">総勤務時間</p>
+                <p className="text-2xl font-bold">{formatWorkTime(totalWorkMinutes)}</p>
+              </div>
+              <div className="rounded-lg border bg-white p-4 text-center">
+                <p className="text-xs text-gray-500 mb-1">平均勤務時間</p>
+                <p className="text-2xl font-bold">{formatWorkTime(avgWorkMinutes)}</p>
+              </div>
+            </div>
+
+            {/* 出勤記録テーブル */}
+            <div className="rounded-md border overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50">
+                    <TableHead className="text-xs font-semibold">日付</TableHead>
+                    <TableHead className="text-xs font-semibold">出勤時間</TableHead>
+                    <TableHead className="text-xs font-semibold">退勤時間</TableHead>
+                    <TableHead className="text-xs font-semibold">勤務時間</TableHead>
+                    <TableHead className="text-xs font-semibold">備考</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {SAMPLE_ATTENDANCE.map((record) => (
+                    <TableRow key={record.date}>
+                      <TableCell className="text-xs">{record.date}</TableCell>
+                      <TableCell className="text-xs">{record.checkIn}</TableCell>
+                      <TableCell className="text-xs">{record.checkOut}</TableCell>
+                      <TableCell className="text-xs">{formatWorkTime(record.workMinutes)}</TableCell>
+                      <TableCell className="text-xs">
+                        {record.note ? (
+                          <Badge variant="outline" className="text-xs">{record.note}</Badge>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 }
-

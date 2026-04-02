@@ -47,9 +47,9 @@ export * from './dispatch';
 
 // 面接管理関連の型定義
 export type InterviewType = 'driver' | 'staff' | 'hostess';
-export type InterviewResult = 'hired' | 'cancelled' | 'pending' | 'rejected';
+export type InterviewResult = 'hired' | 'cancelled' | 'pending' | 'rejected' | 'declined';
 export type EmploymentStatus = '' | 'retired';
-export type InterviewProgress = 'application' | 'scheduled' | 'completed' | 'followup' | 'onboarding'; // 進捗 (Item 37)
+export type InterviewProgress = 'uncontacted' | 'contacted' | 'scheduled' | 'completed' | 'hired' | 'rejected' | 'declined'; // 進捗 (Item 39)
 
 export interface InterviewRecord {
   id: string;
@@ -71,17 +71,20 @@ export interface InterviewRecord {
   email?: string; // メールアドレス
   location?: string; // 面接場所
   notes?: string; // 備考
+  surveyContent?: string; // アンケート内容
   createdAt: string;
   updatedAt: string;
 }
 
-// 進捗ラベル
+// 進捗ラベル (Item 39)
 export const INTERVIEW_PROGRESS_LABELS: Record<InterviewProgress, string> = {
-  application: '応募',
+  uncontacted: '未連絡',
+  contacted: '連絡済',
   scheduled: '面接予定',
   completed: '面接完了',
-  followup: 'フォロー中',
-  onboarding: '入店準備',
+  hired: '採用',
+  rejected: '不採用',
+  declined: '辞退',
 };
 
 // 店舗リスト
@@ -122,7 +125,8 @@ export const INTERVIEW_RESULT_LABELS: Record<InterviewResult, string> = {
   hired: '入店',
   cancelled: '取消',
   pending: '保留',
-  rejected: '不採用'
+  rejected: '不採用',
+  declined: '辞退'
 };
 
 // 在職状態の表示ラベル
@@ -159,6 +163,7 @@ export interface StaffLedgerRecord {
   accessType: AccessType; // アクセス権
   accessStatus: AccessStatusType; // アクセス権のステータス
   remarks?: string; // 備考
+  assignedCasts?: { id: string; name: string }[]; // 担当キャスト
   createdAt: string; // 登録日時
   updatedAt: string; // 更新日時
 }

@@ -30,6 +30,9 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
+    confirmCallTime: '18:30',
+    isConfirmCallCompleted: true,
   },
   {
     id: '2',
@@ -41,6 +44,9 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
+    confirmCallTime: '18:45',
+    isConfirmCallCompleted: false,
   },
   {
     id: '3',
@@ -52,6 +58,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: false,
   },
   {
     id: '4',
@@ -63,6 +70,9 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
+    confirmCallTime: '19:00',
+    isConfirmCallCompleted: true,
   },
   {
     id: '5',
@@ -74,6 +84,9 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: false,
+    confirmCallTime: '19:15',
+    isConfirmCallCompleted: false,
   },
   {
     id: '6',
@@ -85,6 +98,9 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
+    confirmCallTime: '19:30',
+    isConfirmCallCompleted: true,
   },
   {
     id: '7',
@@ -96,6 +112,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: false,
   },
   {
     id: '8',
@@ -107,6 +124,9 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
+    confirmCallTime: '20:00',
+    isConfirmCallCompleted: false,
   },
   {
     id: '9',
@@ -118,6 +138,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
   },
   {
     id: '10',
@@ -129,6 +150,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: false,
   },
   {
     id: '11',
@@ -140,6 +162,9 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
+    confirmCallTime: '20:30',
+    isConfirmCallCompleted: true,
   },
   {
     id: '12',
@@ -151,6 +176,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: false,
   },
   {
     id: '13',
@@ -162,6 +188,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
   },
   {
     id: '14',
@@ -173,6 +200,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
   },
   {
     id: '15',
@@ -184,6 +212,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: false,
   },
   {
     id: '16',
@@ -195,6 +224,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
   },
   {
     id: '17',
@@ -206,6 +236,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: false,
   },
   {
     id: '18',
@@ -217,6 +248,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
   },
   {
     id: '19',
@@ -228,6 +260,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
   },
   {
     id: '20',
@@ -239,6 +272,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: false,
   },
   {
     id: '21',
@@ -250,6 +284,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
   },
   {
     id: '22',
@@ -261,6 +296,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: false,
   },
   {
     id: '23',
@@ -272,6 +308,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
   },
   {
     id: '24',
@@ -283,6 +320,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
   },
   {
     id: '25',
@@ -294,6 +332,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: false,
   },
   {
     id: '26',
@@ -305,6 +344,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
   },
   {
     id: '27',
@@ -316,6 +356,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: false,
   },
   {
     id: '28',
@@ -327,6 +368,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
   },
   {
     id: '29',
@@ -338,6 +380,7 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: true,
   },
   {
     id: '30',
@@ -349,37 +392,38 @@ export const scheduledHostessSampleData: ScheduledHostess[] = [
     endTime: '00:00',
     arrivalTime: '00:00',
     count: 1,
+    isConfirmed: false,
   },
-  { id: '31', hostessName: 'よよよ', driverName: '土居4', location: '四条烏丸', area: '京', startTime: '01:00', endTime: '02:00', arrivalTime: '01:30', count: 2 },
-  { id: '32', hostessName: 'らららa', driverName: '汐崎', location: '竹田駅', area: '南', startTime: '00:30', endTime: '01:30', arrivalTime: '01:00', count: 1 },
-  { id: '33', hostessName: 'りりりa', driverName: '松尾', location: '烏丸御池', area: '京', startTime: '02:00', endTime: '03:00', arrivalTime: '02:30', count: 3 },
-  { id: '34', hostessName: 'るるる', driverName: '土居4', location: '丹波橋', area: '南', startTime: '01:30', endTime: '02:30', arrivalTime: '02:00', count: 1 },
-  { id: '35', hostessName: 'れれれ', driverName: '汐崎', location: '北大路', area: '京', startTime: '00:00', endTime: '01:00', arrivalTime: '00:30', count: 2 },
-  { id: '36', hostessName: 'ろろろ', driverName: '松尾', location: '桃山御陵前', area: '南', startTime: '02:30', endTime: '03:30', arrivalTime: '03:00', count: 1 },
-  { id: '37', hostessName: 'わわわ', driverName: '土居4', location: '西院', area: '京', startTime: '01:00', endTime: '02:00', arrivalTime: '01:30', count: 2 },
-  { id: '38', hostessName: 'をを', driverName: '汐崎', location: '伏見桃山', area: '南', startTime: '00:30', endTime: '01:30', arrivalTime: '01:00', count: 1 },
-  { id: '39', hostessName: 'んん', driverName: '松尾', location: '円町', area: '京', startTime: '02:00', endTime: '03:00', arrivalTime: '02:30', count: 3 },
-  { id: '40', hostessName: 'がが', driverName: '土居4', location: '中書島', area: '南', startTime: '01:30', endTime: '02:30', arrivalTime: '02:00', count: 1 },
-  { id: '41', hostessName: 'ぎぎ', driverName: '汐崎', location: '太秦天神川', area: '京', startTime: '00:00', endTime: '01:00', arrivalTime: '00:30', count: 2 },
-  { id: '42', hostessName: 'ぐぐ', driverName: '松尾', location: '淀', area: '南', startTime: '02:30', endTime: '03:30', arrivalTime: '03:00', count: 1 },
-  { id: '43', hostessName: 'げげ', driverName: '土居4', location: '嵐山', area: '京', startTime: '01:00', endTime: '02:00', arrivalTime: '01:30', count: 2 },
-  { id: '44', hostessName: 'ごご', driverName: '汐崎', location: '向島', area: '南', startTime: '00:30', endTime: '01:30', arrivalTime: '01:00', count: 1 },
-  { id: '45', hostessName: 'ざざ', driverName: '松尾', location: '二条', area: '京', startTime: '02:00', endTime: '03:00', arrivalTime: '02:30', count: 3 },
-  { id: '46', hostessName: 'じじ', driverName: '土居4', location: '久津川', area: '南', startTime: '01:30', endTime: '02:30', arrivalTime: '02:00', count: 1 },
-  { id: '47', hostessName: 'ずず', driverName: '汐崎', location: '山科', area: '京', startTime: '00:00', endTime: '01:00', arrivalTime: '00:30', count: 2 },
-  { id: '48', hostessName: 'ぜぜ', driverName: '松尾', location: '大久保', area: '南', startTime: '02:30', endTime: '03:30', arrivalTime: '03:00', count: 1 },
-  { id: '49', hostessName: 'ぞぞ', driverName: '土居4', location: '東福寺', area: '京', startTime: '01:00', endTime: '02:00', arrivalTime: '01:30', count: 2 },
-  { id: '50', hostessName: 'だだ', driverName: '汐崎', location: '新田辺', area: '南', startTime: '00:30', endTime: '01:30', arrivalTime: '01:00', count: 1 },
-  { id: '51', hostessName: 'ぢぢ', driverName: '松尾', location: '稲荷', area: '京', startTime: '02:00', endTime: '03:00', arrivalTime: '02:30', count: 3 },
-  { id: '52', hostessName: 'づづ', driverName: '土居4', location: '宇治', area: '南', startTime: '01:30', endTime: '02:30', arrivalTime: '02:00', count: 1 },
-  { id: '53', hostessName: 'でで', driverName: '汐崎', location: '出町柳', area: '京', startTime: '00:00', endTime: '01:00', arrivalTime: '00:30', count: 2 },
-  { id: '54', hostessName: 'どど', driverName: '松尾', location: '小倉', area: '南', startTime: '02:30', endTime: '03:30', arrivalTime: '03:00', count: 1 },
-  { id: '55', hostessName: 'ばば', driverName: '土居4', location: '一乗寺', area: '京', startTime: '01:00', endTime: '02:00', arrivalTime: '01:30', count: 2 },
-  { id: '56', hostessName: 'びび', driverName: '汐崎', location: '三室戸', area: '南', startTime: '00:30', endTime: '01:30', arrivalTime: '01:00', count: 1 },
-  { id: '57', hostessName: 'ぶぶ', driverName: '松尾', location: '岩倉', area: '京', startTime: '02:00', endTime: '03:00', arrivalTime: '02:30', count: 3 },
-  { id: '58', hostessName: 'べべ', driverName: '土居4', location: '黄檗', area: '南', startTime: '01:30', endTime: '02:30', arrivalTime: '02:00', count: 1 },
-  { id: '59', hostessName: 'ぼぼ', driverName: '汐崎', location: '修学院', area: '京', startTime: '00:00', endTime: '01:00', arrivalTime: '00:30', count: 2 },
-  { id: '60', hostessName: 'ぱぱ', driverName: '松尾', location: '木幡', area: '南', startTime: '02:30', endTime: '03:30', arrivalTime: '03:00', count: 1 },
+  { id: '31', hostessName: 'よよよ', driverName: '土居4', location: '四条烏丸', area: '京', startTime: '01:00', endTime: '02:00', arrivalTime: '01:30', count: 2, isConfirmed: true },
+  { id: '32', hostessName: 'らららa', driverName: '汐崎', location: '竹田駅', area: '南', startTime: '00:30', endTime: '01:30', arrivalTime: '01:00', count: 1, isConfirmed: false },
+  { id: '33', hostessName: 'りりりa', driverName: '松尾', location: '烏丸御池', area: '京', startTime: '02:00', endTime: '03:00', arrivalTime: '02:30', count: 3, isConfirmed: true },
+  { id: '34', hostessName: 'るるる', driverName: '土居4', location: '丹波橋', area: '南', startTime: '01:30', endTime: '02:30', arrivalTime: '02:00', count: 1, isConfirmed: true },
+  { id: '35', hostessName: 'れれれ', driverName: '汐崎', location: '北大路', area: '京', startTime: '00:00', endTime: '01:00', arrivalTime: '00:30', count: 2, isConfirmed: false },
+  { id: '36', hostessName: 'ろろろ', driverName: '松尾', location: '桃山御陵前', area: '南', startTime: '02:30', endTime: '03:30', arrivalTime: '03:00', count: 1, isConfirmed: true },
+  { id: '37', hostessName: 'わわわ', driverName: '土居4', location: '西院', area: '京', startTime: '01:00', endTime: '02:00', arrivalTime: '01:30', count: 2, isConfirmed: false },
+  { id: '38', hostessName: 'をを', driverName: '汐崎', location: '伏見桃山', area: '南', startTime: '00:30', endTime: '01:30', arrivalTime: '01:00', count: 1, isConfirmed: true },
+  { id: '39', hostessName: 'んん', driverName: '松尾', location: '円町', area: '京', startTime: '02:00', endTime: '03:00', arrivalTime: '02:30', count: 3, isConfirmed: true },
+  { id: '40', hostessName: 'がが', driverName: '土居4', location: '中書島', area: '南', startTime: '01:30', endTime: '02:30', arrivalTime: '02:00', count: 1, isConfirmed: false },
+  { id: '41', hostessName: 'ぎぎ', driverName: '汐崎', location: '太秦天神川', area: '京', startTime: '00:00', endTime: '01:00', arrivalTime: '00:30', count: 2, isConfirmed: true },
+  { id: '42', hostessName: 'ぐぐ', driverName: '松尾', location: '淀', area: '南', startTime: '02:30', endTime: '03:30', arrivalTime: '03:00', count: 1, isConfirmed: false },
+  { id: '43', hostessName: 'げげ', driverName: '土居4', location: '嵐山', area: '京', startTime: '01:00', endTime: '02:00', arrivalTime: '01:30', count: 2, isConfirmed: true },
+  { id: '44', hostessName: 'ごご', driverName: '汐崎', location: '向島', area: '南', startTime: '00:30', endTime: '01:30', arrivalTime: '01:00', count: 1, isConfirmed: true },
+  { id: '45', hostessName: 'ざざ', driverName: '松尾', location: '二条', area: '京', startTime: '02:00', endTime: '03:00', arrivalTime: '02:30', count: 3, isConfirmed: false },
+  { id: '46', hostessName: 'じじ', driverName: '土居4', location: '久津川', area: '南', startTime: '01:30', endTime: '02:30', arrivalTime: '02:00', count: 1, isConfirmed: true },
+  { id: '47', hostessName: 'ずず', driverName: '汐崎', location: '山科', area: '京', startTime: '00:00', endTime: '01:00', arrivalTime: '00:30', count: 2, isConfirmed: false },
+  { id: '48', hostessName: 'ぜぜ', driverName: '松尾', location: '大久保', area: '南', startTime: '02:30', endTime: '03:30', arrivalTime: '03:00', count: 1, isConfirmed: true },
+  { id: '49', hostessName: 'ぞぞ', driverName: '土居4', location: '東福寺', area: '京', startTime: '01:00', endTime: '02:00', arrivalTime: '01:30', count: 2, isConfirmed: true },
+  { id: '50', hostessName: 'だだ', driverName: '汐崎', location: '新田辺', area: '南', startTime: '00:30', endTime: '01:30', arrivalTime: '01:00', count: 1, isConfirmed: false },
+  { id: '51', hostessName: 'ぢぢ', driverName: '松尾', location: '稲荷', area: '京', startTime: '02:00', endTime: '03:00', arrivalTime: '02:30', count: 3, isConfirmed: true },
+  { id: '52', hostessName: 'づづ', driverName: '土居4', location: '宇治', area: '南', startTime: '01:30', endTime: '02:30', arrivalTime: '02:00', count: 1, isConfirmed: false },
+  { id: '53', hostessName: 'でで', driverName: '汐崎', location: '出町柳', area: '京', startTime: '00:00', endTime: '01:00', arrivalTime: '00:30', count: 2, isConfirmed: true },
+  { id: '54', hostessName: 'どど', driverName: '松尾', location: '小倉', area: '南', startTime: '02:30', endTime: '03:30', arrivalTime: '03:00', count: 1, isConfirmed: true },
+  { id: '55', hostessName: 'ばば', driverName: '土居4', location: '一乗寺', area: '京', startTime: '01:00', endTime: '02:00', arrivalTime: '01:30', count: 2, isConfirmed: false },
+  { id: '56', hostessName: 'びび', driverName: '汐崎', location: '三室戸', area: '南', startTime: '00:30', endTime: '01:30', arrivalTime: '01:00', count: 1, isConfirmed: true },
+  { id: '57', hostessName: 'ぶぶ', driverName: '松尾', location: '岩倉', area: '京', startTime: '02:00', endTime: '03:00', arrivalTime: '02:30', count: 3, isConfirmed: false },
+  { id: '58', hostessName: 'べべ', driverName: '土居4', location: '黄檗', area: '南', startTime: '01:30', endTime: '02:30', arrivalTime: '02:00', count: 1, isConfirmed: true },
+  { id: '59', hostessName: 'ぼぼ', driverName: '汐崎', location: '修学院', area: '京', startTime: '00:00', endTime: '01:00', arrivalTime: '00:30', count: 2, isConfirmed: false },
+  { id: '60', hostessName: 'ぱぱ', driverName: '松尾', location: '木幡', area: '南', startTime: '02:30', endTime: '03:30', arrivalTime: '03:00', count: 1, isConfirmed: true },
 ];
 
 // INドラ未定予約リストサンプルデータ
@@ -764,21 +808,23 @@ export const hostessTransportSampleData: HostessTransport[] = [
     hostessName: '南 リョウナ',
     departureTime: '00:00',
     destination: '南ICコイン',
-    count: 0, // countが0のサンプルデータ
+    count: 0,
+    luggageDetails: '紙袋1、ポーチ1',
   },
   {
     id: '2',
     hostessName: '南 リョウナ',
     departureTime: '00:00',
     destination: '南ICコイン',
-    count: 1, // countが0以外のサンプルデータ
+    count: 1,
   },
   {
     id: '3',
     hostessName: '南 リョウナ',
     departureTime: '00:00',
     destination: '南ICコイン',
-    count: 0, // countが0のサンプルデータ
+    count: 0,
+    luggageDetails: 'キャリーバッグ1',
   },
   {
     id: '4',
@@ -786,6 +832,7 @@ export const hostessTransportSampleData: HostessTransport[] = [
     departureTime: '00:00',
     destination: '南ICコイン',
     count: 2,
+    luggageDetails: '衣装袋2、靴箱1',
   },
   {
     id: '5',
@@ -800,6 +847,7 @@ export const hostessTransportSampleData: HostessTransport[] = [
     departureTime: '00:00',
     destination: '南ICコイン',
     count: 3,
+    luggageDetails: '紙袋2',
   },
   {
     id: '7',
@@ -814,6 +862,7 @@ export const hostessTransportSampleData: HostessTransport[] = [
     departureTime: '00:00',
     destination: '南ICコイン',
     count: 1,
+    luggageDetails: 'ボストンバッグ1、紙袋1',
   },
   {
     id: '9',

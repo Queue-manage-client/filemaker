@@ -16,8 +16,27 @@ import {
 import { EMPLOYMENT_TYPE_LABELS, type EmploymentType } from '@/types/staff-attendance';
 import { useStaffLedger } from '@/hooks/use-staff';
 
+type EmploymentStatusFilter = 'all' | 'active' | 'retired';
+type EmployeeTypeFilter = 'all' | 'employee' | 'part_time';
+
+const KANA_ROWS: Record<string, string[]> = {
+  'あ': ['あ','い','う','え','お'],
+  'か': ['か','き','く','け','こ','が','ぎ','ぐ','げ','ご'],
+  'さ': ['さ','し','す','せ','そ','ざ','じ','ず','ぜ','ぞ'],
+  'た': ['た','ち','つ','て','と','だ','ぢ','づ','で','ど'],
+  'な': ['な','に','ぬ','ね','の'],
+  'は': ['は','ひ','ふ','へ','ほ','ば','び','ぶ','べ','ぼ','ぱ','ぴ','ぷ','ぺ','ぽ'],
+  'ま': ['ま','み','む','め','も'],
+  'や': ['や','ゆ','よ'],
+  'ら': ['ら','り','る','れ','ろ'],
+  'わ': ['わ','を','ん'],
+};
+
 export default function StaffLedger() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [employmentStatusFilter, setEmploymentStatusFilter] = useState<EmploymentStatusFilter>('all');
+  const [employeeTypeFilter, setEmployeeTypeFilter] = useState<EmployeeTypeFilter>('all');
+  const [kanaFilter, setKanaFilter] = useState<string>('all');
 
   React.useEffect(() => {
     document.title = 'スタッフ台帳 - Dispatch Harmony Hub';
@@ -26,12 +45,25 @@ export default function StaffLedger() {
   // React Queryを使用してデータ取得
   const { data: staffs = [], isLoading, error } = useStaffLedger();
 
-  // 検索フィルタリング
+  // 検索・フィルタリング
   const filteredStaffs = useMemo(() => {
-    if (!searchQuery) return staffs;
-    
-    const q = searchQuery.toLowerCase();
     return staffs.filter(staff => {
+      if (employmentStatusFilter === 'active' && staff.employmentStatus !== 'active') return false;
+      if (employmentStatusFilter === 'retired' && staff.employmentStatus !== '') return false;
+
+      if (employeeTypeFilter === 'employee' && staff.employmentType !== 'employee') return false;
+      if (employeeTypeFilter === 'part_time' && staff.employmentType !== 'part_time') return false;
+
+      if (kanaFilter !== 'all') {
+        const fullNameKana = `${staff.lastNameKana ?? ''}${staff.firstNameKana ?? ''}`.toLowerCase();
+        const fullName = `${staff.lastName}${staff.firstName}`;
+        const reading = fullNameKana || fullName;
+        const allowedKana = KANA_ROWS[kanaFilter] ?? [];
+        if (!allowedKana.some(k => reading.startsWith(k))) return false;
+      }
+
+      if (!searchQuery) return true;
+      const q = searchQuery.toLowerCase();
       const fullName = `${staff.lastName}${staff.firstName}`;
       const fullNameKana = `${staff.lastNameKana ?? ''}${staff.firstNameKana ?? ''}`;
       return (
@@ -42,7 +74,7 @@ export default function StaffLedger() {
         ROLE_LABELS[staff.role].toLowerCase().includes(q)
       );
     });
-  }, [staffs, searchQuery]);
+  }, [staffs, searchQuery, employmentStatusFilter, employeeTypeFilter, kanaFilter]);
 
 
   const formatDateTime = (dateTimeString: string) => {
@@ -166,6 +198,76 @@ export default function StaffLedger() {
                 </div>
               </div>
             </div>
+
+            {/* フィルター */}
+            <div className="flex flex-col gap-3 mt-3">
+              {/* あかさたな順フィルター */}
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-gray-500 mr-1 whitespace-nowrap">かな:</span>
+                <div className="flex flex-wrap gap-1">
+                  {['全て','あ','か','さ','た','な','は','ま','や','ら','わ'].map(kana => (
+                    <button
+                      key={kana}
+                      type="button"
+                      onClick={() => setKanaFilter(kana === '全て' ? 'all' : kana)}
+                      className={`h-7 px-2 text-xs rounded border transition-colors ${
+                        kanaFilter === (kana === '全て' ? 'all' : kana)
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {kana}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6">
+              {/* 在職ステータスフィルター */}
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-gray-500 mr-1">在職:</span>
+                {(['all', 'active', 'retired'] as const).map((value) => {
+                  const label = value === 'all' ? '全て' : value === 'active' ? '現職' : '退職';
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setEmploymentStatusFilter(value)}
+                      className={`px-3 py-1 text-xs rounded border transition-colors ${
+                        employmentStatusFilter === value
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* 雇用区分フィルター */}
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-gray-500 mr-1">雇用区分:</span>
+                {(['all', 'employee', 'part_time'] as const).map((value) => {
+                  const label = value === 'all' ? '全て' : value === 'employee' ? '社員' : 'アルバイト';
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setEmployeeTypeFilter(value)}
+                      className={`px-3 py-1 text-xs rounded border transition-colors ${
+                        employeeTypeFilter === value
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              </div>
+            </div>
           </CardHeader>
         </Card>
       </div>
@@ -189,6 +291,7 @@ export default function StaffLedger() {
                     <th className="border border-gray-300 px-2 py-2 w-24">アカウント名</th>
                     <th className="border border-gray-300 px-2 py-2 w-20">アクセス権</th>
                     <th className="border border-gray-300 px-2 py-2 w-16">ステータス</th>
+                    <th className="border border-gray-300 px-2 py-2 w-32">担当キャスト</th>
                     <th className="border border-gray-300 px-2 py-2 w-32">登録日時</th>
                     <th className="border border-gray-300 px-2 py-2 w-32">更新日時</th>
                     <th className="border border-gray-300 px-2 py-2 w-20">操作</th>
@@ -204,7 +307,12 @@ export default function StaffLedger() {
                         {staff.sfid}
                       </td>
                       <td className="border border-gray-300 px-2 py-2 font-semibold">
-                        {staff.lastName}{staff.firstName}
+                        <Link
+                          href={`/staff-ledger/${staff.id}`}
+                          className="text-blue-700 hover:underline"
+                        >
+                          {staff.lastName}{staff.firstName}
+                        </Link>
                       </td>
                       <td className="border border-gray-300 px-2 py-2 text-center">
                         <span className={`px-2 py-1 rounded text-xs ${
@@ -273,6 +381,23 @@ export default function StaffLedger() {
                         }`}>
                           {ACCESS_STATUS_LABELS[staff.accessStatus]}
                         </span>
+                      </td>
+                      <td className="border border-gray-300 px-2 py-2">
+                        {staff.assignedCasts && staff.assignedCasts.length > 0 ? (
+                          <div className="flex flex-col gap-1">
+                            {staff.assignedCasts.map(cast => (
+                              <Link
+                                key={cast.id}
+                                href={`/hostess-ledger?id=${cast.id}`}
+                                className="text-blue-600 underline cursor-pointer hover:text-blue-800 text-xs whitespace-nowrap"
+                              >
+                                {cast.name}
+                              </Link>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-xs">-</span>
+                        )}
                       </td>
                       <td className="border border-gray-300 px-2 py-2 text-center font-mono text-xs">
                         {formatDateTime(staff.createdAt)}

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Search, Plus, Download, Calendar, BarChart3, List } from "lucide-react";
+import { ArrowLeft, Search, Plus, Download, Calendar, BarChart3, List, AlignJustify } from "lucide-react";
 import type { InterviewRecord } from '@/types';
 import { INTERVIEW_TYPE_LABELS, INTERVIEW_RESULT_LABELS, EMPLOYMENT_STATUS_LABELS, INTERVIEW_PROGRESS_LABELS } from '@/types';
 import { interviewSampleData, mediaList } from '@/data/interviewSampleData';
@@ -20,6 +20,7 @@ interface AggregatedData {
   pending: number;
   rejected: number;
   cancelled: number;
+  declined: number;
   dekasegi: number;
 }
 
@@ -40,6 +41,9 @@ export default function InterviewList() {
   // 表示モード（一覧 or 集計）
   const [viewMode, setViewMode] = useState<'list' | 'aggregate'>('list');
   const [aggregateBy, setAggregateBy] = useState<'media' | 'month' | 'year' | 'store'>('media');
+
+  // 表示密度（詳細 or 簡易）
+  const [displayMode, setDisplayMode] = useState<'detail' | 'compact'>('detail');
 
   React.useEffect(() => {
     document.title = '面接リスト - Dispatch Harmony Hub';
@@ -132,6 +136,7 @@ export default function InterviewList() {
           pending: 0,
           rejected: 0,
           cancelled: 0,
+          declined: 0,
           dekasegi: 0
         });
       }
@@ -142,6 +147,7 @@ export default function InterviewList() {
       if (interview.result === 'pending') data.pending++;
       if (interview.result === 'rejected') data.rejected++;
       if (interview.result === 'cancelled') data.cancelled++;
+      if (interview.result === 'declined') data.declined++;
       if (interview.isRemoteWork) data.dekasegi++;
     });
 
@@ -156,6 +162,7 @@ export default function InterviewList() {
       pending: filteredInterviews.filter(i => i.result === 'pending').length,
       rejected: filteredInterviews.filter(i => i.result === 'rejected').length,
       cancelled: filteredInterviews.filter(i => i.result === 'cancelled').length,
+      declined: filteredInterviews.filter(i => i.result === 'declined').length,
       dekasegi: filteredInterviews.filter(i => i.isRemoteWork).length,
     };
   }, [filteredInterviews]);
@@ -382,6 +389,30 @@ export default function InterviewList() {
                     </SelectContent>
                   </Select>
                 )}
+
+                {/* 詳細/簡易 切替（一覧モード時のみ） */}
+                {viewMode === 'list' && (
+                  <>
+                    <span className="mx-1 text-gray-300">|</span>
+                    <Button
+                      variant={displayMode === 'detail' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setDisplayMode('detail')}
+                      className="h-7 text-xs"
+                    >
+                      詳細表示
+                    </Button>
+                    <Button
+                      variant={displayMode === 'compact' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setDisplayMode('compact')}
+                      className="h-7 text-xs"
+                    >
+                      <AlignJustify className="w-3 h-3 mr-1" />
+                      簡易表示
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </CardHeader>
@@ -393,6 +424,55 @@ export default function InterviewList() {
         <Card>
           <CardContent className="p-0">
             {viewMode === 'list' ? (
+              displayMode === 'compact' ? (
+                /* 簡易表示（配車パネル向け） */
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse" style={{ fontSize: '11px' }}>
+                    <thead>
+                      <tr className="bg-gray-200">
+                        <th className="border border-gray-300 px-1 py-1 w-8 text-center">No</th>
+                        <th className="border border-gray-300 px-1 py-1 w-16 text-center">面接日</th>
+                        <th className="border border-gray-300 px-1 py-1 w-20">氏名</th>
+                        <th className="border border-gray-300 px-1 py-1 w-24">電話番号</th>
+                        <th className="border border-gray-300 px-1 py-1 w-16 text-center">進捗</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredInterviews.map((interview, index) => (
+                        <tr key={interview.id} className="hover:bg-gray-50">
+                          <td className="border border-gray-300 px-1 py-0.5 text-center text-gray-500">
+                            {index + 1}
+                          </td>
+                          <td className="border border-gray-300 px-1 py-0.5 text-center">
+                            {formatDate(interview.date)}
+                          </td>
+                          <td className="border border-gray-300 px-1 py-0.5 font-semibold">
+                            {interview.name}
+                          </td>
+                          <td className="border border-gray-300 px-1 py-0.5">
+                            {interview.phoneNumber || '—'}
+                          </td>
+                          <td className="border border-gray-300 px-1 py-0.5 text-center">
+                            {interview.progress ? (
+                              <span className={`px-1 py-0.5 rounded ${
+                                interview.progress === 'uncontacted' ? 'bg-gray-100 text-gray-700' :
+                                interview.progress === 'contacted' ? 'bg-blue-100 text-blue-800' :
+                                interview.progress === 'scheduled' ? 'bg-purple-100 text-purple-800' :
+                                interview.progress === 'completed' ? 'bg-teal-100 text-teal-800' :
+                                interview.progress === 'hired' ? 'bg-green-100 text-green-800' :
+                                interview.progress === 'rejected' ? 'bg-gray-200 text-gray-700' :
+                                'bg-red-100 text-red-800'
+                              }`}>
+                                {INTERVIEW_PROGRESS_LABELS[interview.progress]}
+                              </span>
+                            ) : '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs border-collapse">
                   <thead>
@@ -416,6 +496,7 @@ export default function InterviewList() {
                       <th className="border border-gray-300 px-2 py-2 w-40">メールアドレス</th>
                       <th className="border border-gray-300 px-2 py-2 w-28">場所</th>
                       <th className="border border-gray-300 px-2 py-2 w-32">備考</th>
+                      <th className="border border-gray-300 px-2 py-2 min-w-[150px]">アンケート</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -463,6 +544,7 @@ export default function InterviewList() {
                             interview.result === 'hired' ? 'bg-green-100 text-green-800' :
                             interview.result === 'cancelled' ? 'bg-red-100 text-red-800' :
                             interview.result === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            interview.result === 'declined' ? 'bg-purple-100 text-purple-800' :
                             'bg-gray-100 text-gray-800'
                           }`}>
                             {INTERVIEW_RESULT_LABELS[interview.result]}
@@ -471,11 +553,13 @@ export default function InterviewList() {
                         <td className="border border-gray-300 px-2 py-2 text-center">
                           {interview.progress && (
                             <span className={`px-2 py-1 rounded text-xs ${
-                              interview.progress === 'application' ? 'bg-blue-100 text-blue-800' :
+                              interview.progress === 'uncontacted' ? 'bg-gray-100 text-gray-700' :
+                              interview.progress === 'contacted' ? 'bg-blue-100 text-blue-800' :
                               interview.progress === 'scheduled' ? 'bg-purple-100 text-purple-800' :
-                              interview.progress === 'completed' ? 'bg-green-100 text-green-800' :
-                              interview.progress === 'followup' ? 'bg-orange-100 text-orange-800' :
-                              'bg-cyan-100 text-cyan-800'
+                              interview.progress === 'completed' ? 'bg-teal-100 text-teal-800' :
+                              interview.progress === 'hired' ? 'bg-green-100 text-green-800' :
+                              interview.progress === 'rejected' ? 'bg-gray-200 text-gray-700' :
+                              'bg-red-100 text-red-800'
                             }`}>
                               {INTERVIEW_PROGRESS_LABELS[interview.progress]}
                             </span>
@@ -509,11 +593,15 @@ export default function InterviewList() {
                         <td className="border border-gray-300 px-2 py-2 max-w-32 truncate" title={interview.notes}>
                           {interview.notes}
                         </td>
+                        <td className="border border-gray-300 px-2 py-2 min-w-[150px]">
+                          {interview.surveyContent || '-'}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+              )
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs border-collapse">
@@ -531,6 +619,7 @@ export default function InterviewList() {
                       <th className="border border-gray-300 px-2 py-2 text-center w-16">保留</th>
                       <th className="border border-gray-300 px-2 py-2 text-center w-16">不採用</th>
                       <th className="border border-gray-300 px-2 py-2 text-center w-16">取消</th>
+                      <th className="border border-gray-300 px-2 py-2 text-center w-16">辞退</th>
                       <th className="border border-gray-300 px-2 py-2 text-center w-16">入店率</th>
                     </tr>
                   </thead>
@@ -570,6 +659,11 @@ export default function InterviewList() {
                             {data.cancelled}
                           </span>
                         </td>
+                        <td className="border border-gray-300 px-2 py-2 text-center">
+                          <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded">
+                            {data.declined}
+                          </span>
+                        </td>
                         <td className="border border-gray-300 px-2 py-2 text-center font-semibold">
                           {data.total > 0 ? `${Math.round((data.hired / data.total) * 100)}%` : '-'}
                         </td>
@@ -606,6 +700,11 @@ export default function InterviewList() {
                       <td className="border border-gray-300 px-2 py-2 text-center">
                         <span className="bg-red-200 text-red-900 px-2 py-0.5 rounded">
                           {statistics.cancelled}
+                        </span>
+                      </td>
+                      <td className="border border-gray-300 px-2 py-2 text-center">
+                        <span className="bg-purple-200 text-purple-900 px-2 py-0.5 rounded">
+                          {statistics.declined}
                         </span>
                       </td>
                       <td className="border border-gray-300 px-2 py-2 text-center">
@@ -662,6 +761,13 @@ export default function InterviewList() {
             <span className="font-semibold">取消:</span>
             <span className="bg-red-100 text-red-800 px-2 py-1 rounded">
               {statistics.cancelled}件
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="font-semibold">辞退:</span>
+            <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded">
+              {statistics.declined}件
             </span>
           </div>
         </div>

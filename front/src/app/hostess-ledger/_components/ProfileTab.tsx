@@ -1,9 +1,59 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Settings } from 'lucide-react';
+import { WorkStyleType, TRANSPORTATION_PAYMENT_METHOD_LABELS, TransportationPaymentMethod } from '@/types/hostess';
+
+// A9: コース料金計算の型
+interface CourseRate {
+  basePrice: string;
+  hostessRatio: string; // ホステス取分（%）
+}
+
+function calcHostessShare(basePrice: string, ratio: string): string {
+  const price = parseFloat(basePrice.replace(/,/g, ''));
+  const r = parseFloat(ratio);
+  if (isNaN(price) || isNaN(r)) return '-';
+  return Math.round(price * (r / 100)).toLocaleString();
+}
+
+function calcStoreShare(basePrice: string, ratio: string): string {
+  const price = parseFloat(basePrice.replace(/,/g, ''));
+  const r = parseFloat(ratio);
+  if (isNaN(price) || isNaN(r)) return '-';
+  return Math.round(price * (1 - r / 100)).toLocaleString();
+}
 
 export default function ProfileTab() {
+  // A7: 勤務形態（出稼ぎを含む選択肢）
+  const [workStyle, setWorkStyle] = useState<WorkStyleType | null>(null);
+
+  // A8: 出稼ぎ選択時に連動（workStyle === 'dekasegi' で導出）
+  const isDekasegi = workStyle === 'dekasegi';
+  const [transportationFee, setTransportationFee] = useState('');
+  const [dormitoryFee, setDormitoryFee] = useState('');
+  const [transportationMethod, setTransportationMethod] = useState<TransportationPaymentMethod | ''>('');
+
+  // A9: コース料金自動計算の状態
+  const [specialNomination, setSpecialNomination] = useState<CourseRate>({ basePrice: '', hostessRatio: '60' });
+  const [classBonus, setClassBonus] = useState<CourseRate>({ basePrice: '', hostessRatio: '60' });
+  const [extensionFee, setExtensionFee] = useState<CourseRate>({ basePrice: '', hostessRatio: '60' });
+
+  const specialNominationResult = useMemo(() => ({
+    hostess: calcHostessShare(specialNomination.basePrice, specialNomination.hostessRatio),
+    store: calcStoreShare(specialNomination.basePrice, specialNomination.hostessRatio),
+  }), [specialNomination]);
+
+  const classBonusResult = useMemo(() => ({
+    hostess: calcHostessShare(classBonus.basePrice, classBonus.hostessRatio),
+    store: calcStoreShare(classBonus.basePrice, classBonus.hostessRatio),
+  }), [classBonus]);
+
+  const extensionFeeResult = useMemo(() => ({
+    hostess: calcHostessShare(extensionFee.basePrice, extensionFee.hostessRatio),
+    store: calcStoreShare(extensionFee.basePrice, extensionFee.hostessRatio),
+  }), [extensionFee]);
+
   return (
     <div className="bg-pink-200 p-2 text-[11px] h-full flex gap-2">
       {/* 左側セクション */}
@@ -248,20 +298,73 @@ export default function ProfileTab() {
               </button>
             </div>
 
-            {/* ラジオボタンリスト（枠付き） */}
+            {/* A7: 勤務形態ラジオボタン（出稼ぎは下の独立チェックボックスで選択） */}
             <div className="border border-gray-400 bg-white px-1 py-0.5 mt-0.5">
               <div className="flex flex-col text-[11px] leading-tight">
-                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" /><span className="ml-0.5">1 レギュラー</span></label>
-                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" /><span className="ml-0.5">2 準レギュラー</span></label>
-                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" /><span className="ml-0.5">3 直前</span></label>
-                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" /><span className="ml-0.5">4 出稼ぎ</span></label>
-                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" /><span className="ml-0.5">5 新人</span></label>
-                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" /><span className="ml-0.5">6 緊急</span></label>
-                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" /><span className="ml-0.5">7 不定期</span></label>
-                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" /><span className="ml-0.5">8 退店</span></label>
-                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" /><span className="ml-0.5">9 2ヶ月出勤ナシ</span></label>
+                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" checked={workStyle === 'regular'} onChange={() => setWorkStyle('regular')} /><span className="ml-0.5">1 レギュラー</span></label>
+                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" checked={workStyle === 'semi-regular'} onChange={() => setWorkStyle('semi-regular')} /><span className="ml-0.5">2 準レギュラー</span></label>
+                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" checked={workStyle === 'last-minute'} onChange={() => setWorkStyle('last-minute')} /><span className="ml-0.5">3 直前</span></label>
+                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" checked={workStyle === 'newbie'} onChange={() => setWorkStyle('newbie')} /><span className="ml-0.5">4 新人</span></label>
+                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" checked={workStyle === 'emergency'} onChange={() => setWorkStyle('emergency')} /><span className="ml-0.5">5 緊急</span></label>
+                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" checked={workStyle === 'irregular'} onChange={() => setWorkStyle('irregular')} /><span className="ml-0.5">6 不定期</span></label>
+                <label className="flex items-center"><input type="radio" name="workStyle" className="w-3 h-3" checked={workStyle === 'retired'} onChange={() => setWorkStyle('retired')} /><span className="ml-0.5">7 退店</span></label>
               </div>
             </div>
+
+            {/* A7/A8: 出稼ぎ（独立したラジオボタン相当の選択肢として配置） */}
+            <div className="border border-orange-300 bg-orange-50 px-1 py-0.5 mt-1">
+              <label className="flex items-center gap-1 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-3.5 h-3.5 accent-orange-500"
+                  checked={isDekasegi}
+                  onChange={(e) => setWorkStyle(e.target.checked ? 'dekasegi' : null)}
+                />
+                <span className="text-[11px] font-bold text-orange-700">出稼ぎ</span>
+              </label>
+            </div>
+
+            {/* A8: 出稼ぎON時の詳細入力 */}
+            {isDekasegi && (
+              <div className="border border-blue-400 bg-blue-50 px-1 py-1 mt-0.5 flex flex-col gap-0.5">
+                <div className="text-[10px] text-blue-700 font-bold mb-0.5">出稼ぎ情報</div>
+                <div className="flex items-center gap-1">
+                  <span className="w-[68px] text-right whitespace-nowrap text-[11px]">交通費支給</span>
+                  <input
+                    type="text"
+                    className="w-[60px] h-[18px] text-[11px] px-1 bg-white border border-gray-400"
+                    placeholder="¥"
+                    value={transportationFee}
+                    onChange={(e) => setTransportationFee(e.target.value)}
+                  />
+                  <span className="text-[11px]">円</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="w-[68px] text-right whitespace-nowrap text-[11px]">寮費</span>
+                  <input
+                    type="text"
+                    className="w-[60px] h-[18px] text-[11px] px-1 bg-white border border-gray-400"
+                    placeholder="¥"
+                    value={dormitoryFee}
+                    onChange={(e) => setDormitoryFee(e.target.value)}
+                  />
+                  <span className="text-[11px]">円</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="w-[68px] text-right whitespace-nowrap text-[10px]">支給方法</span>
+                  <select
+                    className="h-[18px] text-[11px] px-0.5 bg-white border border-gray-400"
+                    value={transportationMethod}
+                    onChange={(e) => setTransportationMethod(e.target.value as TransportationPaymentMethod | '')}
+                  >
+                    <option value="">選択</option>
+                    {(Object.entries(TRANSPORTATION_PAYMENT_METHOD_LABELS) as [TransportationPaymentMethod, string][]).map(([value, label]) => (
+                      <option key={value} value={value}>{label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 右カラム: 併用登録エリア */}
@@ -347,6 +450,76 @@ export default function ProfileTab() {
             <button type="button" className="h-[18px] px-2 text-[10px] bg-orange-400 border border-gray-400 hover:bg-orange-500 text-white font-bold whitespace-nowrap">自動入力</button>
             <input type="text" className="w-[50px] h-[18px] text-[11px] bg-orange-200 border border-gray-400" />
             <input type="text" className="w-[50px] h-[18px] text-[11px] bg-orange-100 border border-gray-400" />
+          </div>
+        </div>
+
+        {/* A9: コース料金自動計算（割合制） */}
+        <div className="border border-purple-300 bg-purple-50 px-2 py-1 mt-1 text-[11px]">
+          <div className="text-[11px] font-bold text-purple-700 mb-1">コース料金 自動計算（割合制）</div>
+          {/* ヘッダー */}
+          <div className="grid grid-cols-[90px_60px_40px_60px_60px] gap-x-1 text-[10px] text-gray-500 mb-0.5 font-bold">
+            <span>項目</span>
+            <span>基本料金(¥)</span>
+            <span>取分(%)</span>
+            <span>ホステス取分</span>
+            <span>店舗取分</span>
+          </div>
+          {/* 特別指名料金 */}
+          <div className="grid grid-cols-[90px_60px_40px_60px_60px] gap-x-1 items-center mb-0.5">
+            <span className="whitespace-nowrap">特別指名料金</span>
+            <input
+              type="text"
+              className="h-[18px] text-[11px] px-1 bg-white border border-gray-400"
+              placeholder="0"
+              value={specialNomination.basePrice}
+              onChange={(e) => setSpecialNomination((prev) => ({ ...prev, basePrice: e.target.value }))}
+            />
+            <input
+              type="text"
+              className="h-[18px] text-[11px] px-1 bg-white border border-gray-400"
+              value={specialNomination.hostessRatio}
+              onChange={(e) => setSpecialNomination((prev) => ({ ...prev, hostessRatio: e.target.value }))}
+            />
+            <span className="text-right pr-1 font-bold text-purple-700">¥{specialNominationResult.hostess}</span>
+            <span className="text-right pr-1 font-bold text-gray-600">¥{specialNominationResult.store}</span>
+          </div>
+          {/* クラス加算金 */}
+          <div className="grid grid-cols-[90px_60px_40px_60px_60px] gap-x-1 items-center mb-0.5">
+            <span className="whitespace-nowrap">クラス加算金</span>
+            <input
+              type="text"
+              className="h-[18px] text-[11px] px-1 bg-white border border-gray-400"
+              placeholder="0"
+              value={classBonus.basePrice}
+              onChange={(e) => setClassBonus((prev) => ({ ...prev, basePrice: e.target.value }))}
+            />
+            <input
+              type="text"
+              className="h-[18px] text-[11px] px-1 bg-white border border-gray-400"
+              value={classBonus.hostessRatio}
+              onChange={(e) => setClassBonus((prev) => ({ ...prev, hostessRatio: e.target.value }))}
+            />
+            <span className="text-right pr-1 font-bold text-purple-700">¥{classBonusResult.hostess}</span>
+            <span className="text-right pr-1 font-bold text-gray-600">¥{classBonusResult.store}</span>
+          </div>
+          {/* 延長料金 */}
+          <div className="grid grid-cols-[90px_60px_40px_60px_60px] gap-x-1 items-center">
+            <span className="whitespace-nowrap">延長料金</span>
+            <input
+              type="text"
+              className="h-[18px] text-[11px] px-1 bg-white border border-gray-400"
+              placeholder="0"
+              value={extensionFee.basePrice}
+              onChange={(e) => setExtensionFee((prev) => ({ ...prev, basePrice: e.target.value }))}
+            />
+            <input
+              type="text"
+              className="h-[18px] text-[11px] px-1 bg-white border border-gray-400"
+              value={extensionFee.hostessRatio}
+              onChange={(e) => setExtensionFee((prev) => ({ ...prev, hostessRatio: e.target.value }))}
+            />
+            <span className="text-right pr-1 font-bold text-purple-700">¥{extensionFeeResult.hostess}</span>
+            <span className="text-right pr-1 font-bold text-gray-600">¥{extensionFeeResult.store}</span>
           </div>
         </div>
       </div>

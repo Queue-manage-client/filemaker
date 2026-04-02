@@ -30,6 +30,9 @@ export interface TodayCastData {
   category?: 'VIP' | 'Lady' | 'Girls' | 'SUP' | '新人'; // カテゴリー
   storeColor?: string; // 店舗の背景色
   isNewbie?: boolean; // 新人フラグ
+  newbieStartDate?: string; // 新人開始日 (例: "2026-03-25")
+  hasGuarantee?: boolean; // 保証有無
+  guaranteeRemaining?: number; // 保証残金
   weeklyRemarks?: string; // 週間備考
   workStyle?: string; // 勤務形態
   manager?: string; // 担当者

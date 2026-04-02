@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, User2, ArrowLeft, Pen } from "lucide-react";
+import { FileText, User2, ArrowLeft, Pen, UserPlus, Phone } from "lucide-react";
 import { Customer } from '@/types';
 import type { Vehicle, UsageHistory, PreferenceForm, ReceiptForm, PetOption, WorkAreaOption } from '@/types/customer-ledger';
 import { sampleCustomers } from '@/data/customerSampleData';
@@ -44,6 +44,26 @@ export default function CustomerLedger() {
     note: ''
   });
 
+  // 新規顧客ダイアログ
+  const [showNewCustomerDialog, setShowNewCustomerDialog] = useState(false);
+  const [newCustomerPhone, setNewCustomerPhone] = useState('');
+  const [newCustomerName, setNewCustomerName] = useState('');
+  const [newCustomerNameKana, setNewCustomerNameKana] = useState('');
+
+  const handleNewCustomer = () => {
+    // 着信番号を自動取得する想定（デモでは最後に架電された番号をシミュレート）
+    const simulatedCallerNumber = '090-1234-5678';
+    setNewCustomerPhone(simulatedCallerNumber);
+    setNewCustomerName('');
+    setNewCustomerNameKana('');
+    setShowNewCustomerDialog(true);
+  };
+
+  const handleSaveNewCustomer = () => {
+    // フロントエンドのみ: 保存処理のシミュレーション
+    setShowNewCustomerDialog(false);
+  };
+
   // 顧客の統計カード表示状態
   const [showCustomerStats, setShowCustomerStats] = useState(false);
   const statsCardRef = useRef<HTMLDivElement>(null);
@@ -65,6 +85,9 @@ export default function CustomerLedger() {
     };
   }, [showCustomerStats]);
 
+  // 本日の利用回数（サンプル値）
+  const todayVisitCount = 3;
+
   // 顧客の統計データ
   const customerStats = {
     firstVisit: '2017/04/07',
@@ -73,7 +96,9 @@ export default function CustomerLedger() {
     nominationCount: 1,
     nominationRate: 25,
     extensionCount: null as number | null,
-    averageTime: 30
+    averageTime: 30,
+    totalAmount: 240000,
+    averageAmount: 60000
   };
 
   // ポイント履歴ウィンドウを開く関数
@@ -325,6 +350,13 @@ export default function CustomerLedger() {
               >
                 新規顧客検索
               </button>
+              <button
+                onClick={handleNewCustomer}
+                className="px-4 py-2 bg-orange-500 border-2 border-orange-700 text-white text-sm font-semibold rounded hover:bg-orange-600 transition-colors flex items-center gap-1"
+              >
+                <UserPlus className="w-4 h-4" />
+                新規顧客
+              </button>
             </div>
             
             {/* 右側：統合顧客テキストと追加情報 */}
@@ -424,6 +456,10 @@ export default function CustomerLedger() {
             <span className="ml-1 px-2 py-0.5 bg-red-600 text-white text-xs font-bold rounded animate-pulse">
               NG 3件
             </span>
+            {/* 本日利用回数バッジ */}
+            <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">
+              本日 {todayVisitCount}回目
+            </span>
 
             {/* 氏名ふりがな */}
             <span className="text-xs ml-2">氏名ふりがな</span>
@@ -494,28 +530,28 @@ export default function CustomerLedger() {
           <Tabs defaultValue="basic-info" className="w-full">
             {/* カスタムタブヘッダー */}
             <TabsList className="h-auto p-0 bg-transparent grid grid-cols-2 w-full">
-              <TabsTrigger 
-                value="basic-info" 
-                className="bg-pink-100 border border-gray-400 px-4 py-2 text-sm font-medium text-gray-800 data-[state=active]:bg-white data-[state=active]:border-b-white relative z-10 rounded-none justify-start"
+              <TabsTrigger
+                value="basic-info"
+                className="bg-pink-100 border border-gray-400 px-3 py-1 text-xs font-medium text-gray-800 data-[state=active]:bg-white data-[state=active]:border-b-white relative z-10 rounded-none justify-start"
               >
-                <FileText className="w-4 h-4 mr-2" />
+                <FileText className="w-3 h-3 mr-1" />
                 基本情報
               </TabsTrigger>
-              <TabsTrigger 
-                value="profile" 
-                className="bg-pink-100 border border-gray-400 border-l-0 px-4 py-2 text-sm font-medium text-gray-800 data-[state=active]:bg-white data-[state=active]:border-b-white relative z-10 rounded-none justify-start"
+              <TabsTrigger
+                value="profile"
+                className="bg-pink-100 border border-gray-400 border-l-0 px-3 py-1 text-xs font-medium text-gray-800 data-[state=active]:bg-white data-[state=active]:border-b-white relative z-10 rounded-none justify-start"
               >
-                <User2 className="w-4 h-4 mr-2" />
+                <User2 className="w-3 h-3 mr-1" />
                 プロフィール
               </TabsTrigger>
             </TabsList>
-            
+
             {/* 基本情報タブ */}
-            <TabsContent value="basic-info" className="mt-0 p-2 border border-gray-400 border-t-0 text-xs bg-pink-50">
-              <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr_1.2fr] gap-2">
+            <TabsContent value="basic-info" className="mt-0 p-1 border border-gray-400 border-t-0 text-xs bg-pink-50">
+              <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr_1.2fr] gap-1">
                 
                 {/* 左カラム - 基本情報入力エリア */}
-                <div className="space-y-0 bg-white rounded p-2 border border-gray-300">
+                <div className="space-y-0 bg-white rounded p-1 border border-gray-300">
 
                   {/* 電話番号（複数欄） */}
                   <div className="p-1 space-y-1">
@@ -597,48 +633,105 @@ export default function CustomerLedger() {
 
                   {/* 住所 */}
                   <div className="p-1 space-y-1">
+                    {/* 住所フリガナ */}
                     <div className="flex items-center gap-2">
-                      <Label className="text-xs font-semibold w-16">郵便番号</Label>
-                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
-                      <Button variant="outline" size="sm" className="h-7 text-xs">
+                      <Label className="text-xs font-semibold w-20">住所フリガナ</Label>
+                      <Input className="w-56 h-6 text-xs border-gray-400 bg-yellow-50" placeholder="例: トウキョウトシンジュクク" />
+                    </div>
+                    {/* 郵便番号 */}
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs font-semibold w-20">郵便番号</Label>
+                      <Input className="w-28 h-6 text-xs border-gray-500 bg-white" placeholder="000-0000" />
+                      <Button variant="outline" size="sm" className="h-6 text-xs px-2">
                         住所検索
                       </Button>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Label className="text-xs font-semibold w-16">市区町村</Label>
-                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
+                    {/* 住所構造化入力 - 2カラムグリッド */}
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+                      {/* 都道府県 */}
+                      <div className="flex flex-col gap-0.5">
+                        <Label className="text-xs font-semibold">都道府県</Label>
+                        <select className="h-6 text-xs border border-gray-500 bg-white rounded px-1 outline-none focus:border-blue-400">
+                          <option value="">選択してください</option>
+                          <option value="北海道">北海道</option>
+                          <option value="青森県">青森県</option>
+                          <option value="岩手県">岩手県</option>
+                          <option value="宮城県">宮城県</option>
+                          <option value="秋田県">秋田県</option>
+                          <option value="山形県">山形県</option>
+                          <option value="福島県">福島県</option>
+                          <option value="茨城県">茨城県</option>
+                          <option value="栃木県">栃木県</option>
+                          <option value="群馬県">群馬県</option>
+                          <option value="埼玉県">埼玉県</option>
+                          <option value="千葉県">千葉県</option>
+                          <option value="東京都">東京都</option>
+                          <option value="神奈川県">神奈川県</option>
+                          <option value="新潟県">新潟県</option>
+                          <option value="富山県">富山県</option>
+                          <option value="石川県">石川県</option>
+                          <option value="福井県">福井県</option>
+                          <option value="山梨県">山梨県</option>
+                          <option value="長野県">長野県</option>
+                          <option value="岐阜県">岐阜県</option>
+                          <option value="静岡県">静岡県</option>
+                          <option value="愛知県">愛知県</option>
+                          <option value="三重県">三重県</option>
+                          <option value="滋賀県">滋賀県</option>
+                          <option value="京都府">京都府</option>
+                          <option value="大阪府">大阪府</option>
+                          <option value="兵庫県">兵庫県</option>
+                          <option value="奈良県">奈良県</option>
+                          <option value="和歌山県">和歌山県</option>
+                          <option value="鳥取県">鳥取県</option>
+                          <option value="島根県">島根県</option>
+                          <option value="岡山県">岡山県</option>
+                          <option value="広島県">広島県</option>
+                          <option value="山口県">山口県</option>
+                          <option value="徳島県">徳島県</option>
+                          <option value="香川県">香川県</option>
+                          <option value="愛媛県">愛媛県</option>
+                          <option value="高知県">高知県</option>
+                          <option value="福岡県">福岡県</option>
+                          <option value="佐賀県">佐賀県</option>
+                          <option value="長崎県">長崎県</option>
+                          <option value="熊本県">熊本県</option>
+                          <option value="大分県">大分県</option>
+                          <option value="宮崎県">宮崎県</option>
+                          <option value="鹿児島県">鹿児島県</option>
+                          <option value="沖縄県">沖縄県</option>
+                        </select>
+                      </div>
+                      {/* 市区町村 */}
+                      <div className="flex flex-col gap-0.5">
+                        <Label className="text-xs font-semibold">市区町村</Label>
+                        <Input className="h-6 text-xs border-gray-500 bg-white" placeholder="" />
+                      </div>
+                      {/* 丁目・番地・号 */}
+                      <div className="flex flex-col gap-0.5">
+                        <Label className="text-xs font-semibold leading-tight">
+                          丁目・番地・号
+                          <span className="text-[9px] font-normal text-gray-500 ml-1">（半角数字）</span>
+                        </Label>
+                        <Input className="h-6 text-xs border-gray-500 bg-white" placeholder="半角数字で入力" />
+                      </div>
+                      {/* 建物名・部屋番号 */}
+                      <div className="flex flex-col gap-0.5">
+                        <Label className="text-xs font-semibold">建物名・部屋番号</Label>
+                        <Input className="h-6 text-xs border-gray-500 bg-white" placeholder="" />
+                      </div>
                     </div>
+                    {/* 京都市内住所 */}
                     <div className="flex items-center gap-2">
-                      <Label className="text-xs font-semibold w-16">町丁番地</Label>
-                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
+                      <Label className="text-xs font-semibold w-20">京都市内住所</Label>
+                      <Input className="w-28 h-6 text-xs border-gray-500 bg-white" placeholder="" />
                     </div>
+                    {/* 住所備考 */}
                     <div className="flex items-center gap-2">
-                      <Label className="text-xs font-semibold w-16">番地</Label>
-                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Label className="text-xs font-semibold w-16">建物名他</Label>
-                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
-                      <Label className="text-xs font-semibold">号室</Label>
-                      <Input className="w-16 h-7 text-xs border-gray-500 bg-white" placeholder="" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Label className="text-xs font-semibold w-16">京都市内住所</Label>
-                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Label className="text-xs font-semibold w-16">住所ふりがな</Label>
-                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Label className="text-xs font-semibold w-16">町ふりがな</Label>
-                      <Input className="w-36 h-7 text-xs border-gray-500 bg-white" placeholder="" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Label className="text-xs font-semibold w-16">住所備考</Label>
+                      <Label className="text-xs font-semibold w-20">住所備考</Label>
                     </div>
                     <Textarea
-                      className="min-h-[60px] text-xs border-gray-500 bg-white"
+                      className="min-h-[48px] text-xs border-gray-500 bg-white"
                       placeholder=""
                     />
                   </div>
@@ -797,10 +890,10 @@ export default function CustomerLedger() {
                 </div>
 
                 {/* 中央カラム - 好み情報 */}
-                <div className="space-y-0 bg-white rounded p-2 border border-gray-300">
+                <div className="space-y-0 bg-white rounded p-1 border border-gray-300">
 
                   {/* お客様メモ履歴（お客様との歴史） - 中央上部に配置 */}
-                  <div className="p-1 mb-3">
+                  <div className="p-1 mb-1">
                     <div className="border-2 border-orange-400 rounded bg-orange-50">
                       <div className="bg-orange-400 text-white px-2 py-1 text-xs font-bold flex items-center justify-between">
                         <span>📝 お客様メモ履歴（お客様との歴史）</span>
@@ -825,7 +918,7 @@ export default function CustomerLedger() {
                         </div>
                       </div>
                       {/* メモ履歴一覧 */}
-                      <div className="max-h-[200px] overflow-y-auto">
+                      <div className="max-h-[120px] overflow-y-auto">
                         {customerMemoHistory.map((memo, idx) => (
                           <div key={memo.id} className={`p-2 border-b border-orange-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-orange-50'}`}>
                             <div className="flex items-center justify-between text-[10px] text-gray-500 mb-1">
@@ -877,26 +970,34 @@ export default function CustomerLedger() {
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-gray-700 font-medium">履歴回数</span>
-                            <span className="text-gray-900">{customerStats.historyCount}</span>
+                            <span className="text-gray-900">{customerStats.historyCount}回</span>
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-gray-700 font-medium">継続日数</span>
-                            <span className="text-gray-900">{customerStats.continuousDays}</span>
+                            <span className="text-gray-900">{customerStats.continuousDays.toLocaleString()}日</span>
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-gray-700 font-medium">指名本数</span>
                             <div className="flex items-center gap-2">
-                              <span className="text-gray-900">{customerStats.nominationCount}</span>
+                              <span className="text-gray-900">{customerStats.nominationCount}回</span>
                               <span className="text-gray-900">{customerStats.nominationRate}%</span>
                             </div>
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-gray-700 font-medium">延長本数</span>
-                            <span className="text-gray-900">{customerStats.extensionCount ?? ''}</span>
+                            <span className="text-gray-900">{customerStats.extensionCount != null ? `${customerStats.extensionCount}回` : '0回'}</span>
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-gray-700 font-medium">平均時間</span>
-                            <span className="text-gray-900">{customerStats.averageTime}</span>
+                            <span className="text-gray-900">{customerStats.averageTime}分</span>
+                          </div>
+                          <div className="flex justify-between items-center border-t border-gray-200 pt-1">
+                            <span className="text-gray-700 font-medium">累計利用金額</span>
+                            <span className="text-gray-900 font-semibold">¥{customerStats.totalAmount.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-700 font-medium">平均利用金額</span>
+                            <span className="text-gray-900">¥{customerStats.averageAmount.toLocaleString()}</span>
                           </div>
                         </div>
                       </div>
@@ -957,33 +1058,45 @@ export default function CustomerLedger() {
                   </div>
 
                   {/* 接客履歴テーブル - 大きく表示 */}
-                  <div className="p-1 mb-3">
+                  <div className="p-1 mb-1">
                     <div className="text-sm font-semibold text-blue-700 mb-2 flex items-center gap-2">
                       <span>📅 接客履歴（接客日一覧）</span>
                       <span className="text-xs font-normal text-gray-500">全{filteredHistory.length}件</span>
                     </div>
                     <div className="border-2 border-blue-400 rounded overflow-hidden">
                       {/* テーブルヘッダー */}
-                      <div className="bg-blue-500 text-white grid grid-cols-6 text-xs border-b border-blue-400 font-semibold">
+                      <div className="bg-blue-500 text-white grid grid-cols-7 text-xs border-b border-blue-400 font-semibold">
                         <div className="px-3 py-2 border-r border-blue-400">接客日</div>
                         <div className="px-3 py-2 border-r border-blue-400">ホステス名</div>
                         <div className="px-3 py-2 border-r border-blue-400">コース名</div>
                         <div className="px-3 py-2 border-r border-blue-400">時間</div>
                         <div className="px-3 py-2 border-r border-blue-400">延長</div>
+                        <div className="px-3 py-2 border-r border-blue-400">料金</div>
                         <div className="px-3 py-2">派遣場所</div>
                       </div>
                       {/* テーブルボディ - 大きく表示 */}
-                      <div className="max-h-[400px] overflow-y-auto bg-white">
+                      <div className="max-h-[200px] overflow-y-auto bg-white">
                         {filteredHistory.map((history, idx) => (
-                          <div key={history.id} className={`grid grid-cols-6 text-sm border-b border-gray-200 hover:bg-blue-50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                          <div key={history.id} className={`grid grid-cols-7 text-sm border-b border-gray-200 hover:bg-blue-50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                             <div className="px-3 py-2 border-r border-gray-200 font-medium">{history.date}</div>
                             <div className="px-3 py-2 border-r border-gray-200">{history.staffName}</div>
                             <div className="px-3 py-2 border-r border-gray-200">{history.category}</div>
                             <div className="px-3 py-2 border-r border-gray-200">{history.startTime}</div>
                             <div className="px-3 py-2 border-r border-gray-200">{history.endTime || '-'}</div>
+                            <div className="px-3 py-2 border-r border-gray-200 text-right font-medium">
+                              {history.amount > 0 ? `¥${history.amount.toLocaleString()}` : '-'}
+                            </div>
                             <div className="px-3 py-2">{history.storeName}</div>
                           </div>
                         ))}
+                      </div>
+                      {/* 合計行 */}
+                      <div className="bg-blue-50 border-t-2 border-blue-400 grid grid-cols-7 text-sm font-semibold">
+                        <div className="px-3 py-1.5 border-r border-gray-200 text-blue-700 col-span-5">合計（{filteredHistory.filter(h => h.amount > 0).length}件）</div>
+                        <div className="px-3 py-1.5 border-r border-gray-200 text-right text-blue-700">
+                          ¥{filteredHistory.reduce((sum, h) => sum + h.amount, 0).toLocaleString()}
+                        </div>
+                        <div className="px-3 py-1.5"></div>
                       </div>
                     </div>
                   </div>
@@ -1155,7 +1268,7 @@ export default function CustomerLedger() {
 
                   {/* ホステス一覧 */}
                   <div className="p-1">
-                    <div className="border border-gray-500 max-h-[300px] overflow-y-auto">
+                    <div className="border border-gray-500 max-h-[180px] overflow-y-auto">
                       {/* サンプルホステスデータ */}
                       {[
                         { id: '1184', area: '京都', name: 'あみ', type: 'レディ', status: '終了', time1: '20:00', time2: '24:00', time3: '2:00' },
@@ -1283,7 +1396,7 @@ export default function CustomerLedger() {
                         <div className="mt-1 p-1 bg-red-50 border-2 border-red-300 rounded">
                           <Label className="text-[10px] font-semibold text-red-700">旧備考</Label>
                           <div className="text-[10px] text-red-600">
-                            巨乳好きの50分だが利用頻度は○。なんせ乳が無い千は×。 Bランク
+                            巨乳好きの50分だが利用頻度は○。なんせ乳が無い千は×。
                           </div>
                         </div>
                       </div>
@@ -1306,6 +1419,67 @@ export default function CustomerLedger() {
           </Tabs>
         </div>
       </div>
+
+      {/* 新規顧客ダイアログ */}
+      {showNewCustomerDialog && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-2xl w-[480px] overflow-hidden">
+            <div className="bg-orange-500 text-white px-4 py-3 flex items-center gap-2">
+              <UserPlus className="w-5 h-5" />
+              <span className="font-bold">新規顧客登録</span>
+            </div>
+            <div className="p-4 space-y-4">
+              {/* 電話番号（自動入力済み） */}
+              <div>
+                <Label className="text-sm font-semibold flex items-center gap-1 mb-1">
+                  <Phone className="w-4 h-4 text-green-600" />
+                  電話番号（着信番号から自動入力）
+                </Label>
+                <Input
+                  value={newCustomerPhone}
+                  onChange={(e) => setNewCustomerPhone(e.target.value)}
+                  className="h-10 text-lg font-mono bg-green-50 border-green-300"
+                  placeholder="電話番号"
+                />
+                <p className="text-xs text-gray-500 mt-1">着信時の発信者番号が自動で入力されます</p>
+              </div>
+
+              {/* 顧客名 */}
+              <div>
+                <Label className="text-sm font-semibold mb-1">顧客名</Label>
+                <Input
+                  value={newCustomerName}
+                  onChange={(e) => setNewCustomerName(e.target.value)}
+                  className="h-9"
+                  placeholder="顧客名を入力"
+                />
+              </div>
+
+              {/* フリガナ */}
+              <div>
+                <Label className="text-sm font-semibold mb-1">フリガナ</Label>
+                <Input
+                  value={newCustomerNameKana}
+                  onChange={(e) => setNewCustomerNameKana(e.target.value)}
+                  className="h-9"
+                  placeholder="フリガナを入力"
+                />
+              </div>
+            </div>
+            <div className="px-4 py-3 bg-gray-50 border-t flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowNewCustomerDialog(false)}>
+                キャンセル
+              </Button>
+              <Button
+                onClick={handleSaveNewCustomer}
+                className="bg-orange-500 hover:bg-orange-600 text-white"
+              >
+                登録して開く
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -30,6 +30,35 @@ interface LocationData {
   no: number;
 }
 
+// 店舗別実績データ型
+interface StorePerformanceData {
+  id: number;
+  storeName: string;
+  year: number;
+  month: number;
+  registeredCount: number;   // 在籍人数
+  attendanceDays: number;    // 出勤日数合計
+  possibleDays: number;      // 可能出勤日数合計（在籍人数 × 営業日数）
+  storeSales: number;
+  salesCount: number;
+}
+
+// 出勤率を計算
+const calcAttendanceRate = (attendanceDays: number, possibleDays: number): number => {
+  if (possibleDays === 0) return 0;
+  return Math.round((attendanceDays / possibleDays) * 1000) / 10;
+};
+
+// 店舗別実績サンプルデータ
+const storePerformanceSampleData: StorePerformanceData[] = [
+  { id: 1, storeName: "銀座本店", year: 2026, month: 3, registeredCount: 18, attendanceDays: 198, possibleDays: 288, storeSales: 4850000, salesCount: 142 },
+  { id: 2, storeName: "新宿店",   year: 2026, month: 3, registeredCount: 14, attendanceDays: 140, possibleDays: 224, storeSales: 3620000, salesCount: 108 },
+  { id: 3, storeName: "渋谷店",   year: 2026, month: 3, registeredCount: 11, attendanceDays: 99,  possibleDays: 176, storeSales: 2780000, salesCount: 84  },
+  { id: 4, storeName: "銀座本店", year: 2026, month: 2, registeredCount: 17, attendanceDays: 170, possibleDays: 272, storeSales: 4410000, salesCount: 131 },
+  { id: 5, storeName: "新宿店",   year: 2026, month: 2, registeredCount: 13, attendanceDays: 117, possibleDays: 208, storeSales: 3200000, salesCount: 96  },
+  { id: 6, storeName: "渋谷店",   year: 2026, month: 2, registeredCount: 10, attendanceDays: 80,  possibleDays: 160, storeSales: 2510000, salesCount: 75  },
+];
+
 // サンプルデータ
 const locationSampleData: LocationData[] = [
   {
@@ -96,6 +125,55 @@ const locationSampleData: LocationData[] = [
     no: 3
   }
 ];
+
+// 店舗別実績テーブルコンポーネント
+const StorePerformanceTable = () => {
+  return (
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-16">No</TableHead>
+            <TableHead>店舗名</TableHead>
+            <TableHead className="w-20">西暦</TableHead>
+            <TableHead className="w-16">月</TableHead>
+            <TableHead className="w-24 text-center">在籍人数</TableHead>
+            <TableHead className="w-28 text-center">出勤率</TableHead>
+            <TableHead className="w-28 text-right">店舗売上</TableHead>
+            <TableHead className="w-24 text-right">売上件数</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {storePerformanceSampleData.map((item) => {
+            const rate = calcAttendanceRate(item.attendanceDays, item.possibleDays);
+            const rateColor = rate >= 70 ? 'text-green-600' : rate >= 50 ? 'text-yellow-600' : 'text-red-600';
+            return (
+              <TableRow key={item.id}>
+                <TableCell className="text-center text-gray-500">{item.id}</TableCell>
+                <TableCell className="font-medium">{item.storeName}</TableCell>
+                <TableCell className="text-center">{item.year}</TableCell>
+                <TableCell className="text-center">{item.month}</TableCell>
+                <TableCell className="text-center">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-sm font-medium">
+                    {item.registeredCount}名
+                  </span>
+                </TableCell>
+                <TableCell className="text-center">
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-sm font-semibold ${rateColor} bg-gray-50`}>
+                    {rate.toFixed(1)}%
+                  </span>
+                  <div className="text-[10px] text-gray-400 mt-0.5">{item.attendanceDays}/{item.possibleDays}日</div>
+                </TableCell>
+                <TableCell className="text-right">¥{item.storeSales.toLocaleString()}</TableCell>
+                <TableCell className="text-right">{item.salesCount}</TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </div>
+  );
+};
 
 // 場所別の表コンポーネント
 const LocationTable = () => {
@@ -214,6 +292,15 @@ export default function SummaryGraph() {
             <div className="flex flex-wrap gap-2 justify-center">
               <Button
                 size="default"
+                variant={selectedTable === '店舗別実績' ? 'default' : 'outline'}
+                className={`flex items-center gap-2 px-3 py-2 ${selectedTable === '店舗別実績' ? 'bg-primary text-primary-foreground' : ''}`}
+                onClick={() => setSelectedTable('店舗別実績')}
+              >
+                <span className="text-sm font-semibold">店舗別実績</span>
+              </Button>
+
+              <Button
+                size="default"
                 variant={selectedTable === '場所' ? 'default' : 'outline'}
                 className={`flex items-center gap-2 px-3 py-2 ${selectedTable === '場所' ? 'bg-primary text-primary-foreground' : ''}`}
                 onClick={() => setSelectedTable('場所')}
@@ -267,6 +354,7 @@ export default function SummaryGraph() {
 
             {/* 表の表示エリア */}
             <div className="bg-white rounded-lg shadow-sm">
+              {selectedTable === '店舗別実績' && <StorePerformanceTable />}
               {selectedTable === '場所' && <LocationTable />}
 
               {selectedTable === '割引' && (

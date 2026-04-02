@@ -1171,7 +1171,7 @@ export default function StoreLedger() {
               </div>
 
               {/* 右半分：URL表示エリア */}
-              <div className="space-y-4">
+              <div className="space-y-4 overflow-hidden">
                 {/* web連携関連項目 */}
                 <div className="space-y-4">
                   <div>
@@ -1345,7 +1345,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono text-center break-all">
+                        <div className="p-2 bg-white rounded border border-blue-200 text-xs font-mono text-center break-all overflow-hidden">
                           {basicTagData.url}{basicTagData.webSendUrls.hsprofile}
                         </div>
                       )}
@@ -1361,7 +1361,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono text-center break-all">
+                        <div className="p-2 bg-white rounded border border-blue-200 text-xs font-mono text-center break-all overflow-hidden">
                           {basicTagData.url}{basicTagData.webSendUrls.hsattend}
                         </div>
                       )}
@@ -1377,7 +1377,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono text-center break-all">
+                        <div className="p-2 bg-white rounded border border-blue-200 text-xs font-mono text-center break-all overflow-hidden">
                           {basicTagData.url}{basicTagData.webSendUrls.hsjob}
                         </div>
                       )}
@@ -1393,7 +1393,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono text-center break-all">
+                        <div className="p-2 bg-white rounded border border-blue-200 text-xs font-mono text-center break-all overflow-hidden">
                           {basicTagData.url}{basicTagData.webSendUrls.ctpoint}
                         </div>
                       )}
@@ -1409,7 +1409,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono text-center break-all">
+                        <div className="p-2 bg-white rounded border border-blue-200 text-xs font-mono text-center break-all overflow-hidden">
                           {basicTagData.url}{basicTagData.webSendUrls.hstattendweek}
                         </div>
                       )}
@@ -1425,7 +1425,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono text-center break-all">
+                        <div className="p-2 bg-white rounded border border-blue-200 text-xs font-mono text-center break-all overflow-hidden">
                           {basicTagData.url}{basicTagData.webSendUrls.hsstart}
                         </div>
                       )}
@@ -1441,7 +1441,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-blue-200 text-sm font-mono text-center break-all">
+                        <div className="p-2 bg-white rounded border border-blue-200 text-xs font-mono text-center break-all overflow-hidden">
                           {basicTagData.url}{basicTagData.webSendUrls.hsranking}
                         </div>
                       )}
@@ -1464,7 +1464,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono text-center break-all">
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-xs font-mono text-center break-all overflow-hidden">
                           {basicTagData.url}{basicTagData.webSendUrlsTemp.hsprofile}
                         </div>
                       )}
@@ -1480,7 +1480,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono text-center break-all">
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-xs font-mono text-center break-all overflow-hidden">
                           {basicTagData.url}{basicTagData.webSendUrlsTemp.hsattend}
                         </div>
                       )}
@@ -1496,7 +1496,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono text-center break-all">
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-xs font-mono text-center break-all overflow-hidden">
                           {basicTagData.url}{basicTagData.webSendUrlsTemp.hsjob}
                         </div>
                       )}
@@ -1512,7 +1512,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono text-center break-all">
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-xs font-mono text-center break-all overflow-hidden">
                           {basicTagData.url}{basicTagData.webSendUrlsTemp.ctpoint}
                         </div>
                       )}
@@ -1528,7 +1528,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono text-center break-all">
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-xs font-mono text-center break-all overflow-hidden">
                           {basicTagData.url}{basicTagData.webSendUrlsTemp.hstattendweek}
                         </div>
                       )}
@@ -1544,7 +1544,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono text-center break-all">
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-xs font-mono text-center break-all overflow-hidden">
                           {basicTagData.url}{basicTagData.webSendUrlsTemp.hsstart}
                         </div>
                       )}
@@ -1560,7 +1560,7 @@ export default function StoreLedger() {
                           className="text-sm font-mono"
                         />
                       ) : (
-                        <div className="p-2 bg-white rounded border border-yellow-200 text-sm font-mono text-center break-all">
+                        <div className="p-2 bg-white rounded border border-yellow-200 text-xs font-mono text-center break-all overflow-hidden">
                           {basicTagData.url}{basicTagData.webSendUrlsTemp.hsranking}
                         </div>
                       )}
@@ -1691,21 +1691,38 @@ export default function StoreLedger() {
             )}
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">コース料金</h3>
-              <Button 
-                size="sm" 
-                className="flex items-center gap-2"
-                onClick={() => {
-                  if (!canEdit) {
-                    alert('このタブの編集は管理者のみ可能です。管理者モードをオンにしてください。');
-                    return;
-                  }
-                  handleAddCourseFee();
-                }}
-                disabled={!canEdit}
-              >
-                <Plus className="w-4 h-4" />
-                追加
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2 border-purple-300 text-purple-700 hover:bg-purple-50"
+                  onClick={() => {
+                    const sharesSummary = courseFeeData.map(c => {
+                      const shares = calculateCourseFeeShares(c.price, c.hostessShare.free.percentage, c.hostessShare.panel.percentage, c.hostessShare.nomination.percentage);
+                      return `${c.courseName}(${c.duration}分) ¥${c.price.toLocaleString()}\n  ホステス: フリー¥${shares.hostessShare.free.amount.toLocaleString()} / パネル¥${shares.hostessShare.panel.amount.toLocaleString()} / 指名¥${shares.hostessShare.nomination.amount.toLocaleString()}\n  店舗: フリー¥${shares.storeShare.free.amount.toLocaleString()} / パネル¥${shares.storeShare.panel.amount.toLocaleString()} / 指名¥${shares.storeShare.nomination.amount.toLocaleString()}`;
+                    }).join('\n\n');
+                    alert(`【取分一覧】\n\n${sharesSummary}`);
+                  }}
+                >
+                  <Eye className="w-4 h-4" />
+                  取分一覧
+                </Button>
+                <Button
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={() => {
+                    if (!canEdit) {
+                      alert('このタブの編集は管理者のみ可能です。管理者モードをオンにしてください。');
+                      return;
+                    }
+                    handleAddCourseFee();
+                  }}
+                  disabled={!canEdit}
+                >
+                  <Plus className="w-4 h-4" />
+                  追加
+                </Button>
+              </div>
             </div>
 
             {/* 編集モーダル */}
@@ -2983,8 +3000,32 @@ export default function StoreLedger() {
       <div className="flex-1 flex overflow-hidden">
         {/* 左側：店舗一覧 */}
         <div className="w-[200px] bg-white border-r border-gray-200 flex flex-col shrink-0">
-          <div className="p-3 border-b border-gray-200">
-            <h2 className="text-sm font-semibold text-gray-700">店舗一覧</h2>
+          <div className="p-2 border-b border-gray-200">
+            <h2 className="text-sm font-semibold text-gray-700 mb-1.5">店舗一覧</h2>
+            <div className="flex gap-1">
+              <button
+                onClick={() => {
+                  const newName = `新規店舗${storeList.length + 1}`;
+                  setLocalStoreList(prev => [...prev, newName]);
+                  setSelectedStore(newName);
+                }}
+                className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs bg-green-500 hover:bg-green-600 text-white rounded transition-colors"
+              >
+                <Plus className="w-3 h-3" />
+                追加
+              </button>
+              <button
+                onClick={() => {
+                  const copyName = `${selectedStore}（複製）`;
+                  setLocalStoreList(prev => [...prev, copyName]);
+                  setSelectedStore(copyName);
+                }}
+                className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors"
+              >
+                <Copy className="w-3 h-3" />
+                複製
+              </button>
+            </div>
           </div>
           <div className="flex-1 overflow-y-auto">
             {storeList.length === 0 ? (
@@ -2994,20 +3035,22 @@ export default function StoreLedger() {
                 <button
                   key={storeName}
                   onClick={() => setSelectedStore(storeName)}
-                  className={`w-full text-left px-3 py-2 text-sm border-b border-gray-100 ${
+                  title={storeName}
+                  className={`w-full text-left px-3 py-1.5 text-sm border-b border-gray-100 group relative ${
                     selectedStore === storeName
                       ? 'bg-blue-50 text-blue-700 font-medium'
                       : 'hover:bg-gray-50'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    <Building className="w-4 h-4 shrink-0" />
+                  <div className="flex items-center gap-1.5">
+                    <Building className="w-3.5 h-3.5 shrink-0" />
                     <div className="min-w-0 flex-1">
-                      <div className="truncate">{storeName}</div>
-                      <div className="text-xs text-gray-500 truncate">
-                        {storeBasicInfoList?.find(s => s.storeName === storeName)?.storeCode || ''}
-                      </div>
+                      <div className="truncate text-xs">{storeName}</div>
                     </div>
+                  </div>
+                  {/* オンマウスでフルネーム表示 */}
+                  <div className="hidden group-hover:block absolute left-full top-0 ml-1 z-50 bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap shadow-lg">
+                    {storeName}
                   </div>
                 </button>
               ))

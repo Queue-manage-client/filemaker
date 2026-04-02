@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Hotel, Heart, Building, Camera, CameraOff, Phone, MapPin, Plus, ArrowUpDown } from "lucide-react";
+import { ArrowLeft, Hotel, Heart, Building, Camera, CameraOff, MapPin, Plus, Star } from "lucide-react";
 import { hotelDivisionSampleData } from '@/data/hotelDivisionSampleData';
 import type { HotelDivision } from '@/types/hotel-division';
 
@@ -16,94 +16,55 @@ export default function HotelPage() {
     document.title = 'ホテル区分管理 - Dispatch Harmony Hub';
   }, []);
 
-  const formatPhoneNumber = (phone: string) => {
-    // 電話番号をハイフン区切りで表示
-    return phone.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
-  };
-
   const formatPostalCode = (code: string) => {
-    // 郵便番号をハイフン区切りで表示
     return code.replace(/(\d{3})(\d{4})/, '$1-$2');
   };
 
   const loveHotelCount = hotelDivisionSampleData.filter(item => item.type === 'ラブホテル').length;
   const cityHotelCount = hotelDivisionSampleData.filter(item => item.type === 'シティホテル').length;
   const withImageCount = hotelDivisionSampleData.filter(item => item.hotelImage === 'あり').length;
-  const singleRoomAvailableCount = hotelDivisionSampleData.filter(item => item.singleRoomEntry === '可能').length;
+  const firstGuidanceCount = hotelDivisionSampleData.filter(item => item.isFirstGuidance === true).length;
 
   // 絞り込み用の状態
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [typeFilter, setTypeFilter] = useState<'すべて' | 'ラブホテル' | 'シティホテル'>('すべて');
   const [areaFilter, setAreaFilter] = useState<string>('すべて');
-  const [singleFilter, setSingleFilter] = useState<'すべて' | '可能' | '不可'>('すべて');
-  const [imageFilter, setImageFilter] = useState<'すべて' | 'あり' | 'なし'>('すべて');
-  const [minAmount, setMinAmount] = useState<string>('');
-  const [maxAmount, setMaxAmount] = useState<string>('');
-  const [sortKey, setSortKey] = useState<'name' | 'kana'>('name');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   // 選択肢（サンプルデータから抽出）
   const areaOptions = useMemo(() => {
-    const set = new Set<string>();
-    hotelDivisionSampleData.forEach(h => set.add(h.areaCategory));
-    return ['すべて', ...Array.from(set)];
+    const areas = new Set<string>();
+    hotelDivisionSampleData.forEach(h => areas.add(h.areaCategory));
+    return ['すべて', ...Array.from(areas).sort()];
   }, []);
 
-  // フィルター済みデータ
+  // フィルター済みデータ（50音順）
   const filteredHotels = useMemo(() => {
-    const collator = new Intl.Collator('ja', { numeric: true, sensitivity: 'base' });
+    const collator = new Intl.Collator('ja', { sensitivity: 'base' });
     const result = hotelDivisionSampleData.filter((item) => {
       if (typeFilter !== 'すべて' && item.type !== typeFilter) return false;
       if (areaFilter !== 'すべて' && item.areaCategory !== areaFilter) return false;
-      if (singleFilter !== 'すべて' && item.singleRoomEntry !== singleFilter) return false;
-      if (imageFilter !== 'すべて' && item.hotelImage !== imageFilter) return false;
-
-      const min = minAmount === '' ? undefined : Number(minAmount);
-      const max = maxAmount === '' ? undefined : Number(maxAmount);
-      if (min !== undefined && !(typeof item.amount === 'number' && item.amount >= min)) return false;
-      if (max !== undefined && !(typeof item.amount === 'number' && item.amount <= max)) return false;
 
       if (searchQuery.trim() !== '') {
         const q = searchQuery.trim().toLowerCase();
-        const haystack = `${item.hotelName} ${item.address} ${item.areaCategory} ${item.firstTwoChars}`.toLowerCase();
+        const haystack = `${item.hotelName} ${item.areaCategory} ${item.firstTwoChars}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
     });
-    return result.sort((a, b) => {
-      const aKey = sortKey === 'name' ? a.hotelName : a.firstTwoChars;
-      const bKey = sortKey === 'name' ? b.hotelName : b.firstTwoChars;
-      return sortOrder === 'asc'
-        ? collator.compare(aKey, bKey)
-        : collator.compare(bKey, aKey);
-    });
-  }, [typeFilter, areaFilter, singleFilter, imageFilter, minAmount, maxAmount, searchQuery, sortKey, sortOrder]);
+
+    // 50音順（ひらがな頭2文字）でソート
+    return result.sort((a, b) => collator.compare(a.firstTwoChars, b.firstTwoChars));
+  }, [typeFilter, areaFilter, searchQuery]);
 
   const clearFilters = () => {
     setSearchQuery('');
     setTypeFilter('すべて');
     setAreaFilter('すべて');
-    setSingleFilter('すべて');
-    setImageFilter('すべて');
-    setMinAmount('');
-    setMaxAmount('');
   };
 
-  const toggleNameSort = () => {
-    if (sortKey === 'name') {
-      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortKey('name');
-      setSortOrder('asc');
-    }
-  };
-  const toggleKanaSort = () => {
-    if (sortKey === 'kana') {
-      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortKey('kana');
-      setSortOrder('asc');
-    }
+  const formatFee = (value: number | undefined): string => {
+    if (typeof value !== 'number') return '-';
+    return `¥${value.toLocaleString()}`;
   };
 
   return (
@@ -111,10 +72,7 @@ export default function HotelPage() {
       {/* 戻るボタン */}
       <div className="mb-4">
         <Link href="/dashboard">
-          <Button
-            variant="outline"
-            className="flex items-center gap-2"
-          >
+          <Button variant="outline" className="flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
             ダッシュボードに戻る
           </Button>
@@ -177,10 +135,10 @@ export default function HotelPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <Hotel className="w-5 h-5 text-purple-600" />
+              <Star className="w-5 h-5 text-yellow-500" />
               <div>
-                <p className="text-sm font-medium text-muted-foreground">独り入室可</p>
-                <p className="text-2xl font-bold">{singleRoomAvailableCount}</p>
+                <p className="text-sm font-medium text-muted-foreground">初案内ホテル</p>
+                <p className="text-2xl font-bold">{firstGuidanceCount}</p>
               </div>
             </div>
           </CardContent>
@@ -195,7 +153,7 @@ export default function HotelPage() {
             <Button
               onClick={() => {
                 try {
-                  window.open('/hotel/new', 'hotel-new', 'width=900,height=700,noopener,noreferrer');
+                  window.open('/hotel/new', 'hotel-new', 'width=900,height=800,noopener,noreferrer');
                 } catch {
                   // UI_001: 新規ウィンドウを開けませんでした
                 }
@@ -206,10 +164,12 @@ export default function HotelPage() {
               項目の追加
             </Button>
           </div>
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-6 gap-3">
+
+          {/* 検索・絞り込み */}
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3">
             <div className="md:col-span-2">
               <Input
-                placeholder="ホテル名・住所・地域で検索"
+                placeholder="ホテル名・地域で検索"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -232,90 +192,33 @@ export default function HotelPage() {
                 onChange={(e) => setAreaFilter(e.target.value)}
               >
                 {areaOptions.map(opt => (
-                  <option key={opt} value={opt}>{`地域: ${opt}`}</option>
+                  <option key={opt} value={opt}>{opt === 'すべて' ? '地域: すべて' : opt}</option>
                 ))}
               </select>
             </div>
-            <div>
-              <select
-                className="w-full border rounded-md px-3 py-2 bg-white"
-                value={singleFilter}
-                onChange={(e) => setSingleFilter(e.target.value as 'すべて' | '可能' | '不可')}
-              >
-                <option value="すべて">独り入室: すべて</option>
-                <option value="可能">可能</option>
-                <option value="不可">不可</option>
-              </select>
-            </div>
-            <div>
-              <select
-                className="w-full border rounded-md px-3 py-2 bg-white"
-                value={imageFilter}
-                onChange={(e) => setImageFilter(e.target.value as 'すべて' | 'あり' | 'なし')}
-              >
-                <option value="すべて">画像: すべて</option>
-                <option value="あり">あり</option>
-                <option value="なし">なし</option>
-              </select>
-            </div>
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                placeholder="金額(最小)"
-                value={minAmount}
-                onChange={(e) => setMinAmount(e.target.value)}
-              />
-              <span className="text-muted-foreground">〜</span>
-              <Input
-                type="number"
-                placeholder="金額(最大)"
-                value={maxAmount}
-                onChange={(e) => setMaxAmount(e.target.value)}
-              />
-            </div>
-            <div className="md:col-span-6 flex justify-end">
+            <div className="md:col-span-4 flex justify-end">
               <Button variant="outline" onClick={clearFilters}>条件クリア</Button>
             </div>
           </div>
         </CardHeader>
+
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>初案内</TableHead>
                   <TableHead>区分</TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      className="h-8 px-2 -ml-2 flex items-center gap-1"
-                      onClick={toggleKanaSort}
-                    >
-                      頭2文字
-                      <ArrowUpDown className="w-4 h-4" />
-                      {sortKey === 'kana' && (
-                        <span className="text-xs text-muted-foreground">{sortOrder === 'asc' ? 'A→Z' : 'Z→A'}</span>
-                      )}
-                    </Button>
-                  </TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      className="h-8 px-2 -ml-2 flex items-center gap-1"
-                      onClick={toggleNameSort}
-                    >
-                      ホテル名
-                      <ArrowUpDown className="w-4 h-4" />
-                      {sortKey === 'name' && (
-                        <span className="text-xs text-muted-foreground">{sortOrder === 'asc' ? 'A→Z' : 'Z→A'}</span>
-                      )}
-                    </Button>
-                  </TableHead>
+                  <TableHead>頭2文字</TableHead>
+                  <TableHead>ホテル名</TableHead>
                   <TableHead>地域区分</TableHead>
                   <TableHead>電話番号</TableHead>
                   <TableHead>独り入室</TableHead>
-                  <TableHead>金額</TableHead>
-                  <TableHead>駅コード</TableHead>
-                  <TableHead>交通費</TableHead>
+                  <TableHead>休憩料金</TableHead>
+                  <TableHead>宿泊料金</TableHead>
+                  <TableHead>フリータイム</TableHead>
+                  <TableHead>駐車場</TableHead>
+                  <TableHead>派遣条件</TableHead>
                   <TableHead>郵便番号</TableHead>
                   <TableHead>住所</TableHead>
                   <TableHead>画像</TableHead>
@@ -325,9 +228,17 @@ export default function HotelPage() {
                 {filteredHotels.map((item: HotelDivision) => (
                   <TableRow key={item.no}>
                     <TableCell>
-                      <Badge 
+                      {item.isFirstGuidance === true && (
+                        <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-300 flex items-center gap-1 whitespace-nowrap">
+                          <Star className="w-3 h-3" />
+                          初案内
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
                         variant={item.type === 'ラブホテル' ? 'destructive' : 'default'}
-                        className="flex items-center gap-1"
+                        className="flex items-center gap-1 whitespace-nowrap"
                       >
                         {item.type === 'ラブホテル' ? (
                           <Heart className="w-3 h-3" />
@@ -340,33 +251,67 @@ export default function HotelPage() {
                     <TableCell className="text-sm font-mono text-muted-foreground">
                       {item.firstTwoChars}
                     </TableCell>
-                    <TableCell className="font-medium">{item.hotelName}</TableCell>
+                    <TableCell className="font-medium whitespace-nowrap">{item.hotelName}</TableCell>
                     <TableCell>
                       <Badge variant="outline">{item.areaCategory}</Badge>
                     </TableCell>
-                    <TableCell className="flex items-center gap-1">
-                      <Phone className="w-3 h-3 text-muted-foreground" />
-                      <span className="text-sm font-mono">
-                        {formatPhoneNumber(item.phoneNumber)}
-                      </span>
+                    <TableCell className="text-sm font-mono whitespace-nowrap">
+                      {item.phoneNumber}
                     </TableCell>
                     <TableCell>
-                      <Badge 
-                        variant={item.singleRoomEntry === '可能' ? 'secondary' : 'outline'}
-                      >
+                      <Badge variant={item.singleRoomEntry === '可能' ? 'secondary' : 'outline'}>
                         {item.singleRoomEntry}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right font-mono">
-                      {typeof item.amount === 'number' ? `¥${item.amount.toLocaleString()}` : '-'}
+                    <TableCell className="text-right font-mono whitespace-nowrap">
+                      {formatFee(item.restFee)}
                     </TableCell>
-                    <TableCell className="text-sm font-mono text-center">
-                      {item.stationCode || '-'}
+                    <TableCell className="text-right font-mono whitespace-nowrap">
+                      {formatFee(item.stayFee)}
                     </TableCell>
-                    <TableCell className="text-right font-mono">
-                      {typeof item.transportationFee === 'number' ? `¥${item.transportationFee.toLocaleString()}` : '-'}
+                    <TableCell className="text-right font-mono whitespace-nowrap">
+                      {formatFee(item.freeTimeFee)}
                     </TableCell>
-                    <TableCell className="flex items-center gap-1">
+                    <TableCell>
+                      {item.hasParking !== undefined ? (
+                        <Badge variant={item.hasParking === 'あり' ? 'secondary' : 'outline'}>
+                          {item.hasParking}
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {item.dispatchCondition === 'possible' && (
+                        <Badge className="bg-green-100 text-green-800 border border-green-300 whitespace-nowrap">
+                          可能
+                        </Badge>
+                      )}
+                      {item.dispatchCondition === 'impossible' && (
+                        <div className="flex flex-col gap-1">
+                          <Badge className="bg-red-100 text-red-800 border border-red-300 whitespace-nowrap">
+                            不可
+                          </Badge>
+                          {item.conditionNote && (
+                            <span className="text-xs text-red-600">{item.conditionNote}</span>
+                          )}
+                        </div>
+                      )}
+                      {item.dispatchCondition === 'conditional' && (
+                        <div className="flex flex-col gap-1">
+                          <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-300 whitespace-nowrap">
+                            条件付き
+                          </Badge>
+                          {item.conditionNote && (
+                            <span className="text-xs text-yellow-700">{item.conditionNote}</span>
+                          )}
+                        </div>
+                      )}
+                      {item.dispatchCondition === undefined && (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="flex items-center gap-1 whitespace-nowrap">
                       <MapPin className="w-3 h-3 text-muted-foreground" />
                       <span className="text-sm font-mono">
                         {formatPostalCode(item.postalCode)}
@@ -376,7 +321,7 @@ export default function HotelPage() {
                       {item.address}
                     </TableCell>
                     <TableCell>
-                      <Badge 
+                      <Badge
                         variant={item.hotelImage === 'あり' ? 'default' : 'outline'}
                         className="flex items-center gap-1"
                       >

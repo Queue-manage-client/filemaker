@@ -1,16 +1,35 @@
 // ホステス関連の型定義
 
-// 勤務形態 (Item 46)
-export type WorkStyleType = 'regular' | 'semi-regular' | 'last-minute' | 'newbie' | 'emergency' | 'irregular' | 'retired';
+// 勤務形態 (Item 46) ※出稼ぎを独立した選択肢として含む
+export type WorkStyleType = 'regular' | 'semi-regular' | 'last-minute' | 'dekasegi' | 'newbie' | 'emergency' | 'irregular' | 'retired' | 'no-attendance-2months';
 
 export const WORK_STYLE_LABELS: Record<WorkStyleType, string> = {
   regular: 'レギュラー',
   'semi-regular': '準レギュラー',
   'last-minute': '直前',
+  dekasegi: '出稼ぎ',
   newbie: '新人',
   emergency: '緊急',
   irregular: '不定期',
   retired: '退店',
+  'no-attendance-2months': '2ヶ月出勤ナシ',
+};
+
+// スケジュールステータスラベル
+export const SCHEDULE_STATUS_LABELS: Record<'draft' | 'confirmed' | 'published', string> = {
+  draft: '確認依頼',
+  confirmed: '確認済',
+  published: '公開中',
+};
+
+// 交通費支給方法
+export type TransportationPaymentMethod = 'cash' | 'transfer' | 'prepaid' | 'included';
+
+export const TRANSPORTATION_PAYMENT_METHOD_LABELS: Record<TransportationPaymentMethod, string> = {
+  cash: '現金支給',
+  transfer: '振込支給',
+  prepaid: '前払い',
+  included: 'バック込み',
 };
 
 // ホステス台帳データ
@@ -42,8 +61,9 @@ export interface HostessLedger {
   workStyle?: WorkStyleType; // 勤務形態 (Item 46)
   isOutsideWork?: boolean; // 出稼ぎ (Item 45)
   outsideWorkInfo?: { // 出稼ぎ情報 (Item 47)
-    transportationAllowance?: number; // 交通費支給
+    transportationCost?: number; // 交通費
     dormitoryFee?: number; // 寮費
+    transportationPaymentMethod?: TransportationPaymentMethod; // 交通費支給方法
     notes?: string; // 備考
   };
   totalWorkDays: number; // 総勤務日数
@@ -82,6 +102,9 @@ export interface HostessRanking {
   regularNominationCount: number; // 通常指名数
   panelNominationCount: number; // パネル指名数
   freeNominationCount: number; // フリー指名数
+  honShimeiCount?: number; // 本指名数（Item 38）
+  dataYear?: number; // データ対象年
+  dataMonth?: number; // データ対象月
   nominationRevenue: number; // 指名売上
   // 詳細集計
   totalServiceTime: number; // 総サービス時間（分）

@@ -24,6 +24,7 @@ export const LeftPanel = () => {
       items: [
         { name: "RTⅡパネル", icon: Monitor, href: "/rt2-panel" },
         { name: "配車パネル2D", icon: Car, href: "/dispatch-panel-2d" },
+        { name: "キャスト出勤予定票", icon: Calendar, href: "/cast-attendance-schedule" },
         { name: "ホステス出勤予定", icon: Calendar, href: "/hostess-schedule" },
         { name: "従業員出勤予定", icon: Calendar, href: "/employee-schedule" },
         { name: "手配表", icon: FileText, href: "/tehai" },
@@ -46,8 +47,7 @@ export const LeftPanel = () => {
         { name: "集計・グラフ", icon: TrendingUp, href: "/summary-graph" },
         { name: "従業員給与集計", icon: DollarSign, href: "/employee-salary" },
         { name: "会計集計", icon: BarChart3, href: "/accounting-summary" },
-        { name: "面接リスト・集計", icon: Users, href: "/interview-list" },
-        { name: "アルバイト給与月計", icon: DollarSign, href: "/part-time-salary" }
+        { name: "面接リスト・集計", icon: Users, href: "/interview-list" }
       ]
     }
   ];

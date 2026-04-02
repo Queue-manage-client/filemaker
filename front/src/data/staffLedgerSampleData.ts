@@ -20,6 +20,10 @@ export const staffLedgerSampleData: StaffLedgerRecord[] = [
     accountName: "yamada_taro",
     accessType: "admin",
     accessStatus: "active",
+    assignedCasts: [
+      { id: "hostess001", name: "山田美咲" },
+      { id: "hostess002", name: "田中さくら" }
+    ],
     createdAt: "2025-01-01 09:00:00",
     updatedAt: "2025-01-15 14:30:00"
   },
@@ -40,6 +44,9 @@ export const staffLedgerSampleData: StaffLedgerRecord[] = [
     accountName: "suzuki_hanako",
     accessType: "manager",
     accessStatus: "active",
+    assignedCasts: [
+      { id: "hostess003", name: "佐藤ゆり" }
+    ],
     createdAt: "2025-01-02 10:15:00",
     updatedAt: "2025-01-16 11:20:00"
   },
@@ -60,6 +67,11 @@ export const staffLedgerSampleData: StaffLedgerRecord[] = [
     accountName: "sato_jiro",
     accessType: "staff",
     accessStatus: "active",
+    assignedCasts: [
+      { id: "hostess004", name: "伊藤みく" },
+      { id: "hostess005", name: "渡辺あい" },
+      { id: "hostess006", name: "小林なな" }
+    ],
     createdAt: "2025-01-03 14:20:00",
     updatedAt: "2025-01-17 16:45:00"
   },
@@ -80,6 +92,9 @@ export const staffLedgerSampleData: StaffLedgerRecord[] = [
     accountName: "tanaka_misaki",
     accessType: "accounting_manager",
     accessStatus: "active",
+    assignedCasts: [
+      { id: "hostess007", name: "加藤りな" }
+    ],
     createdAt: "2025-01-04 11:30:00",
     updatedAt: "2025-01-18 13:15:00"
   },
@@ -100,6 +115,10 @@ export const staffLedgerSampleData: StaffLedgerRecord[] = [
     accountName: "takahashi_kenta",
     accessType: "staff",
     accessStatus: "active",
+    assignedCasts: [
+      { id: "hostess008", name: "吉田えみ" },
+      { id: "hostess009", name: "山本ひな" }
+    ],
     createdAt: "2025-01-05 15:45:00",
     updatedAt: "2025-01-19 09:30:00"
   },
@@ -140,6 +159,9 @@ export const staffLedgerSampleData: StaffLedgerRecord[] = [
     accountName: "watanabe_daisuke",
     accessType: "staff",
     accessStatus: "active",
+    assignedCasts: [
+      { id: "hostess010", name: "松田あかり" }
+    ],
     createdAt: "2025-01-07 16:20:00",
     updatedAt: "2025-01-21 14:40:00"
   },
@@ -180,6 +202,11 @@ export const staffLedgerSampleData: StaffLedgerRecord[] = [
     accountName: "kato_yuichi",
     accessType: "admin",
     accessStatus: "active",
+    assignedCasts: [
+      { id: "hostess001", name: "山田美咲" },
+      { id: "hostess003", name: "佐藤ゆり" },
+      { id: "hostess005", name: "渡辺あい" }
+    ],
     createdAt: "2025-01-09 09:50:00",
     updatedAt: "2025-01-23 11:15:00"
   },
@@ -200,6 +227,9 @@ export const staffLedgerSampleData: StaffLedgerRecord[] = [
     accountName: "yoshida_aimi",
     accessType: "manager",
     accessStatus: "active",
+    assignedCasts: [
+      { id: "hostess002", name: "田中さくら" }
+    ],
     createdAt: "2025-01-10 14:05:00",
     updatedAt: "2025-01-24 16:30:00"
   },

@@ -11,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, TrendingUp, ArrowUp, ArrowDown, Minus, Crown, Award, Star } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, TrendingUp, ArrowUp, ArrowDown, Minus, Crown, Award, Star, ChevronLeft, ChevronRight, Filter } from "lucide-react";
 import { sampleHostessRanking } from "@/data/hostessSampleData";
 import type { HostessRanking } from "@/types/hostess";
 import type { SortKey, RankingCardProps, RankChangeIconProps } from "@/types/hostess-ranking";
@@ -34,51 +35,32 @@ const RankChangeIcon = ({ change }: RankChangeIconProps) => {
 };
 
 // ランキングカードコンポーネント
-const RankingCard = ({ 
-  title, 
+const RankingCard = ({
+  title,
   icon: Icon,
-  sortKey, 
+  sortKey,
   onSortChange,
   hostessRankingData
 }: RankingCardProps) => {
-  const [selectedStore, setSelectedStore] = useState<string>('all');
-  
-  // 店舗でフィルタリング
-  const filteredData = useMemo(() => {
-    if (selectedStore === 'all') {
-      return hostessRankingData;
-    }
-    return hostessRankingData.filter(item => item.storeId === selectedStore);
-  }, [selectedStore, hostessRankingData]);
-
-  // データをソート（本指名数対応 Item 36）
+  // データをソート（本指名数対応）
   const sortedData = useMemo(() => {
-    return [...filteredData].sort((a, b) => {
+    return [...hostessRankingData].sort((a, b) => {
       let aValue: number;
       let bValue: number;
 
-      // 本指名数は通常指名 + パネル指名の合計
       if (sortKey === 'totalNominationCount') {
         aValue = (a.regularNominationCount || 0) + (a.panelNominationCount || 0);
         bValue = (b.regularNominationCount || 0) + (b.panelNominationCount || 0);
+      } else if (sortKey === 'honShimeiCount') {
+        aValue = a.honShimeiCount || 0;
+        bValue = b.honShimeiCount || 0;
       } else {
-        aValue = a[sortKey] || 0;
-        bValue = b[sortKey] || 0;
+        aValue = (a[sortKey] as number) || 0;
+        bValue = (b[sortKey] as number) || 0;
       }
       return bValue - aValue;
     });
-  }, [filteredData, sortKey]);
-
-  // 店舗リストを取得
-  const stores = useMemo(() => {
-    const storeMap = new Map<string, string>();
-    hostessRankingData.forEach(item => {
-      if (item.storeId && item.storeName) {
-        storeMap.set(item.storeId, item.storeName);
-      }
-    });
-    return Array.from(storeMap.entries()).map(([id, name]) => ({ id, name }));
-  }, [hostessRankingData]);
+  }, [hostessRankingData, sortKey]);
 
   // 現在のソート基準のラベルを取得
   const currentSortLabel = SORT_OPTIONS.find(opt => opt.value === sortKey)?.label || '';
@@ -92,49 +74,39 @@ const RankingCard = ({
             {title}
           </CardTitle>
         </div>
-        
-        {/* ソート基準選択 */}
-        <div className="space-y-2">
-          <Select value={sortKey} onValueChange={(value) => onSortChange(value as SortKey)}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="ソート基準を選択" />
-            </SelectTrigger>
-            <SelectContent>
-              {SORT_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
 
-          {/* 店舗フィルター */}
-          <Select value={selectedStore} onValueChange={setSelectedStore}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="店舗を選択" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">全店舗</SelectItem>
-              {stores.map((store) => (
-                <SelectItem key={store.id} value={store.id}>
-                  {store.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* ソート基準選択 */}
+        <Select value={sortKey} onValueChange={(value) => onSortChange(value as SortKey)}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="ソート基準を選択" />
+          </SelectTrigger>
+          <SelectContent>
+            {SORT_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </CardHeader>
 
       <CardContent className="flex-1 overflow-y-auto">
         <div className="space-y-2">
           {sortedData.map((hostess, index) => {
-            // 本指名数の場合は計算値を使用
-            const displayValue = sortKey === 'totalNominationCount'
-              ? (hostess.regularNominationCount || 0) + (hostess.panelNominationCount || 0)
-              : hostess[sortKey];
+            // 表示値の計算
+            let displayValue: number;
+            if (sortKey === 'totalNominationCount') {
+              displayValue = (hostess.regularNominationCount || 0) + (hostess.panelNominationCount || 0);
+            } else if (sortKey === 'honShimeiCount') {
+              displayValue = hostess.honShimeiCount || 0;
+            } else {
+              displayValue = (hostess[sortKey] as number) || 0;
+            }
+
             const isPercentage = sortKey === 'repeatCustomerRate' || sortKey === 'extensionRate';
             const isCurrency = sortKey === 'monthlyEarnings' || sortKey === 'nominationRevenue' || sortKey === 'averageCustomerSpending';
-            
+            const honShimei = hostess.honShimeiCount ?? 0;
+
             return (
               <div
                 key={hostess.id}
@@ -174,7 +146,7 @@ const RankingCard = ({
                       </div>
                       <p className="text-xs text-gray-600 mb-1">{hostess.hostessName}</p>
                       <p className="text-xs text-gray-500">{hostess.storeName}</p>
-                      
+
                       {/* 主要指標 */}
                       <div className="mt-2 text-sm">
                         <div className="font-bold text-blue-600">
@@ -186,11 +158,11 @@ const RankingCard = ({
                         </div>
                       </div>
 
-                      {/* サブ指標 */}
+                      {/* サブ指標（本指名数を常に表示） */}
                       <div className="mt-2 grid grid-cols-2 gap-1 text-xs text-gray-600">
                         <div>月収: ¥{hostess.monthlyEarnings.toLocaleString()}</div>
                         <div>客数: {hostess.totalCustomers}名</div>
-                        <div>指名: {hostess.regularNominationCount + hostess.panelNominationCount}件</div>
+                        <div className="font-semibold text-indigo-600">本指名: {honShimei}件</div>
                         <div>満足度: {hostess.customerSatisfactionScore}</div>
                       </div>
 
@@ -228,8 +200,8 @@ export default function HostessRanking() {
   const [sortKeys, setSortKeys] = useState<[SortKey, SortKey, SortKey, SortKey]>([
     'monthlyEarnings',
     'nominationRevenue',
+    'honShimeiCount',
     'totalCustomers',
-    'totalNominationCount' // Item 36: 本指名数をデフォルトに
   ]);
 
   // 月次推移用コントロール
@@ -238,45 +210,108 @@ export default function HostessRanking() {
   const [transitionMonths, setTransitionMonths] = useState<number>(6);
   const [transitionTopN, setTransitionTopN] = useState<number>(5);
 
-  // 期間選択（Items 33, 35）
-  const currentDate = useMemo(() => new Date(), []);
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
+  // --- Change 1: 1か月単位表示 (月ナビゲーション) ---
+  const today = useMemo(() => new Date(), []);
+  const [selectedYear, setSelectedYear] = useState<number>(today.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState<number>(today.getMonth() + 1);
+
+  const handlePrevMonth = () => {
+    if (selectedMonth === 1) {
+      setSelectedYear(y => y - 1);
+      setSelectedMonth(12);
+    } else {
+      setSelectedMonth(m => m - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    const isCurrentOrFuture =
+      selectedYear > today.getFullYear() ||
+      (selectedYear === today.getFullYear() && selectedMonth >= today.getMonth() + 1);
+    if (isCurrentOrFuture) return;
+    if (selectedMonth === 12) {
+      setSelectedYear(y => y + 1);
+      setSelectedMonth(1);
+    } else {
+      setSelectedMonth(m => m + 1);
+    }
+  };
+
+  const isCurrentMonth =
+    selectedYear === today.getFullYear() && selectedMonth === today.getMonth() + 1;
+
+  // --- Change 2: グローバルフィルター (店舗・月範囲指定) ---
+  const [globalStore, setGlobalStore] = useState<string>('all');
+  const [rangeStartYear, setRangeStartYear] = useState<number>(today.getFullYear());
+  const [rangeStartMonth, setRangeStartMonth] = useState<number>(today.getMonth() + 1);
+  const [rangeEndYear, setRangeEndYear] = useState<number>(today.getFullYear());
+  const [rangeEndMonth, setRangeEndMonth] = useState<number>(today.getMonth() + 1);
   const [periodType, setPeriodType] = useState<'month' | 'range'>('month');
-  const [rangeStartMonth, setRangeStartMonth] = useState<number>(new Date().getMonth() + 1);
-  const [rangeEndMonth, setRangeEndMonth] = useState<number>(new Date().getMonth() + 1);
 
   // 年のオプション生成（過去3年から現在まで）
   const yearOptions = useMemo(() => {
-    const years = [];
-    for (let y = currentDate.getFullYear(); y >= currentDate.getFullYear() - 3; y--) {
+    const years: number[] = [];
+    for (let y = today.getFullYear(); y >= today.getFullYear() - 3; y--) {
       years.push(y);
     }
     return years;
-  }, [currentDate]);
+  }, [today]);
 
-  // 月のオプション生成
   const monthOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
   // React Queryを使用してデータ取得（フォールバックとしてサンプルデータを使用）
-  const { data: hostessRankingData = sampleHostessRanking, isLoading, error } = useHostessRanking('monthly');
+  const { data: rawHostessData = sampleHostessRanking, isLoading, error } = useHostessRanking('monthly');
+
+  // グローバルフィルター適用（店舗 + 月/月範囲）
+  const hostessRankingData = useMemo(() => {
+    let filtered = rawHostessData;
+
+    // 店舗フィルター
+    if (globalStore !== 'all') {
+      filtered = filtered.filter(item => item.storeId === globalStore);
+    }
+
+    // 月フィルター
+    if (periodType === 'month') {
+      filtered = filtered.filter(item =>
+        item.dataYear === selectedYear && item.dataMonth === selectedMonth
+      );
+    } else {
+      // 月範囲フィルター
+      const startVal = rangeStartYear * 12 + rangeStartMonth;
+      const endVal = rangeEndYear * 12 + rangeEndMonth;
+      filtered = filtered.filter(item => {
+        if (!item.dataYear || !item.dataMonth) return true;
+        const itemVal = item.dataYear * 12 + item.dataMonth;
+        return itemVal >= startVal && itemVal <= endVal;
+      });
+    }
+
+    return filtered;
+  }, [rawHostessData, globalStore, periodType, selectedYear, selectedMonth, rangeStartYear, rangeStartMonth, rangeEndYear, rangeEndMonth]);
 
   // 店舗一覧（共通）
   const allStores = useMemo(() => {
     const storeMap = new Map<string, string>();
-    hostessRankingData.forEach(item => {
+    rawHostessData.forEach(item => {
       if (item.storeId && item.storeName) {
         storeMap.set(item.storeId, item.storeName);
       }
     });
     return Array.from(storeMap.entries()).map(([id, name]) => ({ id, name }));
-  }, [hostessRankingData]);
+  }, [rawHostessData]);
 
   const handleSortChange = (index: number, key: SortKey) => {
     const newSortKeys = [...sortKeys] as [SortKey, SortKey, SortKey, SortKey];
     newSortKeys[index] = key;
     setSortKeys(newSortKeys);
   };
+
+  // 本指名数の合計（フィルター後データ）
+  const totalHonShimei = useMemo(() =>
+    hostessRankingData.reduce((sum, h) => sum + (h.honShimeiCount ?? 0), 0),
+    [hostessRankingData]
+  );
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
@@ -296,36 +331,90 @@ export default function HostessRanking() {
       {/* ヘッダー */}
       <Card className="mb-4">
         <CardHeader>
+          <div className="flex items-center gap-3 mb-4">
+            <TrendingUp className="w-6 h-6" />
+            <div>
+              <h1 className="text-2xl font-bold">ホステスランキング</h1>
+              <p className="text-sm text-gray-600 mt-1">
+                指名料金区分や様々な条件で集計し、ランキングを作成します
+              </p>
+            </div>
+          </div>
+
+          {/* Change 1: 月ナビゲーション（1か月単位表示） */}
           <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <TrendingUp className="w-6 h-6" />
-              <div>
-                <h1 className="text-2xl font-bold">ホステスランキング</h1>
-                <p className="text-sm text-gray-600 mt-1">
-                  指名料金区分や様々な条件で集計し、ランキングを作成します
-                </p>
+            <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handlePrevMonth}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+              <div className="text-center min-w-[140px]">
+                <div className="text-xl font-bold text-gray-900">
+                  {selectedYear}年{selectedMonth}月
+                </div>
+                {isCurrentMonth && (
+                  <Badge variant="secondary" className="text-xs mt-0.5">今月</Badge>
+                )}
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleNextMonth}
+                disabled={isCurrentMonth}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </Button>
             </div>
 
-            {/* 期間選択 (Items 33, 35) */}
-            <div className="flex items-center gap-4 bg-gray-50 p-3 rounded-lg">
+            {/* Change 2: フィルターパネル（店舗・月範囲指定） */}
+            <div className="flex items-start gap-3 bg-gray-50 border border-gray-200 rounded-xl p-3 flex-wrap">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">表示期間:</span>
-                <Select value={periodType} onValueChange={(v) => setPeriodType(v as 'month' | 'range')}>
-                  <SelectTrigger className="w-[120px]">
-                    <SelectValue />
+                <Filter className="w-4 h-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">フィルター</span>
+              </div>
+
+              {/* 店舗フィルター */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500 whitespace-nowrap">店舗</span>
+                <Select value={globalStore} onValueChange={setGlobalStore}>
+                  <SelectTrigger className="w-[130px] h-8 text-sm">
+                    <SelectValue placeholder="店舗を選択" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="month">1ヶ月単位</SelectItem>
-                    <SelectItem value="range">期間指定</SelectItem>
+                    <SelectItem value="all">全店舗</SelectItem>
+                    {allStores.map((store) => (
+                      <SelectItem key={store.id} value={store.id}>
+                        {store.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              {periodType === 'month' ? (
-                <div className="flex items-center gap-2">
-                  <Select value={String(selectedYear)} onValueChange={(v) => setSelectedYear(Number(v))}>
-                    <SelectTrigger className="w-[100px]">
+              {/* 期間タイプ切替 */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500 whitespace-nowrap">期間</span>
+                <Select value={periodType} onValueChange={(v) => setPeriodType(v as 'month' | 'range')}>
+                  <SelectTrigger className="w-[110px] h-8 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="month">1ヶ月単位</SelectItem>
+                    <SelectItem value="range">月範囲指定</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 月範囲指定 */}
+              {periodType === 'range' && (
+                <div className="flex items-center gap-1 flex-wrap">
+                  <Select value={String(rangeStartYear)} onValueChange={(v) => setRangeStartYear(Number(v))}>
+                    <SelectTrigger className="w-[90px] h-8 text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -334,21 +423,8 @@ export default function HostessRanking() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <Select value={String(selectedMonth)} onValueChange={(v) => setSelectedMonth(Number(v))}>
-                    <SelectTrigger className="w-[80px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {monthOptions.map(m => (
-                        <SelectItem key={m} value={String(m)}>{m}月</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
                   <Select value={String(rangeStartMonth)} onValueChange={(v) => setRangeStartMonth(Number(v))}>
-                    <SelectTrigger className="w-[80px]">
+                    <SelectTrigger className="w-[70px] h-8 text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -357,9 +433,19 @@ export default function HostessRanking() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <span className="text-sm">〜</span>
+                  <span className="text-sm text-gray-500">〜</span>
+                  <Select value={String(rangeEndYear)} onValueChange={(v) => setRangeEndYear(Number(v))}>
+                    <SelectTrigger className="w-[90px] h-8 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {yearOptions.map(y => (
+                        <SelectItem key={y} value={String(y)}>{y}年</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <Select value={String(rangeEndMonth)} onValueChange={(v) => setRangeEndMonth(Number(v))}>
-                    <SelectTrigger className="w-[80px]">
+                    <SelectTrigger className="w-[70px] h-8 text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -451,7 +537,7 @@ export default function HostessRanking() {
         </CardContent>
       </Card>
 
-      {/* 統計サマリー */}
+      {/* 統計サマリー（Change 3: 本指名数カード追加） */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <Card>
           <CardContent className="pt-6">
@@ -468,8 +554,20 @@ export default function HostessRanking() {
               <TrendingUp className="w-8 h-8 mx-auto mb-2 text-blue-600" />
               <p className="text-sm text-gray-600">平均月間売上</p>
               <p className="text-2xl font-bold">
-                ¥{hostessRankingData.length > 0 ? Math.round(hostessRankingData.reduce((sum, h) => sum + h.monthlyEarnings, 0) / hostessRankingData.length).toLocaleString() : '0'}
+                ¥{hostessRankingData.length > 0
+                  ? Math.round(hostessRankingData.reduce((sum, h) => sum + h.monthlyEarnings, 0) / hostessRankingData.length).toLocaleString()
+                  : '0'}
               </p>
+            </div>
+          </CardContent>
+        </Card>
+        {/* Change 3: 本指名数カード */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <Star className="w-8 h-8 mx-auto mb-2 text-indigo-600" />
+              <p className="text-sm text-gray-600">総本指名数</p>
+              <p className="text-2xl font-bold text-indigo-700">{totalHonShimei}件</p>
             </div>
           </CardContent>
         </Card>
@@ -477,20 +575,11 @@ export default function HostessRanking() {
           <CardContent className="pt-6">
             <div className="text-center">
               <Award className="w-8 h-8 mx-auto mb-2 text-green-600" />
-              <p className="text-sm text-gray-600">総指名数</p>
-              <p className="text-2xl font-bold">
-                {hostessRankingData.reduce((sum, h) => sum + h.regularNominationCount + h.panelNominationCount, 0)}件
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <Star className="w-8 h-8 mx-auto mb-2 text-purple-600" />
               <p className="text-sm text-gray-600">平均満足度</p>
               <p className="text-2xl font-bold">
-                {hostessRankingData.length > 0 ? (hostessRankingData.reduce((sum, h) => sum + h.customerSatisfactionScore, 0) / hostessRankingData.length).toFixed(1) : '0'}
+                {hostessRankingData.length > 0
+                  ? (hostessRankingData.reduce((sum, h) => sum + h.customerSatisfactionScore, 0) / hostessRankingData.length).toFixed(1)
+                  : '0'}
               </p>
             </div>
           </CardContent>

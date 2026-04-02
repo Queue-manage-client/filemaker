@@ -11,6 +11,9 @@ export interface ScheduledHostess {
   endTime: string; // 終了時間（例：「00:00」）
   arrivalTime: string; // 到着時間（例：「00:00」）
   count: number; // 件数（例：1）
+  isConfirmed: boolean; // 出勤確認済みフラグ
+  confirmCallTime?: string; // 確認電話の時間（例：「18:30」）
+  isConfirmCallCompleted?: boolean; // 確認電話後の精算完了フラグ（色変化用）
 }
 
 // INドラ未定予約リスト
@@ -39,6 +42,7 @@ export interface HostessTransport {
   destination: string; // 送り場所
   returnTime?: string; // 帰宅時間
   count?: number; // 件数
+  luggageDetails?: string; // 預り荷物の詳細（例：「紙袋1、ポーチ1」）
 }
 
 // 帰宅ホステス
@@ -152,5 +156,6 @@ export interface SendHostess {
   destination: string; // 送り場所
   destinationMark?: string; // 送り場所マーク（例：「■」）
   count: number; // 件数
+  luggageDetails?: string; // 預り荷物の詳細（例：「紙袋1、ポーチ1」）
 }
 

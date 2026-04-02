@@ -72,6 +72,7 @@ export default function HostessAdminPage() {
   const [activeTab, setActiveTab] = useState<'cast-list' | 'announcements' | 'settings'>('cast-list');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStore, setSelectedStore] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('全て');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   React.useEffect(() => {
@@ -86,6 +87,9 @@ export default function HostessAdminPage() {
     { id: 'store3', name: '渋谷店' },
   ];
 
+  // カテゴリーリスト
+  const categoryList = ['全て', 'レギュラー', '新人', '出稼ぎ', 'フリー'];
+
   // キャストリスト（サンプルデータ）
   const [castList, setCastList] = useState([
     {
@@ -94,6 +98,7 @@ export default function HostessAdminPage() {
       stageName: 'はなこ',
       storeId: 'store1',
       storeName: '本店',
+      category: 'レギュラー',
       status: 'active',
       thisMonthSales: 850000,
       nominations: 15,
@@ -108,6 +113,7 @@ export default function HostessAdminPage() {
       stageName: 'みさき',
       storeId: 'store1',
       storeName: '本店',
+      category: 'レギュラー',
       status: 'active',
       thisMonthSales: 920000,
       nominations: 18,
@@ -122,6 +128,7 @@ export default function HostessAdminPage() {
       stageName: 'あやか',
       storeId: 'store2',
       storeName: '新宿店',
+      category: '新人',
       status: 'active',
       thisMonthSales: 780000,
       nominations: 12,
@@ -136,6 +143,7 @@ export default function HostessAdminPage() {
       stageName: 'りな',
       storeId: 'store3',
       storeName: '渋谷店',
+      category: '出稼ぎ',
       status: 'inactive',
       thisMonthSales: 450000,
       nominations: 8,
@@ -150,6 +158,7 @@ export default function HostessAdminPage() {
       stageName: 'ゆい',
       storeId: 'store2',
       storeName: '新宿店',
+      category: 'フリー',
       status: 'active',
       thisMonthSales: 680000,
       nominations: 10,
@@ -209,6 +218,7 @@ export default function HostessAdminPage() {
   const filteredCastList = castList
     .filter(cast => {
       if (selectedStore !== 'all' && cast.storeId !== selectedStore) return false;
+      if (selectedCategory !== '全て' && cast.category !== selectedCategory) return false;
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         return (
@@ -348,6 +358,17 @@ export default function HostessAdminPage() {
                   ))}
                 </SelectContent>
               </Select>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full sm:w-[160px]">
+                  <Filter className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder="カテゴリー" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categoryList.map(cat => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 結果件数 */}
@@ -372,6 +393,9 @@ export default function HostessAdminPage() {
                             <span className="text-sm text-gray-500">({cast.name})</span>
                             <Badge className={cast.status === 'active' ? 'bg-green-500' : 'bg-gray-400'}>
                               {cast.status === 'active' ? '在籍' : '休止'}
+                            </Badge>
+                            <Badge variant="outline" className="text-indigo-600 border-indigo-300 bg-indigo-50">
+                              {cast.category}
                             </Badge>
                           </div>
                           <div className="flex items-center gap-3 text-sm text-gray-500 mt-1 flex-wrap">

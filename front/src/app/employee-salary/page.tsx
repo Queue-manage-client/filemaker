@@ -5,11 +5,17 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, ChevronLeft, ChevronRight, Search, Calendar, Users, FileText, Calculator, BookOpen } from "lucide-react";
-import type { ShiftType } from '@/types/employee';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, ChevronLeft, ChevronRight, Search, Calendar, Users, FileText, Calculator, BookOpen, CalendarPlus } from "lucide-react";
+import type { ShiftType, EmployeeCategory } from '@/types/employee';
 import { shiftTypeSettings } from '@/types/employee';
 import { sampleEmployeeWeeklyShifts } from '@/data/employeeSampleData';
 import { useEmployeeWeeklyShifts } from '@/hooks/use-employee';
+
+// 週間予定一括作成モーダルのターゲット選択タイプ
+type BatchTargetType = 'all' | 'staff_only' | 'part_time_only';
 
 // 今週の日付を取得する関数
 const getCurrentWeekDates = (baseDate: Date = new Date()) => {
@@ -32,14 +38,30 @@ const getCurrentWeekDates = (baseDate: Date = new Date()) => {
 // タブのタイプ定義
 type TabType = 'weekly_schedule' | 'attendance_registration' | 'shift_print' | 'registration_list' | 'monthly_summary';
 
+// カテゴリフィルターのタイプ定義
+type CategoryFilter = 'all' | EmployeeCategory;
+
+const categoryFilterConfig: { key: CategoryFilter; label: string; subtitle: string }[] = [
+  { key: 'all', label: '全て', subtitle: '全従業員' },
+  { key: 'staff', label: 'スタッフ', subtitle: '内勤・女子管理・広報' },
+  { key: 'part_time', label: 'アルバイト', subtitle: '内勤・ドライバー・広報' }
+];
+
 export default function EmployeeSalary() {
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
   const [weekDates, setWeekDates] = useState<Date[]>([]);
   const [activeTab, setActiveTab] = useState<TabType>('weekly_schedule');
   const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
+
+  // 週間予定一括作成モーダル用ステート
+  const [batchModalOpen, setBatchModalOpen] = useState(false);
+  const [batchTarget, setBatchTarget] = useState<BatchTargetType>('all');
+  const [batchStartDate, setBatchStartDate] = useState('');
+  const [batchEndDate, setBatchEndDate] = useState('');
 
   useEffect(() => {
-    document.title = '従業員週間出勤予定 - Dispatch Harmony Hub';
+    document.title = '従業員給与集計 - Dispatch Harmony Hub';
   }, []);
 
   useEffect(() => {
@@ -75,6 +97,27 @@ export default function EmployeeSalary() {
     setCurrentWeekStart(new Date());
   };
 
+  const openBatchModal = () => {
+    setBatchStartDate(weekStartDateStr);
+    setBatchEndDate(weekEndDateStr);
+    setBatchTarget('all');
+    setBatchModalOpen(true);
+  };
+
+  const batchTargetLabel: Record<BatchTargetType, string> = {
+    all: '社員＆アルバイト',
+    staff_only: '社員のみ',
+    part_time_only: 'アルバイトのみ',
+  };
+
+  const affectedEmployees = useMemo(() => {
+    return shiftsData.filter((shift) => {
+      if (batchTarget === 'staff_only') return shift.category === 'staff';
+      if (batchTarget === 'part_time_only') return shift.category === 'part_time';
+      return true;
+    });
+  }, [shiftsData, batchTarget]);
+
   const formatDate = (date: Date) => {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -101,11 +144,17 @@ export default function EmployeeSalary() {
   //   return settings ? settings.label : '不明';
   // };
 
-  const filteredShifts = shiftsData.filter(shift =>
-    shift.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    shift.employeeNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    shift.position.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const activeCategoryConfig = categoryFilterConfig.find(c => c.key === categoryFilter) ?? categoryFilterConfig[0];
+
+  const filteredShifts = shiftsData.filter(shift => {
+    const matchesSearch =
+      shift.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      shift.employeeNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      shift.position.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory =
+      categoryFilter === 'all' || shift.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
 
   const tabConfig = [
     { key: 'weekly_schedule', label: '従業員週間出勤予定', icon: Calendar },
@@ -135,7 +184,10 @@ export default function EmployeeSalary() {
         <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <h1 className="text-xl font-bold">従業員週間出勤予定</h1>
+              <div>
+                <h1 className="text-xl font-bold">従業員給与集計</h1>
+                <p className="text-sm text-gray-500 mt-0.5">{activeCategoryConfig.subtitle}</p>
+              </div>
 
               <div className="flex items-center gap-4">
                 {error && (
@@ -171,6 +223,17 @@ export default function EmployeeSalary() {
                   </Button>
                 </div>
 
+                {/* 週間予定一括作成ボタン */}
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={openBatchModal}
+                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                >
+                  <CalendarPlus className="w-4 h-4" />
+                  週間予定一括作成
+                </Button>
+
                 {/* 週表示 */}
                 <div className="text-sm font-semibold">
                   {weekDates.length > 0 && `${formatDate(weekDates[0])} - ${formatDate(weekDates[6])}`}
@@ -191,8 +254,23 @@ export default function EmployeeSalary() {
               </div>
             </div>
 
+            {/* カテゴリフィルター */}
+            <div className="flex items-center gap-2 mt-3">
+              <span className="text-sm text-gray-600 font-medium">絞り込み:</span>
+              {categoryFilterConfig.map((config) => (
+                <Button
+                  key={config.key}
+                  variant={categoryFilter === config.key ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCategoryFilter(config.key)}
+                >
+                  {config.label}
+                </Button>
+              ))}
+            </div>
+
             {/* タブ */}
-            <div className="flex items-center gap-2 mt-4">
+            <div className="flex items-center gap-2 mt-3">
               {tabConfig.map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -311,6 +389,107 @@ export default function EmployeeSalary() {
           </CardContent>
         </Card>
       </div>
+
+      {/* 週間予定一括作成モーダル */}
+      <Dialog open={batchModalOpen} onOpenChange={setBatchModalOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarPlus className="w-5 h-5 text-emerald-600" />
+              週間予定一括作成
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-5 py-2">
+            {/* 対象選択 */}
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold">対象スタッフ</Label>
+              <RadioGroup
+                value={batchTarget}
+                onValueChange={(value) => setBatchTarget(value as BatchTargetType)}
+                className="flex flex-col gap-2"
+              >
+                {(Object.entries(batchTargetLabel) as [BatchTargetType, string][]).map(([value, label]) => (
+                  <div key={value} className="flex items-center gap-2">
+                    <RadioGroupItem value={value} id={`target-${value}`} />
+                    <Label htmlFor={`target-${value}`} className="cursor-pointer">{label}</Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+
+            {/* 入力範囲（日付） */}
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold">入力範囲</Label>
+              <div className="flex items-center gap-3">
+                <div className="flex flex-col gap-1 flex-1">
+                  <Label htmlFor="batch-start" className="text-xs text-gray-500">開始日</Label>
+                  <Input
+                    id="batch-start"
+                    type="date"
+                    value={batchStartDate}
+                    onChange={(e) => setBatchStartDate(e.target.value)}
+                  />
+                </div>
+                <span className="mt-5 text-gray-400">〜</span>
+                <div className="flex flex-col gap-1 flex-1">
+                  <Label htmlFor="batch-end" className="text-xs text-gray-500">終了日</Label>
+                  <Input
+                    id="batch-end"
+                    type="date"
+                    value={batchEndDate}
+                    onChange={(e) => setBatchEndDate(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 対象従業員リスト */}
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold">
+                対象従業員
+                <span className="ml-2 text-xs text-gray-500 font-normal">
+                  （{affectedEmployees.length}名）
+                </span>
+              </Label>
+              <div className="border rounded-md max-h-40 overflow-y-auto divide-y">
+                {affectedEmployees.length === 0 ? (
+                  <p className="text-sm text-gray-500 p-3">対象の従業員がいません</p>
+                ) : (
+                  affectedEmployees.map((emp) => (
+                    <div key={emp.id} className="flex items-center justify-between px-3 py-2 text-sm">
+                      <span className="font-medium">{emp.name}</span>
+                      <span className="text-xs text-gray-500">
+                        {emp.employeeNumber} ·{' '}
+                        {emp.category === 'staff' ? '社員' : 'アルバイト'} ·{' '}
+                        {emp.department}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* 基本スケジュールから作成ボタン（プレビュー用） */}
+            <div className="rounded-md bg-blue-50 border border-blue-200 p-3 text-sm text-blue-700">
+              スタッフ台帳の基本スケジュール情報を元に、指定期間の週間予定を自動生成します。
+            </div>
+          </div>
+
+          <DialogFooter className="flex gap-2 justify-end pt-2">
+            <Button variant="outline" onClick={() => setBatchModalOpen(false)}>
+              キャンセル
+            </Button>
+            <Button
+              variant="default"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              onClick={() => setBatchModalOpen(false)}
+            >
+              作成
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* フッター - 凡例 */}
       <div className="p-4 mt-4">

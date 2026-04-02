@@ -3,7 +3,8 @@
 import React, { useState, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, Trash2, Save, X, Check } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Trash2, Save, X, Check, BarChart2, Tag } from "lucide-react";
 
 // スケジュールデータの型定義
 interface ScheduleEntry {
@@ -23,29 +24,47 @@ interface HostessData {
   workType: string;
   assignedStaff: string;
   storeId: string;
+  weeklyNote?: string;
+  newbieStartDate?: string; // ISO date string, e.g. "2026-03-10" (新人ステータス開始日)
 }
 
-// 店舗データ
+// 店舗データ（背景色付き）
 const sampleStores = [
-  { id: "store1", name: "銀座本店" },
-  { id: "store2", name: "新宿店" },
-  { id: "store3", name: "渋谷店" },
+  { id: "store1", name: "銀座本店", color: "#fce7f3" },
+  { id: "store2", name: "新宿店", color: "#dbeafe" },
+  { id: "store3", name: "渋谷店", color: "#fef3c7" },
 ];
+
+// 店舗IDから背景色を取得
+const getStoreColor = (storeId: string): string => {
+  return sampleStores.find(s => s.id === storeId)?.color || '#f3f4f6';
+};
+
+// 新人ステータスの残日数を計算 (デモ用固定日: 2026-03-27)
+const DEMO_TODAY = "2026-03-27";
+const NEWBIE_DAYS = 20;
+
+const getNewbieDaysRemaining = (newbieStartDate: string): number => {
+  const start = new Date(newbieStartDate);
+  const today = new Date(DEMO_TODAY);
+  const elapsed = Math.floor((today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  return NEWBIE_DAYS - elapsed;
+};
 
 // サンプルホステスデータ
 const sampleHostesses: HostessData[] = [
-  { id: "1", name: "すみれ", workType: "正社員", assignedStaff: "佐藤", storeId: "store1" },
-  { id: "2", name: "瑠璃-ruri-", workType: "パート", assignedStaff: "高橋", storeId: "store1" },
+  { id: "1", name: "すみれ", workType: "正社員", assignedStaff: "佐藤", storeId: "store1", weeklyNote: "今週は月水金のみ出勤予定。体調管理注意。" },
+  { id: "2", name: "瑠璃-ruri-", workType: "パート", assignedStaff: "高橋", storeId: "store1", weeklyNote: "土曜は早上がり希望" },
   { id: "3", name: "かんな", workType: "契約", assignedStaff: "田中", storeId: "store1" },
-  { id: "4", name: "スイレン", workType: "派遣", assignedStaff: "山田", storeId: "store1" },
+  { id: "4", name: "スイレン", workType: "派遣", assignedStaff: "山田", storeId: "store1", weeklyNote: "木曜に面談あり。午後から出勤。" },
   { id: "5", name: "妃-kisaki-", workType: "正社員", assignedStaff: "佐藤", storeId: "store2" },
-  { id: "6", name: "ミイ", workType: "パート", assignedStaff: "鈴木", storeId: "store2" },
+  { id: "6", name: "ミイ", workType: "新人", assignedStaff: "鈴木", storeId: "store2", weeklyNote: "研修期間中。先輩スタッフのサポート必要。", newbieStartDate: "2026-03-10" },
   { id: "7", name: "かなの", workType: "契約", assignedStaff: "高橋", storeId: "store2" },
-  { id: "8", name: "あみ", workType: "派遣", assignedStaff: "田中", storeId: "store2" },
-  { id: "9", name: "雪-yuki-", workType: "正社員", assignedStaff: "山田", storeId: "store3" },
+  { id: "8", name: "あみ", workType: "派遣", assignedStaff: "田中", storeId: "store2", weeklyNote: "イベント対応のため週末は通常より遅くまで勤務" },
+  { id: "9", name: "雪-yuki-", workType: "正社員", assignedStaff: "山田", storeId: "store3", weeklyNote: "VIP顧客対応週。スケジュール調整済み。" },
   { id: "10", name: "か美-hiro-…", workType: "パート", assignedStaff: "佐藤", storeId: "store3" },
   { id: "11", name: "りあん", workType: "契約", assignedStaff: "鈴木", storeId: "store3" },
-  { id: "12", name: "あず", workType: "派遣", assignedStaff: "高橋", storeId: "store3" },
+  { id: "12", name: "あず", workType: "新人", assignedStaff: "高橋", storeId: "store3", weeklyNote: "今週から独り立ち開始", newbieStartDate: "2026-03-24" },
 ];
 
 // 日付をYYYY-MM-DD形式にフォーマット
@@ -141,17 +160,31 @@ export default function HostessSchedule() {
 
   const [currentDate, setCurrentDate] = useState(getToday());
   const [activeTab, setActiveTab] = useState<ViewTab>('daily');
-  const [hostesses] = useState<HostessData[]>(sampleHostesses);
+  const [hostesses, setHostesses] = useState<HostessData[]>(sampleHostesses);
   const [stores] = useState(sampleStores);
   const [selectedStoreId, setSelectedStoreId] = useState<string>(sampleStores[0].id);
   const [schedules, setSchedules] = useState<ScheduleEntry[]>(generateSampleSchedules);
   const [originalSchedules, setOriginalSchedules] = useState<ScheduleEntry[]>(generateSampleSchedules);
   const [searchText, setSearchText] = useState('');
-  const [staffFilter, setStaffFilter] = useState<string>('');
+  const [staffFilter, setStaffFilter] = useState<string>('全て');
+  const [workTypeFilter, setWorkTypeFilter] = useState<string>('全て');
+  const [storeFilter, setStoreFilter] = useState<string>('全て');
+  const [weeklyNotes, setWeeklyNotes] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {};
+    sampleHostesses.forEach(h => {
+      if (h.weeklyNote) initial[h.id] = h.weeklyNote;
+    });
+    return initial;
+  });
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [selectedHostessId, setSelectedHostessId] = useState<string | null>(null);
 
   // 変更追跡用
   const [changedHostessIds, setChangedHostessIds] = useState<Set<string>>(new Set());
+
+  // 週間統計・ステータスの表示制御（デフォルト非表示）
+  const [showWeeklyStats, setShowWeeklyStats] = useState(false);
+  const [showStatusColumns, setShowStatusColumns] = useState(false);
 
   // 保存モーダル用
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -280,6 +313,13 @@ export default function HostessSchedule() {
       setSelectedForSave(new Set(changedHostessIds));
     }
   }, [changedHostessIds, selectedForSave.size]);
+
+  // ホステスの主店舗を変更
+  const changeHostessStore = useCallback((hostessId: string, newStoreId: string) => {
+    setHostesses(prev =>
+      prev.map(h => h.id === hostessId ? { ...h, storeId: newStoreId } : h)
+    );
+  }, []);
 
   // ドラッグ操作用のstate
   const [dragState, setDragState] = useState<{
@@ -474,21 +514,39 @@ export default function HostessSchedule() {
     return Array.from(staffSet).sort((a, b) => a.localeCompare(b, 'ja'));
   }, [hostesses]);
 
+  // 勤務形態リストを抽出
+  const workTypeList = useMemo(() => {
+    const typeSet = new Set<string>();
+    hostesses.forEach(h => {
+      if (h.workType) typeSet.add(h.workType);
+    });
+    return Array.from(typeSet).sort((a, b) => a.localeCompare(b, 'ja'));
+  }, [hostesses]);
+
   // フィルタされたホステス
   const filteredHostesses = useMemo(() => {
     let filtered = [...hostesses];
-    // 店舗でフィルタ
+    // 店舗タブ選択でフィルタ
     filtered = filtered.filter(h => h.storeId === selectedStoreId);
     if (searchText.trim()) {
       filtered = filtered.filter(h =>
         h.name.toLowerCase().includes(searchText.toLowerCase())
       );
     }
-    if (staffFilter) {
+    if (staffFilter !== '全て') {
       filtered = filtered.filter(h => h.assignedStaff === staffFilter);
     }
+    if (workTypeFilter !== '全て') {
+      filtered = filtered.filter(h => h.workType === workTypeFilter);
+    }
+    if (storeFilter !== '全て') {
+      filtered = filtered.filter(h => {
+        const store = sampleStores.find(s => s.id === h.storeId);
+        return store?.name === storeFilter;
+      });
+    }
     return filtered;
-  }, [hostesses, selectedStoreId, searchText, staffFilter]);
+  }, [hostesses, selectedStoreId, searchText, staffFilter, workTypeFilter, storeFilter]);
 
   // ナビゲーション
   const navigate = (direction: 'prev' | 'next') => {
@@ -778,11 +836,35 @@ export default function HostessSchedule() {
           <select
             value={staffFilter}
             onChange={(e) => setStaffFilter(e.target.value)}
-            className="h-7 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-pink-400"
+            className="h-7 px-2 text-xs border border-pink-300 rounded bg-pink-50 text-pink-700 focus:outline-none focus:ring-1 focus:ring-pink-400"
           >
-            <option value="">全員</option>
+            <option value="全て">全て</option>
             {staffList.map(staff => (
               <option key={staff} value={staff}>{staff}</option>
+            ))}
+          </select>
+          <div className="w-px h-5 bg-gray-300 mx-1" />
+          <span className="text-xs text-gray-600 font-medium">勤務形態:</span>
+          <select
+            value={workTypeFilter}
+            onChange={(e) => setWorkTypeFilter(e.target.value)}
+            className="h-7 px-2 text-xs border border-pink-300 rounded bg-pink-50 text-pink-700 focus:outline-none focus:ring-1 focus:ring-pink-400"
+          >
+            <option value="全て">全て</option>
+            {workTypeList.map(wt => (
+              <option key={wt} value={wt}>{wt}</option>
+            ))}
+          </select>
+          <div className="w-px h-5 bg-gray-300 mx-1" />
+          <span className="text-xs text-gray-600 font-medium">店舗:</span>
+          <select
+            value={storeFilter}
+            onChange={(e) => setStoreFilter(e.target.value)}
+            className="h-7 px-2 text-xs border border-pink-300 rounded bg-pink-50 text-pink-700 focus:outline-none focus:ring-1 focus:ring-pink-400"
+          >
+            <option value="全て">全て</option>
+            {sampleStores.map(store => (
+              <option key={store.id} value={store.name}>{store.name}</option>
             ))}
           </select>
           <div className="w-px h-5 bg-gray-300 mx-1" />
@@ -792,7 +874,7 @@ export default function HostessSchedule() {
             placeholder="キャスト名"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            className="w-[180px] h-7 px-3 text-xs border border-gray-500 rounded-full focus:outline-none focus:ring-1 focus:ring-pink-400"
+            className="w-[140px] h-7 px-3 text-xs border border-gray-500 rounded-full focus:outline-none focus:ring-1 focus:ring-pink-400"
           />
         </div>
       </div>
@@ -802,18 +884,47 @@ export default function HostessSchedule() {
         {/* 左側パネル - ホステスリスト（4カラム） */}
         <div className="flex-shrink-0 flex flex-col bg-pink-100 border-r border-pink-300">
           {/* ヘッダー行 */}
-          <div className="h-[40px] border-b border-pink-300 flex-shrink-0 flex">
-            <div className="w-[100px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
-              名前
-            </div>
-            <div className="w-[60px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
-              勤務形態
-            </div>
-            <div className="w-[50px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
-              担当者
-            </div>
-            <div className="w-[50px] flex items-center justify-center text-xs font-bold text-gray-700">
-              {activeTab === 'daily' ? '日' : activeTab === 'weekly' ? '週' : '月'}
+          <div className="border-b border-pink-300 flex-shrink-0">
+            {/* ステータス折りたたみトグル */}
+            <button
+              onClick={() => setShowStatusColumns(prev => !prev)}
+              className="w-full h-[22px] flex items-center gap-1 px-2 bg-pink-200 hover:bg-pink-300 transition-colors text-left"
+            >
+              <Tag className="w-3 h-3 text-pink-600 flex-shrink-0" />
+              <span className="text-[10px] font-bold text-pink-700 flex-1">ステータス</span>
+              {showStatusColumns ? (
+                <ChevronUp className="w-3 h-3 text-pink-500" />
+              ) : (
+                <ChevronDown className="w-3 h-3 text-pink-500" />
+              )}
+            </button>
+            {/* 列ヘッダー */}
+            <div className="h-[32px] flex">
+              <div className="w-[24px] border-r border-pink-300 flex items-center justify-center text-[10px] font-bold text-gray-500">
+                No
+              </div>
+              <div className="w-[100px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
+                名前
+              </div>
+              <div className="w-[80px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
+                主店舗
+              </div>
+              {showStatusColumns && (
+                <>
+                  <div className="w-[60px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
+                    勤務形態
+                  </div>
+                  <div className="w-[50px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
+                    担当者
+                  </div>
+                </>
+              )}
+              <div className="w-[120px] border-r border-pink-300 flex items-center justify-center text-xs font-bold text-gray-700">
+                週間備考
+              </div>
+              <div className="w-[50px] flex items-center justify-center text-xs font-bold text-gray-700">
+                {activeTab === 'daily' ? '日' : activeTab === 'weekly' ? '週' : '月'}
+              </div>
             </div>
           </div>
 
@@ -823,7 +934,7 @@ export default function HostessSchedule() {
             onScroll={handleLeftScroll}
             className="flex-1 overflow-y-auto"
           >
-            {filteredHostesses.map((hostess) => (
+            {filteredHostesses.map((hostess, hIdx) => (
               <div
                 key={hostess.id}
                 className={`border-b border-pink-300 flex ${
@@ -836,22 +947,94 @@ export default function HostessSchedule() {
                   }
                 }}
               >
-                {/* 名前 */}
-                <div className="w-[100px] border-r border-pink-300 flex items-center px-2">
+                {/* No. (狭い列) */}
+                <div className="w-[24px] border-r border-pink-300 flex items-center justify-center">
+                  <span className="text-[10px] text-gray-400">{hIdx + 1}</span>
+                </div>
+                {/* 名前（所属主店舗の背景色 + 新人マーク） */}
+                <div className="w-[100px] border-r border-pink-300 flex items-center px-2" style={{ backgroundColor: getStoreColor(hostess.storeId) }}>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1">
+                      {hostess.workType === '新人' && (() => {
+                        if (!hostess.newbieStartDate) {
+                          return <span className="text-[9px] bg-green-500 text-white px-1 rounded flex-shrink-0">新</span>;
+                        }
+                        const remaining = getNewbieDaysRemaining(hostess.newbieStartDate);
+                        if (remaining <= 0) {
+                          return (
+                            <span className="flex items-center gap-0.5 flex-shrink-0">
+                              <span className="text-[9px] bg-green-500 text-white px-1 rounded">新</span>
+                              <span className="text-[9px] text-gray-400 font-medium">解除</span>
+                            </span>
+                          );
+                        }
+                        const isWarning = remaining <= 5;
+                        return (
+                          <span className="flex items-center gap-0.5 flex-shrink-0">
+                            <span className="text-[9px] bg-green-500 text-white px-1 rounded">新</span>
+                            <span className={`text-[9px] font-medium ${isWarning ? 'text-red-500' : 'text-gray-500'}`}>
+                              残{remaining}日
+                            </span>
+                          </span>
+                        );
+                      })()}
                       <span className="text-sm font-medium truncate">{hostess.name}</span>
                       <ChevronDown className="w-3 h-3 text-gray-500 flex-shrink-0" />
                     </div>
                   </div>
                 </div>
-                {/* 勤務形態 */}
-                <div className="w-[60px] border-r border-pink-300 flex items-center justify-center">
-                  <span className="text-xs text-gray-700">{hostess.workType}</span>
+                {/* 主店舗変更 */}
+                <div className="w-[80px] border-r border-pink-300 flex items-center justify-center px-1">
+                  <div className="relative w-full">
+                    <select
+                      value={hostess.storeId}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        changeHostessStore(hostess.id, e.target.value);
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-full h-6 px-1 pr-5 text-[10px] font-medium border border-pink-300 rounded bg-white text-pink-700 appearance-none focus:outline-none focus:ring-1 focus:ring-pink-400 cursor-pointer"
+                    >
+                      {sampleStores.map(store => (
+                        <option key={store.id} value={store.id}>{store.name}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-0.5 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-pink-400" />
+                  </div>
                 </div>
-                {/* 担当者 */}
-                <div className="w-[50px] border-r border-pink-300 flex items-center justify-center">
-                  <span className="text-xs text-gray-700">{hostess.assignedStaff}</span>
+                {/* 勤務形態・担当者（ステータス表示時のみ） */}
+                {showStatusColumns && (
+                  <>
+                    <div className="w-[60px] border-r border-pink-300 flex items-center justify-center">
+                      <span className="text-xs text-gray-700">{hostess.workType}</span>
+                    </div>
+                    <div className="w-[50px] border-r border-pink-300 flex items-center justify-center">
+                      <span className="text-xs text-gray-700">{hostess.assignedStaff}</span>
+                    </div>
+                  </>
+                )}
+                {/* 週間備考 */}
+                <div
+                  className="w-[120px] border-r border-pink-300 flex items-center px-1.5 cursor-pointer hover:bg-pink-200 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingNoteId(hostess.id);
+                  }}
+                >
+                  <span
+                    className="text-[10px] text-gray-600 leading-tight"
+                    style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      wordBreak: 'break-all',
+                    }}
+                  >
+                    {weeklyNotes[hostess.id] || (
+                      <span className="text-pink-300 italic">タップして入力</span>
+                    )}
+                  </span>
                 </div>
                 {/* 週/日/月 */}
                 <div className="w-[50px] flex items-center justify-center">
@@ -1009,23 +1192,53 @@ export default function HostessSchedule() {
           {/* 週間タブ */}
           {activeTab === 'weekly' && (
             <>
+              {/* 週間統計トグル */}
+              <Collapsible open={showWeeklyStats} onOpenChange={setShowWeeklyStats}>
+                <CollapsibleTrigger asChild>
+                  <button className="w-full h-[22px] flex items-center gap-1 px-3 bg-gray-100 hover:bg-gray-200 border-b border-gray-300 transition-colors text-left flex-shrink-0">
+                    <BarChart2 className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                    <span className="text-[10px] font-bold text-gray-600 flex-1">週間統計</span>
+                    {showWeeklyStats ? (
+                      <ChevronUp className="w-3 h-3 text-gray-400" />
+                    ) : (
+                      <ChevronDown className="w-3 h-3 text-gray-400" />
+                    )}
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  {/* 週間統計パネル */}
+                  <div className="bg-gray-50 border-b border-gray-300 flex px-3 py-1.5 gap-3">
+                    {weekDays.map((day) => (
+                      <div key={day.dayIndex} className="flex flex-col items-center gap-0.5 flex-1">
+                        <span className={`text-[10px] font-medium ${
+                          day.dayName === '土' ? 'text-blue-600' :
+                          day.dayName === '日' ? 'text-red-600' : 'text-gray-600'
+                        }`}>
+                          {day.displayDate}
+                        </span>
+                        <span className="text-[11px] font-bold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">
+                          {getWorkCountForDate(day.dateStr)}名
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+
               {/* 曜日ヘッダー */}
-              <div className="h-[40px] bg-gray-50 border-b border-gray-300 flex-shrink-0 flex">
+              <div className="h-[32px] bg-gray-50 border-b border-gray-300 flex-shrink-0 flex">
                 {weekDays.map((day) => (
                   <div
                     key={day.dayIndex}
-                    className={`flex-1 border-r border-gray-300 flex items-center justify-center gap-2 ${
+                    className={`flex-1 border-r border-gray-300 flex items-center justify-center ${
                       day.isWeekend ? (day.dayName === '土' ? 'bg-blue-50' : 'bg-red-50') : ''
                     }`}
                   >
-                    <span className={`text-sm font-medium ${
+                    <span className={`text-xs font-medium ${
                       day.dayName === '土' ? 'text-blue-600' :
                       day.dayName === '日' ? 'text-red-600' : 'text-gray-700'
                     }`}>
                       {day.displayDate}
-                    </span>
-                    <span className="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">
-                      {getWorkCountForDate(day.dateStr)}名
                     </span>
                   </div>
                 ))}
@@ -1254,6 +1467,67 @@ export default function HostessSchedule() {
           )}
         </div>
       </div>
+
+      {/* 週間備考編集モーダル */}
+      {editingNoteId !== null && (() => {
+        const editingHostess = hostesses.find(h => h.id === editingNoteId);
+        if (!editingHostess) return null;
+        return (
+          <div
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            onClick={() => setEditingNoteId(null)}
+          >
+            <div
+              className="bg-white rounded-lg shadow-xl w-[420px] flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* モーダルヘッダー */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-pink-50 rounded-t-lg">
+                <div>
+                  <h2 className="text-base font-bold text-pink-700">週間備考</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">{editingHostess.name} / {editingHostess.workType} / 担当: {editingHostess.assignedStaff}</p>
+                </div>
+                <button
+                  onClick={() => setEditingNoteId(null)}
+                  className="p-1 hover:bg-pink-100 rounded"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              {/* テキストエリア */}
+              <div className="p-4">
+                <textarea
+                  autoFocus
+                  rows={5}
+                  value={weeklyNotes[editingNoteId] ?? ''}
+                  onChange={(e) => setWeeklyNotes(prev => ({ ...prev, [editingNoteId]: e.target.value }))}
+                  placeholder="今週の備考・注意事項を入力してください"
+                  className="w-full px-3 py-2 text-sm border border-pink-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-pink-400 placeholder-pink-200"
+                />
+              </div>
+
+              {/* フッター */}
+              <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+                <Button
+                  variant="outline"
+                  onClick={() => setEditingNoteId(null)}
+                  className="px-4 text-sm"
+                >
+                  閉じる
+                </Button>
+                <Button
+                  onClick={() => setEditingNoteId(null)}
+                  className="px-4 text-sm bg-pink-500 hover:bg-pink-600 text-white"
+                >
+                  <Check className="w-4 h-4 mr-1" />
+                  保存
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* 保存確認モーダル */}
       {showSaveModal && (

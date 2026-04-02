@@ -28,6 +28,7 @@ interface ReservationData {
   location: string;
   type: 'final' | 'current' | 'inDriver' | 'next1' | 'next2' | 'next3' | 'next4' | 'next5';
   customerName?: string; // 顧客名（未登録の場合はundefined）
+  guideType?: 'width' | 'specified'; // 案内タイプ: 幅 or 指定
 }
 
 // サンプル顧客名リスト
@@ -113,11 +114,31 @@ const getRemarkColor = (remark: string, storeColor?: string): string => {
   }
 };
 
+// 新人日数を計算（newbieStartDate から今日まで）
+const calcNewbieDays = (startDate: string): number => {
+  const start = new Date(startDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  start.setHours(0, 0, 0, 0);
+  const diff = Math.floor((today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  return diff + 1; // 初日を1日目とする
+};
+
+// 2つの時刻の差を分で計算（深夜帯対応）
+const calcMinutes = (start: string, end: string): number => {
+  const s = timeToMinutes(start);
+  const e = timeToMinutes(end);
+  return Math.max(0, e - s);
+};
+
 export default function RT2Panel() {
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [sortKey, setSortKey] = useState<SortKey>('endTime');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+
+  // 選択された予約（A12: ポップアップ用）
+  const [selectedReservation, setSelectedReservation] = useState<{ castId: string; reservationId: string } | null>(null);
 
   // フィルター状態
   const [filterManager, setFilterManager] = useState<string>('all');
@@ -365,7 +386,8 @@ export default function RT2Panel() {
         time: cast.finalCustomerTime || cast.homeTime,
         location: cast.finalCustomer,
         type: 'final',
-        customerName: getRandomCustomerName(`${cast.id}-final`)
+        customerName: getRandomCustomerName(`${cast.id}-final`),
+        guideType: 'specified'
       });
     }
 
@@ -376,7 +398,8 @@ export default function RT2Panel() {
         time: cast.nowCustomerTime,
         location: cast.nowCustomer,
         type: 'current',
-        customerName: getRandomCustomerName(`${cast.id}-current`)
+        customerName: getRandomCustomerName(`${cast.id}-current`),
+        guideType: 'specified'
       });
     }
 
@@ -387,7 +410,8 @@ export default function RT2Panel() {
         time: cast.inDriverMoving,
         location: cast.deliverPlace,
         type: 'inDriver',
-        customerName: getRandomCustomerName(`${cast.id}-inDriver`)
+        customerName: getRandomCustomerName(`${cast.id}-inDriver`),
+        guideType: 'width'
       });
     }
 
@@ -404,12 +428,16 @@ export default function RT2Panel() {
       if (field) {
         const parts = field.split(' ');
         if (parts.length >= 2) {
+          // 末尾に "[指定]" が含まれていれば 'specified'、なければ 'width'
+          const isSpecified = parts[parts.length - 1] === '[指定]';
+          const location = isSpecified ? parts.slice(1, -1).join(' ') : parts.slice(1).join(' ');
           reservations.push({
             id: `${cast.id}-${type}`,
             time: parts[0],
-            location: parts.slice(1).join(' '),
+            location,
             type,
-            customerName: getRandomCustomerName(`${cast.id}-${type}`)
+            customerName: getRandomCustomerName(`${cast.id}-${type}`),
+            guideType: isSpecified ? 'specified' : 'width'
           });
         }
       }
@@ -602,6 +630,26 @@ export default function RT2Panel() {
                       <span className="text-black">{cast.remark}</span>
                       {cast.achieve && <span className="text-red-600">{cast.achieve}</span>}
                     </div>
+                    {/* A10: 新人バッジ */}
+                    {cast.isNewbie && cast.newbieStartDate && (
+                      <div className="flex flex-col gap-0.5 mt-0.5">
+                        <span className="text-[8px] bg-green-500 text-white px-1 rounded leading-tight whitespace-nowrap">
+                          🔰新人{calcNewbieDays(cast.newbieStartDate)}日目
+                        </span>
+                        {cast.hasGuarantee && cast.guaranteeRemaining != null && cast.guaranteeRemaining > 0 && (
+                          <span className="text-[8px] bg-amber-100 text-amber-700 px-1 rounded leading-tight whitespace-nowrap">
+                            保証 ¥{cast.guaranteeRemaining.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {/* A11: 開始/終了時間と幅 */}
+                    <div className="flex items-center gap-0.5 mt-0.5 flex-wrap">
+                      <span className="text-[8px] text-gray-600 whitespace-nowrap">{cast.startTime}〜{cast.endTime}</span>
+                      <span className="text-[8px] bg-blue-100 text-blue-800 px-0.5 rounded whitespace-nowrap">
+                        幅{calcMinutes(cast.startTime, cast.endTime)}分
+                      </span>
+                    </div>
                   </div>
                 </div>
                 {/* ￥ボタン */}
@@ -692,6 +740,7 @@ export default function RT2Panel() {
             ref={timelineBodyRef}
             className="flex-1 overflow-auto"
             onScroll={handleTimelineScroll}
+            onClick={() => setSelectedReservation(null)}
           >
             <div
               className="flex"
@@ -746,6 +795,9 @@ export default function RT2Panel() {
                       {reservations.map((reservation) => {
                         const barLeft = timeToPosition(reservation.time);
                         const barWidth = 120;
+                        const isSelected =
+                          selectedReservation?.castId === cast.id &&
+                          selectedReservation?.reservationId === reservation.id;
 
                         return (
                           <div
@@ -756,23 +808,76 @@ export default function RT2Panel() {
                               width: `${barWidth}px`,
                               top: '6px',
                               bottom: '6px',
-                              zIndex: 1
+                              zIndex: isSelected ? 20 : 1
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedReservation(
+                                isSelected ? null : { castId: cast.id, reservationId: reservation.id }
+                              );
                             }}
                           >
-                            {/* ツールチップ */}
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                              <div className="font-medium mb-1">{getReservationLabel(reservation.type)}</div>
-                              <div>{reservation.time} - {reservation.location}</div>
-                              {/* 顧客名表示 */}
-                              <div className={`mt-1 pt-1 border-t border-gray-600 ${reservation.customerName ? 'text-green-300' : 'text-orange-300'}`}>
-                                顧客: {reservation.customerName || '顧客未登録'}
+                            {/* A12: クリックポップアップ */}
+                            {isSelected && (
+                              <div
+                                className="absolute bottom-full left-0 mb-2 bg-white border border-gray-200 rounded shadow-lg z-50 text-xs"
+                                style={{ minWidth: '180px' }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <div
+                                  className="px-2 py-1 rounded-t text-white text-[10px] font-bold flex items-center justify-between"
+                                  style={{ background: getReservationColor(reservation.type) }}
+                                >
+                                  <span>{getReservationLabel(reservation.type)}</span>
+                                  <button
+                                    className="ml-2 opacity-80 hover:opacity-100"
+                                    onClick={() => setSelectedReservation(null)}
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </div>
+                                <div className="px-2 py-1.5 space-y-0.5">
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-gray-500 w-14 flex-shrink-0">予約時刻</span>
+                                    <span className="font-medium text-gray-800">{reservation.time}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-gray-500 w-14 flex-shrink-0">案内場所</span>
+                                    <span className="font-medium text-gray-800">{reservation.location || '未定'}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-gray-500 w-14 flex-shrink-0">タイプ</span>
+                                    <span
+                                      className={`px-1 rounded text-[9px] font-bold ${reservation.guideType === 'specified' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}
+                                    >
+                                      {reservation.guideType === 'specified' ? '指定' : '幅'}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-gray-500 w-14 flex-shrink-0">顧客</span>
+                                    <span className={`font-medium ${reservation.customerName ? 'text-gray-800' : 'text-orange-500'}`}>
+                                      {reservation.customerName || '未登録'}
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
-                            </div>
+                            )}
+
+                            {/* ホバーツールチップ（ポップアップ非表示時のみ） */}
+                            {!isSelected && (
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                                <div className="font-medium mb-1">{getReservationLabel(reservation.type)}</div>
+                                <div>{reservation.time} - {reservation.location}</div>
+                                <div className={`mt-1 pt-1 border-t border-gray-600 ${reservation.customerName ? 'text-green-300' : 'text-orange-300'}`}>
+                                  顧客: {reservation.customerName || '顧客未登録'}
+                                </div>
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
+                              </div>
+                            )}
 
                             {/* バー本体 */}
                             <div
-                              className="absolute inset-0 rounded-full flex items-center px-2 shadow-sm overflow-hidden hover:ring-2 hover:ring-offset-1 hover:ring-blue-400"
+                              className={`absolute inset-0 rounded-full flex items-center px-2 shadow-sm overflow-hidden hover:ring-2 hover:ring-offset-1 hover:ring-blue-400 ${isSelected ? 'ring-2 ring-offset-1 ring-yellow-400' : ''}`}
                               style={{
                                 background: getReservationColor(reservation.type)
                               }}
