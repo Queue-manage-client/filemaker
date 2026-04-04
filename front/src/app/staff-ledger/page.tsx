@@ -324,9 +324,9 @@ export default function StaffLedger() {
                         </span>
                       </td>
                       <td className="border border-gray-300 px-2 py-2 text-center">
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-wrap gap-0.5 justify-center">
                           {staff.jobTypes.map(jobType => (
-                            <span key={jobType} className={`px-2 py-1 rounded text-xs inline-block ${
+                            <span key={jobType} className={`px-1.5 py-0.5 rounded text-[10px] inline-block whitespace-nowrap ${
                               jobType === 'driver'
                                 ? 'bg-orange-100 text-orange-800'
                                 : 'bg-purple-100 text-purple-800'
@@ -382,18 +382,23 @@ export default function StaffLedger() {
                           {ACCESS_STATUS_LABELS[staff.accessStatus]}
                         </span>
                       </td>
-                      <td className="border border-gray-300 px-2 py-2">
+                      <td className="border border-gray-300 px-2 py-2 max-w-[128px] overflow-hidden">
                         {staff.assignedCasts && staff.assignedCasts.length > 0 ? (
-                          <div className="flex flex-col gap-1">
-                            {staff.assignedCasts.map(cast => (
+                          <div className="flex flex-wrap gap-0.5">
+                            {staff.assignedCasts.slice(0, 3).map(cast => (
                               <Link
                                 key={cast.id}
                                 href={`/hostess-ledger?id=${cast.id}`}
-                                className="text-blue-600 underline cursor-pointer hover:text-blue-800 text-xs whitespace-nowrap"
+                                className="text-blue-600 underline cursor-pointer hover:text-blue-800 text-[10px] whitespace-nowrap"
                               >
                                 {cast.name}
                               </Link>
                             ))}
+                            {staff.assignedCasts.length > 3 && (
+                              <span className="text-gray-500 text-[10px]" title={staff.assignedCasts.map(c => c.name).join(', ')}>
+                                +{staff.assignedCasts.length - 3}名
+                              </span>
+                            )}
                           </div>
                         ) : (
                           <span className="text-gray-400 text-xs">-</span>

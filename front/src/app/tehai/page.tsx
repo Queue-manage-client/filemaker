@@ -319,13 +319,13 @@ export default function TehaiPage() {
             {officeAssignmentData.map((data) => (
               <div key={data.id} className="flex items-center border-b border-gray-300 text-[11px] bg-white">
                 <div className="w-5 text-center border-r border-gray-300 bg-lime-400 font-bold">{data.id}</div>
-                <div className="w-14 border-r border-gray-300">{data.driverArea}</div>
+                <div className="w-14 border-r border-gray-300 truncate" title={data.driverArea}>{data.driverArea}</div>
                 <div className="w-10 text-center border-r border-gray-300">{data.startTime}</div>
-                <div className="flex-1 border-r border-gray-300">{data.departure}</div>
+                <div className="flex-1 border-r border-gray-300 truncate" title={data.departure}>{data.departure}</div>
                 <div className="w-10 text-center border-r border-gray-300">{data.endTime}</div>
                 <div className="w-10 text-center border-r border-gray-300">{data.returnTime}</div>
-                <div className="w-[65px] border-r border-gray-300">{data.destination}</div>
-                <div className="w-10 text-center">{data.staff}</div>
+                <div className="w-[65px] border-r border-gray-300 truncate" title={data.destination}>{data.destination}</div>
+                <div className="w-10 text-center truncate" title={data.staff}>{data.staff}</div>
               </div>
             ))}
           </div>
@@ -339,7 +339,7 @@ export default function TehaiPage() {
                 <div className="w-4 text-center border-r border-gray-300 bg-blue-600 text-white font-bold">{data.id}</div>
                 <div className="w-9 text-center border-r border-gray-300 bg-lime-400">{data.status}</div>
                 <div className="w-[72px] text-center border-r border-gray-300 bg-lime-400">{data.type}</div>
-                <div className="w-22 border-r border-gray-300">{data.name}</div>
+                <div className="w-22 border-r border-gray-300 truncate" title={data.name}>{data.name}</div>
                 <div className="w-11 text-center border-r border-gray-300 text-blue-600 font-bold">{data.startTime}</div>
                 <div className="w-11 text-center border-r border-gray-300">{data.endTime}</div>
                 <div className="w-[36px] text-center border-r border-gray-300 bg-lime-400 text-[10px]">{data.statusLabel}</div>

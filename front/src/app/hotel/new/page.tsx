@@ -26,6 +26,8 @@ export default function HotelNewPage() {
   const [hotelImage, setHotelImage] = useState<'あり' | 'なし'>('あり');
   const [hasParking, setHasParking] = useState<'あり' | 'なし'>('なし');
   const [notes, setNotes] = useState<string>('');
+  const [dispatchCondition, setDispatchCondition] = useState<'可能' | '不可' | '条件付き'>('可能');
+  const [dispatchConditionNote, setDispatchConditionNote] = useState<string>('');
   const [isFirstGuidance, setIsFirstGuidance] = useState<boolean>(false);
 
   const handleSave = () => {
@@ -189,6 +191,33 @@ export default function HotelNewPage() {
                 onChange={(e) => setAddress(e.target.value)}
               />
             </div>
+
+            {/* 派遣条件 */}
+            <div>
+              <label className="block text-sm font-medium mb-1">派遣条件</label>
+              <select
+                className="w-full border rounded-md px-3 py-2 bg-white"
+                value={dispatchCondition}
+                onChange={(e) => setDispatchCondition(e.target.value as '可能' | '不可' | '条件付き')}
+              >
+                <option value="可能">可能</option>
+                <option value="不可">不可</option>
+                <option value="条件付き">条件付き</option>
+              </select>
+            </div>
+
+            {dispatchCondition !== '可能' && (
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {dispatchCondition === '不可' ? '不可理由' : '条件の詳細'}
+                </label>
+                <Input
+                  placeholder={dispatchCondition === '不可' ? '例: 独り入室不可・女性スタッフ入室に制限あり' : '例: 事前に部屋番号の確認が必要'}
+                  value={dispatchConditionNote}
+                  onChange={(e) => setDispatchConditionNote(e.target.value)}
+                />
+              </div>
+            )}
 
             {/* その他 */}
             <div>

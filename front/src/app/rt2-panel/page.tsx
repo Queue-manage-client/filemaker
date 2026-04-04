@@ -619,37 +619,35 @@ export default function RT2Panel() {
                   <span className="text-[9px] text-black">出勤</span>
                 </div>
                 {/* 名前 */}
-                <div className="w-[80px] border-r border-blue-200 flex items-center px-1">
+                <div className="w-[80px] border-r border-blue-200 flex items-center px-1 overflow-hidden relative group/name cursor-pointer">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-0.5">
-                      {cast.isNewbie && <Star className="w-3 h-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />}
-                      <span className="text-xs font-bold truncate">{cast.name}</span>
-                      <ChevronDown className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                      {cast.isNewbie && <Star className="w-2.5 h-2.5 text-yellow-500 fill-yellow-500 flex-shrink-0" />}
+                      <span className="text-[11px] font-bold truncate">{cast.name}</span>
+                      <ChevronDown className="w-2.5 h-2.5 text-gray-400 flex-shrink-0" />
                     </div>
-                    <div className="flex items-center gap-1 text-[9px]">
-                      <span className="text-black">{cast.remark}</span>
-                      {cast.achieve && <span className="text-red-600">{cast.achieve}</span>}
+                    <div className="flex items-center gap-0.5 text-[9px] leading-none">
+                      <span className="text-gray-600">{cast.remark}</span>
+                      <span className="text-pink-600">{cast.achieve}</span>
                     </div>
-                    {/* A10: 新人バッジ */}
+                  </div>
+                  {/* ホバーで詳細ツールチップ表示 */}
+                  <div className="hidden group-hover/name:block absolute left-0 top-full z-50 bg-white border border-gray-300 rounded shadow-lg p-2 min-w-[140px]">
+                    <div className="text-[11px] font-bold mb-1">{cast.name}</div>
+                    <div className="text-[10px] text-gray-600 mb-1">{cast.remark} {cast.achieve}</div>
+                    <div className="text-[10px] text-gray-700 mb-1">
+                      {cast.startTime}〜{cast.endTime}（幅{calcMinutes(cast.startTime, cast.endTime)}分）
+                    </div>
                     {cast.isNewbie && cast.newbieStartDate && (
-                      <div className="flex flex-col gap-0.5 mt-0.5">
-                        <span className="text-[8px] bg-green-500 text-white px-1 rounded leading-tight whitespace-nowrap">
-                          🔰新人{calcNewbieDays(cast.newbieStartDate)}日目
-                        </span>
-                        {cast.hasGuarantee && cast.guaranteeRemaining != null && cast.guaranteeRemaining > 0 && (
-                          <span className="text-[8px] bg-amber-100 text-amber-700 px-1 rounded leading-tight whitespace-nowrap">
-                            保証 ¥{cast.guaranteeRemaining.toLocaleString()}
-                          </span>
-                        )}
+                      <div className="text-[10px] bg-green-500 text-white px-1.5 py-0.5 rounded mb-1 whitespace-nowrap inline-block">
+                        🔰新人{calcNewbieDays(cast.newbieStartDate)}日目
                       </div>
                     )}
-                    {/* A11: 開始/終了時間と幅 */}
-                    <div className="flex items-center gap-0.5 mt-0.5 flex-wrap">
-                      <span className="text-[8px] text-gray-600 whitespace-nowrap">{cast.startTime}〜{cast.endTime}</span>
-                      <span className="text-[8px] bg-blue-100 text-blue-800 px-0.5 rounded whitespace-nowrap">
-                        幅{calcMinutes(cast.startTime, cast.endTime)}分
-                      </span>
-                    </div>
+                    {cast.hasGuarantee && cast.guaranteeRemaining != null && cast.guaranteeRemaining > 0 && (
+                      <div className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded whitespace-nowrap inline-block">
+                        保証 ¥{cast.guaranteeRemaining.toLocaleString()}
+                      </div>
+                    )}
                   </div>
                 </div>
                 {/* ￥ボタン */}
