@@ -97,7 +97,7 @@ export default function HostessAdminPage() {
   // ランクアップ候補用フィルター
   const [rankUpStoreFilter, setRankUpStoreFilter] = useState('all');
   const [rankUpManagerFilter, setRankUpManagerFilter] = useState('all');
-  const [rankUpSortField, setRankUpSortField] = useState<'avgMonthlyEarnings' | 'attendanceRate' | 'honShimeiCount'>('avgMonthlyEarnings');
+  const [rankUpSortField, setRankUpSortField] = useState<'avgMonthlyEarnings' | 'attendanceRate' | 'honShimeiCount' | 'consecutiveMonths'>('avgMonthlyEarnings');
   const [rankUpSortOrder, setRankUpSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // 当欠指導対象用フィルター
@@ -793,13 +793,13 @@ export default function HostessAdminPage() {
                               if (rankUpSortField === 'consecutiveMonths') {
                                 setRankUpSortOrder(prev => prev === 'desc' ? 'asc' : 'desc');
                               } else {
-                                setRankUpSortField('avgMonthlyEarnings');
+                                setRankUpSortField('consecutiveMonths');
                                 setRankUpSortOrder('desc');
                               }
                             }}
                           >
                             連続月数
-                            {rankUpSortField === 'avgMonthlyEarnings' && (rankUpSortOrder === 'desc' ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />)}
+                            {rankUpSortField === 'consecutiveMonths' && (rankUpSortOrder === 'desc' ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />)}
                           </button>
                         </TableHead>
                         <TableHead className="whitespace-nowrap">
