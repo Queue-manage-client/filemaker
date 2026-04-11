@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -89,6 +90,7 @@ function formatWorkTime(minutes: number): string {
 
 export default function StaffDetailPage({ params }: StaffDetailPageProps) {
   const { id } = React.use(params);
+  const router = useRouter();
 
   React.useEffect(() => {
     document.title = 'スタッフ詳細 - Dispatch Harmony Hub';
@@ -424,7 +426,7 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
       <div className="max-w-6xl mx-auto flex items-center justify-between mb-4">
         <h1 className="text-xl font-bold">スタッフ詳細</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => window.close()}>閉じる</Button>
+          <Button variant="outline" onClick={() => router.back()}>閉じる</Button>
           <Button onClick={handleSave} disabled={isSaving}>{isSaving ? '保存中...' : '保存'}</Button>
         </div>
       </div>

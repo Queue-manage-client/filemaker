@@ -561,14 +561,16 @@ export default function TimeBasedHostessAttendance() {
         <Card>
           <CardContent className="p-4">
             {/* タイトル行 */}
-            <div className="mb-4 pb-2 border-b border-gray-200">
-              <h3 className="text-lg font-bold text-gray-800 mb-2">時間区分別統計</h3>
-              <div className="grid grid-cols-5 gap-2 text-xs text-gray-600 font-medium">
-                <div>時間帯</div>
-                <div>人数計</div>
-                <div>実績(分)</div>
-                <div>目標時間(分)</div>
-                <div>目標との差</div>
+            <div className="mb-4">
+              <h3 className="text-lg font-bold text-gray-800 mb-3">時間区分別統計</h3>
+              <div className="bg-slate-700 text-white rounded-t-lg p-3">
+                <div className="grid grid-cols-5 gap-4 text-sm font-bold text-center">
+                  <div>時間帯</div>
+                  <div>人数計</div>
+                  <div>実値</div>
+                  <div>目標時間(分)</div>
+                  <div>目標との差</div>
+                </div>
               </div>
             </div>
 
@@ -587,17 +589,17 @@ export default function TimeBasedHostessAttendance() {
                     {stat.label}
                   </div>
 
-                  {/* 延人数計 */}
+                  {/* 人数計 */}
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-[10px] text-gray-600">延人数計</span>
-                    <span className="text-sm font-bold">{stat.hostessCount}</span>
+                    <span className="text-[10px] text-gray-600">人数計</span>
+                    <span className="text-sm font-bold">{stat.hostessCount}人</span>
                   </div>
 
-                  {/* 実績（分と%） */}
+                  {/* 実値（分と%） */}
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-[10px] text-gray-600">実績</span>
+                    <span className="text-[10px] text-gray-600">実値</span>
                     <div className="flex items-center gap-1">
-                      <span className="text-sm font-bold">{stat.totalMinutes.toLocaleString()}</span>
+                      <span className="text-sm font-bold">{stat.totalMinutes.toLocaleString()}分</span>
                       <span className="text-[10px] bg-blue-200 px-1 rounded">{stat.percentage}%</span>
                     </div>
                   </div>
@@ -633,17 +635,17 @@ export default function TimeBasedHostessAttendance() {
                   総計
                 </div>
 
-                {/* 延人数計 */}
+                {/* 人数計 */}
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-[10px] text-gray-600">延人数計</span>
-                  <span className="text-sm font-bold">{totalStats.totalHostessCount}</span>
+                  <span className="text-[10px] text-gray-600">人数計</span>
+                  <span className="text-sm font-bold">{totalStats.totalHostessCount}人</span>
                 </div>
 
-                {/* 実績（分と%） */}
+                {/* 実値（分と%） */}
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-[10px] text-gray-600">実績</span>
+                  <span className="text-[10px] text-gray-600">実値</span>
                   <div className="flex items-center gap-1">
-                    <span className="text-sm font-bold">{totalStats.totalMinutes.toLocaleString()}</span>
+                    <span className="text-sm font-bold">{totalStats.totalMinutes.toLocaleString()}分</span>
                     <span className="text-[10px] bg-green-200 px-1 rounded">100%</span>
                   </div>
                 </div>

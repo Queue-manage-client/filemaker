@@ -1,12 +1,18 @@
 // ホステス関連のサンプルデータ
 
-import { 
-  HostessLedger, 
-  HostessRanking, 
-  HostessManager, 
+import {
+  HostessLedger,
+  HostessRanking,
+  HostessManager,
   HostessScheduleData,
   TimeBasedHostessAttendance,
-  WeeklyHostessAttendance
+  WeeklyHostessAttendance,
+  HostessTransportInfo,
+  StoreCategoryStats,
+  ManagerHostessStats,
+  RankUpCandidate,
+  AbsenceGuidanceTarget,
+  HostessAttendanceSettings
 } from '@/types/hostess';
 
 // ホステス台帳サンプルデータ
@@ -563,6 +569,10 @@ export const sampleWeeklyAttendance: WeeklyHostessAttendance[] = [
     hostessId: "hostess001",
     hostessName: "美咲",
     category: "VIP",
+    storeId: "store001",
+    storeName: "銀座本店",
+    managerId: "manager001",
+    managerName: "鈴木太郎",
     dailyAttendance: {
       "2025-01-20": {
         startTime: "19:00",
@@ -629,7 +639,332 @@ export const sampleWeeklyAttendance: WeeklyHostessAttendance[] = [
       totalCustomers: 18,
       averageHoursPerDay: 6.9
     },
-    attendanceRate: 85.7
+    attendanceRate: 85.7,
+    registrationDate: "2024-01-15",
+    isNewbie: false
+  },
+  {
+    id: "weekly002",
+    weekStartDate: "2025-01-20",
+    weekEndDate: "2025-01-26",
+    hostessId: "hostess002",
+    hostessName: "さくら",
+    category: "Lady",
+    storeId: "store001",
+    storeName: "銀座本店",
+    managerId: "manager001",
+    managerName: "鈴木太郎",
+    dailyAttendance: {
+      "2025-01-20": { workHours: 0, status: "day_off", earnings: 0, customerCount: 0 },
+      "2025-01-21": { workHours: 0, status: "day_off", earnings: 0, customerCount: 0 },
+      "2025-01-22": { startTime: "19:00", endTime: "02:00", workHours: 7, status: "present", earnings: 32000, customerCount: 3 },
+      "2025-01-23": { startTime: "19:00", endTime: "02:00", workHours: 7, status: "present", earnings: 35000, customerCount: 3 },
+      "2025-01-24": { startTime: "19:00", endTime: "02:00", workHours: 7, status: "present", earnings: 28000, customerCount: 2 },
+      "2025-01-25": { startTime: "19:00", endTime: "02:00", workHours: 7, status: "present", earnings: 40000, customerCount: 4 },
+      "2025-01-26": { workHours: 0, status: "day_off", earnings: 0, customerCount: 0 }
+    },
+    weeklyTotals: { totalHours: 28, totalDays: 4, totalEarnings: 135000, totalCustomers: 12, averageHoursPerDay: 7 },
+    attendanceRate: 100,
+    registrationDate: "2024-03-20",
+    isNewbie: false
+  },
+  {
+    id: "weekly003",
+    weekStartDate: "2025-01-20",
+    weekEndDate: "2025-01-26",
+    hostessId: "hostess003",
+    hostessName: "まゆ",
+    category: "Girls",
+    storeId: "store002",
+    storeName: "新宿店",
+    managerId: "manager002",
+    managerName: "高橋花子",
+    dailyAttendance: {
+      "2025-01-20": { startTime: "18:00", endTime: "01:00", workHours: 7, status: "present", earnings: 25000, customerCount: 2 },
+      "2025-01-21": { startTime: "18:00", endTime: "01:00", workHours: 7, status: "present", earnings: 28000, customerCount: 3 },
+      "2025-01-22": { startTime: "18:00", endTime: "01:00", workHours: 7, status: "present", earnings: 30000, customerCount: 3 },
+      "2025-01-23": { workHours: 0, status: "absent", earnings: 0, customerCount: 0, notes: "当日欠勤" },
+      "2025-01-24": { startTime: "18:00", endTime: "01:00", workHours: 7, status: "present", earnings: 22000, customerCount: 2 },
+      "2025-01-25": { startTime: "18:00", endTime: "01:00", workHours: 7, status: "present", earnings: 35000, customerCount: 4 },
+      "2025-01-26": { workHours: 0, status: "day_off", earnings: 0, customerCount: 0 }
+    },
+    weeklyTotals: { totalHours: 35, totalDays: 5, totalEarnings: 140000, totalCustomers: 14, averageHoursPerDay: 7 },
+    attendanceRate: 83.3,
+    registrationDate: "2025-01-10",
+    isNewbie: true,
+    newbieDaysRemaining: 75
+  },
+  {
+    id: "weekly004",
+    weekStartDate: "2025-01-20",
+    weekEndDate: "2025-01-26",
+    hostessId: "hostess004",
+    hostessName: "あゆみ",
+    category: "Lady",
+    storeId: "store002",
+    storeName: "新宿店",
+    managerId: "manager002",
+    managerName: "高橋花子",
+    dailyAttendance: {
+      "2025-01-20": { startTime: "19:00", endTime: "02:00", workHours: 7, status: "present", earnings: 30000, customerCount: 3 },
+      "2025-01-21": { startTime: "19:00", endTime: "02:00", workHours: 7, status: "present", earnings: 32000, customerCount: 3 },
+      "2025-01-22": { workHours: 0, status: "day_off", earnings: 0, customerCount: 0 },
+      "2025-01-23": { startTime: "19:00", endTime: "02:00", workHours: 7, status: "present", earnings: 35000, customerCount: 4 },
+      "2025-01-24": { startTime: "19:00", endTime: "02:00", workHours: 7, status: "present", earnings: 28000, customerCount: 3 },
+      "2025-01-25": { startTime: "19:00", endTime: "02:00", workHours: 7, status: "present", earnings: 40000, customerCount: 4 },
+      "2025-01-26": { workHours: 0, status: "day_off", earnings: 0, customerCount: 0 }
+    },
+    weeklyTotals: { totalHours: 35, totalDays: 5, totalEarnings: 165000, totalCustomers: 17, averageHoursPerDay: 7 },
+    attendanceRate: 100,
+    registrationDate: "2024-06-15",
+    isNewbie: false
+  },
+  {
+    id: "weekly005",
+    weekStartDate: "2025-01-20",
+    weekEndDate: "2025-01-26",
+    hostessId: "hostess005",
+    hostessName: "ゆい",
+    category: "Girls",
+    storeId: "store003",
+    storeName: "渋谷店",
+    managerId: "manager001",
+    managerName: "鈴木太郎",
+    dailyAttendance: {
+      "2025-01-20": { startTime: "18:00", endTime: "01:00", workHours: 7, status: "present", earnings: 22000, customerCount: 2 },
+      "2025-01-21": { workHours: 0, status: "absent", earnings: 0, customerCount: 0, notes: "当日欠勤（連絡なし）" },
+      "2025-01-22": { workHours: 0, status: "absent", earnings: 0, customerCount: 0, notes: "当日欠勤" },
+      "2025-01-23": { startTime: "18:00", endTime: "01:00", workHours: 7, status: "present", earnings: 25000, customerCount: 2 },
+      "2025-01-24": { startTime: "18:00", endTime: "01:00", workHours: 7, status: "present", earnings: 28000, customerCount: 3 },
+      "2025-01-25": { workHours: 0, status: "absent", earnings: 0, customerCount: 0, notes: "当日欠勤" },
+      "2025-01-26": { workHours: 0, status: "day_off", earnings: 0, customerCount: 0 }
+    },
+    weeklyTotals: { totalHours: 21, totalDays: 3, totalEarnings: 75000, totalCustomers: 7, averageHoursPerDay: 7 },
+    attendanceRate: 50,
+    registrationDate: "2024-11-01",
+    isNewbie: false
   }
 ];
+
+// ホステス送迎情報サンプルデータ
+export const sampleHostessTransportInfo: HostessTransportInfo[] = [
+  {
+    id: "transport001",
+    hostessId: "hostess001",
+    primaryStoreId: "store001",
+    primaryStoreName: "銀座本店",
+    pickupLocation: "渋谷駅ハチ公口",
+    dropoffLocation: "渋谷駅ハチ公口",
+    pickupNotes: "ハチ公像前で待機",
+    dropoffNotes: ""
+  },
+  {
+    id: "transport002",
+    hostessId: "hostess002",
+    primaryStoreId: "store001",
+    primaryStoreName: "銀座本店",
+    pickupLocation: "六本木駅3番出口",
+    dropoffLocation: "六本木駅3番出口",
+    pickupNotes: "",
+    dropoffNotes: "深夜はタクシー使用可"
+  },
+  {
+    id: "transport003",
+    hostessId: "hostess003",
+    primaryStoreId: "store002",
+    primaryStoreName: "新宿店",
+    pickupLocation: "新宿駅南口",
+    dropoffLocation: "新宿駅南口",
+    pickupNotes: "バスタ新宿前",
+    dropoffNotes: ""
+  }
+];
+
+// 店舗別カテゴリー統計サンプルデータ
+export const sampleStoreCategoryStats: StoreCategoryStats[] = [
+  {
+    storeId: "store001",
+    storeName: "銀座本店",
+    categories: [
+      { categoryName: "VIP", totalCount: 5, activeCount: 4, attendanceRate: 92.5, avgEarnings: 420000 },
+      { categoryName: "Lady", totalCount: 8, activeCount: 7, attendanceRate: 88.0, avgEarnings: 350000 },
+      { categoryName: "Girls", totalCount: 12, activeCount: 10, attendanceRate: 78.5, avgEarnings: 280000 }
+    ],
+    totalHostesses: 25,
+    overallAttendanceRate: 85.3
+  },
+  {
+    storeId: "store002",
+    storeName: "新宿店",
+    categories: [
+      { categoryName: "VIP", totalCount: 3, activeCount: 3, attendanceRate: 95.0, avgEarnings: 400000 },
+      { categoryName: "Lady", totalCount: 10, activeCount: 8, attendanceRate: 82.5, avgEarnings: 320000 },
+      { categoryName: "Girls", totalCount: 15, activeCount: 12, attendanceRate: 72.0, avgEarnings: 250000 }
+    ],
+    totalHostesses: 28,
+    overallAttendanceRate: 79.2
+  },
+  {
+    storeId: "store003",
+    storeName: "渋谷店",
+    categories: [
+      { categoryName: "VIP", totalCount: 2, activeCount: 2, attendanceRate: 90.0, avgEarnings: 380000 },
+      { categoryName: "Lady", totalCount: 6, activeCount: 5, attendanceRate: 85.0, avgEarnings: 310000 },
+      { categoryName: "Girls", totalCount: 10, activeCount: 7, attendanceRate: 68.5, avgEarnings: 240000 }
+    ],
+    totalHostesses: 18,
+    overallAttendanceRate: 77.8
+  }
+];
+
+// 担当者別在籍統計サンプルデータ
+export const sampleManagerHostessStats: ManagerHostessStats[] = [
+  {
+    managerId: "manager001",
+    managerName: "鈴木太郎",
+    totalHostesses: 15,
+    hostessesOver2Months: 12,
+    hostessesUnder2Months: 3,
+    newbies: 2,
+    retentionRate: 92.5,
+    avgAttendanceRate: 88.0
+  },
+  {
+    managerId: "manager002",
+    managerName: "高橋花子",
+    totalHostesses: 10,
+    hostessesOver2Months: 7,
+    hostessesUnder2Months: 3,
+    newbies: 3,
+    retentionRate: 85.0,
+    avgAttendanceRate: 82.5
+  },
+  {
+    managerId: "manager003",
+    managerName: "佐藤次郎",
+    totalHostesses: 8,
+    hostessesOver2Months: 6,
+    hostessesUnder2Months: 2,
+    newbies: 1,
+    retentionRate: 88.0,
+    avgAttendanceRate: 85.0
+  }
+];
+
+// ランクアップ候補サンプルデータ
+export const sampleRankUpCandidates: RankUpCandidate[] = [
+  {
+    hostessId: "hostess002",
+    hostessName: "田中さくら",
+    stageName: "さくら",
+    currentRank: 5,
+    currentCategory: "Lady",
+    storeId: "store001",
+    storeName: "銀座本店",
+    managerId: "manager001",
+    managerName: "鈴木太郎",
+    consecutiveMonths: 3,
+    avgMonthlyEarnings: 380000,
+    avgCustomerSatisfaction: 4.5,
+    honShimeiCount: 31,
+    attendanceRate: 95.0,
+    reason: "3ヶ月連続目標達成、本指名数増加傾向"
+  },
+  {
+    hostessId: "hostess004",
+    hostessName: "高橋あゆみ",
+    stageName: "あゆみ",
+    currentRank: 8,
+    currentCategory: "Lady",
+    storeId: "store002",
+    storeName: "新宿店",
+    managerId: "manager002",
+    managerName: "高橋花子",
+    consecutiveMonths: 2,
+    avgMonthlyEarnings: 330000,
+    avgCustomerSatisfaction: 4.6,
+    honShimeiCount: 28,
+    attendanceRate: 100,
+    reason: "出勤率100%、顧客満足度高い"
+  },
+  {
+    hostessId: "hostess007",
+    hostessName: "渡辺ひな",
+    stageName: "ひな",
+    currentRank: 7,
+    currentCategory: "Lady",
+    storeId: "store003",
+    storeName: "渋谷店",
+    managerId: "manager001",
+    managerName: "鈴木太郎",
+    consecutiveMonths: 4,
+    avgMonthlyEarnings: 345000,
+    avgCustomerSatisfaction: 4.5,
+    honShimeiCount: 30,
+    attendanceRate: 92.0,
+    reason: "4ヶ月連続目標達成、延長率が高い"
+  }
+];
+
+// 当欠指導対象サンプルデータ
+export const sampleAbsenceGuidanceTargets: AbsenceGuidanceTarget[] = [
+  {
+    hostessId: "hostess005",
+    hostessName: "鈴木ゆい",
+    stageName: "ゆい",
+    storeId: "store003",
+    storeName: "渋谷店",
+    managerId: "manager001",
+    managerName: "鈴木太郎",
+    absenceCount: 5,
+    lastAbsenceDate: "2025-01-25",
+    totalScheduledDays: 20,
+    attendanceRate: 50.0,
+    consecutiveAbsences: 2,
+    warningLevel: "critical",
+    notes: "連絡なし欠勤が続いている。面談要"
+  },
+  {
+    hostessId: "hostess003",
+    hostessName: "佐藤まゆ",
+    stageName: "まゆ",
+    storeId: "store002",
+    storeName: "新宿店",
+    managerId: "manager002",
+    managerName: "高橋花子",
+    absenceCount: 3,
+    lastAbsenceDate: "2025-01-23",
+    totalScheduledDays: 22,
+    attendanceRate: 83.3,
+    consecutiveAbsences: 1,
+    warningLevel: "medium",
+    notes: "新人期間中。フォローが必要"
+  },
+  {
+    hostessId: "hostess008",
+    hostessName: "中村みき",
+    stageName: "みき",
+    storeId: "store003",
+    storeName: "渋谷店",
+    managerId: "manager002",
+    managerName: "高橋花子",
+    absenceCount: 4,
+    lastAbsenceDate: "2025-01-20",
+    totalScheduledDays: 19,
+    attendanceRate: 68.4,
+    consecutiveAbsences: 1,
+    warningLevel: "high",
+    notes: "体調不良が続いている様子"
+  }
+];
+
+// 出勤設定サンプルデータ
+export const sampleAttendanceSettings: HostessAttendanceSettings = {
+  businessStartTime: "09:00",
+  businessEndTime: "04:00",
+  minStartTime: "10:00",
+  maxEndTime: "02:00",
+  defaultPickupLocation: "店舗前",
+  defaultDropoffLocation: "店舗前"
+};
 

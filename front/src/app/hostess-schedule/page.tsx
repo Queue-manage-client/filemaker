@@ -4,7 +4,11 @@ import React, { useState, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Trash2, Save, X, Check, BarChart2, Tag } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Trash2, Save, X, Check, BarChart2, Tag, AlertTriangle, Settings, Clock, Shield, Lock, Unlock } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 // スケジュールデータの型定義
 interface ScheduleEntry {
@@ -27,6 +31,37 @@ interface HostessData {
   weeklyNote?: string;
   newbieStartDate?: string; // ISO date string, e.g. "2026-03-10" (新人ステータス開始日)
 }
+
+// 予約データの型定義（出勤時間変更時の警告用）
+interface ReservationData {
+  id: string;
+  hostessId: string;
+  date: string; // "YYYY-MM-DD"
+  startTime: string;
+  endTime: string;
+  customerName: string;
+  location: string;
+  status: 'confirmed' | 'pending';
+}
+
+// 出勤時間変更設定の型定義
+interface ScheduleChangeSettings {
+  allowFreeTimeChange: boolean; // 自由変更を許可
+  requireApproval: boolean; // 変更時に承認が必要
+  lockTimeBeforeReservation: boolean; // 予約がある場合に時間をロック
+  warningMinutesBuffer: number; // 予約との警告バッファ（分）
+}
+
+// サンプル予約データ
+const sampleReservations: ReservationData[] = [
+  { id: 'r1', hostessId: '1', date: '2026-03-27', startTime: '14:00', endTime: '16:00', customerName: '田中様', location: '銀座ホテル', status: 'confirmed' },
+  { id: 'r2', hostessId: '1', date: '2026-03-28', startTime: '18:00', endTime: '20:00', customerName: '山田様', location: '新宿ホテル', status: 'confirmed' },
+  { id: 'r3', hostessId: '2', date: '2026-03-27', startTime: '15:00', endTime: '17:00', customerName: '佐藤様', location: '渋谷ホテル', status: 'pending' },
+  { id: 'r4', hostessId: '3', date: '2026-03-27', startTime: '19:00', endTime: '21:00', customerName: '鈴木様', location: '品川ホテル', status: 'confirmed' },
+  { id: 'r5', hostessId: '5', date: '2026-03-28', startTime: '16:00', endTime: '18:00', customerName: '高橋様', location: '池袋ホテル', status: 'confirmed' },
+  { id: 'r6', hostessId: '6', date: '2026-03-29', startTime: '13:00', endTime: '15:00', customerName: '伊藤様', location: '上野ホテル', status: 'pending' },
+  { id: 'r7', hostessId: '9', date: '2026-03-27', startTime: '20:00', endTime: '22:00', customerName: '渡辺様', location: '六本木ホテル', status: 'confirmed' },
+];
 
 // 店舗データ（背景色付き）
 const sampleStores = [
@@ -190,6 +225,25 @@ export default function HostessSchedule() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [selectedForSave, setSelectedForSave] = useState<Set<string>>(new Set());
 
+  // 出勤時間変更警告用
+  const [reservations] = useState<ReservationData[]>(sampleReservations);
+  const [showTimeChangeWarning, setShowTimeChangeWarning] = useState(false);
+  const [pendingTimeChange, setPendingTimeChange] = useState<{
+    hostessId: string;
+    dateStr: string;
+    updates: Partial<ScheduleEntry>;
+    conflictingReservations: ReservationData[];
+  } | null>(null);
+
+  // 出勤時間変更設定
+  const [scheduleChangeSettings, setScheduleChangeSettings] = useState<ScheduleChangeSettings>({
+    allowFreeTimeChange: true,
+    requireApproval: false,
+    lockTimeBeforeReservation: true,
+    warningMinutesBuffer: 30,
+  });
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+
   // スクロール同期用のref
   const leftPanelRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
@@ -219,8 +273,80 @@ export default function HostessSchedule() {
     }
   }, []);
 
-  // スケジュールを更新
+  // 時間を分に変換（ヘルパー関数）
+  const parseTimeToMinutes = (time: string): number => {
+    if (!time) return 0;
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + (minutes || 0);
+  };
+
+  // 予約との衝突をチェック
+  const checkReservationConflicts = useCallback((
+    hostessId: string,
+    dateStr: string,
+    newStartTime: string,
+    newEndTime: string
+  ): ReservationData[] => {
+    if (!newStartTime || !newEndTime) return [];
+
+    const hostessReservations = reservations.filter(
+      r => r.hostessId === hostessId && r.date === dateStr
+    );
+
+    const buffer = scheduleChangeSettings.warningMinutesBuffer;
+    const conflicts: ReservationData[] = [];
+
+    const newStartMinutes = parseTimeToMinutes(newStartTime);
+    const newEndMinutes = parseTimeToMinutes(newEndTime);
+
+    hostessReservations.forEach(reservation => {
+      const resStartMinutes = parseTimeToMinutes(reservation.startTime);
+      const resEndMinutes = parseTimeToMinutes(reservation.endTime);
+
+      // 勤務時間外に予約がある場合は警告
+      // 予約開始時刻が勤務開始時刻より前の場合
+      // または予約終了時刻が勤務終了時刻より後の場合
+      // またはバッファ時間を考慮して警告
+      if (resStartMinutes < newStartMinutes + buffer || resEndMinutes > newEndMinutes - buffer) {
+        conflicts.push(reservation);
+      }
+    });
+
+    return conflicts;
+  }, [reservations, scheduleChangeSettings.warningMinutesBuffer]);
+
+  // スケジュールを更新（予約チェック付き）
   const updateSchedule = useCallback((hostessId: string, dateStr: string, updates: Partial<ScheduleEntry>) => {
+    // 時間変更の場合、予約との衝突をチェック
+    if ((updates.startTime !== undefined || updates.endTime !== undefined) &&
+        scheduleChangeSettings.lockTimeBeforeReservation) {
+      const currentSchedule = schedules.find(s => s.hostessId === hostessId && s.date === dateStr);
+      const newStartTime = updates.startTime ?? currentSchedule?.startTime ?? '';
+      const newEndTime = updates.endTime ?? currentSchedule?.endTime ?? '';
+
+      if (newStartTime && newEndTime) {
+        const conflicts = checkReservationConflicts(hostessId, dateStr, newStartTime, newEndTime);
+
+        if (conflicts.length > 0) {
+          // 警告ダイアログを表示
+          setPendingTimeChange({
+            hostessId,
+            dateStr,
+            updates,
+            conflictingReservations: conflicts,
+          });
+          setShowTimeChangeWarning(true);
+          return; // 変更を保留
+        }
+      }
+    }
+
+    // 変更を実行
+    applyScheduleUpdate(hostessId, dateStr, updates);
+  }, [schedules, scheduleChangeSettings.lockTimeBeforeReservation, checkReservationConflicts]);
+
+  // 実際のスケジュール更新処理
+  const applyScheduleUpdate = useCallback((hostessId: string, dateStr: string, updates: Partial<ScheduleEntry>) => {
     setSchedules(prev => {
       const index = prev.findIndex(s => s.hostessId === hostessId && s.date === dateStr);
       if (index >= 0) {
@@ -243,6 +369,25 @@ export default function HostessSchedule() {
     });
     // 変更されたホステスを追跡
     setChangedHostessIds(prev => new Set(prev).add(hostessId));
+  }, []);
+
+  // 警告を無視して変更を実行
+  const confirmTimeChangeWithWarning = useCallback(() => {
+    if (pendingTimeChange) {
+      applyScheduleUpdate(
+        pendingTimeChange.hostessId,
+        pendingTimeChange.dateStr,
+        pendingTimeChange.updates
+      );
+    }
+    setShowTimeChangeWarning(false);
+    setPendingTimeChange(null);
+  }, [pendingTimeChange, applyScheduleUpdate]);
+
+  // 警告でキャンセル
+  const cancelTimeChange = useCallback(() => {
+    setShowTimeChangeWarning(false);
+    setPendingTimeChange(null);
   }, []);
 
   // 変更があるホステスの情報を取得
@@ -696,6 +841,11 @@ export default function HostessSchedule() {
     ).length;
   };
 
+  // 特定のホステスと日付の予約を取得
+  const getReservationsForHostessDate = useCallback((hostessId: string, dateStr: string): ReservationData[] => {
+    return reservations.filter(r => r.hostessId === hostessId && r.date === dateStr);
+  }, [reservations]);
+
   // 時間をパーセントに変換（0-36時間対応）
   const timeToPercent = (time: string): number => {
     if (!time) return 0;
@@ -824,6 +974,16 @@ export default function HostessSchedule() {
                   {changedHostessIds.size}
                 </span>
               )}
+            </Button>
+
+            {/* 設定ボタン */}
+            <Button
+              variant="outline"
+              onClick={() => setShowSettingsModal(true)}
+              className="h-8 px-3 text-sm flex items-center gap-2"
+            >
+              <Settings className="w-4 h-4" />
+              時間変更設定
             </Button>
           </div>
         </div>
@@ -1063,6 +1223,7 @@ export default function HostessSchedule() {
                 const startTime = schedule?.startTime || '';
                 const endTime = schedule?.endTime || '';
                 const comment = schedule?.comment || '';
+                const todayReservations = getReservationsForHostessDate(hostess.id, todayStr);
 
                 return (
                   <div
@@ -1072,6 +1233,19 @@ export default function HostessSchedule() {
                   >
                     {/* 上段: 入力コントロール */}
                     <div className="h-[40px] flex items-center px-2 border-b border-gray-100">
+                      {/* 予約インジケーター */}
+                      {todayReservations.length > 0 && (
+                        <div className="flex items-center gap-1 mr-2 bg-amber-100 rounded px-2 py-1 flex-shrink-0">
+                          <AlertTriangle className="w-4 h-4 text-amber-600" />
+                          <span className="text-xs text-amber-700 font-medium">
+                            予約{todayReservations.length}件
+                          </span>
+                          <span className="text-xs text-amber-600">
+                            ({todayReservations.map(r => `${r.startTime}〜${r.endTime}`).join(', ')})
+                          </span>
+                        </div>
+                      )}
+
                       {/* 出勤/休みセレクト */}
                       <div className="relative flex-shrink-0">
                         <select
@@ -1101,14 +1275,22 @@ export default function HostessSchedule() {
                               type="time"
                               value={startTime}
                               onChange={(e) => updateSchedule(hostess.id, todayStr, { startTime: e.target.value })}
-                              className="h-7 px-2 text-sm border-none bg-transparent text-center"
+                              className={`h-7 px-2 text-sm text-center border rounded ${
+                                todayReservations.length > 0
+                                  ? 'border-amber-400 bg-amber-50'
+                                  : 'border-transparent bg-transparent'
+                              }`}
                             />
                             <span className="text-gray-500">〜</span>
                             <input
                               type="time"
                               value={endTime}
                               onChange={(e) => updateSchedule(hostess.id, todayStr, { endTime: e.target.value })}
-                              className="h-7 px-2 text-sm border-none bg-transparent text-center"
+                              className={`h-7 px-2 text-sm text-center border rounded ${
+                                todayReservations.length > 0
+                                  ? 'border-amber-400 bg-amber-50'
+                                  : 'border-transparent bg-transparent'
+                              }`}
                             />
                           </>
                         ) : (
@@ -1262,6 +1444,7 @@ export default function HostessSchedule() {
                       const startTime = schedule?.startTime || '';
                       const endTime = schedule?.endTime || '';
                       const comment = schedule?.comment || '';
+                      const dayReservations = getReservationsForHostessDate(hostess.id, day.dateStr);
 
                       return (
                         <div
@@ -1270,6 +1453,16 @@ export default function HostessSchedule() {
                             day.isWeekend ? (day.dayName === '土' ? 'bg-blue-50/30' : 'bg-red-50/30') : ''
                           }`}
                         >
+                          {/* 予約インジケーター */}
+                          {dayReservations.length > 0 && (
+                            <div className="flex items-center gap-1 mb-1 bg-amber-100 rounded px-1 py-0.5">
+                              <AlertTriangle className="w-3 h-3 text-amber-600" />
+                              <span className="text-[10px] text-amber-700 font-medium">
+                                予約{dayReservations.length}件
+                              </span>
+                            </div>
+                          )}
+
                           {/* 出勤/休みセレクト */}
                           <div className="relative mb-1">
                             <select
@@ -1298,14 +1491,22 @@ export default function HostessSchedule() {
                                 type="time"
                                 value={startTime}
                                 onChange={(e) => updateSchedule(hostess.id, day.dateStr, { startTime: e.target.value })}
-                                className="w-[70px] h-5 px-1 text-xs border border-gray-300 rounded"
+                                className={`w-[70px] h-5 px-1 text-xs border rounded ${
+                                  dayReservations.length > 0
+                                    ? 'border-amber-400 bg-amber-50'
+                                    : 'border-gray-300'
+                                }`}
                               />
                               <span className="text-xs text-gray-400">〜</span>
                               <input
                                 type="time"
                                 value={endTime}
                                 onChange={(e) => updateSchedule(hostess.id, day.dateStr, { endTime: e.target.value })}
-                                className="w-[70px] h-5 px-1 text-xs border border-gray-300 rounded"
+                                className={`w-[70px] h-5 px-1 text-xs border rounded ${
+                                  dayReservations.length > 0
+                                    ? 'border-amber-400 bg-amber-50'
+                                    : 'border-gray-300'
+                                }`}
                               />
                             </div>
                           )}
@@ -1384,6 +1585,7 @@ export default function HostessSchedule() {
                           const startTime = schedule?.startTime || '';
                           const endTime = schedule?.endTime || '';
                           const comment = schedule?.comment || '';
+                          const dayReservations = getReservationsForHostessDate(selectedHostess.id, day.dateStr);
 
                           return (
                             <div
@@ -1392,12 +1594,22 @@ export default function HostessSchedule() {
                                 day.isWeekend ? (day.dayName === '土' ? 'bg-blue-50/30' : 'bg-red-50/30') : 'bg-white'
                               }`}
                             >
-                              {/* 日付 */}
-                              <div className={`text-sm font-bold mb-2 ${
-                                day.dayName === '土' ? 'text-blue-600' :
-                                day.dayName === '日' ? 'text-red-600' : 'text-gray-700'
-                              }`}>
-                                {day.dayOfMonth}
+                              {/* 日付と予約インジケーター */}
+                              <div className="flex items-center justify-between mb-1">
+                                <div className={`text-sm font-bold ${
+                                  day.dayName === '土' ? 'text-blue-600' :
+                                  day.dayName === '日' ? 'text-red-600' : 'text-gray-700'
+                                }`}>
+                                  {day.dayOfMonth}
+                                </div>
+                                {dayReservations.length > 0 && (
+                                  <div className="flex items-center gap-0.5 bg-amber-100 rounded px-1">
+                                    <AlertTriangle className="w-3 h-3 text-amber-600" />
+                                    <span className="text-[9px] text-amber-700 font-medium">
+                                      {dayReservations.length}件
+                                    </span>
+                                  </div>
+                                )}
                               </div>
 
                               {/* 出勤/休みセレクト */}
@@ -1428,13 +1640,21 @@ export default function HostessSchedule() {
                                     type="time"
                                     value={startTime}
                                     onChange={(e) => updateSchedule(selectedHostess.id, day.dateStr, { startTime: e.target.value })}
-                                    className="w-full h-5 px-1 text-xs border border-gray-300 rounded"
+                                    className={`w-full h-5 px-1 text-xs border rounded ${
+                                      dayReservations.length > 0
+                                        ? 'border-amber-400 bg-amber-50'
+                                        : 'border-gray-300'
+                                    }`}
                                   />
                                   <input
                                     type="time"
                                     value={endTime}
                                     onChange={(e) => updateSchedule(selectedHostess.id, day.dateStr, { endTime: e.target.value })}
-                                    className="w-full h-5 px-1 text-xs border border-gray-300 rounded"
+                                    className={`w-full h-5 px-1 text-xs border rounded ${
+                                      dayReservations.length > 0
+                                        ? 'border-amber-400 bg-amber-50'
+                                        : 'border-gray-300'
+                                    }`}
                                   />
                                 </div>
                               )}
@@ -1632,6 +1852,222 @@ export default function HostessSchedule() {
           </div>
         </div>
       )}
+
+      {/* 出勤時間変更警告ダイアログ */}
+      <AlertDialog open={showTimeChangeWarning} onOpenChange={setShowTimeChangeWarning}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-amber-600">
+              <AlertTriangle className="w-5 h-5" />
+              予約との時間衝突警告
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p className="text-sm text-gray-700">
+                  出勤時間の変更により、以下の予約と時間が衝突する可能性があります。
+                </p>
+                {pendingTimeChange && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
+                    {pendingTimeChange.conflictingReservations.map((res) => {
+                      const hostess = hostesses.find(h => h.id === res.hostessId);
+                      return (
+                        <div key={res.id} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-amber-500" />
+                            <span className="font-medium">{res.customerName}</span>
+                          </div>
+                          <div className="text-gray-600">
+                            {res.startTime}〜{res.endTime}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-amber-200">
+                      予約バッファ時間: {scheduleChangeSettings.warningMinutesBuffer}分
+                    </div>
+                  </div>
+                )}
+                <p className="text-sm text-red-600 font-medium">
+                  それでも出勤時間を変更しますか？
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelTimeChange}>
+              キャンセル
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmTimeChangeWithWarning}
+              className="bg-amber-600 hover:bg-amber-700"
+            >
+              警告を確認して変更
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* 出勤時間変更設定モーダル */}
+      <Dialog open={showSettingsModal} onOpenChange={setShowSettingsModal}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings className="w-5 h-5 text-blue-600" />
+              出勤時間変更設定
+            </DialogTitle>
+            <DialogDescription>
+              ホステスの出勤時間変更に関する設定を行います。
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* 自由変更を許可 */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {scheduleChangeSettings.allowFreeTimeChange ? (
+                  <Unlock className="w-5 h-5 text-green-600" />
+                ) : (
+                  <Lock className="w-5 h-5 text-red-600" />
+                )}
+                <div>
+                  <Label htmlFor="allowFreeChange" className="text-sm font-medium">
+                    出勤時間の自由変更を許可
+                  </Label>
+                  <p className="text-xs text-gray-500">
+                    ホステスが自由に出勤時間を変更できます
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="allowFreeChange"
+                checked={scheduleChangeSettings.allowFreeTimeChange}
+                onCheckedChange={(checked) =>
+                  setScheduleChangeSettings(prev => ({ ...prev, allowFreeTimeChange: checked }))
+                }
+              />
+            </div>
+
+            {/* 承認が必要 */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Shield className="w-5 h-5 text-blue-600" />
+                <div>
+                  <Label htmlFor="requireApproval" className="text-sm font-medium">
+                    変更時に承認を必要とする
+                  </Label>
+                  <p className="text-xs text-gray-500">
+                    出勤時間変更時に管理者の承認が必要になります
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="requireApproval"
+                checked={scheduleChangeSettings.requireApproval}
+                onCheckedChange={(checked) =>
+                  setScheduleChangeSettings(prev => ({ ...prev, requireApproval: checked }))
+                }
+              />
+            </div>
+
+            {/* 予約前の時間ロック */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-600" />
+                <div>
+                  <Label htmlFor="lockTimeBeforeReservation" className="text-sm font-medium">
+                    予約衝突時に警告を表示
+                  </Label>
+                  <p className="text-xs text-gray-500">
+                    予約と出勤時間が衝突する場合に警告を表示します
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="lockTimeBeforeReservation"
+                checked={scheduleChangeSettings.lockTimeBeforeReservation}
+                onCheckedChange={(checked) =>
+                  setScheduleChangeSettings(prev => ({ ...prev, lockTimeBeforeReservation: checked }))
+                }
+              />
+            </div>
+
+            {/* 警告バッファ時間 */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <Clock className="w-5 h-5 text-gray-600" />
+                <Label className="text-sm font-medium">
+                  予約警告バッファ時間
+                </Label>
+              </div>
+              <div className="flex items-center gap-2 ml-8">
+                <input
+                  type="number"
+                  min="0"
+                  max="120"
+                  value={scheduleChangeSettings.warningMinutesBuffer}
+                  onChange={(e) =>
+                    setScheduleChangeSettings(prev => ({
+                      ...prev,
+                      warningMinutesBuffer: parseInt(e.target.value) || 0
+                    }))
+                  }
+                  className="w-20 h-8 px-2 text-sm border border-gray-300 rounded"
+                />
+                <span className="text-sm text-gray-600">分</span>
+                <span className="text-xs text-gray-400 ml-2">
+                  （予約の前後にこの時間分の余裕を確保）
+                </span>
+              </div>
+            </div>
+
+            {/* 設定状態のサマリー */}
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mt-4">
+              <h4 className="text-xs font-medium text-gray-700 mb-2">現在の設定状態</h4>
+              <div className="flex flex-wrap gap-2">
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  scheduleChangeSettings.allowFreeTimeChange
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                  {scheduleChangeSettings.allowFreeTimeChange ? '自由変更OK' : '自由変更不可'}
+                </span>
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  scheduleChangeSettings.requireApproval
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {scheduleChangeSettings.requireApproval ? '承認必要' : '承認不要'}
+                </span>
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  scheduleChangeSettings.lockTimeBeforeReservation
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {scheduleChangeSettings.lockTimeBeforeReservation ? '予約警告ON' : '予約警告OFF'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowSettingsModal(false)}
+            >
+              閉じる
+            </Button>
+            <Button
+              onClick={() => {
+                setShowSettingsModal(false);
+                alert('設定を保存しました');
+              }}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              設定を保存
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

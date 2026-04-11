@@ -7,7 +7,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, ArrowUpDown, Check, Star, X, Package } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, ArrowUpDown, Check, Star, X, Package, Sparkles, UserPlus, AlertTriangle, History, UserCheck } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import type { TodayCastData } from '@/types';
 import { sampleCastData } from '@/data/castSampleData';
 
@@ -144,6 +154,7 @@ export default function RT2Panel() {
   const [filterManager, setFilterManager] = useState<string>('all');
   const [filterWorkStyle, _setFilterWorkStyle] = useState<string>('all');
   const [filterStore, setFilterStore] = useState<string>('all');
+  const [filterNewbie, setFilterNewbie] = useState<boolean>(false); // 新人フィルター
 
   // 料金計算ポップオーバー状態
   const [pricePopoverCastId, setPricePopoverCastId] = useState<string | null>(null);
@@ -153,6 +164,12 @@ export default function RT2Panel() {
   const [specialNominationFee, setSpecialNominationFee] = useState<string>(''); // 特別指名料
   const [otherFees, setOtherFees] = useState<{ label: string; amount: string }[]>([]); // その他費用
   const [discounts, setDiscounts] = useState<{ type: string; amount: string }[]>([{ type: 'none', amount: '' }]); // 動的割引
+
+  // 本指名確認ダイアログ用の状態
+  const [showHonshimeiConfirm, setShowHonshimeiConfirm] = useState(false);
+  const [pendingHonshimei, setPendingHonshimei] = useState(false);
+  const [customerNameInput, setCustomerNameInput] = useState('');
+  const [honshimeiValidationError, setHonshimeiValidationError] = useState<string | null>(null);
 
   // 選択されたキャストを取得
   const selectedCastForPrice = useMemo(() => {
@@ -225,6 +242,67 @@ export default function RT2Panel() {
   const closePricePopover = useCallback(() => {
     setPricePopoverCastId(null);
     setPricePopoverPosition(null);
+    // 本指名確認関連もリセット
+    setShowHonshimeiConfirm(false);
+    setPendingHonshimei(false);
+    setCustomerNameInput('');
+    setHonshimeiValidationError(null);
+  }, []);
+
+  // 本指名確認済みのキャスト履歴（デモ用サンプルデータ）
+  const honshimeiHistoryData = useMemo(() => {
+    return new Map([
+      ['cast-1', ['山田様', '田中様']],
+      ['cast-2', ['佐藤様', '高橋様', '渡辺様']],
+      ['cast-3', ['鈴木様']],
+    ]);
+  }, []);
+
+  // 指名区分変更のハンドラー（本指名の場合は確認ダイアログを表示）
+  const handleNominationTypeChange = useCallback((value: 'free' | 'panel' | 'honshimei') => {
+    if (value === 'honshimei') {
+      // 本指名の場合は確認ダイアログを表示
+      setPendingHonshimei(true);
+      setShowHonshimeiConfirm(true);
+      setCustomerNameInput('');
+      setHonshimeiValidationError(null);
+    } else {
+      setNominationType(value);
+    }
+  }, []);
+
+  // 本指名確認
+  const confirmHonshimei = useCallback(() => {
+    if (!customerNameInput.trim()) {
+      setHonshimeiValidationError('顧客名を入力してください');
+      return;
+    }
+
+    // 過去の指名履歴をチェック
+    const castHistory = pricePopoverCastId ? honshimeiHistoryData.get(pricePopoverCastId) : [];
+    const hasHistory = castHistory?.some(name =>
+      name.includes(customerNameInput.trim()) || customerNameInput.trim().includes(name.replace('様', ''))
+    );
+
+    if (!hasHistory) {
+      setHonshimeiValidationError(`「${customerNameInput}」様の指名履歴が見つかりません。本指名として登録するには過去の利用履歴が必要です。`);
+      return;
+    }
+
+    // 確認完了
+    setNominationType('honshimei');
+    setShowHonshimeiConfirm(false);
+    setPendingHonshimei(false);
+    setCustomerNameInput('');
+    setHonshimeiValidationError(null);
+  }, [customerNameInput, pricePopoverCastId, honshimeiHistoryData]);
+
+  // 本指名キャンセル
+  const cancelHonshimei = useCallback(() => {
+    setShowHonshimeiConfirm(false);
+    setPendingHonshimei(false);
+    setCustomerNameInput('');
+    setHonshimeiValidationError(null);
   }, []);
 
   // フィルターオプションを動的に生成
@@ -281,6 +359,10 @@ export default function RT2Panel() {
     if (filterStore !== 'all') {
       filteredData = filteredData.filter(cast => cast.store === filterStore);
     }
+    // 新人フィルター
+    if (filterNewbie) {
+      filteredData = filteredData.filter(cast => cast.isNewbie);
+    }
 
     return filteredData.sort((a, b) => {
       let comparison = 0;
@@ -310,7 +392,19 @@ export default function RT2Panel() {
       return sortOrder === 'asc' ? comparison : -comparison;
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortKey, sortOrder, filterManager, filterWorkStyle, filterStore]);
+  }, [sortKey, sortOrder, filterManager, filterWorkStyle, filterStore, filterNewbie]);
+
+  // 新人カウント
+  const newbieCount = useMemo(() => {
+    return sampleCastData.filter(cast => cast.isNewbie).length;
+  }, []);
+
+  // 新人日数による分類（1週間以内、2週間以内、1ヶ月以内）
+  const getNewbieLevel = (days: number): 'new' | 'recent' | 'normal' => {
+    if (days <= 7) return 'new';
+    if (days <= 14) return 'recent';
+    return 'normal';
+  };
 
   const formatTime = (date: Date) => {
     const hours = String(date.getHours()).padStart(2, '0');
@@ -558,6 +652,24 @@ export default function RT2Panel() {
                   ))}
                 </SelectContent>
               </Select>
+              {/* 新人フィルターボタン */}
+              <Button
+                variant={filterNewbie ? "default" : "outline"}
+                className={`h-8 px-3 text-xs flex items-center gap-1 ${
+                  filterNewbie
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white border-0'
+                    : 'border-green-500 text-green-600 hover:bg-green-50'
+                }`}
+                onClick={() => setFilterNewbie(!filterNewbie)}
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                新人
+                <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                  filterNewbie ? 'bg-white/20 text-white' : 'bg-green-100 text-green-700'
+                }`}>
+                  {newbieCount}
+                </span>
+              </Button>
             </div>
           </div>
         </div>
@@ -592,10 +704,20 @@ export default function RT2Panel() {
             onScroll={handleLeftPanelScroll}
             style={{ scrollbarWidth: 'none', padding: '2px 0' }}
           >
-            {sortedData.map((cast) => (
+            {sortedData.map((cast) => {
+              const newbieDays = cast.isNewbie && cast.newbieStartDate ? calcNewbieDays(cast.newbieStartDate) : null;
+              const newbieLevel = newbieDays ? getNewbieLevel(newbieDays) : null;
+
+              return (
               <div
                 key={cast.id}
-                className="border border-blue-200 flex cursor-pointer hover:opacity-80"
+                className={`flex cursor-pointer hover:opacity-80 ${
+                  newbieLevel === 'new'
+                    ? 'border-2 border-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)] ring-1 ring-green-400'
+                    : newbieLevel === 'recent'
+                    ? 'border-2 border-green-300'
+                    : 'border border-blue-200'
+                }`}
                 style={{
                   height: `${ROW_HEIGHT}px`,
                   marginBottom: `${ROW_GAP}px`,
@@ -619,10 +741,25 @@ export default function RT2Panel() {
                   <span className="text-[9px] text-black">出勤</span>
                 </div>
                 {/* 名前 */}
-                <div className="w-[80px] border-r border-blue-200 flex items-center px-1 overflow-hidden relative group/name cursor-pointer">
+                <div className={`w-[80px] border-r border-blue-200 flex items-center px-1 overflow-hidden relative group/name cursor-pointer ${
+                  cast.isNewbie && cast.newbieStartDate && getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'new'
+                    ? 'animate-pulse'
+                    : ''
+                }`}>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-0.5">
-                      {cast.isNewbie && <Star className="w-2.5 h-2.5 text-yellow-500 fill-yellow-500 flex-shrink-0" />}
+                      {cast.isNewbie && cast.newbieStartDate && (
+                        <div className={`flex items-center gap-0.5 px-1 py-0.5 rounded text-[8px] font-bold flex-shrink-0 ${
+                          getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'new'
+                            ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-sm'
+                            : getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'recent'
+                            ? 'bg-green-100 text-green-700 border border-green-300'
+                            : 'bg-gray-100 text-green-600'
+                        }`}>
+                          <Sparkles className="w-2 h-2" />
+                          {calcNewbieDays(cast.newbieStartDate)}日
+                        </div>
+                      )}
                       <span className="text-[11px] font-bold truncate">{cast.name}</span>
                       <ChevronDown className="w-2.5 h-2.5 text-gray-400 flex-shrink-0" />
                     </div>
@@ -632,15 +769,28 @@ export default function RT2Panel() {
                     </div>
                   </div>
                   {/* ホバーで詳細ツールチップ表示 */}
-                  <div className="hidden group-hover/name:block absolute left-0 top-full z-50 bg-white border border-gray-300 rounded shadow-lg p-2 min-w-[140px]">
+                  <div className="hidden group-hover/name:block absolute left-0 top-full z-50 bg-white border border-gray-300 rounded shadow-lg p-2 min-w-[160px]">
                     <div className="text-[11px] font-bold mb-1">{cast.name}</div>
                     <div className="text-[10px] text-gray-600 mb-1">{cast.remark} {cast.achieve}</div>
                     <div className="text-[10px] text-gray-700 mb-1">
                       {cast.startTime}〜{cast.endTime}（幅{calcMinutes(cast.startTime, cast.endTime)}分）
                     </div>
                     {cast.isNewbie && cast.newbieStartDate && (
-                      <div className="text-[10px] bg-green-500 text-white px-1.5 py-0.5 rounded mb-1 whitespace-nowrap inline-block">
-                        🔰新人{calcNewbieDays(cast.newbieStartDate)}日目
+                      <div className={`text-[10px] px-2 py-1 rounded mb-1 whitespace-nowrap inline-flex items-center gap-1 ${
+                        getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'new'
+                          ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
+                          : getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'recent'
+                          ? 'bg-green-100 text-green-700 border border-green-300'
+                          : 'bg-green-50 text-green-600'
+                      }`}>
+                        <Sparkles className="w-3 h-3" />
+                        新人 {calcNewbieDays(cast.newbieStartDate)}日目
+                        {getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'new' && (
+                          <span className="ml-1 text-[8px] bg-white/20 px-1 rounded">1週間以内</span>
+                        )}
+                        {getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'recent' && (
+                          <span className="ml-1 text-[8px] bg-green-200 px-1 rounded">2週間以内</span>
+                        )}
                       </div>
                     )}
                     {cast.hasGuarantee && cast.guaranteeRemaining != null && cast.guaranteeRemaining > 0 && (
@@ -698,7 +848,8 @@ export default function RT2Panel() {
                   <span className="text-[9px] text-black truncate">{cast.special}</span>
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         </div>
 
@@ -757,15 +908,27 @@ export default function RT2Panel() {
               >
                 {sortedData.map((cast, index) => {
                   const reservations = getReservations(cast);
+                  const newbieDays = cast.isNewbie && cast.newbieStartDate ? calcNewbieDays(cast.newbieStartDate) : null;
+                  const newbieLevel = newbieDays ? getNewbieLevel(newbieDays) : null;
 
                   return (
                     <div
                       key={cast.id}
-                      className="relative border border-gray-200"
+                      className={`relative ${
+                        newbieLevel === 'new'
+                          ? 'border-2 border-green-500 ring-1 ring-green-400'
+                          : newbieLevel === 'recent'
+                          ? 'border-2 border-green-300'
+                          : 'border border-gray-200'
+                      }`}
                       style={{
                         height: `${ROW_HEIGHT}px`,
                         marginBottom: `${ROW_GAP}px`,
-                        backgroundColor: index % 2 === 0 ? '#f8fafc' : '#ffffff'
+                        backgroundColor: newbieLevel === 'new'
+                          ? 'rgba(220, 252, 231, 0.5)'
+                          : newbieLevel === 'recent'
+                          ? 'rgba(220, 252, 231, 0.3)'
+                          : index % 2 === 0 ? '#f8fafc' : '#ffffff'
                       }}
                     >
                       {/* 時間のグリッド線 */}
@@ -1058,20 +1221,35 @@ export default function RT2Panel() {
               {/* 指名区分 */}
               <div>
                 <Label className="text-xs font-bold text-gray-700 mb-1.5 block">指名区分</Label>
-                <RadioGroup value={nominationType} onValueChange={(v) => setNominationType(v as typeof nominationType)} className="flex gap-2">
-                  <div className="flex items-center">
+                <RadioGroup value={nominationType} onValueChange={handleNominationTypeChange} className="flex gap-2">
+                  <div className={`flex items-center px-2 py-1 rounded-md border ${nominationType === 'free' ? 'bg-blue-50 border-blue-300' : 'border-gray-200'}`}>
                     <RadioGroupItem value="free" id="price-free" className="w-3 h-3" />
                     <Label htmlFor="price-free" className="text-xs ml-1 cursor-pointer">フリー</Label>
                   </div>
-                  <div className="flex items-center">
+                  <div className={`flex items-center px-2 py-1 rounded-md border ${nominationType === 'panel' ? 'bg-purple-50 border-purple-300' : 'border-gray-200'}`}>
                     <RadioGroupItem value="panel" id="price-panel" className="w-3 h-3" />
                     <Label htmlFor="price-panel" className="text-xs ml-1 cursor-pointer">パネル</Label>
                   </div>
-                  <div className="flex items-center">
+                  <div className={`flex items-center px-2 py-1 rounded-md border ${nominationType === 'honshimei' ? 'bg-amber-50 border-amber-400' : 'border-gray-200'}`}>
                     <RadioGroupItem value="honshimei" id="price-hon" className="w-3 h-3" />
-                    <Label htmlFor="price-hon" className="text-xs ml-1 cursor-pointer">本指名</Label>
+                    <Label htmlFor="price-hon" className="text-xs ml-1 cursor-pointer flex items-center gap-1">
+                      <Star className="w-3 h-3 text-amber-500" />
+                      本指名
+                    </Label>
                   </div>
                 </RadioGroup>
+                {/* 本指名選択時の注意メッセージ */}
+                {nominationType === 'honshimei' && (
+                  <div className="mt-2 p-2 bg-amber-50 border border-amber-300 rounded-md">
+                    <div className="flex items-center gap-1 text-amber-700">
+                      <UserCheck className="w-4 h-4" />
+                      <span className="text-xs font-bold">本指名確認済み</span>
+                    </div>
+                    <p className="text-[10px] text-amber-600 mt-1">
+                      顧客の指名履歴を確認しました。本指名料金が適用されます。
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* 交通費（1000円単位） */}
@@ -1312,6 +1490,88 @@ export default function RT2Panel() {
           </div>
         </>
       )}
+
+      {/* 本指名確認ダイアログ */}
+      <AlertDialog open={showHonshimeiConfirm} onOpenChange={(open) => {
+        if (!open) cancelHonshimei();
+      }}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+              本指名の確認
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-4">
+                <div className="bg-amber-50 border border-amber-200 rounded-md p-3">
+                  <div className="flex items-center gap-2 text-amber-700 mb-2">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span className="font-bold text-sm">本指名間違い防止チェック</span>
+                  </div>
+                  <p className="text-xs text-amber-600">
+                    本指名は過去に利用実績のある顧客のみ適用可能です。
+                    顧客名を入力して履歴を確認してください。
+                  </p>
+                </div>
+
+                {selectedCastForPrice && (
+                  <div className="bg-gray-50 rounded-md p-3">
+                    <div className="text-sm">
+                      <span className="text-gray-500">対象キャスト:</span>
+                      <span className="ml-2 font-bold">{selectedCastForPrice.name}</span>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                      <History className="w-3 h-3" />
+                      過去の指名履歴を確認します
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="customer-name" className="text-sm font-bold">
+                    顧客名を入力
+                  </Label>
+                  <Input
+                    id="customer-name"
+                    type="text"
+                    value={customerNameInput}
+                    onChange={(e) => {
+                      setCustomerNameInput(e.target.value);
+                      setHonshimeiValidationError(null);
+                    }}
+                    placeholder="例: 山田、田中様"
+                    className="h-10"
+                  />
+                  {honshimeiValidationError && (
+                    <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded p-2">
+                      {honshimeiValidationError}
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-2">
+                  <p className="text-xs text-blue-700">
+                    <strong>ヒント:</strong> 顧客名は部分一致で検索されます。
+                    「山田」と入力すると「山田様」の履歴がマッチします。
+                  </p>
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelHonshimei}>
+              キャンセル
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmHonshimei}
+              className="bg-amber-500 hover:bg-amber-600"
+            >
+              <UserCheck className="w-4 h-4 mr-2" />
+              履歴を確認して本指名
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

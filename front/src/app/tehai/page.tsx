@@ -1,9 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, ShieldAlert, MapPinOff, UserX, X, Ban } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type InputMode = 'schedule' | 'email';
 
@@ -42,13 +58,66 @@ const initialAttendanceData: AttendanceEntry[] = [
   { id: 18, lastName: '伊藤', firstName: '大介', status: '出勤', startTime: '11:00', endTime: '19:00', type: 'スタッフ', selected: true, inputMode: 'schedule', confirmed: true },
 ];
 
-// 予約データ
-const reservationData = [
-  { id: '63691', name1: 'ダテ', name2: 'うるる', startTime: '1:10', type1: 'RH', type2: 'GIRL', endTime: '2:30', location: '南心', store: 'マイスクラブ(芸川', color: 'pink' },
-  { id: '28139', name1: 'タナカ', name2: 'ミノア', startTime: '1:30', type1: 'S', type2: 'LADY', endTime: '3:30', location: '南心', store: 'ファインガーデン', color: 'pink' },
+// NG顧客データ（ホステス→顧客NG & 顧客→ホステスNG）
+interface NGCustomerData {
+  customerId: string;
+  customerName: string;
+  hostessName: string;
+  ngType: 'hostess_to_customer' | 'customer_to_hostess' | 'both';
+  reason: string;
+  severity: 'critical' | 'high' | 'medium';
+  registeredDate: string;
+}
+
+const ngCustomerData: NGCustomerData[] = [
+  { customerId: '63691', customerName: 'ダテ', hostessName: 'うるる', ngType: 'hostess_to_customer', reason: '過去にトラブルあり', severity: 'critical', registeredDate: '2025-01-15' },
+  { customerId: '28139', customerName: 'タナカ', hostessName: 'かりん', ngType: 'customer_to_hostess', reason: '顧客からの拒否', severity: 'high', registeredDate: '2025-02-20' },
+  { customerId: '72851', customerName: 'サイトウ', hostessName: '美咲', ngType: 'both', reason: '相互拒否', severity: 'critical', registeredDate: '2025-03-10' },
+];
+
+// NGエリアデータ
+interface NGAreaData {
+  hostessName: string;
+  ngAreas: { areaName: string; reason: string; severity: 'critical' | 'high' | 'medium' }[];
+}
+
+const ngAreaData: NGAreaData[] = [
+  { hostessName: 'うるる', ngAreas: [
+    { areaName: '南心', reason: '自宅付近のため', severity: 'critical' },
+    { areaName: '烏丸今出川', reason: '個人的理由', severity: 'medium' },
+  ]},
+  { hostessName: 'さくら', ngAreas: [
+    { areaName: '京都', reason: '以前のトラブル', severity: 'high' },
+  ]},
+  { hostessName: '美咲', ngAreas: [
+    { areaName: '南心', reason: '知人在住エリア', severity: 'high' },
+  ]},
+];
+
+// 予約データ（NG情報付き）
+interface ReservationWithNG {
+  id: string;
+  name1: string;
+  name2: string;
+  startTime: string;
+  type1: string;
+  type2: string;
+  endTime: string;
+  location: string;
+  store: string;
+  color: string;
+  hasNGCustomer?: boolean;
+  hasNGArea?: boolean;
+  ngCustomerInfo?: NGCustomerData;
+  ngAreaInfo?: { areaName: string; reason: string; severity: 'critical' | 'high' | 'medium' };
+}
+
+const reservationData: ReservationWithNG[] = [
+  { id: '63691', name1: 'ダテ', name2: 'うるる', startTime: '1:10', type1: 'RH', type2: 'GIRL', endTime: '2:30', location: '南心', store: 'マイスクラブ(芸川', color: 'pink', hasNGCustomer: true, hasNGArea: true },
+  { id: '28139', name1: 'タナカ', name2: 'ミノア', startTime: '1:30', type1: 'S', type2: 'LADY', endTime: '3:30', location: '南心', store: 'ファインガーデン', color: 'pink', hasNGCustomer: true },
   { id: '61610', name1: 'ナガイ', name2: '知里', startTime: '2:00', type1: '確S', type2: 'Stand', endTime: '4:00', location: '南心', store: '', color: 'blue' },
-  { id: '45237', name1: 'ヤマダ', name2: 'さくら', startTime: '19:00', type1: 'S', type2: 'GIRL', endTime: '21:00', location: '京都', store: 'クラブエレガンス', color: 'pink' },
-  { id: '72851', name1: 'サイトウ', name2: '美咲', startTime: '20:30', type1: 'RH', type2: 'LADY', endTime: '22:30', location: '南心', store: 'ラウンジ桜', color: 'blue' },
+  { id: '45237', name1: 'ヤマダ', name2: 'さくら', startTime: '19:00', type1: 'S', type2: 'GIRL', endTime: '21:00', location: '京都', store: 'クラブエレガンス', color: 'pink', hasNGArea: true },
+  { id: '72851', name1: 'サイトウ', name2: '美咲', startTime: '20:30', type1: 'RH', type2: 'LADY', endTime: '22:30', location: '南心', store: 'ラウンジ桜', color: 'blue', hasNGCustomer: true, hasNGArea: true },
   { id: '89214', name1: 'イトウ', name2: 'あやの', startTime: '22:00', type1: '確S', type2: 'Stand', endTime: '0:00', location: '京都', store: 'ナイトクラブMIX', color: 'pink' },
 ];
 
@@ -163,6 +232,70 @@ export default function TehaiPage() {
 
   const [attendanceData, setAttendanceData] = useState<AttendanceEntry[]>(initialAttendanceData);
   const [attendanceInputMode, setAttendanceInputMode] = useState<InputMode>('schedule');
+
+  // NG警告関連の状態
+  const [selectedReservation, setSelectedReservation] = useState<ReservationWithNG | null>(null);
+  const [showNGWarningDialog, setShowNGWarningDialog] = useState(false);
+  const [showNGConfirmDialog, setShowNGConfirmDialog] = useState(false);
+
+  // 予約データにNG情報を付与
+  const reservationsWithNGInfo = useMemo(() => {
+    return reservationData.map(res => {
+      const ngCustomer = ngCustomerData.find(ng =>
+        ng.customerId === res.id || ng.customerName === res.name1
+      );
+      const ngArea = ngAreaData.find(ng =>
+        ng.hostessName === res.name2
+      )?.ngAreas.find(area => area.areaName === res.location);
+
+      return {
+        ...res,
+        hasNGCustomer: !!ngCustomer,
+        hasNGArea: !!ngArea,
+        ngCustomerInfo: ngCustomer,
+        ngAreaInfo: ngArea,
+      };
+    });
+  }, []);
+
+  // 予約クリック時のハンドラー
+  const handleReservationClick = (reservation: ReservationWithNG) => {
+    setSelectedReservation(reservation);
+    if (reservation.hasNGCustomer || reservation.hasNGArea) {
+      setShowNGWarningDialog(true);
+    }
+  };
+
+  // NG警告を無視して続行
+  const handleProceedWithNG = () => {
+    setShowNGWarningDialog(false);
+    setShowNGConfirmDialog(true);
+  };
+
+  // NG確認ダイアログで続行
+  const handleConfirmProceed = () => {
+    setShowNGConfirmDialog(false);
+    // ここで予約処理を続行
+    alert(`予約 ${selectedReservation?.id} の処理を続行します（NG警告を確認済み）`);
+    setSelectedReservation(null);
+  };
+
+  // 重要度に応じた色を取得
+  const getSeverityColor = (severity: 'critical' | 'high' | 'medium') => {
+    switch (severity) {
+      case 'critical': return 'bg-red-600 text-white';
+      case 'high': return 'bg-orange-500 text-white';
+      case 'medium': return 'bg-yellow-500 text-black';
+    }
+  };
+
+  const getSeverityLabel = (severity: 'critical' | 'high' | 'medium') => {
+    switch (severity) {
+      case 'critical': return '最重要';
+      case 'high': return '重要';
+      case 'medium': return '注意';
+    }
+  };
 
   const handleConfirm = (id: number) => {
     setAttendanceData((prev) =>
@@ -574,29 +707,74 @@ export default function TehaiPage() {
 
           {/* 2行目 - 2列目: 予約 */}
           <div className="col-span-2 border-t border-gray-400 border-r border-gray-400 bg-white flex flex-col">
-            <div className="bg-gray-300 text-black text-center py-0 text-[11px] border-b border-gray-400">
-              予約
+            <div className="bg-gray-300 text-black text-center py-0 text-[11px] border-b border-gray-400 flex items-center justify-center gap-2">
+              <span>予約</span>
+              {reservationsWithNGInfo.filter(r => r.hasNGCustomer || r.hasNGArea).length > 0 && (
+                <span className="flex items-center gap-1 px-2 py-0.5 bg-red-500 text-white rounded-full text-[9px] font-bold animate-pulse">
+                  <AlertTriangle className="w-3 h-3" />
+                  NG警告 {reservationsWithNGInfo.filter(r => r.hasNGCustomer || r.hasNGArea).length}件
+                </span>
+              )}
             </div>
             <div className="flex-1 overflow-y-scroll">
-              {reservationData.map((res, index) => (
-                <div
-                  key={index}
-                  className={`flex items-center text-[11px] border-b border-gray-300 ${
-                    res.color === 'pink' ? 'bg-pink-200' : 'bg-blue-200'
-                  }`}
-                  style={{ height: '20px' }}
-                >
-                  <div className="w-[34px] text-center">{res.id}</div>
-                  <div className="w-[38px] text-left">{res.name1}</div>
-                  <div className="w-[38px] text-left">{res.name2}</div>
-                  <div className="w-[26px] text-center">{res.startTime}</div>
-                  <div className="w-[26px] text-center">{res.type1}</div>
-                  <div className="w-[34px] text-center">{res.type2}</div>
-                  <div className="w-[26px] text-center">{res.endTime}</div>
-                  <div className="w-[28px] text-center">{res.location}</div>
-                  <div className="flex-1 text-left pl-1">{res.store}</div>
-                </div>
-              ))}
+              {reservationsWithNGInfo.map((res, index) => {
+                const hasNG = res.hasNGCustomer || res.hasNGArea;
+                const maxSeverity = res.ngCustomerInfo?.severity === 'critical' || res.ngAreaInfo?.severity === 'critical'
+                  ? 'critical'
+                  : res.ngCustomerInfo?.severity === 'high' || res.ngAreaInfo?.severity === 'high'
+                  ? 'high'
+                  : 'medium';
+
+                return (
+                  <div
+                    key={index}
+                    onClick={() => handleReservationClick(res)}
+                    className={`flex items-center text-[11px] border-b cursor-pointer hover:opacity-80 transition-all ${
+                      hasNG
+                        ? maxSeverity === 'critical'
+                          ? 'bg-red-200 border-red-400 border-2 animate-pulse'
+                          : maxSeverity === 'high'
+                          ? 'bg-orange-200 border-orange-400 border-2'
+                          : 'bg-yellow-100 border-yellow-400'
+                        : `border-gray-300 ${res.color === 'pink' ? 'bg-pink-200' : 'bg-blue-200'}`
+                    }`}
+                    style={{ height: hasNG ? '24px' : '20px' }}
+                  >
+                    {/* NG警告アイコン */}
+                    <div className="w-[20px] flex items-center justify-center">
+                      {hasNG && (
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${
+                          maxSeverity === 'critical' ? 'bg-red-600' : maxSeverity === 'high' ? 'bg-orange-500' : 'bg-yellow-500'
+                        }`}>
+                          <ShieldAlert className="w-3 h-3 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="w-[34px] text-center">{res.id}</div>
+                    <div className={`w-[38px] text-left ${res.hasNGCustomer ? 'font-bold text-red-700' : ''}`}>
+                      {res.name1}
+                      {res.hasNGCustomer && <UserX className="w-3 h-3 inline ml-0.5 text-red-600" />}
+                    </div>
+                    <div className="w-[38px] text-left">{res.name2}</div>
+                    <div className="w-[26px] text-center">{res.startTime}</div>
+                    <div className="w-[26px] text-center">{res.type1}</div>
+                    <div className="w-[34px] text-center">{res.type2}</div>
+                    <div className="w-[26px] text-center">{res.endTime}</div>
+                    <div className={`w-[28px] text-center ${res.hasNGArea ? 'font-bold text-red-700' : ''}`}>
+                      {res.location}
+                      {res.hasNGArea && <MapPinOff className="w-3 h-3 inline ml-0.5 text-red-600" />}
+                    </div>
+                    <div className="flex-1 text-left pl-1 flex items-center gap-1">
+                      {res.store}
+                      {hasNG && (
+                        <span className={`ml-auto mr-1 px-1 py-0.5 rounded text-[8px] font-bold ${getSeverityColor(maxSeverity)}`}>
+                          {res.hasNGCustomer && res.hasNGArea ? 'NG客+エリア' : res.hasNGCustomer ? 'NG客' : 'NGエリア'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -668,6 +846,187 @@ export default function TehaiPage() {
           </div>
         </div>
       </div>
+
+      {/* NG警告ダイアログ */}
+      <Dialog open={showNGWarningDialog} onOpenChange={setShowNGWarningDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <ShieldAlert className="w-6 h-6" />
+              NG警告
+            </DialogTitle>
+          </DialogHeader>
+          {selectedReservation && (
+            <div className="space-y-4">
+              {/* 予約情報 */}
+              <div className="bg-gray-100 p-3 rounded-lg">
+                <div className="text-sm font-bold mb-2">予約情報</div>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="text-gray-500">予約ID:</span> {selectedReservation.id}
+                  </div>
+                  <div>
+                    <span className="text-gray-500">時間:</span> {selectedReservation.startTime} - {selectedReservation.endTime}
+                  </div>
+                  <div>
+                    <span className="text-gray-500">顧客:</span> {selectedReservation.name1}
+                  </div>
+                  <div>
+                    <span className="text-gray-500">キャスト:</span> {selectedReservation.name2}
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-gray-500">場所:</span> {selectedReservation.location} - {selectedReservation.store}
+                  </div>
+                </div>
+              </div>
+
+              {/* NG客警告 */}
+              {selectedReservation.ngCustomerInfo && (
+                <div className={`p-3 rounded-lg border-2 ${
+                  selectedReservation.ngCustomerInfo.severity === 'critical'
+                    ? 'bg-red-50 border-red-500'
+                    : selectedReservation.ngCustomerInfo.severity === 'high'
+                    ? 'bg-orange-50 border-orange-500'
+                    : 'bg-yellow-50 border-yellow-500'
+                }`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <UserX className="w-5 h-5 text-red-600" />
+                    <span className="font-bold text-red-700">NG顧客警告</span>
+                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${getSeverityColor(selectedReservation.ngCustomerInfo.severity)}`}>
+                      {getSeverityLabel(selectedReservation.ngCustomerInfo.severity)}
+                    </span>
+                  </div>
+                  <div className="text-sm space-y-1">
+                    <div>
+                      <span className="text-gray-600">NGタイプ:</span>
+                      <span className="ml-2 font-medium">
+                        {selectedReservation.ngCustomerInfo.ngType === 'hostess_to_customer'
+                          ? 'ホステス→顧客NG'
+                          : selectedReservation.ngCustomerInfo.ngType === 'customer_to_hostess'
+                          ? '顧客→ホステスNG'
+                          : '相互NG'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">対象ホステス:</span>
+                      <span className="ml-2 font-medium">{selectedReservation.ngCustomerInfo.hostessName}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">理由:</span>
+                      <span className="ml-2 font-medium text-red-700">{selectedReservation.ngCustomerInfo.reason}</span>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      登録日: {selectedReservation.ngCustomerInfo.registeredDate}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* NGエリア警告 */}
+              {selectedReservation.ngAreaInfo && (
+                <div className={`p-3 rounded-lg border-2 ${
+                  selectedReservation.ngAreaInfo.severity === 'critical'
+                    ? 'bg-red-50 border-red-500'
+                    : selectedReservation.ngAreaInfo.severity === 'high'
+                    ? 'bg-orange-50 border-orange-500'
+                    : 'bg-yellow-50 border-yellow-500'
+                }`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPinOff className="w-5 h-5 text-red-600" />
+                    <span className="font-bold text-red-700">NGエリア警告</span>
+                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${getSeverityColor(selectedReservation.ngAreaInfo.severity)}`}>
+                      {getSeverityLabel(selectedReservation.ngAreaInfo.severity)}
+                    </span>
+                  </div>
+                  <div className="text-sm space-y-1">
+                    <div>
+                      <span className="text-gray-600">NGエリア:</span>
+                      <span className="ml-2 font-medium text-red-700">{selectedReservation.ngAreaInfo.areaName}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">理由:</span>
+                      <span className="ml-2 font-medium">{selectedReservation.ngAreaInfo.reason}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 警告メッセージ */}
+              <div className="bg-red-100 border border-red-300 rounded-lg p-3">
+                <div className="flex items-center gap-2 text-red-700 font-bold">
+                  <AlertTriangle className="w-5 h-5" />
+                  この予約にはNG条件が含まれています
+                </div>
+                <p className="text-sm text-red-600 mt-2">
+                  この予約を進める場合は、上記のNG条件を十分に確認してください。
+                  予期せぬトラブルが発生する可能性があります。
+                </p>
+              </div>
+
+              {/* アクションボタン */}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowNGWarningDialog(false);
+                    setSelectedReservation(null);
+                  }}
+                  className="flex-1"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  キャンセル
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleProceedWithNG}
+                  className="flex-1"
+                >
+                  <Ban className="w-4 h-4 mr-2" />
+                  警告を確認して続行
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* NG確認ダイアログ */}
+      <AlertDialog open={showNGConfirmDialog} onOpenChange={setShowNGConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+              <ShieldAlert className="w-6 h-6" />
+              最終確認
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p className="font-bold text-red-600">
+                この予約にはNG条件が含まれています。
+              </p>
+              <p>
+                本当にこの予約を進めてもよろしいですか？
+              </p>
+              <p className="text-sm text-gray-500">
+                この操作を行うと、NG警告を確認済みとして予約処理が続行されます。
+                発生したトラブルについては責任を負いかねます。
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setShowNGConfirmDialog(false);
+              setSelectedReservation(null);
+            }}>
+              やっぱりキャンセル
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmProceed}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              NG確認済みで続行
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

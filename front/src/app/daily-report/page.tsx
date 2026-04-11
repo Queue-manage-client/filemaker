@@ -471,17 +471,17 @@ export default function DailyReport() {
   };
 
   return (
-    <div className="w-[1920px] h-[1080px] relative bg-white font-['Inter'] flex flex-col text-xs">
+    <div className="w-[1920px] h-[1080px] relative bg-white font-['Inter'] flex flex-col text-[11px]">
       {/* ヘッダー - dispatch-panel-2dと同じスタイル */}
-      <div className="w-full h-[28px] bg-white">
+      <div className="w-full h-[32px] bg-white">
         <div className="flex items-center h-full px-1">
           {/* ダッシュボードに戻る - 左端 */}
           <Link href="/dashboard">
             <Button
               variant="outline"
-              className="h-6 px-2 text-[10px] flex items-center gap-1 border-[#323232]"
+              className="h-7 px-2 text-[11px] flex items-center gap-1 border-[#323232]"
             >
-              <ArrowLeft className="w-3 h-3" />
+              <ArrowLeft className="w-4 h-4" />
               戻る
             </Button>
           </Link>
@@ -495,10 +495,10 @@ export default function DailyReport() {
             <Button
               variant="outline"
               size="sm"
-              className="h-6 w-6 p-0 border-[#323232]"
+              className="h-7 w-6 p-0 border-[#323232]"
               onClick={goToPreviousDay}
             >
-              <ChevronLeft className="w-3 h-3" />
+              <ChevronLeft className="w-4 h-4" />
             </Button>
 
             {/* カレンダーから日付選択 (#80) */}
@@ -506,9 +506,9 @@ export default function DailyReport() {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="h-6 px-2 text-[10px] border-[#323232] flex items-center gap-1"
+                  className="h-7 px-2 text-[11px] border-[#323232] flex items-center gap-1"
                 >
-                  <CalendarIcon className="w-3 h-3" />
+                  <CalendarIcon className="w-4 h-4" />
                   {format(currentDate, 'yyyy年MM月dd日(E)', { locale: ja })}
                 </Button>
               </PopoverTrigger>
@@ -531,24 +531,24 @@ export default function DailyReport() {
             <Button
               variant="outline"
               size="sm"
-              className="h-6 w-6 p-0 border-[#323232] mr-1"
+              className="h-7 w-6 p-0 border-[#323232] mr-1"
               onClick={goToNextDay}
             >
-              <ChevronRight className="w-3 h-3" />
+              <ChevronRight className="w-4 h-4" />
             </Button>
 
             {/* 日報出力 */}
             <Button
-              className="h-6 px-2 text-[10px] bg-orange-400 hover:bg-orange-500 text-black border border-[#323232] flex items-center gap-1"
+              className="h-7 px-2 text-[11px] bg-orange-400 hover:bg-orange-500 text-black border border-[#323232] flex items-center gap-1"
               onClick={generateDailyReportPDF}
             >
-              <FileText className="w-3 h-3" />
+              <FileText className="w-4 h-4" />
               日報出力
             </Button>
 
             {/* 印刷 */}
             <Button
-              className="h-6 px-2 text-[10px] bg-lime-400 hover:bg-lime-500 text-black border border-[#323232]"
+              className="h-7 px-2 text-[11px] bg-lime-400 hover:bg-lime-500 text-black border border-[#323232]"
               onClick={() => {}}
             >
               印刷
@@ -556,7 +556,7 @@ export default function DailyReport() {
 
             {/* 売上確定 */}
             <Button
-              className="h-6 px-2 text-[10px] bg-cyan-300 hover:bg-cyan-400 text-black border border-[#323232]"
+              className="h-7 px-2 text-[11px] bg-cyan-300 hover:bg-cyan-400 text-black border border-[#323232]"
               onClick={() => {}}
             >
               売上確定
@@ -564,7 +564,7 @@ export default function DailyReport() {
 
             {/* 日報承認 */}
             <Button
-              className="h-6 px-2 text-[10px] bg-purple-400 hover:bg-purple-500 text-black border border-[#323232]"
+              className="h-7 px-2 text-[11px] bg-purple-400 hover:bg-purple-500 text-black border border-[#323232]"
               onClick={() => {}}
             >
               日報承認
@@ -573,7 +573,7 @@ export default function DailyReport() {
             {/* Menu */}
             <Button
               variant="outline"
-              className="h-6 px-2 text-[10px] border-[#323232]"
+              className="h-7 px-2 text-[11px] border-[#323232]"
               onClick={() => {}}
             >
               Menu
@@ -589,14 +589,14 @@ export default function DailyReport() {
         {salesListData.map((store, index) => (
           <div key={store.id} className="border-b border-[#323232]">
             {/* 店舗ヘッダー */}
-            <div className={`bg-cyan-200 h-4 flex items-center px-0.5 border-b border-[#323232] ${index === 0 ? 'border-t' : ''}`}>
-              <span className="text-[10px] font-bold text-black">{store.id} {store.label} 売上リスト</span>
-              <span className="text-[10px] font-bold ml-0.5 text-black">{store.storeName}</span>
+            <div className={`bg-cyan-200 h-5 flex items-center px-0.5 border-b border-[#323232] ${index === 0 ? 'border-t' : ''}`}>
+              <span className="text-[11px] font-bold text-black">{store.id} {store.label} 売上リスト</span>
+              <span className="text-[11px] font-bold ml-0.5 text-black">{store.storeName}</span>
             </div>
             {/* 売上詳細 - 3列レイアウト */}
-            <div className="text-[10px] bg-white">
+            <div className="text-[11px] bg-white">
               {/* 行1: 店売上現金計 / (空白) / 給料日計 */}
-              <div className="flex h-4 border-b border-[#323232]">
+              <div className="flex h-5 border-b border-[#323232]">
                 <div className="flex-1 px-0.5 flex items-center">店売上現金計</div>
                 <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.storeCashSales)}</div>
                 <div className="flex-1 px-0.5 flex items-center"></div>
@@ -604,7 +604,7 @@ export default function DailyReport() {
                 <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.payrollDaily)}</div>
               </div>
               {/* 行2: 店売上カード計 / 領収証発行 / 派遣回数日計 */}
-              <div className="flex h-4 border-b border-[#323232]">
+              <div className="flex h-5 border-b border-[#323232]">
                 <div className="flex-1 px-0.5 flex items-center">店売上カード計</div>
                 <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.storeCardSales)} {store.storeCardCount > 0 ? `${store.storeCardCount}件` : ''}</div>
                 <div className="flex-1 px-0.5 flex items-center">領収証発行</div>
@@ -613,7 +613,7 @@ export default function DailyReport() {
                 <div className="w-8 text-right px-0.5 flex items-center justify-end">{formatNumber(store.dispatchDaily)}</div>
               </div>
               {/* 行3: 店売上計 / 割引チケット利用 / 指名回数日計 */}
-              <div className="flex h-4 border-b border-[#323232]">
+              <div className="flex h-5 border-b border-[#323232]">
                 <div className="flex-1 px-0.5 flex items-center">店売上計</div>
                 <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.storeTotalSales)}</div>
                 <div className="flex-1 px-0.5 flex items-center">割引チケット</div>
@@ -622,7 +622,7 @@ export default function DailyReport() {
                 <div className="w-8 text-right px-0.5 flex items-center justify-end">{formatNumber(store.nominationDaily)}</div>
               </div>
               {/* 行4: カード請求計 / 未回収売掛金額計 / HF指名回数日計 */}
-              <div className="flex h-4 border-b border-[#323232]">
+              <div className="flex h-5 border-b border-[#323232]">
                 <div className="flex-1 px-0.5 flex items-center">カード請求計</div>
                 <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.cardBilling)}</div>
                 <div className="flex-1 px-0.5 flex items-center">未回収売掛</div>
@@ -631,14 +631,14 @@ export default function DailyReport() {
                 <div className="w-8 text-right px-0.5 flex items-center justify-end">{formatNumber(store.hfNominationDaily)}</div>
               </div>
               {/* 行5: カード加算金額計 / (空白) / (空白) */}
-              <div className="flex h-4 border-b border-[#323232]">
+              <div className="flex h-5 border-b border-[#323232]">
                 <div className="flex-1 px-0.5 flex items-center">カード加算金額計</div>
                 <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.cardAddFee)}</div>
                 <div className="flex-1 px-0.5 flex items-center"></div>
                 <div className="flex-1 px-0.5 flex items-center"></div>
               </div>
               {/* 行6: その他売上計 / 入金計 / 出金計 */}
-              <div className="flex h-4 border-b border-[#323232]">
+              <div className="flex h-5 border-b border-[#323232]">
                 <div className="flex-1 px-0.5 flex items-center">その他売上計</div>
                 <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.otherSales)}</div>
                 <div className="flex-1 px-0.5 flex items-center">入金計</div>
@@ -647,7 +647,7 @@ export default function DailyReport() {
                 <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.withdrawal)}</div>
               </div>
               {/* 行7: 現金収入計 / 報告金額 / 旧現金収入計 */}
-              <div className="flex h-4 border-b border-[#323232]">
+              <div className="flex h-5 border-b border-[#323232]">
                 <div className="flex-1 px-0.5 flex items-center">現金収入計</div>
                 <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.cashRevenue)}</div>
                 <div className="flex-1 px-0.5 flex items-center font-bold">報告金額</div>
@@ -656,7 +656,7 @@ export default function DailyReport() {
                 <div className="flex-1 text-right px-0.5 flex items-center justify-end">{formatNumber(store.oldCashRevenue)}</div>
               </div>
               {/* 行8: (空白) / (空白) / 旧報告金額 */}
-              <div className="flex h-4 bg-cyan-50">
+              <div className="flex h-5 bg-cyan-50">
                 <div className="flex-[2] px-0.5 flex items-center"></div>
                 <div className="flex-1 px-0.5 flex items-center"></div>
                 <div className="flex-1 px-0.5 flex items-center">旧報告金額</div>
@@ -670,38 +670,38 @@ export default function DailyReport() {
         {/* 中央左セクション - 集計結果 + 入出金 + クレジット */}
         <div className="h-full border-r border-[#323232] overflow-y-auto">
           {/* 集計結果 */}
-        <div className="text-[10px]">
-          <div className="flex h-4 border-t border-b border-[#323232]">
+        <div className="text-[11px]">
+          <div className="flex h-5 border-t border-b border-[#323232]">
             <div className="flex-1 px-px bg-zinc-200 border-r border-[#323232] flex items-center">現金収入計</div>
             <div className="w-18 text-right px-px border-r border-[#323232] flex items-center justify-end font-bold">860,655</div>
             <div className="flex-1 px-px bg-zinc-200 border-r border-[#323232] flex items-center">ドライバ回収額計</div>
             <div className="w-18 text-right px-px flex items-center justify-end font-bold">865,670</div>
           </div>
-          <div className="flex h-4 border-b border-[#323232]">
+          <div className="flex h-5 border-b border-[#323232]">
             <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center">店舗売上計カード</div>
             <div className="w-18 text-right px-px border-r border-[#323232] flex items-center justify-end">49,280</div>
             <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center">ホステス支払計</div>
             <div className="w-18 text-right px-px flex items-center justify-end">1,724,940</div>
           </div>
-          <div className="flex h-4 border-b border-[#323232]">
+          <div className="flex h-5 border-b border-[#323232]">
             <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center">売上計</div>
             <div className="w-18 text-right px-px border-r border-[#323232] flex items-center justify-end">909,600</div>
             <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center">入金計</div>
             <div className="w-18 text-right px-px flex items-center justify-end">402,455</div>
           </div>
-          <div className="flex h-4 border-b border-[#323232]">
+          <div className="flex h-5 border-b border-[#323232]">
             <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center">店舗売上計現金</div>
             <div className="w-18 text-right px-px border-r border-[#323232] flex items-center justify-end">892,070</div>
             <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center">出金計</div>
             <div className="w-18 text-right px-px flex items-center justify-end">128,733</div>
           </div>
-          <div className="flex h-4 border-b border-[#323232]">
+          <div className="flex h-5 border-b border-[#323232]">
             <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center"></div>
             <div className="w-18 text-right px-px border-r border-[#323232] flex items-center justify-end"></div>
             <div className="flex-1 px-px bg-zinc-100 border-r border-[#323232] flex items-center">収支計</div>
             <div className="w-18 text-right px-px flex items-center justify-end">273,722</div>
           </div>
-          <div className="flex h-4 border-b border-[#323232] bg-yellow-100">
+          <div className="flex h-5 border-b border-[#323232] bg-yellow-100">
             <div className="flex-1 px-px border-r border-[#323232] flex items-center"></div>
             <div className="w-18 text-right px-px border-r border-[#323232] flex items-center justify-end"></div>
             <div className="flex-1 px-px border-r border-[#323232] flex items-center font-bold">現金残高</div>
@@ -713,18 +713,18 @@ export default function DailyReport() {
         <div className="flex border-b border-[#323232]">
           {/* 入金 */}
           <div className="w-1/2 border-r border-[#323232]">
-            <div className="bg-red-300 h-4 flex items-center justify-center border-b border-[#323232]">
-              <span className="text-[10px] font-bold">入金</span>
+            <div className="bg-red-300 h-5 flex items-center justify-center border-b border-[#323232]">
+              <span className="text-[11px] font-bold">入金</span>
             </div>
             <div>
               {depositData.map((item, idx) => (
-                <div key={idx} className="flex text-[10px] border-b border-[#323232] h-4">
+                <div key={idx} className="flex text-[11px] border-b border-[#323232] h-5">
                   <div className="flex-1 px-0.5 border-r border-[#323232] flex items-center truncate">{`${item.category} ${item.name}`}</div>
                   <div className="w-16 flex-shrink-0 text-right px-0.5 flex items-center justify-end">{item.amount > 0 ? formatNumber(item.amount) : ''}</div>
                 </div>
               ))}
             </div>
-            <div className="flex text-[10px] bg-zinc-200 border-t border-[#323232] h-4">
+            <div className="flex text-[11px] bg-zinc-200 border-t border-[#323232] h-5">
               <div className="flex-1 px-0.5 font-bold flex items-center">入金計</div>
               <div className="w-16 flex-shrink-0 text-right px-0.5 flex items-center justify-end font-bold">402,455</div>
             </div>
@@ -732,12 +732,12 @@ export default function DailyReport() {
 
           {/* 出金 */}
           <div className="w-1/2">
-            <div className="bg-blue-300 h-4 flex items-center justify-between px-1 border-b border-[#323232]">
-              <span className="text-[10px] font-bold">出金</span>
+            <div className="bg-blue-300 h-5 flex items-center justify-between px-1 border-b border-[#323232]">
+              <span className="text-[11px] font-bold">出金</span>
               {/* 空伝票起票ボタン */}
               <div className="flex items-center gap-1">
                 <Select value={blankSlipCount} onValueChange={setBlankSlipCount}>
-                  <SelectTrigger className="h-4 w-12 text-[10px] bg-white border-gray-400">
+                  <SelectTrigger className="h-5 w-12 text-[11px] bg-white border-gray-400">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -750,7 +750,7 @@ export default function DailyReport() {
                 </Select>
                 <Button
                   size="sm"
-                  className="h-4 px-1 text-[10px] bg-yellow-400 hover:bg-yellow-500 text-black border border-gray-600"
+                  className="h-5 px-1 text-[11px] bg-yellow-400 hover:bg-yellow-500 text-black border border-gray-600"
                   onClick={createBlankSlips}
                 >
                   <Plus className="w-3 h-3 mr-1" />
@@ -761,19 +761,19 @@ export default function DailyReport() {
             <div>
               {/* 既存の出金データ */}
               {withdrawalData.map((item, idx) => (
-                <div key={idx} className="flex text-[10px] border-b border-[#323232] h-4">
+                <div key={idx} className="flex text-[11px] border-b border-[#323232] h-5">
                   <div className="flex-1 px-0.5 border-r border-[#323232] flex items-center truncate">{`${item.category} ${item.name}`}</div>
                   <div className="w-16 flex-shrink-0 text-right px-0.5 flex items-center justify-end">{item.amount > 0 ? formatNumber(item.amount) : ''}</div>
                 </div>
               ))}
               {/* 空伝票（編集可能） */}
               {blankSlips.map((slip, idx) => (
-                <div key={slip.id} className="flex text-[10px] border-b border-[#323232] h-4 bg-yellow-50">
+                <div key={slip.id} className="flex text-[11px] border-b border-[#323232] h-5 bg-yellow-50">
                   <div className="flex-1 px-1 py-0.5 border-r border-[#323232] flex items-center">
                     <input
                       type="text"
                       placeholder="項目を入力"
-                      className="w-full h-4 text-xs px-1 border border-gray-300 bg-white"
+                      className="w-full h-5 text-xs px-1 border border-gray-300 bg-white"
                       value={slip.category ? `${slip.category} ${slip.name}` : ''}
                       onChange={(e) => {
                         const newSlips = [...blankSlips];
@@ -786,7 +786,7 @@ export default function DailyReport() {
                     <input
                       type="number"
                       placeholder="0"
-                      className="w-full h-4 text-xs px-1 text-right border border-gray-300 bg-white"
+                      className="w-full h-5 text-xs px-1 text-right border border-gray-300 bg-white"
                       value={slip.amount || ''}
                       onChange={(e) => {
                         const newSlips = [...blankSlips];
@@ -798,7 +798,7 @@ export default function DailyReport() {
                 </div>
               ))}
             </div>
-            <div className="flex text-[10px] bg-zinc-200 border-t border-[#323232] h-4">
+            <div className="flex text-[11px] bg-zinc-200 border-t border-[#323232] h-5">
               <div className="flex-1 px-0.5 font-bold flex items-center">出金計</div>
               <div className="w-16 flex-shrink-0 text-right px-0.5 flex items-center justify-end font-bold">128,733</div>
             </div>
@@ -807,17 +807,17 @@ export default function DailyReport() {
 
         {/* クレジットカード - 簡易表示 (#72) */}
           <div className="border-b border-[#323232]">
-            <div className="bg-purple-300 h-4 flex items-center justify-between p-0.5 border-b border-[#323232]">
-              <span className="text-[10px] font-bold">クレジットカード</span>
+            <div className="bg-purple-300 h-5 flex items-center justify-between p-0.5 border-b border-[#323232]">
+              <span className="text-[11px] font-bold">クレジットカード</span>
               <button
                 onClick={() => setShowCreditDetail(prev => !prev)}
-                className="text-[9px] px-1 py-0 bg-white border border-purple-500 rounded text-purple-700 hover:bg-purple-50 leading-tight"
+                className="text-[10px] px-1 py-0 bg-white border border-purple-500 rounded text-purple-700 hover:bg-purple-50 leading-tight"
               >
                 {showCreditDetail ? '簡易表示' : '詳細表示'}
               </button>
             </div>
             {/* ヘッダー */}
-            <div className="flex text-[10px] bg-zinc-100 border-b border-[#323232] h-4">
+            <div className="flex text-[11px] bg-zinc-100 border-b border-[#323232] h-5">
               <div className="w-12 px-px border-r border-[#323232] flex items-center justify-center">店舗名</div>
               <div className="w-20 px-px border-r border-[#323232] flex items-center justify-center">コース</div>
               <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-center">キャスト名</div>
@@ -832,7 +832,7 @@ export default function DailyReport() {
               )}
             </div>
             {creditCardData.map((card, idx) => (
-              <div key={idx} className="flex text-[10px] border-b border-[#323232] h-4 hover:bg-purple-50">
+              <div key={idx} className="flex text-[11px] border-b border-[#323232] h-5 hover:bg-purple-50">
                 <div className="w-12 px-px border-r border-[#323232] flex items-center truncate">{card.store}</div>
                 <div className="w-20 px-px border-r border-[#323232] flex items-center truncate">{card.course}</div>
                 <div className="flex-1 px-px border-r border-[#323232] flex items-center truncate">{card.hostessName}</div>
@@ -851,11 +851,11 @@ export default function DailyReport() {
 
           {/* 本日のキャスト状況 */}
           <div className="border-b border-[#323232]">
-            <div className="bg-red-400 h-4 flex items-center p-0.5 border-b border-[#323232]">
-              <span className="text-[10px] font-bold text-white">本日のキャスト状況</span>
+            <div className="bg-red-400 h-5 flex items-center p-0.5 border-b border-[#323232]">
+              <span className="text-[11px] font-bold text-white">本日のキャスト状況</span>
             </div>
             {/* 無派遣 */}
-            <div className="flex text-[10px] border-b border-[#323232] h-4">
+            <div className="flex text-[11px] border-b border-[#323232] h-5">
               <div className="w-14 px-1 bg-red-100 border-r border-[#323232] font-semibold flex items-center">無派遣</div>
               <div className="w-6 px-px bg-red-50 border-r border-[#323232] text-center font-bold flex items-center justify-center">{dailyReportExportData.todayNoDispatchCasts.length}名</div>
               <div className="flex-1 px-1 flex items-center truncate">
@@ -866,7 +866,7 @@ export default function DailyReport() {
               </div>
             </div>
             {/* 当欠 */}
-            <div className="flex text-[10px] border-b border-[#323232] h-4">
+            <div className="flex text-[11px] border-b border-[#323232] h-5">
               <div className="w-14 px-1 bg-orange-100 border-r border-[#323232] font-semibold flex items-center">当欠</div>
               <div className="w-6 px-px bg-orange-50 border-r border-[#323232] text-center font-bold flex items-center justify-center">{dailyReportExportData.todayAbsentCasts.length}名</div>
               <div className="flex-1 px-1 flex items-center truncate">
@@ -877,7 +877,7 @@ export default function DailyReport() {
               </div>
             </div>
             {/* 無欠 */}
-            <div className="flex text-[10px] h-4">
+            <div className="flex text-[11px] h-5">
               <div className="w-14 px-1 bg-yellow-100 border-r border-[#323232] font-semibold flex items-center">無欠</div>
               <div className="w-6 px-px bg-yellow-50 border-r border-[#323232] text-center font-bold flex items-center justify-center">{dailyReportExportData.todayNoAbsentCasts.length}名</div>
               <div className="flex-1 px-1 flex items-center truncate">
@@ -891,12 +891,12 @@ export default function DailyReport() {
 
           {/* 面接予定 */}
           <div className="border-b border-[#323232]">
-            <div className="bg-green-500 h-4 flex items-center justify-between p-0.5 border-b border-[#323232]">
-              <span className="text-[10px] font-bold text-white">面接予定</span>
-              <span className="text-[10px] text-white mr-1">{dailyReportExportData.interviewSchedules.length}件</span>
+            <div className="bg-green-500 h-5 flex items-center justify-between p-0.5 border-b border-[#323232]">
+              <span className="text-[11px] font-bold text-white">面接予定</span>
+              <span className="text-[11px] text-white mr-1">{dailyReportExportData.interviewSchedules.length}件</span>
             </div>
             {/* ヘッダー */}
-            <div className="flex text-[10px] bg-green-100 border-b border-[#323232] h-4 font-semibold">
+            <div className="flex text-[11px] bg-green-100 border-b border-[#323232] h-5 font-semibold">
               <div className="w-12 px-px border-r border-[#323232] flex items-center justify-center">時間</div>
               <div className="flex-1 px-px border-r border-[#323232] flex items-center">面接者</div>
               <div className="w-16 px-px border-r border-[#323232] flex items-center justify-center">区分</div>
@@ -904,7 +904,7 @@ export default function DailyReport() {
             </div>
             {dailyReportExportData.interviewSchedules.length > 0 ? (
               dailyReportExportData.interviewSchedules.map((interview, idx) => (
-                <div key={idx} className="flex text-[10px] border-b border-[#323232] h-4 hover:bg-green-50">
+                <div key={idx} className="flex text-[11px] border-b border-[#323232] h-5 hover:bg-green-50">
                   <div className="w-12 px-px border-r border-[#323232] flex items-center justify-center font-bold">{interview.time}</div>
                   <div className="flex-1 px-px border-r border-[#323232] flex items-center truncate">{interview.name}</div>
                   <div className={`w-16 px-px border-r border-[#323232] flex items-center justify-center font-semibold ${
@@ -914,7 +914,7 @@ export default function DailyReport() {
                 </div>
               ))
             ) : (
-              <div className="flex text-[10px] h-4 items-center justify-center text-gray-400">
+              <div className="flex text-[11px] h-5 items-center justify-center text-gray-400">
                 面接予定なし
               </div>
             )}
@@ -927,7 +927,7 @@ export default function DailyReport() {
           <div className="flex border-t border-b border-[#323232]">
             <button
               onClick={() => setActiveTab('staff')}
-              className={`flex-1 h-4 flex items-center justify-center text-[10px] font-bold border-r border-[#323232] ${
+              className={`flex-1 h-5 flex items-center justify-center text-[11px] font-bold border-r border-[#323232] ${
                 activeTab === 'staff' ? 'bg-purple-400 text-white' : 'bg-purple-200 text-black'
               }`}
             >
@@ -935,7 +935,7 @@ export default function DailyReport() {
             </button>
             <button
               onClick={() => setActiveTab('hostess')}
-              className={`flex-1 h-4 flex items-center justify-center text-[10px] font-bold ${
+              className={`flex-1 h-5 flex items-center justify-center text-[11px] font-bold ${
                 activeTab === 'hostess' ? 'bg-cyan-400 text-white' : 'bg-cyan-200 text-black'
               }`}
             >
@@ -947,7 +947,7 @@ export default function DailyReport() {
           {activeTab === 'staff' && (
             <>
               {/* スタッフヘッダー - 画像に基づく列構成 */}
-              <div className="flex text-[10px] bg-zinc-100 border-b border-[#323232] h-4">
+              <div className="flex text-[11px] bg-zinc-100 border-b border-[#323232] h-5">
                 <div className="w-7 px-px border-r border-[#323232] flex items-center justify-center"></div>
                 <div className="w-14 px-px border-r border-[#323232] flex items-center justify-center"></div>
                 <div className="flex-[2] px-px border-r border-[#323232] flex items-center justify-center"></div>
@@ -958,9 +958,6 @@ export default function DailyReport() {
                 <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-center">高速等</div>
                 <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-center">調整額</div>
                 <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-center">差引清算額</div>
-                <div className="w-12 px-px border-r border-[#323232] flex items-center justify-center bg-green-100">備品</div>
-                <div className="w-14 px-px border-r border-[#323232] flex items-center justify-center">割引利用カード</div>
-                <div className="w-16 px-px border-r border-[#323232] flex items-center justify-center">管理者確認</div>
                 <div className="w-8 px-px flex items-center justify-center"></div>
               </div>
               {/* スタッフリスト */}
@@ -980,7 +977,7 @@ export default function DailyReport() {
                   return (
                     <div
                       key={staff.id}
-                      className={`flex text-[10px] border-b border-[#323232] h-4 ${rowBgClass}`}
+                      className={`flex text-[11px] border-b border-[#323232] h-5 ${rowBgClass}`}
                     >
                       <div className="w-7 px-px border-r border-[#323232] flex items-center justify-center bg-yellow-100">{staff.id}</div>
                       <div className={`w-14 px-px border-r border-[#323232] flex items-center justify-center ${staff.type === '社員' ? 'bg-blue-200' : 'bg-pink-200'}`}>
@@ -996,9 +993,6 @@ export default function DailyReport() {
                       <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.express)}</div>
                       <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.adjust)}</div>
                       <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-end">{netDisplay}</div>
-                      <div className="w-12 px-px border-r border-[#323232] flex items-center justify-center bg-green-50">{staff.equip || ''}</div>
-                      <div className="w-14 px-px border-r border-[#323232] flex items-center justify-center">{staff.discountCard || ''}</div>
-                      <div className="w-16 px-px border-r border-[#323232] flex items-center justify-center">{staff.managerCheck || ''}</div>
                       <div className="w-8 px-px flex items-center justify-center">
                         {staff.settlementStatus === 'completed' ? '済' : ''}
                       </div>
@@ -1013,7 +1007,7 @@ export default function DailyReport() {
           {activeTab === 'hostess' && (
             <>
               {/* ホステスヘッダー */}
-              <div className="flex text-[10px] bg-zinc-100 border-b border-[#323232] h-4">
+              <div className="flex text-[11px] bg-zinc-100 border-b border-[#323232] h-5">
                 <div className="w-5 px-px border-r border-[#323232] flex items-center justify-center">番</div>
                 <div className="w-16 px-px border-r border-[#323232] flex items-center justify-center">送り場所</div>
                 <div className="w-14 px-px border-r border-[#323232] flex items-center justify-center">交通費</div>
@@ -1040,7 +1034,7 @@ export default function DailyReport() {
                   return (
                     <div
                       key={staff.id}
-                      className={`flex text-[10px] border-b border-[#323232] h-4 ${rowBgClass} cursor-pointer hover:brightness-95`}
+                      className={`flex text-[11px] border-b border-[#323232] h-5 ${rowBgClass} cursor-pointer hover:brightness-95`}
                     >
                       <div className="w-5 px-px border-r border-[#323232] flex items-center justify-center bg-blue-100">{staff.rowNum}</div>
                       <div className="w-16 px-px border-r border-[#323232] flex items-center truncate">{staff.sendLocation}</div>
@@ -1049,13 +1043,13 @@ export default function DailyReport() {
                       <div className="w-14 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.hostessDeposit)}</div>
                       <div className="w-16 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.paymentAmount)}</div>
                       <div className="w-10 px-px border-r border-[#323232] flex items-center justify-center">
-                        <input type="checkbox" className="w-3 h-3" checked={staff.isPaid} readOnly />
+                        <input type="checkbox" className="w-4 h-4" checked={staff.isPaid} readOnly />
                       </div>
                       <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.collection)}</div>
                       <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.salary)}</div>
                       <div className="flex-1 px-px border-r border-[#323232] flex items-center justify-end">{formatNumber(staff.adjust)}</div>
                       <div className="w-10 px-px flex items-center justify-center">
-                        <input type="checkbox" className="w-3 h-3" checked={staff.approval} readOnly />
+                        <input type="checkbox" className="w-4 h-4" checked={staff.approval} readOnly />
                       </div>
                     </div>
                   );

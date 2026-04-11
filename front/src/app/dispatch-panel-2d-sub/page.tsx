@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Download, Package } from 'lucide-react';
 import { scheduledHostessSampleData } from '@/data/newRt2SampleData';
 import { sendHostessSampleData } from '@/data/sendHostessSampleData';
@@ -46,31 +47,31 @@ const driverCardData: DriverCard = {
 };
 
 // DriverCardコンポーネント
-function DriverCardBlock({ card }: { card: DriverCard }) {
+function DriverCardBlock({ card, isMobile = false }: { card: DriverCard; isMobile?: boolean }) {
   return (
-    <div className="border border-zinc-400 flex flex-col" style={{ minHeight: '140px', backgroundColor: '#e8e8e8' }}>
+    <div className="border border-zinc-400 flex flex-col" style={{ minHeight: isMobile ? '120px' : '140px', backgroundColor: '#e8e8e8' }}>
       {/* ヘッダー行: 名前 | 時間 | 時間 */}
       <div className="flex border-b border-zinc-400">
         <div
-          className="flex-1 text-black text-[11px] font-bold px-1 py-0.5 text-center border-r border-zinc-500"
+          className={`flex-1 text-black ${isMobile ? 'text-[12px]' : 'text-[11px]'} font-bold px-1 py-0.5 text-center border-r border-zinc-500`}
           style={{ backgroundColor: '#ffffcc' }}
         >
           {card.driverName}
         </div>
-        <div className="w-[40px] text-[11px] text-center py-0.5 border-r border-zinc-400" style={{ backgroundColor: '#ffffcc' }}>
+        <div className={`w-[40px] ${isMobile ? 'text-[12px]' : 'text-[11px]'} text-center py-0.5 border-r border-zinc-400`} style={{ backgroundColor: '#ffffcc' }}>
           {card.startTime}
         </div>
-        <div className="w-[36px] text-[11px] text-center py-0.5" style={{ backgroundColor: '#ffffcc' }}>
+        <div className={`w-[36px] ${isMobile ? 'text-[12px]' : 'text-[11px]'} text-center py-0.5`} style={{ backgroundColor: '#ffffcc' }}>
           {card.endTime}
         </div>
       </div>
 
       {/* 2行目: エリア番号 | エリア名 | アップロードアイコン | 金額 */}
       <div className="flex items-center border-b border-zinc-400 h-[22px]" style={{ backgroundColor: '#ffffcc' }}>
-        <div className="text-[14px] font-bold px-2 w-[28px]" style={{ color: '#cc0000' }}>
+        <div className={`${isMobile ? 'text-[16px]' : 'text-[14px]'} font-bold px-2 w-[28px]`} style={{ color: '#cc0000' }}>
           {card.areaNumber}
         </div>
-        <div className="text-[14px] font-bold flex-1" style={{ color: '#0066cc' }}>
+        <div className={`${isMobile ? 'text-[16px]' : 'text-[14px]'} font-bold flex-1`} style={{ color: '#0066cc' }}>
           {card.areaName}
         </div>
         {card.hasDownload && (
@@ -78,7 +79,7 @@ function DriverCardBlock({ card }: { card: DriverCard }) {
             <Download size={14} color="white" strokeWidth={3} />
           </div>
         )}
-        <div className="text-[12px] font-bold pr-1 text-black">
+        <div className={`${isMobile ? 'text-[13px]' : 'text-[12px]'} font-bold pr-1 text-black`}>
           ¥{card.price.toLocaleString()}
         </div>
       </div>
@@ -88,12 +89,12 @@ function DriverCardBlock({ card }: { card: DriverCard }) {
         {card.dispatches.map((dispatch, idx) => (
           <div
             key={idx}
-            className="grid items-center h-[20px] border-b border-zinc-300 bg-white"
+            className={`grid items-center ${isMobile ? 'h-[24px]' : 'h-[20px]'} border-b border-zinc-300 bg-white`}
             style={{ gridTemplateColumns: '18px 12px 50px 32px 1fr 36px' }}
           >
             {/* 送 */}
             <div
-              className="text-[11px] px-0.5 text-black h-full flex items-center"
+              className={`${isMobile ? 'text-[12px]' : 'text-[11px]'} px-0.5 text-black h-full flex items-center`}
               style={{
                 backgroundColor: dispatch.bgColor === 'yellow' ? '#ffff99' :
                   dispatch.bgColor === 'lightblue' ? '#ccffff' : '#ffffff'
@@ -103,7 +104,7 @@ function DriverCardBlock({ card }: { card: DriverCard }) {
             </div>
             {/* prefix */}
             <div
-              className="text-[11px] h-full flex items-center"
+              className={`${isMobile ? 'text-[12px]' : 'text-[11px]'} h-full flex items-center`}
               style={{
                 backgroundColor: dispatch.bgColor === 'yellow' ? '#ffff99' :
                   dispatch.bgColor === 'lightblue' ? '#ccffff' : '#ffffff',
@@ -114,7 +115,7 @@ function DriverCardBlock({ card }: { card: DriverCard }) {
             </div>
             {/* 名前 */}
             <div
-              className="text-[11px] truncate text-black h-full flex items-center overflow-hidden"
+              className={`${isMobile ? 'text-[12px]' : 'text-[11px]'} truncate text-black h-full flex items-center overflow-hidden`}
               style={{
                 backgroundColor: dispatch.bgColor === 'yellow' ? '#ffff99' :
                   dispatch.bgColor === 'lightblue' ? '#ccffff' : '#ffffff'
@@ -123,9 +124,9 @@ function DriverCardBlock({ card }: { card: DriverCard }) {
               {dispatch.name}
             </div>
             {/* 時刻 */}
-            <div className="text-[11px] text-center text-black">{dispatch.time}</div>
+            <div className={`${isMobile ? 'text-[12px]' : 'text-[11px]'} text-center text-black`}>{dispatch.time}</div>
             {/* 場所 */}
-            <div className="text-[11px] truncate text-black overflow-hidden">
+            <div className={`${isMobile ? 'text-[12px]' : 'text-[11px]'} truncate text-black overflow-hidden`}>
               {dispatch.locationMark && <span>{dispatch.locationMark}</span>}
               {dispatch.location}
             </div>
@@ -148,14 +149,255 @@ function DriverCardBlock({ card }: { card: DriverCard }) {
         ))}
         {/* 空行（6行分確保） */}
         {Array.from({ length: Math.max(0, 6 - card.dispatches.length) }).map((_, idx) => (
-          <div key={`empty-${idx}`} className="h-[20px] border-b border-zinc-300" style={{ backgroundColor: '#e8e8e8' }} />
+          <div key={`empty-${idx}`} className={`${isMobile ? 'h-[24px]' : 'h-[20px]'} border-b border-zinc-300`} style={{ backgroundColor: '#e8e8e8' }} />
         ))}
       </div>
     </div>
   );
 }
 
+// モバイル用: 出勤予定ホステス一覧コンポーネント
+function MobileScheduledHostessList() {
+  return (
+    <div className="w-full bg-white">
+      <div className="sticky top-0 z-10 bg-zinc-200 border-b border-zinc-400 px-2 py-2">
+        <span className="font-bold text-[14px]">出勤予定ホステス</span>
+      </div>
+      {scheduledHostessSampleData.map((hostess: ScheduledHostess) => (
+        <div key={hostess.id} className="border-b border-zinc-300 p-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-6 bg-rose-300/60 rounded" />
+              <div className="bg-yellow-200 px-2 py-1 rounded">
+                <span className="text-black text-[14px] font-medium">{hostess.area} {hostess.hostessName}</span>
+              </div>
+            </div>
+            <div className="bg-zinc-400 px-2 py-1 rounded">
+              <span className="text-white text-[14px] font-bold">{hostess.count}</span>
+            </div>
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-2 text-[13px]">
+            <div className="flex justify-between">
+              <span className="text-zinc-500">迎えドラ:</span>
+              <span className="text-black">{hostess.driverName}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-500">出勤:</span>
+              <span className="text-lime-600 font-medium">{hostess.arrivalTime}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-500">迎え場所:</span>
+              <span className="text-black">{hostess.location}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-500">終了:</span>
+              <span className="text-orange-500 font-medium">{hostess.startTime}</span>
+            </div>
+            <div className="flex justify-between col-span-2">
+              <span className="text-zinc-500">帰宅:</span>
+              <span className="text-pink-500 font-medium">{hostess.endTime}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// モバイル用: 送りホステス一覧コンポーネント
+function MobileSendHostessList() {
+  return (
+    <div className="w-full bg-white">
+      <div className="sticky top-0 z-10 bg-zinc-200 border-b border-zinc-400 px-2 py-2">
+        <span className="font-bold text-[14px]">送りホステス</span>
+      </div>
+      {sendHostessSampleData.map((hostess: SendHostess) => (
+        <div key={hostess.id} className="border-b border-zinc-300 p-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {hostess.hasPackage && <Package size={18} className="text-zinc-500" />}
+              <div className="px-2 py-1 rounded" style={{ backgroundColor: '#f0e6f6' }}>
+                <span className="text-red-600 text-[14px]">{hostess.area}</span>
+                <span className="text-black text-[14px] underline ml-1">{hostess.hostessName}</span>
+              </div>
+            </div>
+            {hostess.count > 0 && (
+              <div className="bg-zinc-300 px-2 py-1 rounded">
+                <span className="text-black text-[14px] font-bold">{hostess.count}</span>
+              </div>
+            )}
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-2 text-[13px]">
+            <div className="flex justify-between">
+              <span className="text-zinc-500">送りドラ:</span>
+              <span className="text-black bg-yellow-200 px-1 rounded">{hostess.driverName}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-500">終了:</span>
+              <span className="text-black">{hostess.endTime}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-500">帰宅:</span>
+              <span className="text-black">{hostess.returnTime}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-500">送り場所:</span>
+              <span className="text-black">
+                {hostess.destinationMark}{hostess.destination}
+              </span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// モバイル用: ドライバーカードグリッドコンポーネント
+function MobileDriverCardGrid() {
+  return (
+    <div className="w-full bg-white p-2">
+      <div className="sticky top-0 z-10 bg-zinc-200 border-b border-zinc-400 px-2 py-2 -mx-2 -mt-2 mb-2">
+        <span className="font-bold text-[14px]">ドライバー配車</span>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        {Array.from({ length: 28 }).map((_, index) => (
+          <DriverCardBlock key={index} card={{ ...driverCardData, id: index + 1 }} isMobile={true} />
+        ))}
+      </div>
+
+      {/* 下部セクション */}
+      <div className="mt-4 space-y-3">
+        {/* 南IC事務所 待機 */}
+        <div className="border border-zinc-400 rounded">
+          <div className="h-8 flex items-center justify-center" style={{ backgroundColor: '#ccffff' }}>
+            <span className="text-black text-[14px] font-medium">南IC事務所　待機</span>
+          </div>
+          <div className="bg-zinc-100 p-2 space-y-1">
+            <div className="flex items-center justify-between bg-white rounded px-2 py-1" style={{ backgroundColor: '#ffe0e6' }}>
+              <span className="text-black text-[14px]">南 祈-inori-</span>
+              <span className="text-black text-[14px]">19:07</span>
+            </div>
+            <div className="flex items-center justify-between bg-white rounded px-2 py-1" style={{ backgroundColor: '#ffe0e6' }}>
+              <span className="text-black text-[14px]">南 芽依-</span>
+              <span className="text-black text-[14px]">21:51</span>
+            </div>
+            <div className="flex items-center justify-between bg-white rounded px-2 py-1" style={{ backgroundColor: '#d4f5d4' }}>
+              <span className="text-black text-[14px]">G ゆりか</span>
+              <span className="text-black text-[14px]">23:08</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 南IC待機 ドライバー */}
+        <div className="border border-zinc-400 rounded">
+          <div className="h-8 flex items-center justify-center" style={{ backgroundColor: '#ffffcc' }}>
+            <span className="text-black text-[14px] font-medium">南IC待機　ドライバー</span>
+          </div>
+          <div className="bg-zinc-100 p-2 space-y-1">
+            <div className="flex items-center justify-between bg-white rounded px-2 py-1">
+              <span className="text-black text-[14px]">吉田 琴雅10</span>
+            </div>
+            <div className="flex items-center justify-between bg-white rounded px-2 py-1">
+              <span className="text-black text-[14px]">八塚 4</span>
+              <span className="text-red-600 text-[14px]">嵯峨野</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 南ICバック中 */}
+        <div className="border border-zinc-400 rounded">
+          <div className="h-8 flex items-center justify-center" style={{ backgroundColor: '#ffffcc' }}>
+            <span className="text-black text-[14px] font-medium">南ICバック中</span>
+          </div>
+          <div className="bg-zinc-100 p-2 space-y-1">
+            <div className="flex items-center justify-between bg-white rounded px-2 py-1">
+              <span className="text-black text-[14px]">南部 吉輝11</span>
+            </div>
+            <div className="flex items-center justify-between bg-white rounded px-2 py-1">
+              <span className="text-black text-[14px]">森下 光我1</span>
+            </div>
+            <div className="flex items-center justify-between bg-white rounded px-2 py-1">
+              <span className="text-black text-[14px]">津村 4</span>
+              <span className="text-blue-600 text-[14px]">堀川丸</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DispatchPanel2DSubPage() {
+  const [isMobile, setIsMobile] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState<'scheduled' | 'drivers' | 'send'>('drivers');
+
+  React.useEffect(() => {
+    document.title = '配車パネル2D-Sub - Dispatch Harmony Hub';
+
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // モバイル表示
+  if (isMobile) {
+    return (
+      <div className="flex flex-col h-screen w-full bg-zinc-100">
+        {/* モバイルヘッダー */}
+        <div className="h-[44px] flex items-center justify-center px-2 flex-shrink-0" style={{ backgroundColor: '#0099cc' }}>
+          <span className="text-white text-[16px] font-bold">配車パネル2D-Sub</span>
+        </div>
+
+        {/* タブ切り替え */}
+        <div className="flex border-b border-zinc-300 bg-white flex-shrink-0">
+          <button
+            onClick={() => setActiveTab('scheduled')}
+            className={`flex-1 py-3 text-[14px] font-medium transition-colors ${
+              activeTab === 'scheduled'
+                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                : 'text-zinc-600 hover:bg-zinc-50'
+            }`}
+          >
+            出勤予定
+          </button>
+          <button
+            onClick={() => setActiveTab('drivers')}
+            className={`flex-1 py-3 text-[14px] font-medium transition-colors ${
+              activeTab === 'drivers'
+                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                : 'text-zinc-600 hover:bg-zinc-50'
+            }`}
+          >
+            ドライバー
+          </button>
+          <button
+            onClick={() => setActiveTab('send')}
+            className={`flex-1 py-3 text-[14px] font-medium transition-colors ${
+              activeTab === 'send'
+                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                : 'text-zinc-600 hover:bg-zinc-50'
+            }`}
+          >
+            送り
+          </button>
+        </div>
+
+        {/* コンテンツエリア */}
+        <div className="flex-1 overflow-y-auto">
+          {activeTab === 'scheduled' && <MobileScheduledHostessList />}
+          {activeTab === 'drivers' && <MobileDriverCardGrid />}
+          {activeTab === 'send' && <MobileSendHostessList />}
+        </div>
+      </div>
+    );
+  }
+
+  // デスクトップ表示（元のデザインそのまま）
   return (
     <div className="flex flex-col h-screen w-full">
       {/* ヘッダー */}

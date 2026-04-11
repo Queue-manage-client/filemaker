@@ -60,9 +60,198 @@ function calcWaitingMinutes(since: string): number {
   return Math.min(diff, 720);
 }
 
+// モバイル用コンポーネント
+function MobileScheduledHostessList() {
+  return (
+    <div className="bg-white">
+      <div className="sticky top-0 z-10 bg-cyan-200 border-b border-zinc-400 px-3 py-2">
+        <span className="font-bold text-[14px]">出勤予定ホステス</span>
+      </div>
+      {scheduledHostessSampleData.map((hostess: ScheduledHostess) => (
+        <div key={hostess.id} className="border-b border-zinc-300 p-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-6 bg-rose-300/60 rounded" />
+              <div className="bg-yellow-200 px-2 py-1 rounded">
+                <span className="text-black text-[14px] font-medium">{hostess.area} {hostess.hostessName}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {hostess.isConfirmed && <span className="bg-green-300 px-2 py-0.5 rounded text-[12px]">確認済</span>}
+              <div className="bg-zinc-400 px-2 py-1 rounded">
+                <span className="text-white text-[14px] font-bold">{hostess.count}</span>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-[13px]">
+            <div><span className="text-zinc-500">迎えドラ:</span> <span className="text-black">{hostess.driverName}</span></div>
+            <div><span className="text-zinc-500">出勤:</span> <span className="text-lime-600 font-medium">{hostess.arrivalTime}</span></div>
+            <div><span className="text-zinc-500">地域:</span> <span className="text-black">{hostess.location}</span></div>
+            <div><span className="text-zinc-500">終了:</span> <span className="text-black">{hostess.startTime}</span></div>
+            <div><span className="text-zinc-500">帰宅:</span> <span className="text-black">{hostess.endTime}</span></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MobileDriverList() {
+  return (
+    <div className="bg-white">
+      {/* INドラ未定予約 */}
+      <div className="sticky top-0 z-10 bg-lime-200 border-b border-zinc-400 px-3 py-2">
+        <span className="font-bold text-[14px]">INドラ未定予約リスト</span>
+      </div>
+      {undecidedDriverReservationSampleData.slice(0, 10).map((reservation: UndecidedDriverReservation) => (
+        <div key={reservation.id} className="border-b border-zinc-300 p-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="bg-purple-300 px-2 py-0.5 rounded text-[14px] font-medium">{reservation.departureTime}</span>
+            <span className="bg-yellow-200 px-2 py-0.5 rounded text-[14px]">{reservation.area} {reservation.hostessName}</span>
+          </div>
+          <div className="text-[13px] text-zinc-600">
+            迎え: {reservation.pickupLocation} / 時間計: {reservation.timeTotal}分
+          </div>
+        </div>
+      ))}
+
+      {/* OUTドラ未定・接客中 */}
+      <div className="sticky top-0 z-10 bg-lime-200 border-b border-zinc-400 px-3 py-2 mt-4">
+        <span className="font-bold text-[14px]">OUTドラ未定・接客中リスト</span>
+      </div>
+      {outDriverUndecidedSampleData.slice(0, 10).map((item: OutDriverUndecided) => (
+        <div key={item.id} className="border-b border-zinc-300 p-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="bg-yellow-200 px-2 py-0.5 rounded text-[14px]">{item.hostessName}</span>
+            <span className="text-[13px]">{item.pickupTime} - {item.arrivalTime}</span>
+          </div>
+          <div className="text-[13px] text-zinc-600">{item.destination}</div>
+        </div>
+      ))}
+
+      {/* 待機ドライバー */}
+      <div className="sticky top-0 z-10 bg-yellow-200 border-b border-zinc-400 px-3 py-2 mt-4">
+        <span className="font-bold text-[14px]">南IC待機ドライバー</span>
+      </div>
+      {[
+        { name: '吉田', since: '18:30' },
+        { name: '松尾', since: '19:15' },
+        { name: '山岡', since: '19:45' },
+        { name: '川口', since: '20:00' },
+      ].map((driver) => {
+        const waitingMins = calcWaitingMinutes(driver.since);
+        return (
+          <div key={driver.name} className="border-b border-zinc-300 p-3 flex justify-between items-center">
+            <span className="text-[14px]">{driver.name}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-blue-600 text-[13px]">{driver.since}</span>
+              <span className={`font-bold text-[13px] ${waitingMins >= 60 ? 'text-red-600' : 'text-orange-600'}`}>{waitingMins}分</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function MobileTransportList() {
+  return (
+    <div className="bg-white">
+      {/* ホステス送り・帰宅 */}
+      <div className="sticky top-0 z-10 bg-yellow-200 border-b border-zinc-400 px-3 py-2">
+        <span className="font-bold text-[14px]">ホステス送り・帰宅</span>
+      </div>
+      {hostessTransportSampleData.map((item: HostessTransport) => (
+        <div key={item.id} className="border-b border-zinc-300 p-3">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              {item.luggageDetails && <Package className="w-4 h-4 text-orange-500" />}
+              <span className="text-[14px] font-medium">{item.hostessName}</span>
+            </div>
+            <span className="text-[13px]">{item.count}件</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-[13px]">
+            <div><span className="text-zinc-500">終了:</span> <span>{item.departureTime}</span></div>
+            <div><span className="text-zinc-500">帰宅:</span> <span className="text-pink-500">{item.returnTime}</span></div>
+            <div className="col-span-2"><span className="text-zinc-500">送り場所:</span> <span>{item.destination}</span></div>
+          </div>
+        </div>
+      ))}
+
+      {/* 帰宅ホステス */}
+      <div className="sticky top-0 z-10 bg-cyan-100 border-b border-zinc-400 px-3 py-2 mt-4">
+        <span className="font-bold text-[14px]">帰宅ホステス / 自宅or寮待機</span>
+      </div>
+      {returningHostessSampleData.map((item: ReturningHostess) => (
+        <div key={item.id} className="border-b border-zinc-300 p-3">
+          <span className="text-[14px]">{item.hostessName} - {item.returnTime} - {item.location}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MobileScheduleList() {
+  return (
+    <div className="bg-white">
+      {/* スタッフ予定 */}
+      <div className="sticky top-0 z-10 bg-lime-200 border-b border-zinc-400 px-3 py-2">
+        <span className="font-bold text-[14px]">スタッフ予定リスト</span>
+      </div>
+      {staffScheduleSampleData.map((schedule: StaffSchedule) => (
+        <div key={schedule.id} className={`border-b border-zinc-300 p-3 ${schedule.isHighlighted ? 'bg-lime-100' : ''}`}>
+          <span className="text-[14px]">{schedule.driverName}→{schedule.destination} {schedule.note}</span>
+        </div>
+      ))}
+
+      {/* メモ・引継事項 */}
+      <div className="sticky top-0 z-10 bg-fuchsia-300 border-b border-zinc-400 px-3 py-2 mt-4">
+        <span className="font-bold text-[14px]">メモ・引継事項</span>
+      </div>
+      {memoItemSampleData.map((memo: MemoItem) => (
+        <div key={memo.id} className="border-b border-zinc-300 p-3">
+          <p className="text-[14px] whitespace-pre-wrap">{memo.content}</p>
+        </div>
+      ))}
+
+      {/* 予定 */}
+      <div className="sticky top-0 z-10 bg-purple-300 border-b border-zinc-400 px-3 py-2 mt-4">
+        <span className="font-bold text-[14px]">予定(打ち合わせ・撮影など)</span>
+      </div>
+      {scheduleItemSampleData.map((item: ScheduleItem) => (
+        <div key={item.id} className="border-b border-zinc-300 p-3">
+          <div className="text-[14px] font-medium">{item.title}</div>
+          <div className="text-[13px] text-zinc-600">{item.description}</div>
+        </div>
+      ))}
+
+      {/* 面接予定 */}
+      <div className="sticky top-0 z-10 bg-rose-300/60 border-b border-zinc-400 px-3 py-2 mt-4">
+        <span className="font-bold text-[14px]">面接予定</span>
+      </div>
+      {driverDispatchPanelSampleData.map((item: DriverDispatchPanel) => (
+        <div key={item.id} className="border-b border-zinc-300 p-3">
+          <div className="flex items-center gap-2 mb-1">
+            {item.type === 'entry' && <span className="bg-purple-300 px-2 py-0.5 rounded text-[12px]">入店</span>}
+            <span className="text-[14px]">{item.time}</span>
+            {item.status === 'completed' && <span className="bg-green-300 px-2 py-0.5 rounded text-[12px]">済</span>}
+          </div>
+          <div className="text-[13px]">{item.location}</div>
+          {(item.hostessName1 || item.hostessName2) && (
+            <div className="flex gap-2 mt-1">
+              {item.hostessName1 && <span className="bg-yellow-200 px-2 py-0.5 rounded text-[12px]">{item.hostessName1}</span>}
+              {item.hostessName2 && <span className="bg-yellow-200 px-2 py-0.5 rounded text-[12px]">{item.hostessName2}</span>}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Original() {
   const [isMobileView, setIsMobileView] = React.useState(false);
-  const [mobileScale, setMobileScale] = React.useState(1);
+  const [mobileTab, setMobileTab] = React.useState<'hostess' | 'driver' | 'transport' | 'schedule'>('hostess');
   const [showWaitingAlert, setShowWaitingAlert] = React.useState(true);
   const [dismissedAlerts, setDismissedAlerts] = React.useState<string[]>([]);
   const [showOverdueAlert, setShowOverdueAlert] = React.useState(true);
@@ -73,12 +262,7 @@ export default function Original() {
     document.title = '配車パネル2D - Dispatch Harmony Hub';
 
     const checkMobile = () => {
-      const width = window.innerWidth;
-      const isMobile = width < 1024;
-      setIsMobileView(isMobile);
-      if (isMobile) {
-        setMobileScale(width / 1989);
-      }
+      setIsMobileView(window.innerWidth < 1024);
     };
 
     checkMobile();
@@ -86,35 +270,109 @@ export default function Original() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  return (
-    <div
-      className={`w-full overflow-x-auto ${isMobileView ? 'overflow-y-auto' : 'overflow-y-hidden h-[1080px]'}`}
-      style={isMobileView ? { height: `${Math.ceil(1080 * mobileScale) + 30}px` } : undefined}
-    >
-      {isMobileView && (
-        <div className="sticky top-0 z-30 bg-blue-600 text-white text-center py-1 text-sm flex items-center justify-center gap-2">
-          <Phone className="w-4 h-4" />
-          <span>モバイル表示</span>
+  // モバイル表示
+  if (isMobileView) {
+    return (
+      <div className="flex flex-col h-screen w-full bg-zinc-100">
+        {/* モバイルヘッダー */}
+        <div className="h-[48px] flex items-center justify-between px-3 flex-shrink-0 bg-white border-b border-zinc-300">
+          <Link href="/dashboard">
+            <Button variant="outline" className="h-8 px-2 text-[12px]">
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+          </Link>
+          <h1 className="text-[16px] font-bold">配車パネル2D</h1>
+          <Button variant="outline" className="h-8 px-2 text-[12px]">
+            Menu
+          </Button>
+        </div>
+
+        {/* タブ切り替え */}
+        <div className="flex border-b border-zinc-300 bg-white flex-shrink-0">
           <button
-            type="button"
-            onClick={() => setMobileScale(Math.min(mobileScale + 0.1, 1))}
-            className="px-2 py-0.5 bg-blue-500 rounded text-xs"
+            onClick={() => setMobileTab('hostess')}
+            className={`flex-1 py-3 text-[13px] font-medium transition-colors ${
+              mobileTab === 'hostess' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-zinc-600'
+            }`}
           >
-            +
+            ホステス
           </button>
-          <span className="text-xs">{Math.round(mobileScale * 100)}%</span>
           <button
-            type="button"
-            onClick={() => setMobileScale(Math.max(mobileScale - 0.1, 0.2))}
-            className="px-2 py-0.5 bg-blue-500 rounded text-xs"
+            onClick={() => setMobileTab('driver')}
+            className={`flex-1 py-3 text-[13px] font-medium transition-colors ${
+              mobileTab === 'driver' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-zinc-600'
+            }`}
           >
-            -
+            ドライバー
+          </button>
+          <button
+            onClick={() => setMobileTab('transport')}
+            className={`flex-1 py-3 text-[13px] font-medium transition-colors ${
+              mobileTab === 'transport' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-zinc-600'
+            }`}
+          >
+            送り
+          </button>
+          <button
+            onClick={() => setMobileTab('schedule')}
+            className={`flex-1 py-3 text-[13px] font-medium transition-colors ${
+              mobileTab === 'schedule' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-zinc-600'
+            }`}
+          >
+            予定
           </button>
         </div>
-      )}
-      {/* 待機2時間超キャスト アラート */}
+
+        {/* コンテンツエリア */}
+        <div className="flex-1 overflow-y-auto">
+          {mobileTab === 'hostess' && <MobileScheduledHostessList />}
+          {mobileTab === 'driver' && <MobileDriverList />}
+          {mobileTab === 'transport' && <MobileTransportList />}
+          {mobileTab === 'schedule' && <MobileScheduleList />}
+        </div>
+
+        {/* アラート */}
+        {showWaitingAlert && longWaitingHostesses.filter(h => !dismissedAlerts.includes(h.name)).length > 0 && (
+          <div className="fixed bottom-4 right-4 z-50 w-[280px] bg-red-50 border-2 border-red-400 rounded-lg shadow-xl">
+            <div className="bg-red-500 text-white px-3 py-1.5 flex items-center justify-between rounded-t-lg">
+              <div className="flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4" />
+                <span className="text-sm font-bold">待機2時間超過</span>
+              </div>
+              <button type="button" onClick={() => setShowWaitingAlert(false)} className="hover:bg-red-600 rounded p-0.5">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-2 space-y-1">
+              {longWaitingHostesses.filter(h => !dismissedAlerts.includes(h.name)).map((hostess) => (
+                <div key={hostess.name} className="flex items-center justify-between bg-white rounded px-2 py-1.5 border border-red-200">
+                  <div>
+                    <div className="text-sm font-bold text-red-800">{hostess.name}</div>
+                    <div className="text-xs text-gray-600">{hostess.store}</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setDismissedAlerts(prev => [...prev, hostess.name])}
+                    className="text-xs px-2 py-1 bg-gray-100 rounded"
+                  >
+                    確認
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // デスクトップ表示（元のコード）
+  return (
+    <div className="w-full overflow-x-auto overflow-y-hidden h-[1080px]"
+    >
+      {/* 待機2時間超キャスト アラート - 右下 */}
       {showWaitingAlert && longWaitingHostesses.filter(h => !dismissedAlerts.includes(h.name)).length > 0 && (
-        <div className="fixed top-14 right-4 z-50 w-[300px] bg-red-50 border-2 border-red-400 rounded-lg shadow-2xl overflow-hidden animate-bounce" style={{ animationIterationCount: 3 }}>
+        <div className="fixed bottom-4 right-4 z-50 w-[300px] bg-red-50 border-2 border-red-400 rounded-lg shadow-2xl overflow-hidden">
           <div className="bg-red-500 text-white px-3 py-1.5 flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <AlertTriangle className="w-4 h-4" />
@@ -144,9 +402,9 @@ export default function Original() {
         </div>
       )}
 
-      {/* 送り5分超過 ドライバー未着アラート */}
+      {/* 送り5分超過 ドライバー未着アラート - 右上 */}
       {showOverdueAlert && overdueTransports.filter(t => !dismissedOverdue.includes(t.hostessName)).length > 0 && (
-        <div className="fixed top-14 left-4 z-50 w-[300px] bg-orange-50 border-2 border-orange-400 rounded-lg shadow-2xl overflow-hidden animate-bounce" style={{ animationIterationCount: 3 }}>
+        <div className="fixed top-14 right-4 z-50 w-[300px] bg-orange-50 border-2 border-orange-400 rounded-lg shadow-2xl overflow-hidden">
           <div className="bg-orange-500 text-white px-3 py-1.5 flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <AlertTriangle className="w-4 h-4" />
@@ -213,10 +471,6 @@ export default function Original() {
 
       <div
         className="w-[1989px] h-[1080px] relative"
-        style={isMobileView ? {
-          transform: `scale(${mobileScale})`,
-          transformOrigin: 'top left',
-        } : undefined}
       >
       {/* ヘッダー（固定） */}
       <div className="sticky left-0 top-0 w-full z-20 h-[50px] bg-white border-b border-zinc-300">
