@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, ArrowUpDown, Check, Star, X } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, ArrowUpDown, Check, Star, X, Package } from "lucide-react";
 import type { TodayCastData } from '@/types';
 import { sampleCastData } from '@/data/castSampleData';
 
@@ -1044,6 +1044,17 @@ export default function RT2Panel() {
               </button>
             </div>
             <div className="p-3 space-y-3">
+              {/* 預り荷物の詳細 */}
+              {selectedCastForPrice.luggageDetails && (
+                <div className="bg-orange-50 border border-orange-300 rounded-md p-2">
+                  <div className="flex items-center gap-2">
+                    <Package className="w-4 h-4 text-orange-600" />
+                    <span className="text-xs font-bold text-orange-700">預り荷物</span>
+                  </div>
+                  <p className="text-sm text-orange-800 mt-1 font-medium">{selectedCastForPrice.luggageDetails}</p>
+                </div>
+              )}
+
               {/* 指名区分 */}
               <div>
                 <Label className="text-xs font-bold text-gray-700 mb-1.5 block">指名区分</Label>

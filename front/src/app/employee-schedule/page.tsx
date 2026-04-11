@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, Check, Plus, X } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, Check, Plus, X, Calendar } from "lucide-react";
 
 // 編集中のバーデータ
 interface EditingBar {
@@ -29,17 +29,45 @@ interface WorkSchedule {
   memo?: string;
 }
 
+// 基本スケジュール（曜日ごと）
+interface BasicSchedule {
+  mon: { work: boolean; start: string; end: string };
+  tue: { work: boolean; start: string; end: string };
+  wed: { work: boolean; start: string; end: string };
+  thu: { work: boolean; start: string; end: string };
+  fri: { work: boolean; start: string; end: string };
+  sat: { work: boolean; start: string; end: string };
+  sun: { work: boolean; start: string; end: string };
+}
+
+// 雇用形態
+type EmployeeType = '社員' | 'アルバイト' | '外部';
+
 // 従業員タイムラインデータの型定義
 interface EmployeeTimelineData {
   id: string;
   name: string;
   department: string;
   position: string;
+  employeeType: EmployeeType; // 雇用形態
+  isActive: boolean; // 在籍中かどうか
   workStartTime: string;
   workEndTime: string;
   isOff: boolean;
   schedules: WorkSchedule[];
+  basicSchedule?: BasicSchedule; // 基本スケジュール
 }
+
+// デフォルト基本スケジュール（平日出勤）
+const defaultBasicSchedule: BasicSchedule = {
+  mon: { work: true, start: "09:00", end: "18:00" },
+  tue: { work: true, start: "09:00", end: "18:00" },
+  wed: { work: true, start: "09:00", end: "18:00" },
+  thu: { work: true, start: "09:00", end: "18:00" },
+  fri: { work: true, start: "09:00", end: "18:00" },
+  sat: { work: false, start: "", end: "" },
+  sun: { work: false, start: "", end: "" },
+};
 
 // サンプルデータ
 const sampleEmployeeTimeline: EmployeeTimelineData[] = [
@@ -48,6 +76,8 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
     name: "山田太郎",
     department: "営業部",
     position: "主任",
+    employeeType: "社員",
+    isActive: true,
     workStartTime: "",
     workEndTime: "",
     isOff: true,
@@ -61,13 +91,16 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         status: "completed",
         memo: "重要顧客・事前準備必須"
       }
-    ]
+    ],
+    basicSchedule: defaultBasicSchedule
   },
   {
     id: "2",
     name: "佐藤花子",
     department: "企画部",
     position: "係長",
+    employeeType: "社員",
+    isActive: true,
     workStartTime: "09:00",
     workEndTime: "18:00",
     isOff: false,
@@ -90,23 +123,37 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         status: "pending",
         memo: "来週のプレゼン用"
       }
-    ]
+    ],
+    basicSchedule: defaultBasicSchedule
   },
   {
     id: "3",
     name: "鈴木一郎",
     department: "総務部",
     position: "課長",
+    employeeType: "社員",
+    isActive: true,
     workStartTime: "08:30",
     workEndTime: "17:30",
     isOff: false,
-    schedules: []
+    schedules: [],
+    basicSchedule: {
+      mon: { work: true, start: "08:30", end: "17:30" },
+      tue: { work: true, start: "08:30", end: "17:30" },
+      wed: { work: true, start: "08:30", end: "17:30" },
+      thu: { work: true, start: "08:30", end: "17:30" },
+      fri: { work: true, start: "08:30", end: "17:30" },
+      sat: { work: false, start: "", end: "" },
+      sun: { work: false, start: "", end: "" },
+    }
   },
   {
     id: "4",
     name: "高橋美咲",
     department: "経理部",
     position: "主任",
+    employeeType: "アルバイト",
+    isActive: true,
     workStartTime: "09:00",
     workEndTime: "18:00",
     isOff: false,
@@ -120,13 +167,24 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         status: "completed",
         memo: "締め切り厳守"
       }
-    ]
+    ],
+    basicSchedule: {
+      mon: { work: true, start: "09:00", end: "15:00" },
+      tue: { work: false, start: "", end: "" },
+      wed: { work: true, start: "09:00", end: "15:00" },
+      thu: { work: false, start: "", end: "" },
+      fri: { work: true, start: "09:00", end: "15:00" },
+      sat: { work: false, start: "", end: "" },
+      sun: { work: false, start: "", end: "" },
+    }
   },
   {
     id: "5",
     name: "田中健二",
     department: "人事部",
     position: "部長",
+    employeeType: "社員",
+    isActive: true,
     workStartTime: "08:00",
     workEndTime: "17:00",
     isOff: false,
@@ -140,13 +198,24 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         status: "pending",
         memo: "新卒採用・3名予定"
       }
-    ]
+    ],
+    basicSchedule: {
+      mon: { work: true, start: "08:00", end: "17:00" },
+      tue: { work: true, start: "08:00", end: "17:00" },
+      wed: { work: true, start: "08:00", end: "17:00" },
+      thu: { work: true, start: "08:00", end: "17:00" },
+      fri: { work: true, start: "08:00", end: "17:00" },
+      sat: { work: false, start: "", end: "" },
+      sun: { work: false, start: "", end: "" },
+    }
   },
   {
     id: "6",
     name: "伊藤由美",
     department: "開発部",
     position: "エンジニア",
+    employeeType: "アルバイト",
+    isActive: true,
     workStartTime: "10:00",
     workEndTime: "19:00",
     isOff: false,
@@ -169,13 +238,24 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         status: "pending",
         memo: "PR#123確認"
       }
-    ]
+    ],
+    basicSchedule: {
+      mon: { work: true, start: "10:00", end: "19:00" },
+      tue: { work: true, start: "10:00", end: "19:00" },
+      wed: { work: false, start: "", end: "" },
+      thu: { work: true, start: "10:00", end: "19:00" },
+      fri: { work: true, start: "10:00", end: "19:00" },
+      sat: { work: false, start: "", end: "" },
+      sun: { work: false, start: "", end: "" },
+    }
   },
   {
     id: "7",
     name: "渡辺誠",
     department: "営業部",
     position: "係長",
+    employeeType: "社員",
+    isActive: true,
     workStartTime: "09:00",
     workEndTime: "18:00",
     isOff: false,
@@ -189,23 +269,29 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         status: "completed",
         memo: "契約更新交渉"
       }
-    ]
+    ],
+    basicSchedule: defaultBasicSchedule
   },
   {
     id: "8",
     name: "小林真理",
     department: "企画部",
     position: "主任",
+    employeeType: "アルバイト",
+    isActive: false, // 退職者
     workStartTime: "09:30",
     workEndTime: "18:30",
     isOff: false,
-    schedules: []
+    schedules: [],
+    basicSchedule: defaultBasicSchedule
   },
   {
     id: "9",
     name: "加藤直樹",
     department: "総務部",
     position: "主任",
+    employeeType: "社員",
+    isActive: true,
     workStartTime: "08:30",
     workEndTime: "17:30",
     isOff: false,
@@ -219,13 +305,24 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         status: "pending",
         memo: "月次点検"
       }
-    ]
+    ],
+    basicSchedule: {
+      mon: { work: true, start: "08:30", end: "17:30" },
+      tue: { work: true, start: "08:30", end: "17:30" },
+      wed: { work: true, start: "08:30", end: "17:30" },
+      thu: { work: true, start: "08:30", end: "17:30" },
+      fri: { work: true, start: "08:30", end: "17:30" },
+      sat: { work: false, start: "", end: "" },
+      sun: { work: false, start: "", end: "" },
+    }
   },
   {
     id: "10",
     name: "吉田恵",
     department: "経理部",
     position: "係長",
+    employeeType: "社員",
+    isActive: true,
     workStartTime: "09:00",
     workEndTime: "18:00",
     isOff: false,
@@ -248,13 +345,16 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         status: "pending",
         memo: "次期予算案検討"
       }
-    ]
+    ],
+    basicSchedule: defaultBasicSchedule
   },
   {
     id: "11",
     name: "中村拓也",
     department: "開発部",
     position: "リーダー",
+    employeeType: "社員",
+    isActive: true,
     workStartTime: "10:00",
     workEndTime: "19:00",
     isOff: false,
@@ -268,17 +368,37 @@ const sampleEmployeeTimeline: EmployeeTimelineData[] = [
         status: "completed",
         memo: "Sprint #15"
       }
-    ]
+    ],
+    basicSchedule: {
+      mon: { work: true, start: "10:00", end: "19:00" },
+      tue: { work: true, start: "10:00", end: "19:00" },
+      wed: { work: true, start: "10:00", end: "19:00" },
+      thu: { work: true, start: "10:00", end: "19:00" },
+      fri: { work: true, start: "10:00", end: "19:00" },
+      sat: { work: false, start: "", end: "" },
+      sun: { work: false, start: "", end: "" },
+    }
   },
   {
     id: "12",
     name: "松本さくら",
     department: "人事部",
     position: "主任",
+    employeeType: "アルバイト",
+    isActive: true,
     workStartTime: "09:00",
     workEndTime: "18:00",
     isOff: false,
-    schedules: []
+    schedules: [],
+    basicSchedule: {
+      mon: { work: true, start: "09:00", end: "18:00" },
+      tue: { work: true, start: "09:00", end: "18:00" },
+      wed: { work: false, start: "", end: "" },
+      thu: { work: true, start: "09:00", end: "18:00" },
+      fri: { work: true, start: "09:00", end: "18:00" },
+      sat: { work: false, start: "", end: "" },
+      sun: { work: false, start: "", end: "" },
+    }
   }
 ];
 
@@ -330,10 +450,22 @@ export default function EmployeeSchedule() {
   }, []);
 
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [employeeData] = useState<EmployeeTimelineData[]>(sampleEmployeeTimeline);
+  const [employeeData, setEmployeeData] = useState<EmployeeTimelineData[]>(sampleEmployeeTimeline);
   const [sortType, setSortType] = useState<SortType>('name-asc');
   const [searchText, setSearchText] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState<string>('');
+
+  // 雇用形態フィルター
+  type EmployeeTypeFilter = '全員' | '社員＆アルバイト' | '社員' | '在籍アルバイト';
+  const [employeeTypeFilter, setEmployeeTypeFilter] = useState<EmployeeTypeFilter>('全員');
+
+  // 週間予定一括作成モーダル
+  const [showBulkCreateModal, setShowBulkCreateModal] = useState(false);
+  const [bulkCreateDateRange, setBulkCreateDateRange] = useState<{ start: Date; end: Date }>({
+    start: new Date(),
+    end: (() => { const d = new Date(); d.setDate(d.getDate() + 6); return d; })()
+  });
+  const [selectedEmployeesForBulkCreate, setSelectedEmployeesForBulkCreate] = useState<Set<string>>(new Set());
 
   // 編集中のバー管理
   const [editingBars, setEditingBars] = useState<Map<string, EditingBar>>(new Map());
@@ -376,6 +508,23 @@ export default function EmployeeSchedule() {
       filtered = filtered.filter(e => e.department === departmentFilter);
     }
 
+    // 雇用形態でフィルター
+    switch (employeeTypeFilter) {
+      case '社員＆アルバイト':
+        filtered = filtered.filter(e => (e.employeeType === '社員' || e.employeeType === 'アルバイト') && e.isActive);
+        break;
+      case '社員':
+        filtered = filtered.filter(e => e.employeeType === '社員' && e.isActive);
+        break;
+      case '在籍アルバイト':
+        filtered = filtered.filter(e => e.employeeType === 'アルバイト' && e.isActive);
+        break;
+      case '全員':
+      default:
+        // フィルターなし
+        break;
+    }
+
     // ソート
     switch (sortType) {
       case 'name-asc':
@@ -397,7 +546,7 @@ export default function EmployeeSchedule() {
       default:
         return filtered;
     }
-  }, [employeeData, sortType, searchText, departmentFilter]);
+  }, [employeeData, sortType, searchText, departmentFilter, employeeTypeFilter]);
 
   // スクロール同期用のref
   const leftPanelRef = useRef<HTMLDivElement>(null);
@@ -643,6 +792,95 @@ export default function EmployeeSchedule() {
     return employee?.name || '不明';
   };
 
+  // 曜日キーを取得
+  const getDayKey = (date: Date): keyof BasicSchedule => {
+    const days: (keyof BasicSchedule)[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    return days[date.getDay()];
+  };
+
+  // 日付をフォーマット
+  const formatDateShort = (date: Date): string => {
+    return `${date.getMonth() + 1}/${date.getDate()}`;
+  };
+
+  // 週間予定一括作成モーダルを開く
+  const openBulkCreateModal = () => {
+    // フィルター済みの従業員を選択
+    const filteredIds = new Set(employees.filter(e => e.isActive && e.basicSchedule).map(e => e.id));
+    setSelectedEmployeesForBulkCreate(filteredIds);
+    setShowBulkCreateModal(true);
+  };
+
+  // 週間予定一括作成のチェックボックス切り替え
+  const toggleBulkCreateSelection = (employeeId: string) => {
+    const newSet = new Set(selectedEmployeesForBulkCreate);
+    if (newSet.has(employeeId)) {
+      newSet.delete(employeeId);
+    } else {
+      newSet.add(employeeId);
+    }
+    setSelectedEmployeesForBulkCreate(newSet);
+  };
+
+  // 週間予定一括作成を実行
+  const handleBulkCreate = () => {
+    const updatedEmployees = [...employeeData];
+
+    // 日付範囲を取得
+    const startDate = new Date(bulkCreateDateRange.start);
+    const endDate = new Date(bulkCreateDateRange.end);
+
+    // 選択された従業員に対してスケジュールを作成
+    selectedEmployeesForBulkCreate.forEach(employeeId => {
+      const employeeIndex = updatedEmployees.findIndex(e => e.id === employeeId);
+      if (employeeIndex === -1) return;
+
+      const employee = updatedEmployees[employeeIndex];
+      if (!employee.basicSchedule) return;
+
+      // 各日付に対してスケジュールを生成
+      const currentDate = new Date(startDate);
+      while (currentDate <= endDate) {
+        const dayKey = getDayKey(currentDate);
+        const daySchedule = employee.basicSchedule[dayKey];
+
+        if (daySchedule.work && daySchedule.start && daySchedule.end) {
+          // 基本スケジュールから勤務時間を設定（実際のアプリでは日付ごとのデータを持つ）
+          // ここでは現在の表示日と同じ日のみ更新
+          const isSameDay = currentDate.toDateString() === new Date().toDateString();
+          if (isSameDay) {
+            updatedEmployees[employeeIndex] = {
+              ...employee,
+              workStartTime: daySchedule.start,
+              workEndTime: daySchedule.end,
+              isOff: false
+            };
+          }
+        }
+
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    });
+
+    setEmployeeData(updatedEmployees);
+    setShowBulkCreateModal(false);
+    setSelectedEmployeesForBulkCreate(new Set());
+  };
+
+  // 日付範囲内の日付リストを取得
+  const getDateRangeDays = (): Date[] => {
+    const days: Date[] = [];
+    const currentDate = new Date(bulkCreateDateRange.start);
+    const endDate = new Date(bulkCreateDateRange.end);
+
+    while (currentDate <= endDate) {
+      days.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return days;
+  };
+
   // ドラッグ開始
   const handleDragStart = (
     e: React.MouseEvent,
@@ -753,8 +991,23 @@ export default function EmployeeSchedule() {
 
       {/* ソートボタン・検索・フィルター */}
       <div className="h-[36px] bg-white border-b border-zinc-300 flex items-center px-3 flex-shrink-0">
-        {/* 左側: 部署フィルター・ソートボタン */}
+        {/* 左側: 部署フィルター・雇用形態フィルター・ソートボタン */}
         <div className="flex items-center gap-2">
+          {/* 雇用形態フィルター */}
+          <span className="text-xs text-gray-600 font-medium">雇用形態:</span>
+          <select
+            value={employeeTypeFilter}
+            onChange={(e) => setEmployeeTypeFilter(e.target.value as EmployeeTypeFilter)}
+            className="h-7 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-400"
+          >
+            <option value="全員">全員</option>
+            <option value="社員＆アルバイト">社員＆アルバイト</option>
+            <option value="社員">社員</option>
+            <option value="在籍アルバイト">在籍アルバイト</option>
+          </select>
+
+          <div className="w-px h-5 bg-gray-300 mx-1" />
+
           {/* 部署フィルター */}
           <span className="text-xs text-gray-600 font-medium">部署:</span>
           <select
@@ -824,6 +1077,17 @@ export default function EmployeeSchedule() {
             onChange={(e) => setSearchText(e.target.value)}
             className="w-[180px] h-7 px-3 text-xs border border-gray-500 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-400"
           />
+        </div>
+
+        {/* 週間予定一括作成ボタン */}
+        <div className="ml-4">
+          <button
+            onClick={openBulkCreateModal}
+            className="flex items-center gap-1 px-3 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 font-medium"
+          >
+            <Calendar className="w-3 h-3" />
+            週間予定一括作成
+          </button>
         </div>
 
         {/* 一括保存ボタン（編集中のバーがある場合のみ表示） */}
@@ -1423,6 +1687,168 @@ export default function EmployeeSchedule() {
                 }`}
               >
                 保存する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 週間予定一括作成モーダル */}
+      {showBulkCreateModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-[700px] max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">週間予定一括作成</h3>
+              <button
+                onClick={() => setShowBulkCreateModal(false)}
+                className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-4">
+              スタッフ台帳の基本スケジュールから週間予定を自動作成します。
+            </p>
+
+            {/* 日付範囲選択 */}
+            <div className="flex items-center gap-4 mb-4 p-3 bg-gray-50 rounded">
+              <span className="text-sm font-medium text-gray-700">作成期間:</span>
+              <input
+                type="date"
+                value={bulkCreateDateRange.start.toISOString().split('T')[0]}
+                onChange={(e) => setBulkCreateDateRange(prev => ({ ...prev, start: new Date(e.target.value) }))}
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-green-400"
+              />
+              <span className="text-sm text-gray-500">〜</span>
+              <input
+                type="date"
+                value={bulkCreateDateRange.end.toISOString().split('T')[0]}
+                onChange={(e) => setBulkCreateDateRange(prev => ({ ...prev, end: new Date(e.target.value) }))}
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-green-400"
+              />
+            </div>
+
+            {/* プレビューテーブル */}
+            <div className="flex-1 overflow-auto border border-gray-200 rounded mb-4">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-100 sticky top-0">
+                  <tr>
+                    <th className="px-3 py-2 text-left border-b border-r border-gray-200 w-10">
+                      <input
+                        type="checkbox"
+                        checked={selectedEmployeesForBulkCreate.size === employees.filter(e => e.isActive && e.basicSchedule).length}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedEmployeesForBulkCreate(new Set(employees.filter(emp => emp.isActive && emp.basicSchedule).map(emp => emp.id)));
+                          } else {
+                            setSelectedEmployeesForBulkCreate(new Set());
+                          }
+                        }}
+                        className="w-4 h-4"
+                      />
+                    </th>
+                    <th className="px-3 py-2 text-left border-b border-r border-gray-200 min-w-[100px]">従業員</th>
+                    <th className="px-3 py-2 text-left border-b border-r border-gray-200 min-w-[60px]">雇用形態</th>
+                    {getDateRangeDays().slice(0, 7).map((day, i) => {
+                      const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+                      const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+                      return (
+                        <th
+                          key={i}
+                          className={`px-2 py-2 text-center border-b border-r border-gray-200 min-w-[70px] ${
+                            isWeekend ? 'bg-red-50' : ''
+                          }`}
+                        >
+                          <div>{formatDateShort(day)}</div>
+                          <div className={`text-xs ${isWeekend ? 'text-red-500' : 'text-gray-500'}`}>
+                            ({dayNames[day.getDay()]})
+                          </div>
+                        </th>
+                      );
+                    })}
+                  </tr>
+                </thead>
+                <tbody>
+                  {employees.filter(e => e.isActive && e.basicSchedule).map(employee => (
+                    <tr key={employee.id} className="hover:bg-gray-50">
+                      <td className="px-3 py-2 border-b border-r border-gray-200">
+                        <input
+                          type="checkbox"
+                          checked={selectedEmployeesForBulkCreate.has(employee.id)}
+                          onChange={() => toggleBulkCreateSelection(employee.id)}
+                          className="w-4 h-4"
+                        />
+                      </td>
+                      <td className="px-3 py-2 border-b border-r border-gray-200 font-medium">
+                        {employee.name}
+                      </td>
+                      <td className="px-3 py-2 border-b border-r border-gray-200">
+                        <span className={`px-2 py-0.5 rounded text-xs ${
+                          employee.employeeType === '社員'
+                            ? 'bg-blue-100 text-blue-700'
+                            : employee.employeeType === 'アルバイト'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}>
+                          {employee.employeeType}
+                        </span>
+                      </td>
+                      {getDateRangeDays().slice(0, 7).map((day, i) => {
+                        const dayKey = getDayKey(day);
+                        const schedule = employee.basicSchedule?.[dayKey];
+                        const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+                        return (
+                          <td
+                            key={i}
+                            className={`px-2 py-2 text-center border-b border-r border-gray-200 ${
+                              isWeekend ? 'bg-red-50' : ''
+                            }`}
+                          >
+                            {schedule?.work ? (
+                              <div className="text-xs">
+                                <div className="font-medium text-green-600">{schedule.start}</div>
+                                <div className="text-gray-500">〜</div>
+                                <div className="font-medium text-green-600">{schedule.end}</div>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-400">休み</span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* 選択数表示 */}
+            <div className="text-sm text-gray-600 mb-4">
+              {selectedEmployeesForBulkCreate.size} / {employees.filter(e => e.isActive && e.basicSchedule).length} 名を選択中
+            </div>
+
+            {/* ボタン */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setShowBulkCreateModal(false);
+                  setSelectedEmployeesForBulkCreate(new Set());
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 text-sm font-medium"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleBulkCreate}
+                disabled={selectedEmployeesForBulkCreate.size === 0}
+                className={`flex-1 px-4 py-2 rounded text-sm font-medium ${
+                  selectedEmployeesForBulkCreate.size > 0
+                    ? 'bg-green-500 text-white hover:bg-green-600'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                一括作成
               </button>
             </div>
           </div>

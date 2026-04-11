@@ -37,4 +37,5 @@ export interface TodayCastData {
   workStyle?: string; // 勤務形態
   manager?: string; // 担当者
   store?: string; // 所属店舗
+  luggageDetails?: string; // 預り荷物の詳細（例：「紙袋1、ポーチ1」）
 }

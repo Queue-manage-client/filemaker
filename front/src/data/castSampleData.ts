@@ -36,7 +36,8 @@ export const sampleCastData: TodayCastData[] = [
     weeklyRemarks: "週末出勤増やしたい",
     workStyle: "レギュラー",
     manager: "田中",
-    store: "銀座店"
+    store: "銀座店",
+    luggageDetails: "紙袋1、ポーチ1"
   },
   {
     id: "002",
@@ -104,7 +105,8 @@ export const sampleCastData: TodayCastData[] = [
     weeklyRemarks: "VIP対応経験豊富",
     workStyle: "レギュラー",
     manager: "佐藤",
-    store: "恵比寿店"
+    store: "恵比寿店",
+    luggageDetails: "キャリーバッグ1"
   },
   {
     id: "004",
@@ -175,7 +177,8 @@ export const sampleCastData: TodayCastData[] = [
     weeklyRemarks: "長距離案件優先",
     workStyle: "レギュラー",
     manager: "田中",
-    store: "銀座店"
+    store: "銀座店",
+    luggageDetails: "衣装袋2、靴箱1"
   },
   {
     id: "006",
@@ -277,7 +280,8 @@ export const sampleCastData: TodayCastData[] = [
     weeklyRemarks: "新規エリア開拓中",
     workStyle: "レギュラー",
     manager: "高橋",
-    store: "横浜店"
+    store: "横浜店",
+    luggageDetails: "ボストンバッグ1、紙袋2"
   },
   {
     id: "009",

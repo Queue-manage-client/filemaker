@@ -84,6 +84,9 @@ export default function StoreLedger() {
 
   // イベント追加モーダルの状態管理
   const [isEventModalOpen, setIsEventModalOpen] = React.useState(false);
+
+  // 取分一覧モーダルの状態管理
+  const [isSharesModalOpen, setIsSharesModalOpen] = React.useState(false);
   const [eventList, setEventList] = React.useState([
     { id: '1', date: '2025/02/14', name: 'バレンタインデー', rate: 2.0, color: 'pink', active: true },
     { id: '2', date: '2025/03/03', name: 'ひな祭り', rate: 1.5, color: 'purple', active: true },
@@ -1696,13 +1699,7 @@ export default function StoreLedger() {
                   variant="outline"
                   size="sm"
                   className="flex items-center gap-2 border-purple-300 text-purple-700 hover:bg-purple-50"
-                  onClick={() => {
-                    const sharesSummary = courseFeeData.map(c => {
-                      const shares = calculateCourseFeeShares(c.price, c.hostessShare.free.percentage, c.hostessShare.panel.percentage, c.hostessShare.nomination.percentage);
-                      return `${c.courseName}(${c.duration}分) ¥${c.price.toLocaleString()}\n  ホステス: フリー¥${shares.hostessShare.free.amount.toLocaleString()} / パネル¥${shares.hostessShare.panel.amount.toLocaleString()} / 指名¥${shares.hostessShare.nomination.amount.toLocaleString()}\n  店舗: フリー¥${shares.storeShare.free.amount.toLocaleString()} / パネル¥${shares.storeShare.panel.amount.toLocaleString()} / 指名¥${shares.storeShare.nomination.amount.toLocaleString()}`;
-                    }).join('\n\n');
-                    alert(`【取分一覧】\n\n${sharesSummary}`);
-                  }}
+                  onClick={() => setIsSharesModalOpen(true)}
                 >
                   <Eye className="w-4 h-4" />
                   取分一覧
@@ -1925,6 +1922,93 @@ export default function StoreLedger() {
                       </div>
                     );
                   })()}
+                </div>
+              </div>
+            )}
+
+            {/* 取分一覧モーダル */}
+            {isSharesModalOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[85vh] overflow-hidden flex flex-col">
+                  <div className="flex justify-between items-center px-6 py-4 border-b bg-purple-50">
+                    <h4 className="text-lg font-semibold text-purple-800 flex items-center gap-2">
+                      <Eye className="w-5 h-5" />
+                      取分一覧
+                    </h4>
+                    <Button variant="ghost" size="sm" onClick={() => setIsSharesModalOpen(false)}>
+                      <X className="w-5 h-5" />
+                    </Button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-4">
+                    <table className="w-full text-sm border-collapse">
+                      <thead className="bg-gray-100 sticky top-0">
+                        <tr>
+                          <th className="px-3 py-2 text-left font-medium text-gray-700 border">コース名</th>
+                          <th className="px-3 py-2 text-right font-medium text-gray-700 border">時間</th>
+                          <th className="px-3 py-2 text-right font-medium text-gray-700 border">料金</th>
+                          <th className="px-3 py-2 text-center font-medium text-red-700 border bg-red-50" colSpan={3}>ホステス取分</th>
+                          <th className="px-3 py-2 text-center font-medium text-blue-700 border bg-blue-50" colSpan={3}>店舗取分</th>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <th className="border"></th>
+                          <th className="border"></th>
+                          <th className="border"></th>
+                          <th className="px-2 py-1 text-center text-xs text-red-600 border bg-red-50">フリー</th>
+                          <th className="px-2 py-1 text-center text-xs text-red-600 border bg-red-50">パネル</th>
+                          <th className="px-2 py-1 text-center text-xs text-red-600 border bg-red-50">指名</th>
+                          <th className="px-2 py-1 text-center text-xs text-blue-600 border bg-blue-50">フリー</th>
+                          <th className="px-2 py-1 text-center text-xs text-blue-600 border bg-blue-50">パネル</th>
+                          <th className="px-2 py-1 text-center text-xs text-blue-600 border bg-blue-50">指名</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {courseFeeData.map((course) => {
+                          const shares = calculateCourseFeeShares(
+                            course.price,
+                            course.hostessShare.free.percentage,
+                            course.hostessShare.panel.percentage,
+                            course.hostessShare.nomination.percentage
+                          );
+                          return (
+                            <tr key={course.id} className="hover:bg-gray-50">
+                              <td className="px-3 py-2 border font-medium">{course.courseName}</td>
+                              <td className="px-3 py-2 border text-right">{course.duration}分</td>
+                              <td className="px-3 py-2 border text-right font-medium">¥{course.price.toLocaleString()}</td>
+                              <td className="px-3 py-2 border text-right bg-red-50">
+                                <div className="text-xs text-gray-500">{course.hostessShare.free.percentage}%</div>
+                                <div className="font-medium text-red-700">¥{shares.hostessShare.free.amount.toLocaleString()}</div>
+                              </td>
+                              <td className="px-3 py-2 border text-right bg-red-50">
+                                <div className="text-xs text-gray-500">{course.hostessShare.panel.percentage}%</div>
+                                <div className="font-medium text-red-700">¥{shares.hostessShare.panel.amount.toLocaleString()}</div>
+                              </td>
+                              <td className="px-3 py-2 border text-right bg-red-50">
+                                <div className="text-xs text-gray-500">{course.hostessShare.nomination.percentage}%</div>
+                                <div className="font-medium text-red-700">¥{shares.hostessShare.nomination.amount.toLocaleString()}</div>
+                              </td>
+                              <td className="px-3 py-2 border text-right bg-blue-50">
+                                <div className="text-xs text-gray-500">{100 - course.hostessShare.free.percentage}%</div>
+                                <div className="font-medium text-blue-700">¥{shares.storeShare.free.amount.toLocaleString()}</div>
+                              </td>
+                              <td className="px-3 py-2 border text-right bg-blue-50">
+                                <div className="text-xs text-gray-500">{100 - course.hostessShare.panel.percentage}%</div>
+                                <div className="font-medium text-blue-700">¥{shares.storeShare.panel.amount.toLocaleString()}</div>
+                              </td>
+                              <td className="px-3 py-2 border text-right bg-blue-50">
+                                <div className="text-xs text-gray-500">{100 - course.hostessShare.nomination.percentage}%</div>
+                                <div className="font-medium text-blue-700">¥{shares.storeShare.nomination.amount.toLocaleString()}</div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="px-6 py-3 border-t bg-gray-50 flex justify-end">
+                    <Button variant="outline" onClick={() => setIsSharesModalOpen(false)}>
+                      閉じる
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
