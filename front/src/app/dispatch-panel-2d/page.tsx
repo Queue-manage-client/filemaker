@@ -667,15 +667,15 @@ export default function Original() {
     </div>
 
   {/* INドラ未定予約リスト */}
-  <div className="left-[705px] top-[58px] absolute text-center text-black text-[13px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>オプション</div>
-  <div className="left-[689px] top-[68px] absolute text-center text-black text-[13px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>カード</div>
-  <div className="left-[673px] top-[68px] absolute text-center text-black text-[13px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>着TEL</div>
-  <div className="left-[657px] top-[68px] absolute text-center text-black text-[13px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>待合せ</div>
-  <div className="left-[641px] top-[68px] absolute text-center text-black text-[13px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>領収書</div>
-  <div className="w-10 left-[603px] top-[95px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">時間計</div>
-  <div className="w-8 left-[441px] top-[95px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">迎え場所</div>
-  <div className="w-[42px] left-[361px] top-[95px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">案内時間</div>
-  <div className="w-[70px] left-[504px] top-[95px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">ホステス名</div>
+  <div className="left-[705px] top-[58px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>オプション</div>
+  <div className="left-[689px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>カード</div>
+  <div className="left-[673px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>着TEL</div>
+  <div className="left-[657px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>待合せ</div>
+  <div className="left-[641px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>領収書</div>
+  <div className="left-[605px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">時間計</div>
+  <div className="left-[441px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">迎え場所</div>
+  <div className="left-[365px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">案内時間</div>
+  <div className="left-[516px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">ホステス名</div>
   <div className="w-[150px] h-5 left-[466px] top-[75px] absolute bg-lime-200" />
   <div className="w-[150px] h-5 left-[466px] top-[77px] absolute flex items-center justify-center text-black text-[14px] font-normal font-['Inter'] whitespace-nowrap">INドラ未定予約リスト</div>
   <div className="w-[368px] h-[600px] left-[361px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-x-hidden overflow-y-auto">
@@ -744,15 +744,15 @@ export default function Original() {
   {/* 出勤予定ホステス */}
   <div className="w-[357px] h-5 left-[4px] top-[75px] absolute bg-cyan-200" />
   <div className="w-[357px] left-[4px] top-[77px] absolute text-center text-black text-[12px] font-normal font-['Inter'] overflow-hidden">出勤予定ホステス</div>
-  <div className="left-[352px] top-[68px] absolute text-center text-black text-[13px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>確TEL</div>
-  <div className="w-9 left-[330px] top-[95px] absolute text-center text-black text-[13px] font-normal font-['Inter']">帰宅</div>
-  <div className="w-9 left-[288px] top-[95px] absolute text-center text-black text-[13px] font-normal font-['Inter']">終了</div>
-  <div className="w-20 left-[222px] top-[95px] absolute text-center text-black text-[13px] font-normal font-['Inter']">地域</div>
-  <div className="w-9 left-[180px] top-[95px] absolute text-center text-black text-[13px] font-normal font-['Inter']">出勤</div>
-  <div className="w-4 left-[160px] top-[95px] absolute text-center text-black text-[13px] font-normal font-['Inter']">決定</div>
-  <div className="w-9 left-[119px] top-[95px] absolute text-center text-black text-[13px] font-normal font-['Inter']">迎えドラ</div>
-  <div className="w-[20px] left-[97px] top-[95px] absolute text-center text-black text-[13px] font-normal font-['Inter']">確認</div>
-  <div className="w-12 left-[43px] top-[95px] absolute text-black text-[13px] font-normal font-['Inter']">ホステス名</div>
+  <div className="left-[352px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>確TEL</div>
+  <div className="left-[324px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">帰宅</div>
+  <div className="left-[286px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">終了</div>
+  <div className="w-16 left-[226px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">地域</div>
+  <div className="left-[183px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">出勤</div>
+  <div className="left-[159px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">決定</div>
+  <div className="left-[113px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">迎えドラ</div>
+  <div className="left-[95px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">確認</div>
+  <div className="left-[30px] top-[95px] absolute text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">ホステス名</div>
   <div className="w-[357px] h-[600px] left-[4px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-x-hidden overflow-y-auto">
     {scheduledHostessSampleData.map((hostess: ScheduledHostess, index: number) => {
       const topPosition = index * 22;
@@ -829,21 +829,21 @@ export default function Original() {
   <div className="w-[176px] h-5 left-[961px] top-[77px] absolute flex items-center justify-center text-black text-[14px] font-normal font-['Inter'] whitespace-nowrap">OUTドラ未定・接客中リスト</div>
 
   {/* ヘッダー行 */}
-  <div className="w-10 left-[729px] top-[95px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">開始</div>
-  <div className="w-[70px] left-[769px] top-[95px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">ホステス名</div>
-  <div className="w-10 left-[867px] top-[95px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">時間計</div>
-  <div className="w-12 left-[907px] top-[95px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">開始</div>
-  <div className="w-12 left-[955px] top-[95px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">終了</div>
-  <div className="w-32 left-[1003px] top-[95px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">場所</div>
-  <div className="w-4 left-[1131px] top-[95px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">D</div>
-  <div className="w-16 left-[1147px] top-[95px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">地域</div>
-  <div className="w-10 left-[1211px] top-[95px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">INドラ</div>
-  <div className="w-10 left-[1251px] top-[95px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">OUTドラ</div>
-  <div className="left-[1367px] top-[58px] absolute text-center text-black text-[13px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>オプション</div>
-  <div className="left-[1348px] top-[68px] absolute text-center text-black text-[13px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>カード</div>
-  <div className="left-[1329px] top-[68px] absolute text-center text-black text-[13px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>着TEL</div>
-  <div className="left-[1310px] top-[68px] absolute text-center text-black text-[13px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>待合せ</div>
-  <div className="left-[1291px] top-[68px] absolute text-center text-black text-[13px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>領収書</div>
+  <div className="w-10 left-[729px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">開始</div>
+  <div className="w-[70px] left-[769px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">ホステス名</div>
+  <div className="w-10 left-[867px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">時間計</div>
+  <div className="w-12 left-[907px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">開始</div>
+  <div className="w-12 left-[955px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">終了</div>
+  <div className="w-32 left-[1003px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">場所</div>
+  <div className="w-4 left-[1131px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">D</div>
+  <div className="w-16 left-[1147px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">地域</div>
+  <div className="w-12 left-[1207px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">INドラ</div>
+  <div className="w-14 left-[1245px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">OUTドラ</div>
+  <div className="left-[1367px] top-[58px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>オプション</div>
+  <div className="left-[1348px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>カード</div>
+  <div className="left-[1329px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>着TEL</div>
+  <div className="left-[1310px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>待合せ</div>
+  <div className="left-[1291px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>領収書</div>
   <div className="w-[663px] h-[960px] left-[729px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-x-hidden overflow-y-auto">
     {outDriverUndecidedSampleData.map((item: OutDriverUndecided, index: number) => (
       <div key={item.id} className={`w-[657px] h-6 left-0 absolute overflow-hidden ${index % 2 === 1 ? 'bg-zinc-200' : 'bg-white'} ${index === 0 ? 'border-t border-zinc-300' : ''}`} style={{ top: `${index * 24}px` }}>
@@ -891,10 +891,10 @@ export default function Original() {
   <div className="w-[338px] h-5 left-[1392px] top-[75px] absolute bg-fuchsia-300" />
   <div className="w-[338px] left-[1392px] top-[77px] absolute text-center text-black text-[12px] font-normal font-['Inter'] overflow-hidden">終了リスト</div>
   {/* コラムヘッダー */}
-  <div className="w-[86px] left-[1392px] top-[95px] absolute text-center text-black text-[13px] font-normal font-['Inter']">ホステス名</div>
-  <div className="w-10 left-[1518px] top-[95px] absolute text-center text-black text-[13px] font-normal font-['Inter']">終了</div>
-  <div className="w-28 left-[1558px] top-[95px] absolute text-center text-black text-[13px] font-normal font-['Inter']">場所</div>
-  <div className="w-[54px] left-[1670px] top-[95px] absolute text-center text-black text-[13px] font-normal font-['Inter']">OUTドラ</div>
+  <div className="w-[86px] left-[1392px] top-[95px] absolute text-center text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">ホステス名</div>
+  <div className="w-10 left-[1518px] top-[95px] absolute text-center text-black text-[11px] font-normal font-['Inter']">終了</div>
+  <div className="w-28 left-[1558px] top-[95px] absolute text-center text-black text-[11px] font-normal font-['Inter']">場所</div>
+  <div className="w-[58px] left-[1668px] top-[95px] absolute text-center text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">OUTドラ</div>
   <div className="w-[338px] h-[65px] left-[1392px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-x-hidden overflow-y-auto">
     {completedListSampleData.map((item: CompletedList, index: number) => {
     const topPosition = index * 22;
@@ -1075,12 +1075,12 @@ export default function Original() {
   {/* ホステス送り・帰宅 */}
   <div className="w-[249px] h-5 left-[1736px] top-[75px] absolute bg-yellow-200" />
   <div className="w-[249px] left-[1736px] top-[77px] absolute text-center text-black text-[12px] font-normal font-['Inter'] overflow-hidden">ホステス送り・帰宅</div>
-  <div className="w-5 left-[1736px] top-[96px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">荷物</div>
-  <div className="w-[42px] left-[1797px] top-[96px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">終了</div>
-  <div className="w-[42px] left-[1839px] top-[96px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">帰宅</div>
-  <div className="w-[19px] left-[1947px] top-[96px] absolute text-center justify-end text-black text-[13px] font-normal font-['Inter']">件数</div>
-  <div className="w-[54px] left-[1751px] top-[96px] absolute justify-end text-black text-center text-[13px] font-normal font-['Inter']">ホステス名</div>
-  <div className="w-[66px] left-[1879px] top-[96px] absolute justify-end text-black text-[13px] text-center font-normal font-['Inter']">送り場所</div>
+  <div className="w-5 left-[1736px] top-[96px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter']">荷物</div>
+  <div className="w-[42px] left-[1797px] top-[96px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter']">終了</div>
+  <div className="w-[42px] left-[1839px] top-[96px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter']">帰宅</div>
+  <div className="w-[22px] left-[1945px] top-[96px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter']">件数</div>
+  <div className="w-[54px] left-[1751px] top-[96px] absolute justify-end text-black text-center text-[11px] font-normal font-['Inter'] whitespace-nowrap">ホステス名</div>
+  <div className="w-[66px] left-[1879px] top-[96px] absolute justify-end text-black text-[11px] text-center font-normal font-['Inter'] whitespace-nowrap">送り場所</div>
   <div className="w-[249px] h-[460px] left-[1736px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-hidden">
     {hostessTransportSampleData.map((item: HostessTransport, index: number) => {
       const topPosition = index * 22;
