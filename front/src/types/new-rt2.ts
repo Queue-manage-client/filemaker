@@ -14,6 +14,7 @@ export interface ScheduledHostess {
   isConfirmed: boolean; // 出勤確認済みフラグ
   confirmCallTime?: string; // 確認電話の時間（例：「18:30」）
   isConfirmCallCompleted?: boolean; // 確認電話後の精算完了フラグ（色変化用）
+  isAttendanceConfirmed?: boolean; // マイページから出勤確認済みフラグ
 }
 
 // INドラ未定予約リスト

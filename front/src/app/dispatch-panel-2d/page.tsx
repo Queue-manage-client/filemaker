@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
-import { Pen, Package, ArrowLeft, Phone, AlertTriangle, X } from 'lucide-react';
+import { Pen, Package, ArrowLeft, Phone, AlertTriangle, X, Bell, BellOff, Clock, Settings2 } from 'lucide-react';
 import {
   scheduledHostessSampleData,
   undecidedDriverReservationSampleData,
@@ -34,16 +34,21 @@ import {
   WalkingDispatch,
 } from '@/types/new-rt2';
 
-// 待機2時間超キャスト判定用（サンプル）
-const longWaitingHostesses = [
+// 待機キャスト全データ（サンプル） - 閾値で動的フィルタ
+const allWaitingHostesses = [
   { name: 'かんな', store: '南IC事務所', waitingSince: '17:30', waitingMinutes: 150 },
   { name: 'スイレン', store: '南IC事務所', waitingSince: '18:00', waitingMinutes: 120 },
+  { name: 'まりあ', store: '南IC事務所', waitingSince: '19:00', waitingMinutes: 90 },
+  { name: 'ゆき', store: '南IC事務所', waitingSince: '19:30', waitingMinutes: 60 },
 ];
 
-// 送り5分超過ドライバー未着（サンプル）
-const overdueTransports = [
-  { hostessName: 'ミイ', scheduledTime: '21:00', destination: '河原町三条', minutesOverdue: 8 },
-  { hostessName: 'あず', scheduledTime: '21:15', destination: '四条大宮', minutesOverdue: 5 },
+// 送りドライバー未着（サンプル）- status追加で除外条件対応
+// status: 'waiting'=事務所待機, 'serving'=接客中, 'shooting'=撮影中, 'returning'=帰宅中
+const allOverdueTransports = [
+  { hostessName: 'ミイ', scheduledTime: '21:00', destination: '河原町三条', minutesOverdue: 8, status: 'waiting' as const },
+  { hostessName: 'あず', scheduledTime: '21:15', destination: '四条大宮', minutesOverdue: 5, status: 'waiting' as const },
+  { hostessName: 'りさ', scheduledTime: '20:45', destination: '烏丸御池', minutesOverdue: 12, status: 'serving' as const },
+  { hostessName: 'ゆな', scheduledTime: '21:00', destination: '西院', minutesOverdue: 7, status: 'shooting' as const },
 ];
 
 // 待機ドライバーの待機経過時間を計算（分単位）- サンプル表示用に上限設定
@@ -257,6 +262,22 @@ export default function Original() {
   const [showOverdueAlert, setShowOverdueAlert] = React.useState(true);
   const [dismissedOverdue, setDismissedOverdue] = React.useState<string[]>([]);
   const [showLuggageConfirm, setShowLuggageConfirm] = React.useState<string | null>(null);
+  // 待機アラート オン/オフ & 閾値設定
+  const [waitingAlertEnabled, setWaitingAlertEnabled] = React.useState(true);
+  const [waitingThresholdMinutes, setWaitingThresholdMinutes] = React.useState(120);
+  const [showWaitingSettings, setShowWaitingSettings] = React.useState(false);
+
+  // 閾値でフィルタした待機超過キャスト
+  const longWaitingHostesses = React.useMemo(
+    () => allWaitingHostesses.filter(h => h.waitingMinutes >= waitingThresholdMinutes),
+    [waitingThresholdMinutes]
+  );
+
+  // 除外条件適用済みの送りドライバー未着（事務所待機のみ表示）
+  const overdueTransports = React.useMemo(
+    () => allOverdueTransports.filter(t => t.status === 'waiting'),
+    []
+  );
 
   React.useEffect(() => {
     document.title = '配車パネル2D - Dispatch Harmony Hub';
@@ -332,12 +353,12 @@ export default function Original() {
         </div>
 
         {/* アラート */}
-        {showWaitingAlert && longWaitingHostesses.filter(h => !dismissedAlerts.includes(h.name)).length > 0 && (
+        {waitingAlertEnabled && showWaitingAlert && longWaitingHostesses.filter(h => !dismissedAlerts.includes(h.name)).length > 0 && (
           <div className="fixed bottom-4 right-4 z-50 w-[280px] bg-red-50 border-2 border-red-400 rounded-lg shadow-xl">
             <div className="bg-red-500 text-white px-3 py-1.5 flex items-center justify-between rounded-t-lg">
               <div className="flex items-center gap-1.5">
                 <AlertTriangle className="w-4 h-4" />
-                <span className="text-sm font-bold">待機2時間超過</span>
+                <span className="text-sm font-bold">待機{waitingThresholdMinutes}分超過</span>
               </div>
               <button type="button" onClick={() => setShowWaitingAlert(false)} className="hover:bg-red-600 rounded p-0.5">
                 <X className="w-4 h-4" />
@@ -370,13 +391,13 @@ export default function Original() {
   return (
     <div className="w-full overflow-x-auto overflow-y-hidden h-[1080px]"
     >
-      {/* 待機2時間超キャスト アラート - 右下 */}
-      {showWaitingAlert && longWaitingHostesses.filter(h => !dismissedAlerts.includes(h.name)).length > 0 && (
+      {/* 待機超過キャスト アラート - 右下 */}
+      {waitingAlertEnabled && showWaitingAlert && longWaitingHostesses.filter(h => !dismissedAlerts.includes(h.name)).length > 0 && (
         <div className="fixed bottom-4 right-4 z-50 w-[300px] bg-red-50 border-2 border-red-400 rounded-lg shadow-2xl overflow-hidden">
           <div className="bg-red-500 text-white px-3 py-1.5 flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <AlertTriangle className="w-4 h-4" />
-              <span className="text-sm font-bold">待機2時間超過</span>
+              <span className="text-sm font-bold">待機{waitingThresholdMinutes}分超過</span>
             </div>
             <button type="button" onClick={() => setShowWaitingAlert(false)} className="hover:bg-red-600 rounded p-0.5">
               <X className="w-4 h-4" />
@@ -392,7 +413,7 @@ export default function Original() {
                 <button
                   type="button"
                   onClick={() => setDismissedAlerts(prev => [...prev, hostess.name])}
-                  className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-600"
+                  className="text-xs px-2 py-1 bg-green-100 hover:bg-green-200 rounded text-green-700 font-medium border border-green-300"
                 >
                   確認
                 </button>
@@ -409,11 +430,17 @@ export default function Original() {
             <div className="flex items-center gap-1.5">
               <AlertTriangle className="w-4 h-4" />
               <span className="text-sm font-bold">送りドライバー未着</span>
+              <span className="text-xs font-normal ml-1 opacity-80">({overdueTransports.length}/{allOverdueTransports.length}件)</span>
             </div>
             <button type="button" onClick={() => setShowOverdueAlert(false)} className="hover:bg-orange-600 rounded p-0.5">
               <X className="w-4 h-4" />
             </button>
           </div>
+          {allOverdueTransports.filter(t => t.status !== 'waiting').length > 0 && (
+            <div className="px-3 py-1 bg-orange-100 text-xs text-orange-700">
+              接客中・撮影中 {allOverdueTransports.filter(t => t.status !== 'waiting').length}名は除外
+            </div>
+          )}
           <div className="p-2 space-y-1">
             {overdueTransports.filter(t => !dismissedOverdue.includes(t.hostessName)).map((transport) => (
               <div key={transport.hostessName} className="flex items-center justify-between bg-white rounded px-2 py-1.5 border border-orange-200">
@@ -427,7 +454,7 @@ export default function Original() {
                 <button
                   type="button"
                   onClick={() => setDismissedOverdue(prev => [...prev, transport.hostessName])}
-                  className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-600"
+                  className="text-xs px-2 py-1 bg-green-100 hover:bg-green-200 rounded text-green-700 font-medium border border-green-300"
                 >
                   確認
                 </button>
@@ -558,6 +585,66 @@ export default function Original() {
             >
               チャット表示
             </Button>
+
+            {/* 待機アラート オン/オフ + 設定 */}
+            <div className="relative flex items-center gap-1 ml-1">
+              <Button
+                className={`h-8 px-3 text-[13px] border border-black flex items-center gap-1.5 ${
+                  waitingAlertEnabled
+                    ? 'bg-red-400 hover:bg-red-500 text-white'
+                    : 'bg-gray-200 hover:bg-gray-300 text-gray-600'
+                }`}
+                onClick={() => setWaitingAlertEnabled(prev => !prev)}
+              >
+                {waitingAlertEnabled ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
+                待機超過
+              </Button>
+              <Button
+                variant="outline"
+                className="h-8 w-8 px-0 border-black"
+                onClick={() => setShowWaitingSettings(prev => !prev)}
+              >
+                <Settings2 className="w-3.5 h-3.5" />
+              </Button>
+              {showWaitingSettings && (
+                <div className="absolute top-full right-0 mt-1 z-50 bg-white border border-zinc-300 rounded-lg shadow-xl p-3 w-[220px]">
+                  <div className="text-sm font-bold mb-2 flex items-center gap-1.5">
+                    <Clock className="w-4 h-4" />
+                    待機超過アラート設定
+                  </div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm text-gray-600 whitespace-nowrap">閾値:</span>
+                    <input
+                      type="number"
+                      min={30}
+                      max={480}
+                      step={30}
+                      value={waitingThresholdMinutes}
+                      onChange={(e) => setWaitingThresholdMinutes(Number(e.target.value) || 120)}
+                      className="w-20 border rounded px-2 py-1 text-sm text-center"
+                    />
+                    <span className="text-sm text-gray-600">分</span>
+                  </div>
+                  <div className="flex gap-1 flex-wrap">
+                    {[60, 90, 120, 180].map(m => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setWaitingThresholdMinutes(m)}
+                        className={`px-2 py-1 text-xs rounded border ${
+                          waitingThresholdMinutes === m ? 'bg-red-100 border-red-400 text-red-700 font-bold' : 'bg-gray-50 border-gray-300 text-gray-600'
+                        }`}
+                      >
+                        {m}分
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-2 text-xs text-gray-500">
+                    現在 {longWaitingHostesses.length}名が超過中
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -606,7 +693,7 @@ export default function Original() {
           <div className="w-5 left-[246px] top-[2px] absolute text-right text-black text-[12px] font-normal font-['Inter'] overflow-hidden">{reservation.timeTotal}</div>
           <div className="w-6 h-5 left-[218px] top-0 absolute border-r border-b border-zinc-300" />
           <div className="w-4 left-[220px] top-[2px] absolute text-center text-black text-[12px] font-normal font-['Inter'] overflow-hidden">{reservation.sColumn}</div>
-          <div className={`w-[20px] h-5 left-[48px] top-0 absolute border-r border-b border-zinc-300 ${reservation.isConfirmed ? 'bg-purple-300' : ''}`} />
+          <div className={`w-[20px] h-5 left-[48px] top-0 absolute border-r border-b border-zinc-300 ${reservation.isConfirmed ? 'bg-blue-200' : ''}`} />
           {reservation.isConfirmed && (
             <div className="w-3 left-[52px] top-[2px] absolute text-center text-black text-[12px] font-normal font-['Inter'] overflow-hidden">確</div>
           )}
@@ -614,9 +701,9 @@ export default function Original() {
           <div className="w-[66px] left-[150px] top-[2px] absolute text-black text-[12px] font-normal font-['Inter'] overflow-hidden">{reservation.area} {reservation.hostessName}</div>
           <div className="w-16 h-5 left-[68px] top-0 absolute border-r border-b border-zinc-300" />
           <div className="w-14 left-[71px] top-[2px] absolute text-black text-[12px] font-normal font-['Inter'] overflow-hidden">{reservation.pickupLocation}</div>
-          <div className="w-4 h-[20px] left-[132px] top-0 absolute bg-purple-300 border-r border-b border-zinc-300"/>
+          <div className="w-4 h-[20px] left-[132px] top-0 absolute bg-blue-200 border-r border-b border-zinc-300"/>
           <div className="w-3 left-[134px] top-[2px] absolute text-center text-black text-[12px] font-normal font-['Inter'] overflow-hidden">D</div>
-          <div className="w-12 h-5 left-0 top-0 absolute rounded-[2px] bg-gradient-to-b from-purple-200 via-purple-300 to-purple-400 border-2 border-t-purple-100 border-l-purple-100 border-r-purple-500 border-b-purple-500 shadow-[2px_2px_3px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.5)]" />
+          <div className="w-12 h-5 left-0 top-0 absolute rounded-[2px] bg-gradient-to-b from-blue-100 via-blue-200 to-blue-300 border-2 border-t-blue-50 border-l-blue-50 border-r-blue-400 border-b-blue-400 shadow-[2px_2px_3px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.5)]" />
           <div className="w-11 left-[3px] top-[2px] absolute text-center text-black text-[12px] font-normal font-['Inter'] overflow-hidden">{reservation.departureTime}</div>
         </div>
       );
@@ -675,7 +762,19 @@ export default function Original() {
           {/* 背景色ベース - 行全体を白で塗りつぶし */}
           <div className="w-[356px] h-5 left-0 top-0 absolute bg-white" />
           <div className="w-[70px] h-5 left-[23px] top-0 absolute bg-yellow-200 border-r border-b border-zinc-300" />
-          <div className="w-5 h-5 left-0 top-0 absolute bg-zinc-300 border-r border-b border-zinc-300" />
+          {/* 左端セル: マイページ出勤確認済み=緑+✓ / 未確認=グレー */}
+          <div className={`w-5 h-5 left-0 top-0 absolute border-r border-b border-zinc-300 group/att ${
+            hostess.isAttendanceConfirmed
+              ? 'bg-green-400'
+              : 'bg-zinc-300'
+          }`}>
+            {hostess.isAttendanceConfirmed && (
+              <div className="w-5 h-5 flex items-center justify-center text-white text-[11px] font-bold">✓</div>
+            )}
+            <div className="hidden group-hover/att:block absolute left-0 bottom-full mb-1 z-50 bg-black text-white text-[11px] px-2 py-1 rounded whitespace-nowrap shadow-lg">
+              {hostess.isAttendanceConfirmed ? 'マイページ出勤確認済み' : '出勤未確認'}
+            </div>
+          </div>
           <div className="w-4 h-5 left-[155px] top-0 absolute bg-zinc-400 border-r border-b border-zinc-300" />
           <div className={`w-[20px] h-5 left-[93px] top-0 absolute border-r border-b border-zinc-300 ${hostess.isConfirmed ? 'bg-green-300' : 'bg-white'}`} />
           <div className="w-[24px] h-5 left-[113px] top-0 absolute bg-white border-r border-b border-zinc-300" />
@@ -760,7 +859,7 @@ export default function Original() {
       <div className="w-[24px] h-6 left-[112px] top-[3px] absolute text-center text-black text-[12px] font-normal font-['Inter'] overflow-hidden">{item.shopCode || ''}</div>
       <div className="w-32 h-6 left-[274px] top-0 absolute border-r border-b border-zinc-300" />
       <div className="w-32 h-6 left-[276px] top-[3px] absolute text-black text-[12px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap" title={item.destination}>{item.destination}</div>
-      <div className="w-4 h-6 left-[402px] top-0 absolute bg-purple-300 border-r border-b border-zinc-300" />
+      <div className="w-4 h-6 left-[402px] top-0 absolute bg-blue-200 border-r border-b border-zinc-300" />
       <div className="w-3 h-6 left-[404px] top-[3px] absolute text-center text-black text-[12px] font-normal font-['Inter']">D</div>
       <div className="w-16 h-6 left-[418px] top-0 absolute border-r border-b border-zinc-300" />
       <div className="w-14 h-6 left-[422px] top-[3px] absolute text-black text-[12px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">{item.station}</div>
@@ -1064,13 +1163,13 @@ export default function Original() {
       const topPosition = index * 22;
       return (
         <div key={item.id} className="w-[406px] h-5 left-0 absolute overflow-hidden" style={{ top: `${topPosition}px` }}>
-          <div className="w-[18px] h-5 left-[78px] absolute bg-purple-300 border border-neutral-300" />
-          <div className="w-9 h-5 left-0 absolute bg-purple-300 border border-neutral-300" />
+          <div className="w-[18px] h-5 left-[78px] absolute bg-rose-200 border border-neutral-300" />
+          <div className="w-9 h-5 left-0 absolute bg-rose-200 border border-neutral-300" />
           <div className="w-3 h-5 left-[81px] top-[2px] absolute text-center text-black text-[12px] font-normal font-['Inter'] overflow-hidden">{item.status === 'completed' ? '済' : ''}</div>
           <div className="w-6 h-5 left-[6px] top-[2px] absolute text-center text-black text-[12px] font-normal font-['Inter'] overflow-hidden">{item.type === 'entry' ? '入店' : ''}</div>
-          <div className="w-[42px] h-5 left-[36px] absolute border border-rose-300/60" />
+          <div className="w-[42px] h-5 left-[36px] absolute border border-rose-200" />
           <div className="w-9 h-5 left-[39px] top-[2px] absolute text-center text-black text-[12px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">{item.time}</div>
-          <div className="w-48 h-5 left-[96px] absolute bg-purple-300 border border-neutral-300" />
+          <div className="w-48 h-5 left-[96px] absolute bg-rose-200 border border-neutral-300" />
           <div className="w-44 h-5 left-[99px] top-[2px] absolute text-black text-[12px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">{item.location}</div>
           {item.hostessName1 && (
             <>
