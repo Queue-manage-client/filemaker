@@ -25,8 +25,8 @@ export default function PointHistoryWindow() {
     customerName: 'フクダ',
     salesNo: '624359',
     hostessName: 'みらい',
-    pointAcquired: '680',
-    pointUsed: '',
+    points: '680',
+    sign: 'plus' as 'plus' | 'minus',
     remarks: '',
     expirationOption: '1year' as 'unlimited' | '3months' | '6months' | '1year' | 'custom',
     expirationDate: ''
@@ -108,8 +108,8 @@ export default function PointHistoryWindow() {
       customerName: 'フクダ',
       salesNo: '',
       hostessName: '',
-      pointAcquired: '',
-      pointUsed: '',
+      points: '',
+      sign: 'plus',
       remarks: '',
       expirationOption: '1year',
       expirationDate: ''
@@ -350,26 +350,46 @@ export default function PointHistoryWindow() {
                 </div>
               </div>
 
-              {/* ポイント得点 */}
+              {/* ポイント（プラス/マイナス統合） */}
               <div className="flex items-center gap-3">
-                <label className="w-24 text-right text-gray-800 text-sm font-medium">ポイント得点</label>
-                <input
-                  type="text"
-                  value={formData.pointAcquired}
-                  onChange={(e) => handleFormChange('pointAcquired', e.target.value)}
-                  className="flex-1 h-8 px-2 text-sm border border-gray-400 bg-white"
-                />
-              </div>
-
-              {/* ポイント減点 */}
-              <div className="flex items-center gap-3">
-                <label className="w-24 text-right text-gray-800 text-sm font-medium">ポイント減点</label>
-                <input
-                  type="text"
-                  value={formData.pointUsed}
-                  onChange={(e) => handleFormChange('pointUsed', e.target.value)}
-                  className="flex-1 h-8 px-2 text-sm border border-gray-400 bg-white"
-                />
+                <label className="w-24 text-right text-gray-800 text-sm font-medium">ポイント</label>
+                <div className="flex items-center gap-2 flex-1">
+                  {/* プラス/マイナストグル */}
+                  <div className="flex rounded overflow-hidden border border-gray-400">
+                    <button
+                      type="button"
+                      onClick={() => handleFormChange('sign', 'plus')}
+                      className={`px-3 h-8 text-sm font-bold transition-colors ${
+                        formData.sign === 'plus'
+                          ? 'bg-green-500 text-white'
+                          : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                      }`}
+                    >
+                      ＋
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleFormChange('sign', 'minus')}
+                      className={`px-3 h-8 text-sm font-bold transition-colors ${
+                        formData.sign === 'minus'
+                          ? 'bg-red-500 text-white'
+                          : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                      }`}
+                    >
+                      ー
+                    </button>
+                  </div>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.points}
+                    onChange={(e) => handleFormChange('points', e.target.value)}
+                    className={`flex-1 h-8 px-2 text-sm border border-gray-400 bg-white font-semibold ${
+                      formData.sign === 'plus' ? 'text-green-700' : 'text-red-700'
+                    }`}
+                    placeholder="ポイント数"
+                  />
+                </div>
               </div>
 
               {/* 有効期限 */}

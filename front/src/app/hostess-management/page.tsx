@@ -1,7 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { sampleCastData } from '@/data/castSampleData';
+import { pickupCars, sendoffCars } from '@/data/transportCarSampleData';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -62,23 +65,55 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-export default function HostessManagementPage() {
+function HostessManagementContent() {
+  const searchParams = useSearchParams();
+  const castId = searchParams.get('cast_id');
+  const foundCast = sampleCastData.find(c => c.id === castId) ?? sampleCastData[0];
+
   const [activeSection, setActiveSection] = useState<string>('customer');
   const [isAttendanceConfirmed, setIsAttendanceConfirmed] = useState(false);
-  const [selectedCarId, setSelectedCarId] = useState<string | null>(null);
+
+  // 3状態送迎 state
+  type TransportStatus = 'idle' | 'pickup' | 'arrived' | 'sendoff';
+  const [transportStatus, setTransportStatus] = useState<TransportStatus>('idle');
+  const [selectedPickupCarId, setSelectedPickupCarId] = useState<string | null>(null);
+  const [selectedSendoffCarId, setSelectedSendoffCarId] = useState<string | null>(null);
+  const [showSendoffSelect, setShowSendoffSelect] = useState(false);
+
+  const handleSelectPickupCar = (id: string) => {
+    setSelectedPickupCarId(id);
+    setTransportStatus('pickup');
+  };
+
+  const handleArrive = () => {
+    setTransportStatus('arrived');
+  };
+
+  const handleStartSendoff = (id: string) => {
+    setSelectedSendoffCarId(id);
+    setTransportStatus('sendoff');
+    setShowSendoffSelect(false);
+  };
+
+  const handleCompleteSendoff = () => {
+    setTransportStatus('idle');
+    setSelectedPickupCarId(null);
+    setSelectedSendoffCarId(null);
+    setShowSendoffSelect(false);
+  };
 
   React.useEffect(() => {
     document.title = 'プロフィール設定 - Dispatch Harmony Hub';
   }, []);
 
-  // サンプルデータ
+  // castSampleData から取得したキャスト情報をホステスデータにマッピング
   const hostessData = {
-    name: '山田 花子',
-    stageName: 'はなこ',
+    name: foundCast.name,
+    stageName: foundCast.name,
     thisMonthEarnings: 850000,
     lastMonthEarnings: 780000,
-    influencerLevel: 'ゴールド', // インフルエンサーレベル
-    influencerFollowers: 15000, // フォロワー数
+    influencerLevel: 'ゴールド',
+    influencerFollowers: 15000,
   };
 
   const monthOverMonthChange = hostessData.thisMonthEarnings - hostessData.lastMonthEarnings;
@@ -733,15 +768,6 @@ export default function HostessManagementPage() {
     ],
   };
 
-  // 送迎車サンプルデータ（社番・送り担当ドライバー情報を追加）
-  const availableCars = [
-    { id: '1', name: '1号車', vehicleNumber: '品川 500 あ 12-34', driver: '山田ドライバー', sendDriver: '鈴木ドライバー', eta: '18:30' },
-    { id: '2', name: '2号車', vehicleNumber: '品川 500 い 56-78', driver: '田中ドライバー', sendDriver: '高橋ドライバー', eta: '18:45' },
-    { id: '3', name: '3号車', vehicleNumber: '品川 500 う 90-12', driver: '佐藤ドライバー', sendDriver: '伊藤ドライバー', eta: '19:00' },
-  ];
-
-  // 迎え完了状態の管理
-  const [pickupCompleted, setPickupCompleted] = useState(false);
 
   const handleSaveCustomerMemo = (id: string) => {
     if (!editingMemo.trim()) return;
@@ -965,7 +991,7 @@ export default function HostessManagementPage() {
                 <button
                   onClick={() => setActiveSection('car')}
                   className={`p-2 lg:p-4 rounded-xl lg:rounded-2xl flex flex-col lg:flex-row items-center gap-1 lg:gap-4 transition-all hover:scale-[1.02] ${
-                    selectedCarId
+                    selectedPickupCarId
                       ? 'bg-blue-500 shadow-lg shadow-blue-500/30'
                       : 'bg-gradient-to-r from-blue-500 to-cyan-500 shadow-lg shadow-blue-500/20'
                   }`}
@@ -974,7 +1000,7 @@ export default function HostessManagementPage() {
                     <Car className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                   </div>
                   <div className="text-center lg:text-left">
-                    <div className="text-white font-bold text-xs lg:text-base">{selectedCarId ? '選択済み' : '送迎車確認'}</div>
+                    <div className="text-white font-bold text-xs lg:text-base">{selectedPickupCarId ? '選択済み' : '送迎車確認'}</div>
                     <div className="text-white/70 text-[10px] lg:text-sm hidden lg:block">出勤時の車両選択</div>
                   </div>
                 </button>
@@ -2330,98 +2356,193 @@ export default function HostessManagementPage() {
                   </div>
                 )}
 
-                {/* 送迎車選択 */}
+                {/* 送迎 */}
                 {activeSection === 'car' && (
                   <div className="space-y-3 lg:space-y-4">
-                    {/* 迎え/送り切り替えタブ */}
-                    <div className="flex gap-2 p-1 bg-gray-100 rounded-lg">
-                      <button
-                        onClick={() => setPickupCompleted(false)}
-                        className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-                          !pickupCompleted
-                            ? 'bg-blue-500 text-white shadow-sm'
-                            : 'text-gray-600 hover:bg-gray-200'
-                        }`}
-                      >
-                        迎え
-                      </button>
-                      <button
-                        onClick={() => setPickupCompleted(true)}
-                        className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-                          pickupCompleted
-                            ? 'bg-green-500 text-white shadow-sm'
-                            : 'text-gray-600 hover:bg-gray-200'
-                        }`}
-                      >
-                        送り
-                      </button>
-                    </div>
 
-                    <p className="text-gray-500 mb-3 lg:mb-4 text-sm lg:text-base">
-                      {pickupCompleted ? '送り担当のドライバー情報' : '出勤時に利用する送迎車を選択してください'}
-                    </p>
-
-                    <div className="grid gap-2 lg:gap-3">
-                      {availableCars.map(car => (
-                        <button
-                          key={car.id}
-                          onClick={() => setSelectedCarId(car.id)}
-                          className={`w-full p-3 lg:p-4 rounded-xl transition-all flex items-center gap-3 lg:gap-4 ${
-                            selectedCarId === car.id
-                              ? pickupCompleted
-                                ? 'bg-gradient-to-r from-green-500 to-emerald-500 shadow-lg shadow-green-500/30'
-                                : 'bg-gradient-to-r from-blue-500 to-cyan-500 shadow-lg shadow-blue-500/30'
-                              : 'bg-gray-50 hover:bg-gray-100'
-                          }`}
-                        >
-                          <div className={`w-10 h-10 lg:w-14 lg:h-14 rounded-full flex items-center justify-center flex-shrink-0 ${
-                            selectedCarId === car.id ? 'bg-white/20' : pickupCompleted ? 'bg-green-100' : 'bg-blue-100'
-                          }`}>
-                            <Car className={`w-5 h-5 lg:w-7 lg:h-7 ${selectedCarId === car.id ? 'text-white' : pickupCompleted ? 'text-green-500' : 'text-blue-500'}`} />
-                          </div>
-                          <div className="flex-1 text-left min-w-0">
-                            <div className={`font-bold text-base lg:text-lg ${selectedCarId === car.id ? 'text-white' : 'text-gray-800'}`}>
-                              {car.name}
-                            </div>
-                            {/* 社番表示 */}
-                            <div className={`text-[10px] lg:text-xs font-mono ${selectedCarId === car.id ? 'text-white/60' : 'text-gray-400'}`}>
-                              社番: {car.vehicleNumber}
-                            </div>
-                            {/* 迎え/送りに応じてドライバー名を切り替え */}
-                            <div className={`text-xs lg:text-sm ${selectedCarId === car.id ? 'text-white/70' : 'text-gray-500'}`}>
-                              {pickupCompleted ? `送り: ${car.sendDriver}` : `迎え: ${car.driver}`}
-                            </div>
-                          </div>
-                          <div className="text-right flex-shrink-0">
-                            <div className={`text-[10px] lg:text-xs ${selectedCarId === car.id ? 'text-white/60' : 'text-gray-400'}`}>
-                              {pickupCompleted ? '送り予定' : '到着予定'}
-                            </div>
-                            <div className={`font-bold text-lg lg:text-xl ${selectedCarId === car.id ? 'text-white' : 'text-gray-800'}`}>
-                              {car.eta}
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                    {selectedCarId && !pickupCompleted && (
-                      <Button
-                        className="w-full h-10 lg:h-12 text-sm lg:text-lg bg-blue-600 hover:bg-blue-700 mt-3 lg:mt-4"
-                        onClick={() => {
-                          setPickupCompleted(true);
-                          alert('迎え完了！送り担当ドライバー情報に切り替わりました');
-                        }}
-                      >
-                        迎え完了（送りドライバーに切り替え）
-                      </Button>
-                    )}
-                    {selectedCarId && pickupCompleted && (
-                      <div className="p-4 bg-green-50 rounded-xl border border-green-200">
-                        <div className="text-green-700 font-medium text-sm">✓ 送り担当ドライバーが割り当てられています</div>
-                        <div className="text-green-600 text-xs mt-1">
-                          お仕事終了後、送りドライバーがお迎えに参ります
+                    {/* idle: お迎え車両候補一覧 */}
+                    {transportStatus === 'idle' && (
+                      <div className="space-y-3">
+                        <p className="text-gray-500 text-sm lg:text-base">出勤時に利用するお迎え車を選択してください</p>
+                        <div className="grid gap-2 lg:gap-3">
+                          {pickupCars.map(car => (
+                            <button
+                              key={car.id}
+                              onClick={() => handleSelectPickupCar(car.id)}
+                              className="w-full p-3 lg:p-4 rounded-xl transition-all flex items-center gap-3 lg:gap-4 bg-gray-50 hover:bg-blue-50 border border-transparent hover:border-blue-200"
+                            >
+                              <div className="w-10 h-10 lg:w-14 lg:h-14 rounded-full flex items-center justify-center flex-shrink-0 bg-blue-100">
+                                <Car className="w-5 h-5 lg:w-7 lg:h-7 text-blue-500" />
+                              </div>
+                              <div className="flex-1 text-left min-w-0">
+                                <div className="font-bold text-base lg:text-lg text-gray-800">{car.name}</div>
+                                <div className="text-[10px] lg:text-xs font-mono text-gray-400">社番: {car.vehicleNumber}</div>
+                                <div className="text-xs lg:text-sm text-gray-500 flex items-center gap-1">
+                                  <User className="w-3 h-3" />{car.driverName}
+                                </div>
+                              </div>
+                              <div className="text-right flex-shrink-0">
+                                <div className="text-[10px] lg:text-xs text-gray-400">到着予定</div>
+                                <div className="font-bold text-lg lg:text-xl text-gray-800 flex items-center gap-1 justify-end">
+                                  <Clock className="w-4 h-4 text-blue-400" />{car.eta}
+                                </div>
+                              </div>
+                            </button>
+                          ))}
                         </div>
                       </div>
                     )}
+
+                    {/* pickup: お迎え中カード */}
+                    {transportStatus === 'pickup' && (() => {
+                      const car = pickupCars.find(c => c.id === selectedPickupCarId);
+                      if (!car) return null;
+                      return (
+                        <div className="space-y-3">
+                          <div className="rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 p-4 lg:p-6 shadow-lg shadow-blue-500/30 text-white">
+                            <div className="text-center mb-4">
+                              <div className="text-xs lg:text-sm font-medium text-white/70 mb-1">お迎え車両</div>
+                              <div className="text-2xl lg:text-3xl font-bold">この車です</div>
+                            </div>
+                            <div className="bg-white/15 rounded-xl p-3 lg:p-4 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Car className="w-4 h-4 lg:w-5 lg:h-5 text-white/80 flex-shrink-0" />
+                                <span className="font-bold text-base lg:text-lg">{car.name}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
+                                <MapPin className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
+                                <span className="font-mono">{car.vehicleNumber}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
+                                <User className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
+                                <span>{car.driverName}</span>
+                              </div>
+                              {car.driverPhone && (
+                                <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
+                                  <MapPin className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
+                                  <span>{car.driverPhone}</span>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-2 text-white font-bold text-sm lg:text-base">
+                                <Clock className="w-4 h-4 flex-shrink-0" />
+                                <span>到着予想: {car.eta}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <Button
+                            className="w-full h-11 lg:h-13 text-sm lg:text-base bg-blue-600 hover:bg-blue-700 flex items-center gap-2 justify-center"
+                            onClick={handleArrive}
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                            到着しました
+                          </Button>
+                        </div>
+                      );
+                    })()}
+
+                    {/* arrived: 到着済みカード */}
+                    {transportStatus === 'arrived' && (
+                      <div className="space-y-3">
+                        <div className="rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-500 p-4 lg:p-6 shadow-lg shadow-amber-400/30 text-white">
+                          <div className="text-center mb-4">
+                            <div className="flex items-center justify-center gap-2 mb-2">
+                              <CheckCircle className="w-6 h-6 lg:w-8 lg:h-8" />
+                              <span className="text-xl lg:text-2xl font-bold">到着済み</span>
+                            </div>
+                            <div className="text-white/80 text-sm lg:text-base">次の送迎をお待ちください</div>
+                          </div>
+                          <div className="bg-white/15 rounded-xl p-3 text-center text-white/90 text-xs lg:text-sm">
+                            お仕事終了後、送迎ドライバーがお迎えに参ります
+                          </div>
+                        </div>
+
+                        {!showSendoffSelect ? (
+                          <Button
+                            className="w-full h-11 lg:h-13 text-sm lg:text-base bg-amber-500 hover:bg-amber-600 flex items-center gap-2 justify-center"
+                            onClick={() => setShowSendoffSelect(true)}
+                          >
+                            <Car className="w-4 h-4" />
+                            送迎を開始する
+                          </Button>
+                        ) : (
+                          <div className="space-y-2">
+                            <p className="text-gray-500 text-sm">送迎車を選択してください</p>
+                            {sendoffCars.map(car => (
+                              <button
+                                key={car.id}
+                                onClick={() => handleStartSendoff(car.id)}
+                                className="w-full p-3 lg:p-4 rounded-xl transition-all flex items-center gap-3 lg:gap-4 bg-gray-50 hover:bg-green-50 border border-transparent hover:border-green-200"
+                              >
+                                <div className="w-10 h-10 lg:w-14 lg:h-14 rounded-full flex items-center justify-center flex-shrink-0 bg-green-100">
+                                  <Car className="w-5 h-5 lg:w-7 lg:h-7 text-green-500" />
+                                </div>
+                                <div className="flex-1 text-left min-w-0">
+                                  <div className="font-bold text-base lg:text-lg text-gray-800">{car.name}</div>
+                                  <div className="text-[10px] lg:text-xs font-mono text-gray-400">社番: {car.vehicleNumber}</div>
+                                  <div className="text-xs lg:text-sm text-gray-500 flex items-center gap-1">
+                                    <User className="w-3 h-3" />{car.driverName}
+                                  </div>
+                                </div>
+                                <div className="text-right flex-shrink-0">
+                                  <div className="text-[10px] lg:text-xs text-gray-400">送り予定</div>
+                                  <div className="font-bold text-lg lg:text-xl text-gray-800 flex items-center gap-1 justify-end">
+                                    <Clock className="w-4 h-4 text-green-400" />{car.eta}
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* sendoff: 送迎中カード */}
+                    {transportStatus === 'sendoff' && (() => {
+                      const car = sendoffCars.find(c => c.id === selectedSendoffCarId);
+                      if (!car) return null;
+                      return (
+                        <div className="space-y-3">
+                          <div className="rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 p-4 lg:p-6 shadow-lg shadow-green-500/30 text-white">
+                            <div className="text-center mb-4">
+                              <div className="text-xs lg:text-sm font-medium text-white/70 mb-1">送迎中</div>
+                              <div className="text-2xl lg:text-3xl font-bold">この車です</div>
+                            </div>
+                            <div className="bg-white/15 rounded-xl p-3 lg:p-4 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Car className="w-4 h-4 lg:w-5 lg:h-5 text-white/80 flex-shrink-0" />
+                                <span className="font-bold text-base lg:text-lg">{car.name}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
+                                <MapPin className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
+                                <span className="font-mono">{car.vehicleNumber}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
+                                <User className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
+                                <span>{car.driverName}</span>
+                              </div>
+                              {car.driverPhone && (
+                                <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
+                                  <MapPin className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
+                                  <span>{car.driverPhone}</span>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-2 text-white font-bold text-sm lg:text-base">
+                                <Clock className="w-4 h-4 flex-shrink-0" />
+                                <span>送り予定: {car.eta}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <Button
+                            className="w-full h-11 lg:h-13 text-sm lg:text-base bg-green-600 hover:bg-green-700 flex items-center gap-2 justify-center"
+                            onClick={handleCompleteSendoff}
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                            完了・リセット
+                          </Button>
+                        </div>
+                      );
+                    })()}
+
                   </div>
                 )}
 
@@ -2431,5 +2552,13 @@ export default function HostessManagementPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function HostessManagementPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen text-gray-500">読み込み中...</div>}>
+      <HostessManagementContent />
+    </Suspense>
   );
 }

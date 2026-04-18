@@ -40,7 +40,6 @@ const tabIcons: Record<StoreLedgerTab, React.ComponentType<{ className?: string 
   'communications': MessageSquare,
   'sales-data': TrendingUp,
   'other-points': Plus,
-  'minus-points': Minus,
   'customer-points': Gift,
   'discounts': Percent,
   'display-settings': Eye,

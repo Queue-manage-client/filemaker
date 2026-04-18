@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, User2, ArrowLeft, Pen, UserPlus, Phone } from "lucide-react";
+import { FileText, User2, ArrowLeft, Pen, UserPlus, Phone, List, Gift, Users } from "lucide-react";
+import { useToast } from '@/hooks/use-toast';
 import { Customer } from '@/types';
 import type { Vehicle, UsageHistory, PreferenceForm, ReceiptForm, PetOption, WorkAreaOption } from '@/types/customer-ledger';
 import { sampleCustomers } from '@/data/customerSampleData';
@@ -21,11 +22,83 @@ export default function CustomerLedger() {
     document.title = '顧客台帳 - Dispatch Harmony Hub';
   }, []);
 
-  const [, setSelectedCustomer] = useState<Customer>(sampleCustomers[0]);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer>(sampleCustomers[0]);
   const [, setVehicles] = useState<Vehicle[]>([
     { id: '1', type: 'BMW 7シリーズ', color: 'ブラック', number: '品川300あ1234' }
   ]);
   
+  // 管理者モード（デモ用、デフォルトtrue）
+  const [isAdminMode, setIsAdminMode] = useState(true);
+
+  // 顧客一覧タブの選択状態
+  const [selectedCustomerIds, setSelectedCustomerIds] = useState<string[]>([]);
+
+  // アクティブタブ管理
+  const [activeTab, setActiveTab] = useState<string>('customer-list');
+
+  // 一括ポイント付与モーダル
+  const [isBulkPointModalOpen, setIsBulkPointModalOpen] = useState(false);
+  const [bulkPointSign, setBulkPointSign] = useState<'plus' | 'minus'>('plus');
+  const [bulkPointAmount, setBulkPointAmount] = useState('');
+  const [bulkPointRemarks, setBulkPointRemarks] = useState('');
+  const [bulkManualIds, setBulkManualIds] = useState('');
+
+  const { toast } = useToast();
+
+  // 拡張サンプル顧客一覧（5件以上）
+  const extendedCustomers: Customer[] = [
+    ...sampleCustomers,
+    { ...sampleCustomers[0], id: 'cust004', customerNumber: 'C-00004', name: '高橋一郎', nameKana: 'タカハシイチロウ', phoneNumber: '090-1111-2222', totalAmount: 320000 },
+    { ...sampleCustomers[1], id: 'cust005', customerNumber: 'C-00005', name: '伊藤めぐみ', nameKana: 'イトウメグミ', phoneNumber: '080-3333-4444', totalAmount: 180000 },
+    { ...sampleCustomers[2], id: 'cust006', customerNumber: 'C-00006', name: '渡辺健二', nameKana: 'ワタナベケンジ', phoneNumber: '070-5555-6666', totalAmount: 560000 },
+  ];
+
+  // 顧客ポイント残高サンプル
+  const customerPointsMap: Record<string, number> = {
+    cust001: 3420, cust002: 1680, cust003: 8200,
+    cust004: 500, cust005: 1200, cust006: 4500,
+  };
+
+  const handleToggleCustomer = (id: string) => {
+    setSelectedCustomerIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedCustomerIds.length === extendedCustomers.length) {
+      setSelectedCustomerIds([]);
+    } else {
+      setSelectedCustomerIds(extendedCustomers.map(c => c.id));
+    }
+  };
+
+  const handleBulkPointSave = () => {
+    const manualIdList = bulkManualIds
+      .split(/[,\n]/)
+      .map(s => s.trim())
+      .filter(Boolean);
+    const allIds = Array.from(new Set([...selectedCustomerIds, ...manualIdList]));
+    const count = allIds.length;
+    const amount = parseInt(bulkPointAmount, 10);
+    if (!count) {
+      toast({ title: 'エラー', description: '対象顧客を選択してください', variant: 'destructive' });
+      return;
+    }
+    if (!bulkPointAmount || isNaN(amount) || amount <= 0) {
+      toast({ title: 'エラー', description: 'ポイント数を正しく入力してください', variant: 'destructive' });
+      return;
+    }
+    toast({
+      title: `${count}件にポイント付与しました`,
+      description: `${bulkPointSign === 'plus' ? '+' : '-'}${amount.toLocaleString()}ポイント${bulkPointRemarks ? ` / ${bulkPointRemarks}` : ''}`,
+    });
+    setIsBulkPointModalOpen(false);
+    setBulkPointAmount('');
+    setBulkPointRemarks('');
+    setBulkManualIds('');
+  };
+
   const [kanaFilter, setKanaFilter] = useState<string>('all');
   const [preferenceForm, setPreferenceForm] = useState<PreferenceForm>({
     favoriteType: '',
@@ -389,14 +462,32 @@ export default function CustomerLedger() {
               </div>
               
               {/* ポイントー括送信ボタン */}
-              <button
-                onClick={() => {
-                  // ポイント一括送信の処理をここに追加
-                }}
-                className="px-3 py-1.5 bg-pink-100 border-2 border-pink-400 text-pink-700 text-sm font-semibold rounded hover:bg-pink-200 transition-colors whitespace-nowrap"
-              >
-                ポイントー括送信
-              </button>
+              {isAdminMode && (
+                <button
+                  onClick={() => setIsBulkPointModalOpen(true)}
+                  className="px-3 py-1.5 bg-green-100 border-2 border-green-500 text-green-800 text-sm font-semibold rounded hover:bg-green-200 transition-colors whitespace-nowrap flex items-center gap-1"
+                >
+                  <Gift className="w-4 h-4" />
+                  ポイント一括付与
+                </button>
+              )}
+
+              {/* 管理者モードトグル */}
+              <div className="flex items-center gap-2 ml-2 border border-gray-300 rounded px-2 py-1 bg-gray-50">
+                <span className="text-xs text-gray-600 whitespace-nowrap">管理者</span>
+                <button
+                  type="button"
+                  onClick={() => setIsAdminMode(prev => !prev)}
+                  className={`relative w-10 h-5 rounded-full transition-colors ${isAdminMode ? 'bg-blue-500' : 'bg-gray-300'}`}
+                >
+                  <span
+                    className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${isAdminMode ? 'translate-x-5' : 'translate-x-0.5'}`}
+                  />
+                </button>
+                <span className={`text-xs font-semibold ${isAdminMode ? 'text-blue-600' : 'text-gray-400'}`}>
+                  {isAdminMode ? 'ON' : 'OFF'}
+                </span>
+              </div>
               
               {/* 訂正ボタン2 */}
               <button
@@ -527,12 +618,19 @@ export default function CustomerLedger() {
       {/* メインコンテンツエリア - タブ構造 */}
       <div className="bg-white">
         <div>
-          <Tabs defaultValue="basic-info" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* カスタムタブヘッダー */}
-            <TabsList className="h-auto p-0 bg-transparent grid grid-cols-2 w-full">
+            <TabsList className="h-auto p-0 bg-transparent grid grid-cols-3 w-full">
+              <TabsTrigger
+                value="customer-list"
+                className="bg-pink-100 border border-gray-400 px-3 py-1 text-xs font-medium text-gray-800 data-[state=active]:bg-white data-[state=active]:border-b-white relative z-10 rounded-none justify-start"
+              >
+                <Users className="w-3 h-3 mr-1" />
+                顧客一覧
+              </TabsTrigger>
               <TabsTrigger
                 value="basic-info"
-                className="bg-pink-100 border border-gray-400 px-3 py-1 text-xs font-medium text-gray-800 data-[state=active]:bg-white data-[state=active]:border-b-white relative z-10 rounded-none justify-start"
+                className="bg-pink-100 border border-gray-400 border-l-0 px-3 py-1 text-xs font-medium text-gray-800 data-[state=active]:bg-white data-[state=active]:border-b-white relative z-10 rounded-none justify-start"
               >
                 <FileText className="w-3 h-3 mr-1" />
                 基本情報
@@ -545,6 +643,81 @@ export default function CustomerLedger() {
                 プロフィール
               </TabsTrigger>
             </TabsList>
+
+            {/* 顧客一覧タブ */}
+            <TabsContent value="customer-list" className="mt-0 border border-gray-400 border-t-0 bg-pink-50">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-pink-100 border-b border-gray-400">
+                      {isAdminMode && (
+                        <th className="w-8 px-2 py-2 text-center border-r border-gray-300">
+                          <input
+                            type="checkbox"
+                            className="w-3 h-3"
+                            checked={selectedCustomerIds.length === extendedCustomers.length && extendedCustomers.length > 0}
+                            onChange={handleSelectAll}
+                          />
+                        </th>
+                      )}
+                      <th className="px-3 py-2 text-left border-r border-gray-300 font-semibold text-gray-700">会員番号</th>
+                      <th className="px-3 py-2 text-left border-r border-gray-300 font-semibold text-gray-700">氏名</th>
+                      <th className="px-3 py-2 text-left border-r border-gray-300 font-semibold text-gray-700">フリガナ</th>
+                      <th className="px-3 py-2 text-left border-r border-gray-300 font-semibold text-gray-700">電話番号</th>
+                      <th className="px-3 py-2 text-right font-semibold text-gray-700">現在ポイント</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {extendedCustomers.map((customer, idx) => (
+                      <tr
+                        key={customer.id}
+                        className={`border-b border-gray-200 cursor-pointer hover:bg-blue-50 ${
+                          selectedCustomer.id === customer.id ? 'bg-blue-100' : idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                        }`}
+                        onClick={() => {
+                          setSelectedCustomer(customer);
+                          setActiveTab('basic-info');
+                        }}
+                      >
+                        {isAdminMode && (
+                          <td
+                            className="w-8 px-2 py-1.5 text-center border-r border-gray-200"
+                            onClick={(e) => { e.stopPropagation(); handleToggleCustomer(customer.id); }}
+                          >
+                            <input
+                              type="checkbox"
+                              className="w-3 h-3"
+                              checked={selectedCustomerIds.includes(customer.id)}
+                              onChange={() => handleToggleCustomer(customer.id)}
+                            />
+                          </td>
+                        )}
+                        <td className="px-3 py-1.5 border-r border-gray-200 font-mono text-blue-700">{customer.customerNumber}</td>
+                        <td className="px-3 py-1.5 border-r border-gray-200 font-semibold">{customer.name}</td>
+                        <td className="px-3 py-1.5 border-r border-gray-200 text-gray-600">{customer.nameKana}</td>
+                        <td className="px-3 py-1.5 border-r border-gray-200">{customer.phoneNumber}</td>
+                        <td className="px-3 py-1.5 text-right font-semibold text-green-700">
+                          {(customerPointsMap[customer.id] ?? 0).toLocaleString()}
+                          <span className="text-gray-500 font-normal ml-1">pt</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {isAdminMode && selectedCustomerIds.length > 0 && (
+                <div className="flex items-center gap-3 px-4 py-2 bg-green-50 border-t border-green-200">
+                  <span className="text-sm text-green-800 font-semibold">{selectedCustomerIds.length}件選択中</span>
+                  <button
+                    onClick={() => setIsBulkPointModalOpen(true)}
+                    className="px-4 py-1.5 bg-green-500 text-white text-sm font-semibold rounded hover:bg-green-600 transition-colors flex items-center gap-1"
+                  >
+                    <Gift className="w-4 h-4" />
+                    ポイント一括付与
+                  </button>
+                </div>
+              )}
+            </TabsContent>
 
             {/* 基本情報タブ */}
             <TabsContent value="basic-info" className="mt-0 p-1 border border-gray-400 border-t-0 text-xs bg-pink-50">
@@ -1419,6 +1592,106 @@ export default function CustomerLedger() {
           </Tabs>
         </div>
       </div>
+
+      {/* 一括ポイント付与モーダル */}
+      {isBulkPointModalOpen && isAdminMode && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-2xl w-[520px] overflow-hidden">
+            <div className="bg-green-600 text-white px-4 py-3 flex items-center gap-2">
+              <Gift className="w-5 h-5" />
+              <span className="font-bold">ポイント一括付与</span>
+            </div>
+            <div className="p-5 space-y-4">
+              {/* 対象顧客 */}
+              <div>
+                <Label className="text-sm font-semibold mb-1 block">対象顧客（選択済み）</Label>
+                {selectedCustomerIds.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {selectedCustomerIds.map(id => {
+                      const c = extendedCustomers.find(x => x.id === id);
+                      return c ? (
+                        <span key={id} className="px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full border border-green-300">
+                          {c.name}
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-400 mb-2">一覧タブで顧客を選択するか、以下に会員番号を入力してください</p>
+                )}
+                <Label className="text-xs text-gray-600 mb-1 block">会員番号をまとめて追加（カンマ/改行区切り）</Label>
+                <Textarea
+                  value={bulkManualIds}
+                  onChange={(e) => setBulkManualIds(e.target.value)}
+                  className="h-16 text-xs border-gray-400 resize-none"
+                  placeholder="C-00001, C-00002&#10;C-00003"
+                />
+              </div>
+
+              {/* プラス/マイナス切替 */}
+              <div>
+                <Label className="text-sm font-semibold mb-2 block">種別</Label>
+                <div className="flex rounded overflow-hidden border border-gray-300 w-40">
+                  <button
+                    type="button"
+                    onClick={() => setBulkPointSign('plus')}
+                    className={`flex-1 py-2 text-sm font-bold transition-colors ${
+                      bulkPointSign === 'plus' ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    ＋ 付与
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBulkPointSign('minus')}
+                    className={`flex-1 py-2 text-sm font-bold transition-colors ${
+                      bulkPointSign === 'minus' ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    ー 減算
+                  </button>
+                </div>
+              </div>
+
+              {/* ポイント数 */}
+              <div>
+                <Label className="text-sm font-semibold mb-1 block">ポイント数</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={bulkPointAmount}
+                  onChange={(e) => setBulkPointAmount(e.target.value)}
+                  className={`w-40 h-9 font-semibold ${bulkPointSign === 'plus' ? 'text-green-700' : 'text-red-700'}`}
+                  placeholder="例: 100"
+                />
+              </div>
+
+              {/* 理由/備考 */}
+              <div>
+                <Label className="text-sm font-semibold mb-1 block">理由・備考（任意）</Label>
+                <Textarea
+                  value={bulkPointRemarks}
+                  onChange={(e) => setBulkPointRemarks(e.target.value)}
+                  className="h-16 text-sm border-gray-400 resize-none"
+                  placeholder="付与理由を入力..."
+                />
+              </div>
+            </div>
+            <div className="px-5 py-3 bg-gray-50 border-t flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsBulkPointModalOpen(false)}>
+                キャンセル
+              </Button>
+              <Button
+                onClick={handleBulkPointSave}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <List className="w-4 h-4 mr-1" />
+                一括保存
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 新規顧客ダイアログ */}
       {showNewCustomerDialog && (

@@ -15,6 +15,8 @@ export interface ScheduledHostess {
   confirmCallTime?: string; // 確認電話の時間（例：「18:30」）
   isConfirmCallCompleted?: boolean; // 確認電話後の精算完了フラグ（色変化用）
   isAttendanceConfirmed?: boolean; // マイページから出勤確認済みフラグ
+  store?: string; // 店舗名（例：「南IC店」） - 最大5文字でUI側がtruncate
+  storeColor?: string; // 店舗の背景色（hex、例：「#fef3c7」）
 }
 
 // INドラ未定予約リスト

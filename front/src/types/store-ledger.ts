@@ -308,7 +308,6 @@ export type StoreLedgerTab =
   | 'communications'
   | 'sales-data'
   | 'other-points'
-  | 'minus-points'
   | 'customer-points'
   | 'discounts'
   | 'display-settings'
@@ -336,7 +335,6 @@ export const storeLedgerTabLabels: Record<StoreLedgerTab, string> = {
   'communications': '連絡',
   'sales-data': '売上/単価/ロング',
   'other-points': 'その他ポイント',
-  'minus-points': 'マイナスポイント',
   'customer-points': '顧客ポイント',
   'discounts': '割引',
   'display-settings': '表示',
@@ -358,7 +356,6 @@ export const storeLedgerTabs: TabInfo[] = [
   { id: 'communications', label: '連絡' },
   { id: 'sales-data', label: '売上/単価/ロング' },
   { id: 'other-points', label: 'その他ポイント' },
-  { id: 'minus-points', label: 'マイナスポイント' },
   { id: 'customer-points', label: '顧客ポイント' },
   { id: 'discounts', label: '割引' },
   { id: 'display-settings', label: '表示' },

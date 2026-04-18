@@ -179,6 +179,18 @@ export interface StoreList {
   notes?: string; // 備考
 }
 
+// 送迎車両データ
+export interface TransportCar {
+  id: string;
+  name: string; // 例: '1号車'
+  vehicleNumber: string; // 例: '品川 500 あ 12-34'
+  driverName: string;
+  driverPhone?: string;
+  eta: string; // 到着予想時刻
+  color?: string; // hex カラー（視覚識別用）
+  purpose: 'pickup' | 'sendoff'; // 用途区分
+}
+
 // 店舗台帳データ
 export interface StoreLedger extends StoreList {
   financialInfo: {
