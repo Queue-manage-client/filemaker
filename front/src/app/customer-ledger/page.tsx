@@ -9,11 +9,13 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, User2, ArrowLeft, Pen, UserPlus, Phone, List, Gift, Users } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FileText, User2, ArrowLeft, Pen, UserPlus, Phone, List, Gift, Users, History, Search, LogIn, LogOut, X, Shield } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
-import { Customer } from '@/types';
+import { Customer, OperationLog } from '@/types';
 import type { Vehicle, UsageHistory, PreferenceForm, ReceiptForm, PetOption, WorkAreaOption } from '@/types/customer-ledger';
-import { sampleCustomers } from '@/data/customerSampleData';
+import { sampleCustomers, sampleOperationLogs } from '@/data/customerSampleData';
+import { isAfter, isBefore, parseISO, isValid } from 'date-fns';
 
 // 型は分離済み
 
@@ -27,8 +29,52 @@ export default function CustomerLedger() {
     { id: '1', type: 'BMW 7シリーズ', color: 'ブラック', number: '品川300あ1234' }
   ]);
   
-  // 管理者モード（デモ用、デフォルトtrue）
-  const [isAdminMode, setIsAdminMode] = useState(true);
+  // 管理者モード
+  const [isAdminMode, setIsAdminMode] = useState(false);
+
+  // 管理者ログインモーダル
+  const ADMIN_CODE = 'admin1234';
+  const [isAdminLoginModalOpen, setIsAdminLoginModalOpen] = useState(false);
+  const [adminCodeInput, setAdminCodeInput] = useState('');
+  const [adminCodeError, setAdminCodeError] = useState('');
+
+  const handleAdminLogin = () => {
+    if (adminCodeInput === ADMIN_CODE) {
+      setIsAdminMode(true);
+      setAdminCodeInput('');
+      setAdminCodeError('');
+      setIsAdminLoginModalOpen(false);
+    } else {
+      setAdminCodeError('管理者コードが正しくありません');
+    }
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdminMode(false);
+    setAdminCodeInput('');
+    setAdminCodeError('');
+  };
+
+  // 操作ログモーダル
+  const [isOperationLogModalOpen, setIsOperationLogModalOpen] = useState(false);
+  const [operationLogs] = useState<OperationLog[]>(sampleOperationLogs);
+  const [logFilterOperator, setLogFilterOperator] = useState('');
+  const [logFilterDateFrom, setLogFilterDateFrom] = useState('');
+  const [logFilterDateTo, setLogFilterDateTo] = useState('');
+
+  const filteredOperationLogs = operationLogs.filter(log => {
+    const matchOperator = logFilterOperator === '' || log.operatorName.includes(logFilterOperator);
+    const logDate = parseISO(log.date);
+    const matchDateFrom = logFilterDateFrom === '' || !isValid(parseISO(logFilterDateFrom)) || !isBefore(logDate, parseISO(logFilterDateFrom));
+    const matchDateTo = logFilterDateTo === '' || !isValid(parseISO(logFilterDateTo)) || !isAfter(logDate, parseISO(logFilterDateTo + 'T23:59:59'));
+    return matchOperator && matchDateFrom && matchDateTo;
+  });
+
+  // 顧客一覧フィルター
+  const [customerSearchText, setCustomerSearchText] = useState('');
+  const [customerEventFilter, setCustomerEventFilter] = useState('all');
+  const [customerVisitDateFrom, setCustomerVisitDateFrom] = useState('');
+  const [customerVisitDateTo, setCustomerVisitDateTo] = useState('');
 
   // 顧客一覧タブの選択状態
   const [selectedCustomerIds, setSelectedCustomerIds] = useState<string[]>([]);
@@ -45,13 +91,37 @@ export default function CustomerLedger() {
 
   const { toast } = useToast();
 
-  // 拡張サンプル顧客一覧（5件以上）
+  // 拡張サンプル顧客一覧（6件）
   const extendedCustomers: Customer[] = [
     ...sampleCustomers,
-    { ...sampleCustomers[0], id: 'cust004', customerNumber: 'C-00004', name: '高橋一郎', nameKana: 'タカハシイチロウ', phoneNumber: '090-1111-2222', totalAmount: 320000 },
-    { ...sampleCustomers[1], id: 'cust005', customerNumber: 'C-00005', name: '伊藤めぐみ', nameKana: 'イトウメグミ', phoneNumber: '080-3333-4444', totalAmount: 180000 },
-    { ...sampleCustomers[2], id: 'cust006', customerNumber: 'C-00006', name: '渡辺健二', nameKana: 'ワタナベケンジ', phoneNumber: '070-5555-6666', totalAmount: 560000 },
+    { ...sampleCustomers[0], id: 'cust004', customerNumber: 'C-00004', name: '高橋一郎', nameKana: 'タカハシイチロウ', phoneNumber: '090-1111-2222', totalAmount: 320000, lastVisitDate: '2025-03-15', lastUsedEvent: '周年記念' },
+    { ...sampleCustomers[1], id: 'cust005', customerNumber: 'C-00005', name: '伊藤めぐみ', nameKana: 'イトウメグミ', phoneNumber: '080-3333-4444', totalAmount: 180000, lastVisitDate: '2025-02-20', lastUsedEvent: '新春キャンペーン' },
+    { ...sampleCustomers[2], id: 'cust006', customerNumber: 'C-00006', name: '渡辺健二', nameKana: 'ワタナベケンジ', phoneNumber: '070-5555-6666', totalAmount: 560000, lastVisitDate: '2025-01-05', lastUsedEvent: '夏フェス2025' },
   ];
+
+  // フィルター後顧客一覧
+  const filteredCustomers = extendedCustomers.filter(customer => {
+    // テキスト検索（会員番号 OR 電話番号 OR 氏名フリガナ OR 氏名）
+    const searchLower = customerSearchText.toLowerCase();
+    const matchText = customerSearchText === '' || (
+      customer.customerNumber.toLowerCase().includes(searchLower) ||
+      customer.phoneNumber.includes(customerSearchText) ||
+      customer.nameKana.toLowerCase().includes(searchLower) ||
+      customer.name.includes(customerSearchText)
+    );
+    // イベントフィルター
+    const matchEvent = customerEventFilter === 'all' || customer.lastUsedEvent === customerEventFilter;
+    // 来店日フィルター
+    const visitDate = customer.lastVisitDate ? parseISO(customer.lastVisitDate) : null;
+    const matchDateFrom = customerVisitDateFrom === '' || !visitDate || !isValid(parseISO(customerVisitDateFrom)) || !isBefore(visitDate, parseISO(customerVisitDateFrom));
+    const matchDateTo = customerVisitDateTo === '' || !visitDate || !isValid(parseISO(customerVisitDateTo)) || !isAfter(visitDate, parseISO(customerVisitDateTo));
+    return matchText && matchEvent && matchDateFrom && matchDateTo;
+  });
+
+  // 利用イベント一覧（ユニーク）
+  const eventOptions = Array.from(
+    new Set(extendedCustomers.map(c => c.lastUsedEvent).filter((e): e is string => !!e))
+  );
 
   // 顧客ポイント残高サンプル
   const customerPointsMap: Record<string, number> = {
@@ -66,10 +136,10 @@ export default function CustomerLedger() {
   };
 
   const handleSelectAll = () => {
-    if (selectedCustomerIds.length === extendedCustomers.length) {
+    if (selectedCustomerIds.length === filteredCustomers.length && filteredCustomers.length > 0) {
       setSelectedCustomerIds([]);
     } else {
-      setSelectedCustomerIds(extendedCustomers.map(c => c.id));
+      setSelectedCustomerIds(filteredCustomers.map(c => c.id));
     }
   };
 
@@ -472,22 +542,39 @@ export default function CustomerLedger() {
                 </button>
               )}
 
-              {/* 管理者モードトグル */}
-              <div className="flex items-center gap-2 ml-2 border border-gray-300 rounded px-2 py-1 bg-gray-50">
-                <span className="text-xs text-gray-600 whitespace-nowrap">管理者</span>
+              {/* 操作履歴ボタン */}
+              <button
+                onClick={() => setIsOperationLogModalOpen(true)}
+                className="px-3 py-1.5 bg-slate-100 border-2 border-slate-400 text-slate-700 text-sm font-semibold rounded hover:bg-slate-200 transition-colors whitespace-nowrap flex items-center gap-1"
+              >
+                <History className="w-4 h-4" />
+                操作履歴
+              </button>
+
+              {/* 管理者ログイン/ログアウト */}
+              {isAdminMode ? (
+                <div className="flex items-center gap-2 ml-2 border border-blue-300 rounded px-2 py-1 bg-blue-50">
+                  <Shield className="w-4 h-4 text-blue-600" />
+                  <span className="text-xs font-semibold text-blue-700 whitespace-nowrap">管理者モード</span>
+                  <button
+                    type="button"
+                    onClick={handleAdminLogout}
+                    className="flex items-center gap-1 text-xs text-red-600 hover:text-red-800 font-semibold whitespace-nowrap"
+                  >
+                    <LogOut className="w-3 h-3" />
+                    ログアウト
+                  </button>
+                </div>
+              ) : (
                 <button
                   type="button"
-                  onClick={() => setIsAdminMode(prev => !prev)}
-                  className={`relative w-10 h-5 rounded-full transition-colors ${isAdminMode ? 'bg-blue-500' : 'bg-gray-300'}`}
+                  onClick={() => setIsAdminLoginModalOpen(true)}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 border-2 border-gray-400 text-gray-700 text-sm font-semibold rounded hover:bg-gray-200 transition-colors whitespace-nowrap"
                 >
-                  <span
-                    className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${isAdminMode ? 'translate-x-5' : 'translate-x-0.5'}`}
-                  />
+                  <LogIn className="w-4 h-4" />
+                  管理者モード
                 </button>
-                <span className={`text-xs font-semibold ${isAdminMode ? 'text-blue-600' : 'text-gray-400'}`}>
-                  {isAdminMode ? 'ON' : 'OFF'}
-                </span>
-              </div>
+              )}
               
               {/* 訂正ボタン2 */}
               <button
@@ -646,6 +733,69 @@ export default function CustomerLedger() {
 
             {/* 顧客一覧タブ */}
             <TabsContent value="customer-list" className="mt-0 border border-gray-400 border-t-0 bg-pink-50">
+              {/* フィルターバー */}
+              <div className="px-3 py-2 bg-white border-b border-gray-200 space-y-2">
+                {/* テキスト検索 */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-1 flex-1 min-w-[200px]">
+                    <Search className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                    <input
+                      type="text"
+                      value={customerSearchText}
+                      onChange={(e) => setCustomerSearchText(e.target.value)}
+                      placeholder="会員番号・電話番号・氏名・フリガナで検索"
+                      className="flex-1 h-7 text-xs px-2 border border-gray-300 rounded outline-none focus:border-blue-400 bg-white"
+                    />
+                  </div>
+                  {/* イベントフィルター */}
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-gray-600 whitespace-nowrap">イベント:</span>
+                    <Select value={customerEventFilter} onValueChange={setCustomerEventFilter}>
+                      <SelectTrigger className="h-7 text-xs w-40 border-gray-300">
+                        <SelectValue placeholder="すべて" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">すべて</SelectItem>
+                        {eventOptions.map(ev => (
+                          <SelectItem key={ev} value={ev}>{ev}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                {/* 来店期間フィルター */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs text-gray-600 whitespace-nowrap">来店期間:</span>
+                  <input
+                    type="date"
+                    value={customerVisitDateFrom}
+                    onChange={(e) => setCustomerVisitDateFrom(e.target.value)}
+                    className="h-7 text-xs px-2 border border-gray-300 rounded outline-none focus:border-blue-400 bg-white"
+                  />
+                  <span className="text-xs text-gray-500">〜</span>
+                  <input
+                    type="date"
+                    value={customerVisitDateTo}
+                    onChange={(e) => setCustomerVisitDateTo(e.target.value)}
+                    className="h-7 text-xs px-2 border border-gray-300 rounded outline-none focus:border-blue-400 bg-white"
+                  />
+                  {(customerSearchText || customerEventFilter !== 'all' || customerVisitDateFrom || customerVisitDateTo) && (
+                    <button
+                      onClick={() => {
+                        setCustomerSearchText('');
+                        setCustomerEventFilter('all');
+                        setCustomerVisitDateFrom('');
+                        setCustomerVisitDateTo('');
+                      }}
+                      className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500 border border-gray-300 rounded px-2 py-0.5"
+                    >
+                      <X className="w-3 h-3" />
+                      クリア
+                    </button>
+                  )}
+                  <span className="text-xs text-gray-500 ml-auto">{filteredCustomers.length}件</span>
+                </div>
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs border-collapse">
                   <thead>
@@ -655,7 +805,7 @@ export default function CustomerLedger() {
                           <input
                             type="checkbox"
                             className="w-3 h-3"
-                            checked={selectedCustomerIds.length === extendedCustomers.length && extendedCustomers.length > 0}
+                            checked={selectedCustomerIds.length === filteredCustomers.length && filteredCustomers.length > 0}
                             onChange={handleSelectAll}
                           />
                         </th>
@@ -664,11 +814,19 @@ export default function CustomerLedger() {
                       <th className="px-3 py-2 text-left border-r border-gray-300 font-semibold text-gray-700">氏名</th>
                       <th className="px-3 py-2 text-left border-r border-gray-300 font-semibold text-gray-700">フリガナ</th>
                       <th className="px-3 py-2 text-left border-r border-gray-300 font-semibold text-gray-700">電話番号</th>
+                      <th className="px-3 py-2 text-left border-r border-gray-300 font-semibold text-gray-700">最終来店日</th>
+                      <th className="px-3 py-2 text-left border-r border-gray-300 font-semibold text-gray-700">利用イベント</th>
                       <th className="px-3 py-2 text-right font-semibold text-gray-700">現在ポイント</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {extendedCustomers.map((customer, idx) => (
+                    {filteredCustomers.length === 0 ? (
+                      <tr>
+                        <td colSpan={isAdminMode ? 8 : 7} className="px-4 py-6 text-center text-xs text-gray-400">
+                          条件に一致する顧客が見つかりません
+                        </td>
+                      </tr>
+                    ) : filteredCustomers.map((customer, idx) => (
                       <tr
                         key={customer.id}
                         className={`border-b border-gray-200 cursor-pointer hover:bg-blue-50 ${
@@ -696,6 +854,12 @@ export default function CustomerLedger() {
                         <td className="px-3 py-1.5 border-r border-gray-200 font-semibold">{customer.name}</td>
                         <td className="px-3 py-1.5 border-r border-gray-200 text-gray-600">{customer.nameKana}</td>
                         <td className="px-3 py-1.5 border-r border-gray-200">{customer.phoneNumber}</td>
+                        <td className="px-3 py-1.5 border-r border-gray-200 text-gray-600">{customer.lastVisitDate ?? '—'}</td>
+                        <td className="px-3 py-1.5 border-r border-gray-200">
+                          {customer.lastUsedEvent ? (
+                            <span className="px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded text-xs">{customer.lastUsedEvent}</span>
+                          ) : '—'}
+                        </td>
                         <td className="px-3 py-1.5 text-right font-semibold text-green-700">
                           {(customerPointsMap[customer.id] ?? 0).toLocaleString()}
                           <span className="text-gray-500 font-normal ml-1">pt</span>
@@ -1687,6 +1851,164 @@ export default function CustomerLedger() {
               >
                 <List className="w-4 h-4 mr-1" />
                 一括保存
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 管理者ログインモーダル */}
+      {isAdminLoginModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-2xl w-[400px] overflow-hidden">
+            <div className="bg-blue-600 text-white px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Shield className="w-5 h-5" />
+                <span className="font-bold">管理者モードを有効化</span>
+              </div>
+              <button
+                onClick={() => { setIsAdminLoginModalOpen(false); setAdminCodeInput(''); setAdminCodeError(''); }}
+                className="text-white/80 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <p className="text-sm text-gray-600">管理者コードを入力してください。</p>
+              <div>
+                <Label className="text-sm font-semibold mb-1 block">管理者コード</Label>
+                <Input
+                  type="password"
+                  value={adminCodeInput}
+                  onChange={(e) => { setAdminCodeInput(e.target.value); setAdminCodeError(''); }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleAdminLogin(); }}
+                  className="h-10 font-mono"
+                  placeholder="コードを入力"
+                  autoFocus
+                />
+                {adminCodeError && (
+                  <p className="text-xs text-red-600 mt-1">{adminCodeError}</p>
+                )}
+              </div>
+              <p className="text-xs text-gray-400">※ バックエンド認証API連携前のUI骨組みです</p>
+            </div>
+            <div className="px-5 py-3 bg-gray-50 border-t flex justify-end gap-2">
+              <Button variant="outline" onClick={() => { setIsAdminLoginModalOpen(false); setAdminCodeInput(''); setAdminCodeError(''); }}>
+                キャンセル
+              </Button>
+              <Button onClick={handleAdminLogin} className="bg-blue-600 hover:bg-blue-700 text-white">
+                <LogIn className="w-4 h-4 mr-1" />
+                ログイン
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 操作ログモーダル */}
+      {isOperationLogModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="bg-slate-700 text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <History className="w-5 h-5" />
+                <span className="font-bold">操作履歴</span>
+              </div>
+              <button onClick={() => setIsOperationLogModalOpen(false)} className="text-white/80 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            {/* フィルター */}
+            <div className="px-4 py-3 bg-slate-50 border-b flex items-center gap-3 flex-wrap flex-shrink-0">
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-gray-600 whitespace-nowrap">操作者:</span>
+                <input
+                  type="text"
+                  value={logFilterOperator}
+                  onChange={(e) => setLogFilterOperator(e.target.value)}
+                  placeholder="操作者名"
+                  className="h-7 text-xs px-2 border border-gray-300 rounded outline-none focus:border-blue-400 bg-white w-28"
+                />
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-gray-600 whitespace-nowrap">期間:</span>
+                <input
+                  type="date"
+                  value={logFilterDateFrom}
+                  onChange={(e) => setLogFilterDateFrom(e.target.value)}
+                  className="h-7 text-xs px-2 border border-gray-300 rounded outline-none focus:border-blue-400 bg-white"
+                />
+                <span className="text-xs text-gray-500">〜</span>
+                <input
+                  type="date"
+                  value={logFilterDateTo}
+                  onChange={(e) => setLogFilterDateTo(e.target.value)}
+                  className="h-7 text-xs px-2 border border-gray-300 rounded outline-none focus:border-blue-400 bg-white"
+                />
+              </div>
+              {(logFilterOperator || logFilterDateFrom || logFilterDateTo) && (
+                <button
+                  onClick={() => { setLogFilterOperator(''); setLogFilterDateFrom(''); setLogFilterDateTo(''); }}
+                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500 border border-gray-300 rounded px-2 py-0.5"
+                >
+                  <X className="w-3 h-3" />
+                  クリア
+                </button>
+              )}
+              <span className="text-xs text-gray-500 ml-auto">{filteredOperationLogs.length}件</span>
+            </div>
+            {/* ログ一覧 */}
+            <div className="overflow-auto flex-1">
+              <table className="w-full text-xs border-collapse">
+                <thead className="sticky top-0 bg-gray-100 z-10">
+                  <tr className="border-b border-gray-300">
+                    <th className="px-3 py-2 text-left border-r border-gray-200 font-semibold text-gray-700 whitespace-nowrap">日時</th>
+                    <th className="px-3 py-2 text-left border-r border-gray-200 font-semibold text-gray-700 whitespace-nowrap">操作者</th>
+                    <th className="px-3 py-2 text-left border-r border-gray-200 font-semibold text-gray-700 whitespace-nowrap">対象顧客</th>
+                    <th className="px-3 py-2 text-center border-r border-gray-200 font-semibold text-gray-700 whitespace-nowrap">種別</th>
+                    <th className="px-3 py-2 text-right border-r border-gray-200 font-semibold text-gray-700 whitespace-nowrap">ポイント数</th>
+                    <th className="px-3 py-2 text-left font-semibold text-gray-700">備考</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredOperationLogs.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-6 text-center text-xs text-gray-400">
+                        条件に一致する操作履歴が見つかりません
+                      </td>
+                    </tr>
+                  ) : filteredOperationLogs.map((log, idx) => (
+                    <tr key={log.id} className={`border-b border-gray-100 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                      <td className="px-3 py-1.5 border-r border-gray-100 text-gray-600 whitespace-nowrap">
+                        {log.date.replace('T', ' ').slice(0, 16)}
+                      </td>
+                      <td className="px-3 py-1.5 border-r border-gray-100 whitespace-nowrap">{log.operatorName}</td>
+                      <td className="px-3 py-1.5 border-r border-gray-100 whitespace-nowrap font-semibold">{log.targetCustomerName}</td>
+                      <td className="px-3 py-1.5 border-r border-gray-100 text-center">
+                        {log.type === 'plus' ? (
+                          <span className="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs font-bold">＋付与</span>
+                        ) : log.type === 'minus' ? (
+                          <span className="px-1.5 py-0.5 bg-red-100 text-red-700 rounded text-xs font-bold">－減算</span>
+                        ) : (
+                          <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-700 rounded text-xs font-bold">調整</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-1.5 border-r border-gray-100 text-right font-semibold">
+                        <span className={log.type === 'minus' ? 'text-red-600' : 'text-green-700'}>
+                          {log.type === 'minus' ? '-' : '+'}{log.points.toLocaleString()}
+                        </span>
+                        <span className="text-gray-400 font-normal ml-0.5">pt</span>
+                      </td>
+                      <td className="px-3 py-1.5 text-gray-500">{log.remarks ?? '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="px-4 py-3 bg-gray-50 border-t flex justify-between items-center flex-shrink-0">
+              <p className="text-xs text-gray-400">※ バックエンド連携前のモックデータです</p>
+              <Button variant="outline" onClick={() => setIsOperationLogModalOpen(false)}>
+                閉じる
               </Button>
             </div>
           </div>

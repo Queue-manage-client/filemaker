@@ -1,6 +1,6 @@
 // 顧客関連のサンプルデータ
 
-import { Customer, CustomerPoints, CustomerVehicleInfo, GroupLedger} from '@/types/customer';
+import { Customer, CustomerPoints, CustomerVehicleInfo, GroupLedger, OperationLog } from '@/types/customer';
 
 // 顧客台帳サンプルデータ
 export const sampleCustomers: Customer[] = [
@@ -23,6 +23,8 @@ export const sampleCustomers: Customer[] = [
     },
     registrationDate: "2024-01-15",
     lastUsedDate: "2025-01-26",
+    lastVisitDate: "2025-01-26",
+    lastUsedEvent: "夏フェス2025",
     totalUsageCount: 45,
     totalAmount: 678000,
     status: "active",
@@ -48,6 +50,8 @@ export const sampleCustomers: Customer[] = [
     },
     registrationDate: "2024-03-20",
     lastUsedDate: "2025-01-25",
+    lastVisitDate: "2025-01-10",
+    lastUsedEvent: "クリスマス特別",
     totalUsageCount: 28,
     totalAmount: 420000,
     status: "active",
@@ -73,6 +77,8 @@ export const sampleCustomers: Customer[] = [
     },
     registrationDate: "2023-11-10",
     lastUsedDate: "2025-01-20",
+    lastVisitDate: "2024-12-20",
+    lastUsedEvent: "周年記念",
     totalUsageCount: 120,
     totalAmount: 1850000,
     status: "active",
@@ -258,3 +264,85 @@ export const sampleGroupLedgers: GroupLedger[] = [
   }
 ];
 
+// 操作ログサンプルデータ
+export const sampleOperationLogs: OperationLog[] = [
+  {
+    id: "log001",
+    date: "2025-04-17T14:32:00",
+    operatorName: "山田 太郎",
+    targetCustomerId: "cust001",
+    targetCustomerName: "田中太郎",
+    type: "plus",
+    points: 500,
+    remarks: "夏フェス2025 来店特典"
+  },
+  {
+    id: "log002",
+    date: "2025-04-16T10:15:00",
+    operatorName: "佐藤 花子",
+    targetCustomerId: "cust002",
+    targetCustomerName: "佐藤花子",
+    type: "plus",
+    points: 200,
+    remarks: "クリスマス特別イベント参加"
+  },
+  {
+    id: "log003",
+    date: "2025-04-15T18:45:00",
+    operatorName: "山田 太郎",
+    targetCustomerId: "cust003",
+    targetCustomerName: "鈴木次郎",
+    type: "minus",
+    points: 1000,
+    remarks: "ポイント利用（料金割引）"
+  },
+  {
+    id: "log004",
+    date: "2025-04-14T09:20:00",
+    operatorName: "鈴木 誠",
+    targetCustomerId: "cust004",
+    targetCustomerName: "高橋一郎",
+    type: "plus",
+    points: 300,
+  },
+  {
+    id: "log005",
+    date: "2025-04-13T16:00:00",
+    operatorName: "佐藤 花子",
+    targetCustomerId: "cust005",
+    targetCustomerName: "伊藤めぐみ",
+    type: "adjust",
+    points: 100,
+    remarks: "ポイント調整（システム誤登録修正）"
+  },
+  {
+    id: "log006",
+    date: "2025-04-12T11:30:00",
+    operatorName: "山田 太郎",
+    targetCustomerId: "cust001",
+    targetCustomerName: "田中太郎",
+    type: "plus",
+    points: 150,
+    remarks: "周年記念キャンペーン"
+  },
+  {
+    id: "log007",
+    date: "2025-04-10T20:10:00",
+    operatorName: "鈴木 誠",
+    targetCustomerId: "cust006",
+    targetCustomerName: "渡辺健二",
+    type: "minus",
+    points: 500,
+    remarks: "ポイント利用（特典交換）"
+  },
+  {
+    id: "log008",
+    date: "2025-04-08T13:55:00",
+    operatorName: "佐藤 花子",
+    targetCustomerId: "cust002",
+    targetCustomerName: "佐藤花子",
+    type: "plus",
+    points: 250,
+    remarks: "紹介キャンペーン"
+  }
+];

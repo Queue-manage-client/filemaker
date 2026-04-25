@@ -20,12 +20,26 @@ export interface Customer {
   };
   registrationDate: string; // 登録日
   lastUsedDate?: string; // 最終利用日
+  lastVisitDate?: string; // 最終来店日 (YYYY-MM-DD)
+  lastUsedEvent?: string; // 最終利用イベント名
   totalUsageCount: number; // 総利用回数
   totalAmount: number; // 総利用金額
   status: 'active' | 'inactive' | 'suspended'; // ステータス
   preferredPayment: 'cash' | 'card' | 'transfer' | 'other'; // 優先支払い方法
   notes?: string; // 備考
   tags: string[]; // タグ
+}
+
+// 操作ログ
+export interface OperationLog {
+  id: string;
+  date: string; // ISO datetime
+  operatorName: string; // 操作者
+  targetCustomerId: string;
+  targetCustomerName: string;
+  type: 'plus' | 'minus' | 'adjust'; // 種別
+  points: number; // ポイント数（正値）
+  remarks?: string; // 備考
 }
 
 // 顧客ポイントデータ

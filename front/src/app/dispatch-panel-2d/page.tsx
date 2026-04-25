@@ -254,8 +254,12 @@ function MobileScheduleList() {
   );
 }
 
+const DESIGN_WIDTH = 1970;
+const DESIGN_HEIGHT = 1080;
+
 export default function Original() {
   const [isMobileView, setIsMobileView] = React.useState(false);
+  const [contentScale, setContentScale] = React.useState(1);
   const [mobileTab, setMobileTab] = React.useState<'hostess' | 'driver' | 'transport' | 'schedule'>('hostess');
   const [showWaitingAlert, setShowWaitingAlert] = React.useState(true);
   const [dismissedAlerts, setDismissedAlerts] = React.useState<string[]>([]);
@@ -283,7 +287,11 @@ export default function Original() {
     document.title = '配車パネル2D - Dispatch Harmony Hub';
 
     const checkMobile = () => {
-      setIsMobileView(window.innerWidth < 1024);
+      const w = window.innerWidth;
+      setIsMobileView(w < 1024);
+      if (w >= 1024) {
+        setContentScale(w / DESIGN_WIDTH);
+      }
     };
 
     checkMobile();
@@ -389,7 +397,13 @@ export default function Original() {
 
   // デスクトップ表示（元のコード）
   return (
-    <div className="w-full overflow-x-auto overflow-y-hidden h-[1080px]"
+    <div
+      className="w-full overflow-hidden bg-zinc-50"
+      style={{ height: `${Math.ceil(DESIGN_HEIGHT * contentScale)}px` }}
+    >
+    <div
+      className="relative"
+      style={{ width: `${DESIGN_WIDTH}px`, height: `${DESIGN_HEIGHT}px`, zoom: contentScale } as React.CSSProperties}
     >
       {/* 待機超過キャスト アラート - 右下 */}
       {waitingAlertEnabled && showWaitingAlert && longWaitingHostesses.filter(h => !dismissedAlerts.includes(h.name)).length > 0 && (
@@ -666,12 +680,12 @@ export default function Original() {
       ))}
     </div>
 
-  {/* INドラ未定予約リスト */}
-  <div className="left-[705px] top-[58px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>オプション</div>
-  <div className="left-[689px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>カード</div>
-  <div className="left-[673px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>着TEL</div>
-  <div className="left-[657px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>待合せ</div>
-  <div className="left-[641px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>領収書</div>
+  {/* INドラ未定予約リスト - 縦書きラベル: 列ヘッダー行(top-95-108)を侵食しないよう底辺をtop-95に揃える */}
+  <div className="w-4 left-[707px] top-[55px] absolute text-center text-black text-[8px] leading-none font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>オプション</div>
+  <div className="w-4 left-[691px] top-[71px] absolute text-center text-black text-[8px] leading-none font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>カード</div>
+  <div className="w-4 left-[675px] top-[63px] absolute text-center text-black text-[8px] leading-none font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>着TEL</div>
+  <div className="w-4 left-[659px] top-[71px] absolute text-center text-black text-[8px] leading-none font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>待合せ</div>
+  <div className="w-4 left-[643px] top-[71px] absolute text-center text-black text-[8px] leading-none font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>領収書</div>
   <div className="left-[605px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">時間計</div>
   <div className="left-[441px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">迎え場所</div>
   <div className="left-[365px] top-[95px] absolute text-center text-blue-600 text-[10px] font-normal font-['Inter'] whitespace-nowrap">案内時間</div>
@@ -741,90 +755,119 @@ export default function Original() {
       );
     })}
   </div>
-  {/* 出勤予定ホステス */}
+  {/* 出勤予定ホステス - Grid Table Layout */}
   <div className="w-[357px] h-5 left-[4px] top-[75px] absolute bg-cyan-200" />
   <div className="w-[357px] left-[4px] top-[77px] absolute text-center text-black text-[12px] font-normal font-['Inter'] overflow-hidden">出勤予定ホステス</div>
-  <div className="left-[352px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>確TEL</div>
-  <div className="left-[324px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">帰宅</div>
-  <div className="left-[286px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">終了</div>
-  <div className="w-16 left-[226px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">地域</div>
-  <div className="left-[213px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">出勤</div>
-  <div className="left-[189px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">決定</div>
-  <div className="left-[143px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">迎えドラ</div>
-  <div className="left-[125px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">確認</div>
-  <div className="left-[30px] top-[95px] absolute text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap">店舗・名前</div>
-  <div className="w-[357px] h-[600px] left-[4px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-x-hidden overflow-y-auto">
-    {scheduledHostessSampleData.map((hostess: ScheduledHostess, index: number) => {
-      const topPosition = index * 22;
-      return (
-        <div key={hostess.id} className="w-[356px] h-5 left-[1px] absolute overflow-hidden" style={{ top: `${topPosition}px` }}>
 
-          {/* 背景色ベース - 行全体を白で塗りつぶし */}
-          <div className="w-[356px] h-5 left-0 top-0 absolute bg-white" />
-          <div className="w-[50px] h-5 left-[23px] top-0 absolute bg-yellow-200 border-r border-b border-zinc-300" />
-          {/* 左端セル: マイページ出勤確認済み=緑+✓ / 未確認=グレー */}
-          <div className={`w-5 h-5 left-0 top-0 absolute border-r border-b border-zinc-300 group/att ${
-            hostess.isAttendanceConfirmed
-              ? 'bg-green-400'
-              : 'bg-zinc-300'
-          }`}>
-            {hostess.isAttendanceConfirmed && (
-              <div className="w-5 h-5 flex items-center justify-center text-white text-[11px] font-bold">✓</div>
-            )}
-            <div className="hidden group-hover/att:block absolute left-0 bottom-full mb-1 z-50 bg-black text-white text-[11px] px-2 py-1 rounded whitespace-nowrap shadow-lg">
-              {hostess.isAttendanceConfirmed ? 'マイページ出勤確認済み' : '出勤未確認'}
-            </div>
+  {/* ヘッダー行 - Grid */}
+  <div
+    className="w-[357px] h-[18px] left-[4px] top-[95px] absolute grid bg-zinc-100 border-y border-zinc-400 text-[10px] text-black text-center font-['Inter'] divide-x divide-zinc-400"
+    style={{ gridTemplateColumns: '20px 50px 48px 20px 42px 17px 36px 28px 36px 36px 24px' }}
+  >
+    <div className="flex items-center justify-center"></div>
+    <div className="flex items-center justify-center">店舗</div>
+    <div className="flex items-center justify-center">名前</div>
+    <div className="flex items-center justify-center">確</div>
+    <div className="flex items-center justify-center">迎えドラ</div>
+    <div className="flex items-center justify-center text-[8px]">決</div>
+    <div className="flex items-center justify-center">出勤</div>
+    <div className="flex items-center justify-center">地域</div>
+    <div className="flex items-center justify-center">終了</div>
+    <div className="flex items-center justify-center">帰宅</div>
+    <div className="flex items-center justify-center text-[8px] leading-none whitespace-nowrap">確TEL</div>
+  </div>
+
+  {/* データ行 - Grid */}
+  <div className="w-[357px] h-[600px] left-[4px] top-[113px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-400 overflow-x-hidden overflow-y-auto bg-white">
+    {scheduledHostessSampleData.map((hostess: ScheduledHostess, index: number) => (
+      <div
+        key={hostess.id}
+        className={`grid h-5 text-[11px] font-['Inter'] divide-x divide-zinc-300 border-b border-zinc-300 ${
+          index % 2 === 0 ? 'bg-white' : 'bg-zinc-50'
+        }`}
+        style={{ gridTemplateColumns: '20px 50px 48px 20px 42px 17px 36px 28px 36px 36px 24px' }}
+      >
+        {/* 出勤確認 */}
+        <div
+          className={`flex items-center justify-center group/att relative ${
+            hostess.isAttendanceConfirmed ? 'bg-green-400 text-white' : 'bg-zinc-300'
+          }`}
+        >
+          {hostess.isAttendanceConfirmed && <span className="text-[11px] font-bold">✓</span>}
+          <div className="hidden group-hover/att:block absolute left-0 bottom-full mb-1 z-50 bg-black text-white text-[11px] px-2 py-1 rounded whitespace-nowrap shadow-lg">
+            {hostess.isAttendanceConfirmed ? 'マイページ出勤確認済み' : '出勤未確認'}
           </div>
-          <div className="w-4 h-5 left-[185px] top-0 absolute bg-zinc-400 border-r border-b border-zinc-300" />
-          <div className={`w-[20px] h-5 left-[123px] top-0 absolute border-r border-b border-zinc-300 ${hostess.isConfirmed ? 'bg-green-300' : 'bg-white'}`} />
-          <div className="w-[24px] h-5 left-[143px] top-0 absolute bg-white border-r border-b border-zinc-300" />
-          <div className="w-[64px] h-5 left-[201px] top-0 absolute bg-white border-r border-b border-zinc-300" />
-          <div className="w-[80px] h-5 left-[218px] top-0 absolute bg-white border-r border-b border-zinc-300" />
-          <div className="w-[36px] h-5 left-[284px] top-0 absolute bg-white border-r border-b border-zinc-300" />
-          <div className="w-[36px] h-5 left-[320px] top-0 absolute bg-white border-r border-b border-zinc-300" />
-          {/* 確認電話ステータス */}
-          <div className={`w-[18px] h-5 left-[348px] top-0 absolute border-r border-b border-zinc-300 group/call ${
+        </div>
+
+        {/* 店舗 */}
+        <div className="flex items-center justify-center bg-yellow-200 overflow-hidden whitespace-nowrap px-0.5">
+          {hostess.store?.slice(0, 5) ?? hostess.area}
+        </div>
+
+        {/* ホステス名 */}
+        <div
+          className="flex items-center justify-center overflow-hidden whitespace-nowrap px-0.5"
+          style={hostess.storeColor ? { backgroundColor: hostess.storeColor, color: '#000' } : { color: '#000' }}
+        >
+          {hostess.hostessName}
+        </div>
+
+        {/* 確 */}
+        <div className={`flex items-center justify-center ${hostess.isConfirmed ? 'bg-green-300' : ''}`}>
+          {hostess.isConfirmed && <span className="text-[12px]">確</span>}
+        </div>
+
+        {/* 迎えドラ */}
+        <div className="flex items-center justify-start overflow-hidden whitespace-nowrap pl-1">
+          {hostess.driverName}
+        </div>
+
+        {/* 決(count) */}
+        <div className="flex items-center justify-center bg-zinc-400 text-white text-[11px]">
+          {hostess.count}
+        </div>
+
+        {/* 出勤 */}
+        <div className="flex items-center justify-center text-[11px] tabular-nums">
+          {hostess.arrivalTime}
+        </div>
+
+        {/* 地域 */}
+        <div className="flex items-center justify-center overflow-hidden whitespace-nowrap" title={hostess.location}>
+          {hostess.area}
+        </div>
+
+        {/* 終了 */}
+        <div className="flex items-center justify-center text-[11px] tabular-nums">
+          {hostess.startTime}
+        </div>
+
+        {/* 帰宅 */}
+        <div className="flex items-center justify-center text-[11px] tabular-nums">
+          {hostess.endTime}
+        </div>
+
+        {/* 確認電話 */}
+        <div
+          className={`flex items-center justify-center group/call relative ${
             hostess.confirmCallTime
               ? hostess.isConfirmCallCompleted
-                ? 'bg-green-400'
+                ? 'bg-green-400 text-white'
                 : 'bg-yellow-300'
-              : 'bg-white'
-          }`}>
-            {hostess.confirmCallTime && (
-              <>
-                <div className={`w-4 left-[1px] top-[2px] absolute text-center text-[12px] font-bold font-['Inter'] ${
-                  hostess.isConfirmCallCompleted ? 'text-white' : 'text-black'
-                }`}>
-                  ✓
-                </div>
-                <div className="hidden group-hover/call:block absolute left-0 bottom-full mb-1 z-50 bg-black text-white text-[13px] px-2 py-1 rounded whitespace-nowrap shadow-lg">
-                  確認TEL {hostess.confirmCallTime} {hostess.isConfirmCallCompleted ? '(完了)' : '(未完了)'}
-                </div>
-              </>
-            )}
-          </div>
-          {/* テキストデータ - z-10で背景の上に表示 */}
-          {hostess.isConfirmed && (
-            <div className="w-4 h-5 left-[125px] top-[2px] absolute text-center text-black text-[12px] font-normal font-['Inter'] z-10">確</div>
+              : ''
+          }`}
+        >
+          {hostess.confirmCallTime && (
+            <>
+              <span className="text-[11px] font-bold">✓</span>
+              <div className="hidden group-hover/call:block absolute right-0 bottom-full mb-1 z-50 bg-black text-white text-[13px] px-2 py-1 rounded whitespace-nowrap shadow-lg">
+                確認TEL {hostess.confirmCallTime} {hostess.isConfirmCallCompleted ? '(完了)' : '(未完了)'}
+              </div>
+            </>
           )}
-          <div className="w-9 h-5 left-[326px] top-[2px] absolute text-center text-black text-[12px] font-normal font-['Inter'] z-10">{hostess.endTime}</div>
-          <div className="w-9 h-5 left-[284px] top-[2px] absolute text-center text-black text-[12px] font-normal font-['Inter'] z-10">{hostess.startTime}</div>
-          <div className="w-[76px] h-5 left-[220px] top-[2px] absolute text-black text-[11px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap z-10" title={hostess.location}>{hostess.location}</div>
-          <div className="w-9 h-5 left-[206px] top-[2px] absolute text-center text-black text-[12px] font-normal font-['Inter'] z-10">{hostess.arrivalTime}</div>
-          <div className="w-3 h-5 left-[188px] top-[2px] absolute text-center text-white text-[12px] font-normal font-['Inter'] z-10">{hostess.count}</div>
-          <div className="w-[22px] h-5 left-[146px] top-[2px] absolute text-black text-[11px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap z-10">{hostess.driverName}</div>
-          <div
-            className="w-[48px] h-5 left-[74px] top-[2px] absolute text-[11px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap z-10 rounded px-0.5"
-            style={hostess.storeColor ? { backgroundColor: hostess.storeColor, color: '#000' } : { color: '#000' }}
-          >{hostess.hostessName}</div>
-          <div className="w-[44px] h-5 left-[25px] top-[2px] absolute text-center text-black text-[11px] font-normal font-['Inter'] z-10 overflow-hidden whitespace-nowrap">{hostess.store?.slice(0, 5) ?? hostess.area}</div>
-          <div className="w-3.5 h-1.5 left-[11px] top-[4px] absolute origin-top-left rotate-90 bg-rose-300/60" />
         </div>
-      );
-    })}
-    <div className="w-[336px] h-5 left-[1px] top-[80px] absolute">
-
-    </div>
+      </div>
+    ))}
   </div>
 
   {/* OUTドラ未定予約リスト */}
@@ -840,13 +883,13 @@ export default function Original() {
   <div className="w-32 left-[1003px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">場所</div>
   <div className="w-4 left-[1131px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">D</div>
   <div className="w-16 left-[1147px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">地域</div>
-  <div className="w-12 left-[1207px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">INドラ</div>
-  <div className="w-14 left-[1245px] top-[95px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">OUTドラ</div>
-  <div className="left-[1367px] top-[58px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>オプション</div>
-  <div className="left-[1348px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>カード</div>
-  <div className="left-[1329px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>着TEL</div>
-  <div className="left-[1310px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>待合せ</div>
-  <div className="left-[1291px] top-[68px] absolute text-center text-black text-[11px] font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>領収書</div>
+  <div className="w-10 left-[1211px] top-[95px] absolute text-center justify-end text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap overflow-hidden">INド</div>
+  <div className="w-10 left-[1251px] top-[95px] absolute text-center justify-end text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap overflow-hidden">OUTド</div>
+  <div className="w-4 left-[1367px] top-[55px] absolute text-center text-black text-[8px] leading-none font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>オプション</div>
+  <div className="w-4 left-[1348px] top-[71px] absolute text-center text-black text-[8px] leading-none font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>カード</div>
+  <div className="w-4 left-[1329px] top-[63px] absolute text-center text-black text-[8px] leading-none font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>着TEL</div>
+  <div className="w-4 left-[1310px] top-[71px] absolute text-center text-black text-[8px] leading-none font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>待合せ</div>
+  <div className="w-4 left-[1291px] top-[71px] absolute text-center text-black text-[8px] leading-none font-normal font-['Inter']" style={{ writingMode: 'vertical-rl' }}>領収書</div>
   <div className="w-[663px] h-[960px] left-[729px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-x-hidden overflow-y-auto">
     {outDriverUndecidedSampleData.map((item: OutDriverUndecided, index: number) => (
       <div key={item.id} className={`w-[657px] h-6 left-0 absolute overflow-hidden ${index % 2 === 1 ? 'bg-zinc-200' : 'bg-white'} ${index === 0 ? 'border-t border-zinc-300' : ''}`} style={{ top: `${index * 24}px` }}>
@@ -897,7 +940,7 @@ export default function Original() {
   <div className="w-[86px] left-[1392px] top-[95px] absolute text-center text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">ホステス名</div>
   <div className="w-10 left-[1518px] top-[95px] absolute text-center text-black text-[11px] font-normal font-['Inter']">終了</div>
   <div className="w-28 left-[1558px] top-[95px] absolute text-center text-black text-[11px] font-normal font-['Inter']">場所</div>
-  <div className="w-[58px] left-[1668px] top-[95px] absolute text-center text-black text-[11px] font-normal font-['Inter'] whitespace-nowrap">OUTドラ</div>
+  <div className="w-[54px] left-[1670px] top-[95px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap overflow-hidden">OUTド</div>
   <div className="w-[338px] h-[65px] left-[1392px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-x-hidden overflow-y-auto">
     {completedListSampleData.map((item: CompletedList, index: number) => {
     const topPosition = index * 22;
@@ -1066,8 +1109,8 @@ export default function Original() {
     {returningHostessSampleData.map((item: ReturningHostess, index: number) => {
       const topPosition = index * 22;
       return (
-        <div key={item.id} className="w-[243px] h-5 left-0 absolute overflow-hidden bg-white border-b border-zinc-300" style={{ top: `${topPosition}px` }}>
-          <div className="w-[239px] h-5 left-0 top-0 absolute text-black text-[12px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">
+        <div key={item.id} className="w-[240px] h-5 left-0 absolute overflow-hidden bg-white border-b border-zinc-300" style={{ top: `${topPosition}px` }}>
+          <div className="w-[236px] h-5 left-[2px] top-0 absolute text-black text-[12px] font-normal font-['Inter'] overflow-hidden whitespace-nowrap">
             {item.hostessName} - {item.returnTime} - {item.location}
           </div>
         </div>
@@ -1078,12 +1121,12 @@ export default function Original() {
   {/* ホステス送り・帰宅 */}
   <div className="w-[249px] h-5 left-[1736px] top-[75px] absolute bg-yellow-200" />
   <div className="w-[249px] left-[1736px] top-[77px] absolute text-center text-black text-[12px] font-normal font-['Inter'] overflow-hidden">ホステス送り・帰宅</div>
-  <div className="w-5 left-[1736px] top-[96px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter']">荷物</div>
-  <div className="w-[42px] left-[1797px] top-[96px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter']">終了</div>
-  <div className="w-[42px] left-[1839px] top-[96px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter']">帰宅</div>
-  <div className="w-[22px] left-[1945px] top-[96px] absolute text-center justify-end text-black text-[11px] font-normal font-['Inter']">件数</div>
-  <div className="w-[54px] left-[1751px] top-[96px] absolute justify-end text-black text-center text-[11px] font-normal font-['Inter'] whitespace-nowrap">ホステス名</div>
-  <div className="w-[66px] left-[1879px] top-[96px] absolute justify-end text-black text-[11px] text-center font-normal font-['Inter'] whitespace-nowrap">送り場所</div>
+  <div className="w-5 left-[1736px] top-[96px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap overflow-hidden">荷物</div>
+  <div className="w-[54px] left-[1756px] top-[96px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap overflow-hidden">ホステス名</div>
+  <div className="w-[42px] left-[1810px] top-[96px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap overflow-hidden">終了</div>
+  <div className="w-[42px] left-[1852px] top-[96px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap overflow-hidden">帰宅</div>
+  <div className="w-[66px] left-[1894px] top-[96px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap overflow-hidden">送り場所</div>
+  <div className="w-[19px] left-[1960px] top-[96px] absolute text-center text-black text-[10px] font-normal font-['Inter'] whitespace-nowrap overflow-hidden">件数</div>
   <div className="w-[249px] h-[460px] left-[1736px] top-[108px] absolute outline outline-1 outline-offset-[-1px] outline-zinc-300 overflow-hidden">
     {hostessTransportSampleData.map((item: HostessTransport, index: number) => {
       const topPosition = index * 22;
@@ -1191,6 +1234,7 @@ export default function Original() {
     })}
   </div>
       </div>
+    </div>
     </div>
   );
 }

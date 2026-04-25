@@ -4,7 +4,7 @@ import React, { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { sampleCastData } from '@/data/castSampleData';
-import { pickupCars, sendoffCars } from '@/data/transportCarSampleData';
+import { getCarsForDriver } from '@/data/transportCarSampleData';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -42,7 +42,9 @@ import {
   PartyPopper,
   Sparkles,
   Gift,
-  Crown
+  Crown,
+  CalendarCheck,
+  RotateCcw
 } from "lucide-react";
 import {
   Select,
@@ -76,12 +78,35 @@ function HostessManagementContent() {
   // 3状態送迎 state
   type TransportStatus = 'idle' | 'pickup' | 'arrived' | 'sendoff';
   const [transportStatus, setTransportStatus] = useState<TransportStatus>('idle');
-  const [selectedPickupCarId, setSelectedPickupCarId] = useState<string | null>(null);
-  const [selectedSendoffCarId, setSelectedSendoffCarId] = useState<string | null>(null);
-  const [showSendoffSelect, setShowSendoffSelect] = useState(false);
 
-  const handleSelectPickupCar = (id: string) => {
-    setSelectedPickupCarId(id);
+  // お迎えドラのドライバー名（dispatch-panel-2d の hostess.driverName に対応）
+  // castId をキーにサンプルマッピング
+  const castDriverMap: Record<string, string> = {
+    '001': '松尾',
+    '002': '山田',
+    '003': '田中',
+    '004': '佐藤',
+    '005': '高橋',
+    '006': '鈴木',
+    '007': '渡辺',
+    '008': '伊藤',
+    '009': '加藤',
+    '010': '山本',
+    '011': '中村',
+    '012': '小林',
+    '013': '松本',
+    '014': '吉田',
+    '015': '木村',
+    '016': '林',
+    '017': '森',
+    '018': '清水',
+    '019': '汐崎',
+    '020': '井上',
+  };
+  const assignedDriverName = castDriverMap[foundCast.id] ?? '松尾';
+  const assignedCars = getCarsForDriver(assignedDriverName);
+
+  const handleStartPickup = () => {
     setTransportStatus('pickup');
   };
 
@@ -89,22 +114,75 @@ function HostessManagementContent() {
     setTransportStatus('arrived');
   };
 
-  const handleStartSendoff = (id: string) => {
-    setSelectedSendoffCarId(id);
+  const handleStartSendoff = () => {
     setTransportStatus('sendoff');
-    setShowSendoffSelect(false);
   };
 
   const handleCompleteSendoff = () => {
     setTransportStatus('idle');
-    setSelectedPickupCarId(null);
-    setSelectedSendoffCarId(null);
-    setShowSendoffSelect(false);
   };
 
   React.useEffect(() => {
     document.title = 'プロフィール設定 - Dispatch Harmony Hub';
   }, []);
+
+  // 出勤管理 (シフト提出) state
+  type ShiftEntry = {
+    date: string;        // 'YYYY-MM-DD'
+    dayOfWeek: string;   // '月'..'日'
+    isWorking: boolean;
+    startHour: string;
+    startMinute: string;
+    endHour: string;
+    endMinute: string;
+    returnHour: string;
+    returnMinute: string;
+  };
+
+  const sharableStores = ['京都デリヘル倶楽部']; // ステップ1: 車重可能併用店
+  const initialNonSharableStores = ['京都ホテヘル倶楽部', '滋賀DCP']; // ステップ2: 車重不可併用店
+  const [nonSharableStoreOrder, setNonSharableStoreOrder] = useState<string[]>(initialNonSharableStores);
+
+  const generateInitialShifts = (): ShiftEntry[] => {
+    const days = ['月', '火', '水', '木', '金', '土', '日'];
+    const start = new Date(2026, 2, 9); // 2026年03月09日 月曜
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return {
+        date: `${yyyy}-${mm}-${dd}`,
+        dayOfWeek: days[i],
+        isWorking: true,
+        startHour: '19',
+        startMinute: '00',
+        endHour: '04',
+        endMinute: '00',
+        returnHour: '06',
+        returnMinute: '00',
+      };
+    });
+  };
+  const [shiftEntries, setShiftEntries] = useState<ShiftEntry[]>(generateInitialShifts());
+
+  const updateShiftField = <K extends keyof ShiftEntry>(idx: number, field: K, value: ShiftEntry[K]) => {
+    setShiftEntries(prev => prev.map((row, i) => (i === idx ? { ...row, [field]: value } : row)));
+  };
+
+  const swapNonSharableStores = () => {
+    setNonSharableStoreOrder(prev => [...prev].reverse());
+  };
+
+  const submitShift = () => {
+    alert(`シフトを送信しました\n対象: ${shiftEntries.filter(s => s.isWorking).length}日`);
+  };
+
+  const resetShift = () => {
+    setShiftEntries(generateInitialShifts());
+    setNonSharableStoreOrder(initialNonSharableStores);
+  };
 
   // castSampleData から取得したキャスト情報をホステスデータにマッピング
   const hostessData = {
@@ -864,6 +942,7 @@ function HostessManagementContent() {
     { id: 'performance', label: 'マイ実績', icon: TrendingUp, gradient: 'from-cyan-400 to-blue-500' },
     { id: 'hime-reservation', label: '姫予約', icon: CalendarPlus, gradient: 'from-fuchsia-500 to-pink-500' },
     { id: 'back-fee', label: 'バック料金表', icon: Receipt, gradient: 'from-green-500 to-emerald-600' },
+    { id: 'attendance', label: '出勤管理', icon: CalendarCheck, gradient: 'from-orange-500 to-amber-600' },
   ];
 
   return (
@@ -991,7 +1070,7 @@ function HostessManagementContent() {
                 <button
                   onClick={() => setActiveSection('car')}
                   className={`p-2 lg:p-4 rounded-xl lg:rounded-2xl flex flex-col lg:flex-row items-center gap-1 lg:gap-4 transition-all hover:scale-[1.02] ${
-                    selectedPickupCarId
+                    transportStatus !== 'idle'
                       ? 'bg-blue-500 shadow-lg shadow-blue-500/30'
                       : 'bg-gradient-to-r from-blue-500 to-cyan-500 shadow-lg shadow-blue-500/20'
                   }`}
@@ -1000,14 +1079,14 @@ function HostessManagementContent() {
                     <Car className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                   </div>
                   <div className="text-center lg:text-left">
-                    <div className="text-white font-bold text-xs lg:text-base">{selectedPickupCarId ? '選択済み' : '送迎車確認'}</div>
-                    <div className="text-white/70 text-[10px] lg:text-sm hidden lg:block">出勤時の車両選択</div>
+                    <div className="text-white font-bold text-xs lg:text-base">{transportStatus !== 'idle' ? '送迎中' : '送迎車確認'}</div>
+                    <div className="text-white/70 text-[10px] lg:text-sm hidden lg:block">担当車両の確認</div>
                   </div>
                 </button>
 
                 {/* 出勤申請 */}
                 <button
-                  onClick={() => alert('出勤申請を送信しました')}
+                  onClick={() => setActiveSection('attendance')}
                   className="p-2 lg:p-4 rounded-xl lg:rounded-2xl flex flex-col lg:flex-row items-center gap-1 lg:gap-4 bg-gradient-to-r from-violet-500 to-purple-600 shadow-lg shadow-violet-500/20 transition-all hover:scale-[1.02]"
                 >
                   <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-white/20 flex items-center justify-center">
@@ -1091,6 +1170,7 @@ function HostessManagementContent() {
                   {activeSection === 'performance' && <><TrendingUp className="w-4 h-4 lg:w-5 lg:h-5 text-cyan-500" />マイ実績</>}
                   {activeSection === 'hime-reservation' && <><CalendarPlus className="w-4 h-4 lg:w-5 lg:h-5 text-fuchsia-500" />姫予約</>}
                   {activeSection === 'back-fee' && <><Receipt className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-500" />バック料金表</>}
+                  {activeSection === 'attendance' && <><CalendarCheck className="w-4 h-4 lg:w-5 lg:h-5 text-orange-500" />出勤管理 - シフト提出</>}
                   {activeSection === 'car' && <><Car className="w-4 h-4 lg:w-5 lg:h-5 text-blue-500" />送迎車選択</>}
                 </CardTitle>
               </CardHeader>
@@ -2356,89 +2436,293 @@ function HostessManagementContent() {
                   </div>
                 )}
 
+                {/* 出勤管理 - シフト提出 */}
+                {activeSection === 'attendance' && (
+                  <div className="space-y-6">
+                    {/* ステップ1: 車重可能併用店 */}
+                    <div className="border border-blue-300 rounded-lg p-4 bg-blue-50/30">
+                      <div className="text-sm font-bold text-gray-800 mb-2">
+                        ステップ1　車重可能併用店で出勤シフトを提出するものを確認します。
+                      </div>
+                      <div className="space-y-2">
+                        {sharableStores.map(name => (
+                          <div
+                            key={name}
+                            className="border border-blue-400 bg-white rounded px-3 py-2 text-sm text-gray-800"
+                          >
+                            {name}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* ステップ2: 車重不可併用店 + 並び替え */}
+                    <div className="border border-blue-300 rounded-lg p-4 bg-blue-50/30">
+                      <div className="text-sm font-bold text-gray-800 mb-2">
+                        ステップ2　車重不可併用店で出勤シフトを提出するものを選択します。
+                      </div>
+                      <div className="border border-blue-400 bg-white rounded mb-3">
+                        {nonSharableStoreOrder.map((name, i) => (
+                          <div
+                            key={name}
+                            className={`flex justify-between items-center px-3 py-2 text-sm text-gray-800 ${
+                              i < nonSharableStoreOrder.length - 1 ? 'border-b border-blue-200' : ''
+                            }`}
+                          >
+                            <span>{name}</span>
+                            <span className="text-gray-600">する</span>
+                          </div>
+                        ))}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={swapNonSharableStores}
+                        className="border-blue-400 text-blue-700 hover:bg-blue-100"
+                      >
+                        <ArrowUpDown className="w-4 h-4 mr-1" />
+                        変更して入れ替える
+                      </Button>
+                    </div>
+
+                    {/* ステップ3: シフト編集テーブル */}
+                    <div className="border border-blue-300 rounded-lg p-4 bg-blue-50/30">
+                      <div className="text-sm font-bold text-gray-800 mb-3">
+                        ステップ3　下記の出勤予定を編集して、最後にOKをクリックします。
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-sm">
+                          <thead>
+                            <tr className="bg-cyan-200 text-gray-800">
+                              <th className="border border-cyan-400 px-2 py-1 text-left">日付</th>
+                              <th className="border border-cyan-400 px-2 py-1">出勤</th>
+                              <th className="border border-cyan-400 px-2 py-1">出勤時刻</th>
+                              <th className="border border-cyan-400 px-2 py-1">終了時刻</th>
+                              <th className="border border-cyan-400 px-2 py-1">帰宅時刻</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr className="bg-cyan-100">
+                              <td colSpan={5} className="border border-cyan-400 px-2 py-1 text-center font-semibold text-gray-800">
+                                2026年03月
+                              </td>
+                            </tr>
+                            {shiftEntries.map((entry, idx) => {
+                              const dayNum = entry.date.split('-')[2];
+                              return (
+                                <tr key={entry.date} className="bg-yellow-100/60 hover:bg-yellow-100">
+                                  <td className="border border-yellow-300 px-2 py-1">
+                                    <span className="font-bold mr-1">{dayNum}日</span>
+                                    <span>{entry.dayOfWeek}</span>
+                                  </td>
+                                  <td className="border border-yellow-300 px-2 py-1 text-center">
+                                    <input
+                                      type="checkbox"
+                                      aria-label={`${dayNum}日 出勤`}
+                                      checked={entry.isWorking}
+                                      onChange={e => updateShiftField(idx, 'isWorking', e.target.checked)}
+                                      className="w-4 h-4 accent-blue-600"
+                                    />
+                                  </td>
+                                  <td className="border border-yellow-300 px-2 py-1">
+                                    <div className="flex items-center gap-1 justify-center">
+                                      <select
+                                        aria-label={`${dayNum}日 出勤時`}
+                                        disabled={!entry.isWorking}
+                                        value={entry.startHour}
+                                        onChange={e => updateShiftField(idx, 'startHour', e.target.value)}
+                                        className="border rounded px-1 py-0.5 text-sm disabled:opacity-50"
+                                      >
+                                        {Array.from({ length: 24 }, (_, h) => String(h).padStart(2, '0')).map(h => (
+                                          <option key={h} value={h}>{h}</option>
+                                        ))}
+                                      </select>
+                                      <span>:</span>
+                                      <select
+                                        aria-label={`${dayNum}日 出勤分`}
+                                        disabled={!entry.isWorking}
+                                        value={entry.startMinute}
+                                        onChange={e => updateShiftField(idx, 'startMinute', e.target.value)}
+                                        className="border rounded px-1 py-0.5 text-sm disabled:opacity-50"
+                                      >
+                                        {['00', '15', '30', '45'].map(m => (
+                                          <option key={m} value={m}>{m}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                  </td>
+                                  <td className="border border-yellow-300 px-2 py-1">
+                                    <div className="flex items-center gap-1 justify-center">
+                                      <select
+                                        aria-label={`${dayNum}日 終了時`}
+                                        disabled={!entry.isWorking}
+                                        value={entry.endHour}
+                                        onChange={e => updateShiftField(idx, 'endHour', e.target.value)}
+                                        className="border rounded px-1 py-0.5 text-sm disabled:opacity-50"
+                                      >
+                                        {Array.from({ length: 24 }, (_, h) => String(h).padStart(2, '0')).map(h => (
+                                          <option key={h} value={h}>{h}</option>
+                                        ))}
+                                      </select>
+                                      <span>:</span>
+                                      <select
+                                        aria-label={`${dayNum}日 終了分`}
+                                        disabled={!entry.isWorking}
+                                        value={entry.endMinute}
+                                        onChange={e => updateShiftField(idx, 'endMinute', e.target.value)}
+                                        className="border rounded px-1 py-0.5 text-sm disabled:opacity-50"
+                                      >
+                                        {['00', '15', '30', '45'].map(m => (
+                                          <option key={m} value={m}>{m}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                  </td>
+                                  <td className="border border-yellow-300 px-2 py-1">
+                                    <div className="flex items-center gap-1 justify-center">
+                                      <select
+                                        aria-label={`${dayNum}日 帰宅時`}
+                                        disabled={!entry.isWorking}
+                                        value={entry.returnHour}
+                                        onChange={e => updateShiftField(idx, 'returnHour', e.target.value)}
+                                        className="border rounded px-1 py-0.5 text-sm disabled:opacity-50"
+                                      >
+                                        {Array.from({ length: 24 }, (_, h) => String(h).padStart(2, '0')).map(h => (
+                                          <option key={h} value={h}>{h}</option>
+                                        ))}
+                                      </select>
+                                      <span>:</span>
+                                      <select
+                                        aria-label={`${dayNum}日 帰宅分`}
+                                        disabled={!entry.isWorking}
+                                        value={entry.returnMinute}
+                                        onChange={e => updateShiftField(idx, 'returnMinute', e.target.value)}
+                                        className="border rounded px-1 py-0.5 text-sm disabled:opacity-50"
+                                      >
+                                        {['00', '15', '30', '45'].map(m => (
+                                          <option key={m} value={m}>{m}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                            <tr className="bg-cyan-100">
+                              <td colSpan={5} className="border border-cyan-400 px-2 py-1 text-center font-semibold text-gray-800">
+                                2026年03月
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-3">
+                        よろしければ OKボタンをタップしてください。
+                      </p>
+                      <div className="flex gap-3 mt-3">
+                        <Button
+                          type="button"
+                          onClick={submitShift}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+                        >
+                          OK
+                        </Button>
+                        <p className="text-xs text-gray-600 self-center">
+                          入力を元に戻すには、リセットをタップします。
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={resetShift}
+                          className="border-gray-400 text-gray-700"
+                        >
+                          <RotateCcw className="w-4 h-4 mr-1" />
+                          リセット
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* 送迎 */}
                 {activeSection === 'car' && (
                   <div className="space-y-3 lg:space-y-4">
 
-                    {/* idle: お迎え車両候補一覧 */}
+                    {/* idle: お迎え車両確認ボタン */}
                     {transportStatus === 'idle' && (
                       <div className="space-y-3">
-                        <p className="text-gray-500 text-sm lg:text-base">出勤時に利用するお迎え車を選択してください</p>
-                        <div className="grid gap-2 lg:gap-3">
-                          {pickupCars.map(car => (
-                            <button
-                              key={car.id}
-                              onClick={() => handleSelectPickupCar(car.id)}
-                              className="w-full p-3 lg:p-4 rounded-xl transition-all flex items-center gap-3 lg:gap-4 bg-gray-50 hover:bg-blue-50 border border-transparent hover:border-blue-200"
-                            >
-                              <div className="w-10 h-10 lg:w-14 lg:h-14 rounded-full flex items-center justify-center flex-shrink-0 bg-blue-100">
-                                <Car className="w-5 h-5 lg:w-7 lg:h-7 text-blue-500" />
-                              </div>
-                              <div className="flex-1 text-left min-w-0">
-                                <div className="font-bold text-base lg:text-lg text-gray-800">{car.name}</div>
-                                <div className="text-[10px] lg:text-xs font-mono text-gray-400">社番: {car.vehicleNumber}</div>
-                                <div className="text-xs lg:text-sm text-gray-500 flex items-center gap-1">
-                                  <User className="w-3 h-3" />{car.driverName}
-                                </div>
-                              </div>
-                              <div className="text-right flex-shrink-0">
-                                <div className="text-[10px] lg:text-xs text-gray-400">到着予定</div>
-                                <div className="font-bold text-lg lg:text-xl text-gray-800 flex items-center gap-1 justify-end">
-                                  <Clock className="w-4 h-4 text-blue-400" />{car.eta}
-                                </div>
-                              </div>
-                            </button>
-                          ))}
+                        <p className="text-gray-500 text-sm lg:text-base">担当ドライバー: {assignedDriverName}</p>
+                        <div className="rounded-xl bg-blue-50 border border-blue-100 p-4 flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100 flex-shrink-0">
+                            <Car className="w-5 h-5 text-blue-500" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-bold text-base text-gray-800">{assignedCars.pickup.name}</div>
+                            <div className="text-[10px] font-mono text-gray-400">社番: {assignedCars.pickup.vehicleNumber}</div>
+                            <div className="text-xs text-gray-500 flex items-center gap-1">
+                              <User className="w-3 h-3" />{assignedCars.pickup.driverName}
+                            </div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <div className="text-[10px] text-gray-400">到着予定</div>
+                            <div className="font-bold text-lg text-gray-800 flex items-center gap-1 justify-end">
+                              <Clock className="w-4 h-4 text-blue-400" />{assignedCars.pickup.eta}
+                            </div>
+                          </div>
                         </div>
+                        <Button
+                          className="w-full h-11 lg:h-13 text-sm lg:text-base bg-blue-600 hover:bg-blue-700 flex items-center gap-2 justify-center"
+                          onClick={handleStartPickup}
+                        >
+                          <Car className="w-4 h-4" />
+                          お迎え車両を確認する
+                        </Button>
                       </div>
                     )}
 
                     {/* pickup: お迎え中カード */}
-                    {transportStatus === 'pickup' && (() => {
-                      const car = pickupCars.find(c => c.id === selectedPickupCarId);
-                      if (!car) return null;
-                      return (
-                        <div className="space-y-3">
-                          <div className="rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 p-4 lg:p-6 shadow-lg shadow-blue-500/30 text-white">
-                            <div className="text-center mb-4">
-                              <div className="text-xs lg:text-sm font-medium text-white/70 mb-1">お迎え車両</div>
-                              <div className="text-2xl lg:text-3xl font-bold">この車です</div>
+                    {transportStatus === 'pickup' && (
+                      <div className="space-y-3">
+                        <div className="rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 p-4 lg:p-6 shadow-lg shadow-blue-500/30 text-white">
+                          <div className="text-center mb-4">
+                            <div className="text-xs lg:text-sm font-medium text-white/70 mb-1">お迎え車両</div>
+                            <div className="text-2xl lg:text-3xl font-bold">この車です</div>
+                          </div>
+                          <div className="bg-white/15 rounded-xl p-3 lg:p-4 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Car className="w-4 h-4 lg:w-5 lg:h-5 text-white/80 flex-shrink-0" />
+                              <span className="font-bold text-base lg:text-lg">{assignedCars.pickup.name}</span>
                             </div>
-                            <div className="bg-white/15 rounded-xl p-3 lg:p-4 space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Car className="w-4 h-4 lg:w-5 lg:h-5 text-white/80 flex-shrink-0" />
-                                <span className="font-bold text-base lg:text-lg">{car.name}</span>
-                              </div>
+                            <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
+                              <MapPin className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
+                              <span className="font-mono">{assignedCars.pickup.vehicleNumber}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
+                              <User className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
+                              <span>{assignedCars.pickup.driverName}</span>
+                            </div>
+                            {assignedCars.pickup.driverPhone && (
                               <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
                                 <MapPin className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
-                                <span className="font-mono">{car.vehicleNumber}</span>
+                                <span>{assignedCars.pickup.driverPhone}</span>
                               </div>
-                              <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
-                                <User className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
-                                <span>{car.driverName}</span>
-                              </div>
-                              {car.driverPhone && (
-                                <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
-                                  <MapPin className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
-                                  <span>{car.driverPhone}</span>
-                                </div>
-                              )}
-                              <div className="flex items-center gap-2 text-white font-bold text-sm lg:text-base">
-                                <Clock className="w-4 h-4 flex-shrink-0" />
-                                <span>到着予想: {car.eta}</span>
-                              </div>
+                            )}
+                            <div className="flex items-center gap-2 text-white font-bold text-sm lg:text-base">
+                              <Clock className="w-4 h-4 flex-shrink-0" />
+                              <span>到着予想: {assignedCars.pickup.eta}</span>
                             </div>
                           </div>
-                          <Button
-                            className="w-full h-11 lg:h-13 text-sm lg:text-base bg-blue-600 hover:bg-blue-700 flex items-center gap-2 justify-center"
-                            onClick={handleArrive}
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                            到着しました
-                          </Button>
                         </div>
-                      );
-                    })()}
+                        <Button
+                          className="w-full h-11 lg:h-13 text-sm lg:text-base bg-blue-600 hover:bg-blue-700 flex items-center gap-2 justify-center"
+                          onClick={handleArrive}
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                          到着しました
+                        </Button>
+                      </div>
+                    )}
 
                     {/* arrived: 到着済みカード */}
                     {transportStatus === 'arrived' && (
@@ -2455,93 +2739,58 @@ function HostessManagementContent() {
                             お仕事終了後、送迎ドライバーがお迎えに参ります
                           </div>
                         </div>
-
-                        {!showSendoffSelect ? (
-                          <Button
-                            className="w-full h-11 lg:h-13 text-sm lg:text-base bg-amber-500 hover:bg-amber-600 flex items-center gap-2 justify-center"
-                            onClick={() => setShowSendoffSelect(true)}
-                          >
-                            <Car className="w-4 h-4" />
-                            送迎を開始する
-                          </Button>
-                        ) : (
-                          <div className="space-y-2">
-                            <p className="text-gray-500 text-sm">送迎車を選択してください</p>
-                            {sendoffCars.map(car => (
-                              <button
-                                key={car.id}
-                                onClick={() => handleStartSendoff(car.id)}
-                                className="w-full p-3 lg:p-4 rounded-xl transition-all flex items-center gap-3 lg:gap-4 bg-gray-50 hover:bg-green-50 border border-transparent hover:border-green-200"
-                              >
-                                <div className="w-10 h-10 lg:w-14 lg:h-14 rounded-full flex items-center justify-center flex-shrink-0 bg-green-100">
-                                  <Car className="w-5 h-5 lg:w-7 lg:h-7 text-green-500" />
-                                </div>
-                                <div className="flex-1 text-left min-w-0">
-                                  <div className="font-bold text-base lg:text-lg text-gray-800">{car.name}</div>
-                                  <div className="text-[10px] lg:text-xs font-mono text-gray-400">社番: {car.vehicleNumber}</div>
-                                  <div className="text-xs lg:text-sm text-gray-500 flex items-center gap-1">
-                                    <User className="w-3 h-3" />{car.driverName}
-                                  </div>
-                                </div>
-                                <div className="text-right flex-shrink-0">
-                                  <div className="text-[10px] lg:text-xs text-gray-400">送り予定</div>
-                                  <div className="font-bold text-lg lg:text-xl text-gray-800 flex items-center gap-1 justify-end">
-                                    <Clock className="w-4 h-4 text-green-400" />{car.eta}
-                                  </div>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                        <Button
+                          className="w-full h-11 lg:h-13 text-sm lg:text-base bg-amber-500 hover:bg-amber-600 flex items-center gap-2 justify-center"
+                          onClick={handleStartSendoff}
+                        >
+                          <Car className="w-4 h-4" />
+                          送迎を開始する
+                        </Button>
                       </div>
                     )}
 
                     {/* sendoff: 送迎中カード */}
-                    {transportStatus === 'sendoff' && (() => {
-                      const car = sendoffCars.find(c => c.id === selectedSendoffCarId);
-                      if (!car) return null;
-                      return (
-                        <div className="space-y-3">
-                          <div className="rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 p-4 lg:p-6 shadow-lg shadow-green-500/30 text-white">
-                            <div className="text-center mb-4">
-                              <div className="text-xs lg:text-sm font-medium text-white/70 mb-1">送迎中</div>
-                              <div className="text-2xl lg:text-3xl font-bold">この車です</div>
+                    {transportStatus === 'sendoff' && (
+                      <div className="space-y-3">
+                        <div className="rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 p-4 lg:p-6 shadow-lg shadow-green-500/30 text-white">
+                          <div className="text-center mb-4">
+                            <div className="text-xs lg:text-sm font-medium text-white/70 mb-1">送迎中</div>
+                            <div className="text-2xl lg:text-3xl font-bold">この車です</div>
+                          </div>
+                          <div className="bg-white/15 rounded-xl p-3 lg:p-4 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Car className="w-4 h-4 lg:w-5 lg:h-5 text-white/80 flex-shrink-0" />
+                              <span className="font-bold text-base lg:text-lg">{assignedCars.sendoff.name}</span>
                             </div>
-                            <div className="bg-white/15 rounded-xl p-3 lg:p-4 space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Car className="w-4 h-4 lg:w-5 lg:h-5 text-white/80 flex-shrink-0" />
-                                <span className="font-bold text-base lg:text-lg">{car.name}</span>
-                              </div>
+                            <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
+                              <MapPin className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
+                              <span className="font-mono">{assignedCars.sendoff.vehicleNumber}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
+                              <User className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
+                              <span>{assignedCars.sendoff.driverName}</span>
+                            </div>
+                            {assignedCars.sendoff.driverPhone && (
                               <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
                                 <MapPin className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
-                                <span className="font-mono">{car.vehicleNumber}</span>
+                                <span>{assignedCars.sendoff.driverPhone}</span>
                               </div>
-                              <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
-                                <User className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
-                                <span>{car.driverName}</span>
-                              </div>
-                              {car.driverPhone && (
-                                <div className="flex items-center gap-2 text-white/80 text-xs lg:text-sm">
-                                  <MapPin className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
-                                  <span>{car.driverPhone}</span>
-                                </div>
-                              )}
-                              <div className="flex items-center gap-2 text-white font-bold text-sm lg:text-base">
-                                <Clock className="w-4 h-4 flex-shrink-0" />
-                                <span>送り予定: {car.eta}</span>
-                              </div>
+                            )}
+                            <div className="flex items-center gap-2 text-white font-bold text-sm lg:text-base">
+                              <Clock className="w-4 h-4 flex-shrink-0" />
+                              <span>送り予定: {assignedCars.sendoff.eta}</span>
                             </div>
                           </div>
-                          <Button
-                            className="w-full h-11 lg:h-13 text-sm lg:text-base bg-green-600 hover:bg-green-700 flex items-center gap-2 justify-center"
-                            onClick={handleCompleteSendoff}
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                            完了・リセット
-                          </Button>
                         </div>
-                      );
-                    })()}
+                        <Button
+                          className="w-full h-11 lg:h-13 text-sm lg:text-base bg-green-600 hover:bg-green-700 flex items-center gap-2 justify-center"
+                          onClick={handleCompleteSendoff}
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                          完了・リセット
+                        </Button>
+                      </div>
+                    )}
 
                   </div>
                 )}
