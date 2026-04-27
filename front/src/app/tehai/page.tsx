@@ -310,7 +310,7 @@ export default function TehaiPage() {
   );
 
   return (
-    <div className="w-full min-w-[1280px] h-screen min-h-[800px] relative bg-white flex flex-col text-[11px]">
+    <div className="w-full min-w-[1400px] h-screen min-h-[800px] relative bg-white flex flex-col text-[11px]">
       {/* ヘッダー */}
       <div className="w-full h-[38px] bg-white border-b border-zinc-300">
         <div className="flex items-center h-full px-1">

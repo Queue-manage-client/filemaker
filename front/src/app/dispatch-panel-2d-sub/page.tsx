@@ -332,6 +332,7 @@ export default function DispatchPanel2DSubPage() {
   const [isMobile, setIsMobile] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState<'scheduled' | 'drivers' | 'send'>('drivers');
   const [luggageConfirmTarget, setLuggageConfirmTarget] = React.useState<SendHostess | null>(null);
+  const [confirmedLuggageIds, setConfirmedLuggageIds] = React.useState<Set<number>>(new Set());
 
   React.useEffect(() => {
     document.title = '配車パネル2D-Sub - Dispatch Harmony Hub';
@@ -760,10 +761,14 @@ export default function DispatchPanel2DSubPage() {
                   <button
                     type="button"
                     onClick={() => setLuggageConfirmTarget(hostess)}
-                    className="hover:bg-amber-100 p-0.5 rounded"
+                    className={`p-0.5 rounded ${confirmedLuggageIds.has(hostess.id) ? 'bg-emerald-100 hover:bg-emerald-200' : 'hover:bg-amber-100'}`}
                     aria-label={`${hostess.hostessName}の荷物を確認`}
+                    title={confirmedLuggageIds.has(hostess.id) ? '確認済み' : '未確認'}
                   >
-                    <Package size={14} className="text-amber-600" />
+                    <Package
+                      size={14}
+                      className={confirmedLuggageIds.has(hostess.id) ? 'text-emerald-600' : 'text-amber-600'}
+                    />
                   </button>
                 )}
               </div>
@@ -813,6 +818,11 @@ export default function DispatchPanel2DSubPage() {
               <p className="mb-3">
                 <span className="font-bold">⚠ {luggageConfirmTarget.hostessName}</span> さんは預り荷物があります。
               </p>
+              {confirmedLuggageIds.has(luggageConfirmTarget.id) && (
+                <p className="mb-3 px-3 py-2 bg-emerald-50 border border-emerald-300 rounded text-emerald-800 text-xs">
+                  ✓ この荷物は既に確認済みです
+                </p>
+              )}
               {luggageConfirmTarget.luggageDetails && (
                 <p className="mb-3 px-3 py-2 bg-amber-50 border border-amber-200 rounded text-amber-900">
                   内容: {luggageConfirmTarget.luggageDetails}
@@ -831,7 +841,11 @@ export default function DispatchPanel2DSubPage() {
               <button
                 type="button"
                 onClick={() => {
-                  alert(`${luggageConfirmTarget.hostessName}さんの荷物確認を完了しました`);
+                  setConfirmedLuggageIds((prev) => {
+                    const next = new Set(prev);
+                    next.add(luggageConfirmTarget.id);
+                    return next;
+                  });
                   setLuggageConfirmTarget(null);
                 }}
                 className="px-3 py-1.5 text-sm bg-amber-600 text-white rounded hover:bg-amber-700 font-bold"

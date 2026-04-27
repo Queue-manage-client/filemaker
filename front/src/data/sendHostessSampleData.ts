@@ -1,16 +1,16 @@
 import { SendHostess } from '@/types/send-hostess';
 
 export const sendHostessSampleData: SendHostess[] = [
-  { id: 1, hasPackage: true, area: '南', hostessName: '祈-', driverName: '', endTime: '1:00', returnTime: '3:00', destination: '堀川五条(自宅)', destinationMark: '■', count: 0 },
+  { id: 1, hasPackage: true, area: '南', hostessName: '祈-', driverName: '', endTime: '1:00', returnTime: '3:00', destination: '堀川五条(自宅)', destinationMark: '■', count: 0, luggageDetails: '紙袋1、ポーチ1' },
   { id: 2, hasPackage: false, area: '京', hostessName: 'まり', driverName: '松尾', endTime: '2:00', returnTime: '4:00', destination: '四条烏丸', count: 1 },
   { id: 3, hasPackage: false, area: '南', hostessName: 'ひとみ', driverName: '土居4', endTime: '1:30', returnTime: '3:30', destination: '京都駅', destinationMark: '■', count: 2 },
-  { id: 4, hasPackage: true, area: '京', hostessName: 'あかね', driverName: '汐崎', endTime: '2:30', returnTime: '4:30', destination: '烏丸御池', count: 0 },
+  { id: 4, hasPackage: true, area: '京', hostessName: 'あかね', driverName: '汐崎', endTime: '2:30', returnTime: '4:30', destination: '烏丸御池', count: 0, luggageDetails: '黒のトートバッグ' },
   { id: 5, hasPackage: false, area: '南', hostessName: 'みく', driverName: '', endTime: '1:00', returnTime: '3:00', destination: '竹田駅', destinationMark: '■', count: 3 },
   { id: 6, hasPackage: false, area: '京', hostessName: 'さくら', driverName: '松尾', endTime: '2:00', returnTime: '4:00', destination: '四条大宮', count: 1 },
-  { id: 7, hasPackage: true, area: '南', hostessName: 'ゆき', driverName: '土居4', endTime: '1:30', returnTime: '3:30', destination: '丹波橋', count: 0 },
+  { id: 7, hasPackage: true, area: '南', hostessName: 'ゆき', driverName: '土居4', endTime: '1:30', returnTime: '3:30', destination: '丹波橋', count: 0, luggageDetails: '紙袋2(衣装)' },
   { id: 8, hasPackage: false, area: '京', hostessName: 'りな', driverName: '', endTime: '2:30', returnTime: '4:30', destination: '北大路', destinationMark: '■', count: 2 },
   { id: 9, hasPackage: false, area: '南', hostessName: 'なな', driverName: '汐崎', endTime: '1:00', returnTime: '3:00', destination: '桃山御陵前', count: 1 },
-  { id: 10, hasPackage: true, area: '京', hostessName: 'もも', driverName: '松尾', endTime: '2:00', returnTime: '4:00', destination: '西院', count: 0 },
+  { id: 10, hasPackage: true, area: '京', hostessName: 'もも', driverName: '松尾', endTime: '2:00', returnTime: '4:00', destination: '西院', count: 0, luggageDetails: 'スーツケース1' },
   { id: 11, hasPackage: false, area: '南', hostessName: 'えり', driverName: '', endTime: '1:30', returnTime: '3:30', destination: '伏見桃山', destinationMark: '■', count: 2 },
   { id: 12, hasPackage: false, area: '京', hostessName: 'かな', driverName: '土居4', endTime: '2:30', returnTime: '4:30', destination: '円町', count: 1 },
   { id: 13, hasPackage: true, area: '南', hostessName: 'あい', driverName: '汐崎', endTime: '1:00', returnTime: '3:00', destination: '中書島', count: 0 },
