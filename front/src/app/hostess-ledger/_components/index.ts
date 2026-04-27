@@ -6,6 +6,7 @@ export { default as CourseFixedTab } from './CourseFixedTab';
 export { default as CourseCombinedTab } from './CourseCombinedTab';
 export { default as ClassTab } from './ClassTab';
 export { default as OptionTab } from './OptionTab';
+export { default as StoreUnifiedTab } from './StoreUnifiedTab';
 
 // 右画面タブ
 export { default as TodayAttendanceTab } from './TodayAttendanceTab';

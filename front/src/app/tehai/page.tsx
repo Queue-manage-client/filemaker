@@ -310,9 +310,9 @@ export default function TehaiPage() {
   );
 
   return (
-    <div className="w-[1920px] h-[1080px] relative bg-white flex flex-col text-[12px]">
+    <div className="w-full min-w-[1280px] h-screen min-h-[800px] relative bg-white flex flex-col text-[11px]">
       {/* ヘッダー */}
-      <div className="w-full h-[42px] bg-white border-b border-zinc-300">
+      <div className="w-full h-[38px] bg-white border-b border-zinc-300">
         <div className="flex items-center h-full px-1">
           <Link href="/dashboard">
             <Button
@@ -395,7 +395,7 @@ export default function TehaiPage() {
       {/* メインコンテンツ */}
       <div className="flex flex-1 overflow-hidden">
         {/* 左1列目: 所属事務所変更 */}
-        <div className="h-full border-r border-gray-400 w-[300px] bg-white flex flex-col">
+        <div className="h-full border-r border-gray-400 w-[260px] bg-white flex flex-col">
           <div className="border-b border-gray-400 py-0.5 px-1">
             <a href="#" className="text-blue-600 underline font-bold text-[11px]">所属事務所変更</a>
           </div>
@@ -434,7 +434,7 @@ export default function TehaiPage() {
         </div>
 
         {/* 左2列目: 所属事務所 */}
-        <div className="h-full border-r border-gray-400 w-[440px] bg-white flex flex-col">
+        <div className="h-full border-r border-gray-400 w-[380px] bg-white flex flex-col">
           <div className="border-b border-gray-400 px-1 bg-gray-100">
             <span className="border border-gray-600 px-1 py-0 text-[10px]">所属事務所:</span>
           </div>
@@ -465,7 +465,7 @@ export default function TehaiPage() {
         </div>
 
         {/* 左3列目: 出勤管理テーブル */}
-        <div className="h-full border-r border-gray-400 w-[460px] bg-white flex flex-col">
+        <div className="h-full border-r border-gray-400 w-[400px] bg-white flex flex-col">
           <div className="flex-1 overflow-y-scroll">
             {attendanceManagementData.map((data) => (
               <div key={data.id} className="flex items-center border-b border-gray-300 text-[11px] bg-white">

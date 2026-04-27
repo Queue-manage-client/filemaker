@@ -602,6 +602,11 @@ export default function RT2Panel() {
                 手配表
               </Button>
             </Link>
+            <Link href="/cast-attendance-schedule">
+              <Button className="h-8 px-3 text-xs bg-pink-300 hover:bg-pink-400 text-black border border-black">
+                キャスト出勤予定
+              </Button>
+            </Link>
 
             {/* ソート */}
             <div className="flex items-center gap-1 ml-2">

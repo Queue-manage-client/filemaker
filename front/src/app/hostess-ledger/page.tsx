@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { SCHEDULE_STATUS_LABELS } from "@/types/hostess";
 import {
   ProfileTab,
   HPDataTab,
@@ -13,6 +14,7 @@ import {
   CourseCombinedTab,
   ClassTab,
   OptionTab,
+  StoreUnifiedTab,
   TodayAttendanceTab,
   SameStoreHostessTab,
   PerformanceDetailTab,
@@ -27,8 +29,15 @@ export default function HostessLedgerPage() {
   const [employmentStatus, setEmploymentStatus] = useState<'active' | 'retired'>('retired');
   const [displayStatus, setDisplayStatus] = useState<'ok' | 'ng'>('ok');
   const [activeRightTab, setActiveRightTab] = useState<string>('当日出勤ホステス');
-  const [activeMiddleTab, setActiveMiddleTab] = useState<string>('プロフィール');
+  const [activeMiddleTab, setActiveMiddleTab] = useState<string>('店舗別統合');
   const [activeBottomTab, setActiveBottomTab] = useState<string>('シフト予定');
+  const [scheduleStatus, setScheduleStatus] = useState<'draft' | 'confirmed' | 'published'>('draft');
+
+  const statusBadgeClass: Record<'draft' | 'confirmed' | 'published', string> = {
+    draft: 'bg-amber-100 text-amber-800 border-amber-400',
+    confirmed: 'bg-emerald-100 text-emerald-800 border-emerald-400',
+    published: 'bg-sky-100 text-sky-800 border-sky-400',
+  };
 
   React.useEffect(() => {
     document.title = 'ホステス台帳 - Dispatch Harmony Hub';
@@ -48,6 +57,19 @@ export default function HostessLedgerPage() {
           </Button>
         </Link>
         <h1 className="text-lg font-bold ml-4">ホステス台帳</h1>
+        <div className="ml-4 flex items-center gap-2">
+          <span className="text-[11px] text-zinc-600">シフトステータス:</span>
+          <select
+            value={scheduleStatus}
+            onChange={(e) => setScheduleStatus(e.target.value as 'draft' | 'confirmed' | 'published')}
+            className={`text-[11px] font-bold px-2 py-0.5 rounded border ${statusBadgeClass[scheduleStatus]}`}
+            aria-label="シフトステータス"
+          >
+            <option value="draft">{SCHEDULE_STATUS_LABELS.draft}</option>
+            <option value="confirmed">{SCHEDULE_STATUS_LABELS.confirmed}</option>
+            <option value="published">{SCHEDULE_STATUS_LABELS.published}</option>
+          </select>
+        </div>
       </div>
 
       {/* メインコンテンツ - 左右6:4 */}
@@ -248,6 +270,7 @@ export default function HostessLedgerPage() {
             {/* タブヘッダー */}
             <div className="bg-white border-x border-gray-400 flex items-end shrink-0">
               {[
+                { id: '店舗別統合', label: '店舗別統合' },
                 { id: 'プロフィール', label: 'プロフィール' },
                 { id: 'HPデータ', label: 'HPデータ' },
                 { id: '管理専用', label: '管理専用' },
@@ -274,6 +297,7 @@ export default function HostessLedgerPage() {
 
             {/* タブコンテンツ */}
             <div className="flex-1 border border-gray-400 border-t-0 p-2 overflow-auto">
+              {activeMiddleTab === '店舗別統合' && <StoreUnifiedTab />}
               {activeMiddleTab === 'プロフィール' && <ProfileTab />}
               {activeMiddleTab === 'HPデータ' && <HPDataTab />}
               {activeMiddleTab === '管理専用' && <ManagementTab />}

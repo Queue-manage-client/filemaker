@@ -10,4 +10,6 @@ export interface SendHostess {
   destination: string;
   destinationMark?: string;
   count: number;
+  luggageDetails?: string;
+  luggageConfirmed?: boolean;
 }

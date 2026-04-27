@@ -53,7 +53,7 @@ export const basicTagSampleData: BasicTag[] = [
     // 追加設定項目
     coursePricingMethod: "定額制",
     nominationMethod: "店舗一律",
-    gmDivision: "有",
+    gmDivision: "ガールズ",
     nominationFee: 1000,
     extensionFee: 3000,
     extensionUnit: 30,
@@ -213,7 +213,7 @@ export const basicTagSampleData: BasicTag[] = [
     // 追加設定項目
     coursePricingMethod: "定額制",
     nominationMethod: "店舗一律",
-    gmDivision: "有",
+    gmDivision: "ガールズ",
     nominationFee: 1000,
     extensionFee: 3000,
     extensionUnit: 30,
@@ -293,7 +293,7 @@ export const basicTagSampleData: BasicTag[] = [
     // 追加設定項目
     coursePricingMethod: "定額制",
     nominationMethod: "店舗一律",
-    gmDivision: "有",
+    gmDivision: "ガールズ",
     nominationFee: 1000,
     extensionFee: 3000,
     extensionUnit: 30,
@@ -373,7 +373,7 @@ export const basicTagSampleData: BasicTag[] = [
     // 追加設定項目
     coursePricingMethod: "定額制",
     nominationMethod: "ホステス別",
-    gmDivision: "有",
+    gmDivision: "ガールズ",
     nominationFee: 800,
     extensionFee: 2800,
     extensionUnit: 25,

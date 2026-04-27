@@ -626,41 +626,34 @@ export default function StoreLedger() {
                       {isEditMode ? (
                         <Select
                           value={basicTagData.gmDivision}
-                          onValueChange={(value) => updateEditFormData({ gmDivision: value as '有' | '無' })}
+                          onValueChange={(value) => updateEditFormData({ gmDivision: value as '無' | 'ガールズ' | 'レディ' | '両方' })}
                         >
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="有">有</SelectItem>
                             <SelectItem value="無">無</SelectItem>
+                            <SelectItem value="ガールズ">ガールズ</SelectItem>
+                            <SelectItem value="レディ">レディ</SelectItem>
+                            <SelectItem value="両方">両方</SelectItem>
                           </SelectContent>
                         </Select>
                       ) : (
                         <div className="p-2 bg-gray-50 rounded border">
-                          <div className="flex gap-4">
-                            <label className="flex items-center">
-                              <input 
-                                type="radio" 
-                                name="gmDivision" 
-                                value="有" 
-                                checked={basicTagData.gmDivision === '有'} 
-                                readOnly
-                                className="mr-2"
-                              />
-                              有
-                            </label>
-                            <label className="flex items-center">
-                              <input 
-                                type="radio" 
-                                name="gmDivision" 
-                                value="無" 
-                                checked={basicTagData.gmDivision === '無'} 
-                                readOnly
-                                className="mr-2"
-                              />
-                              無
-                            </label>
+                          <div className="flex gap-3 flex-wrap">
+                            {(['無', 'ガールズ', 'レディ', '両方'] as const).map((opt) => (
+                              <label key={opt} className="flex items-center">
+                                <input
+                                  type="radio"
+                                  name="gmDivision"
+                                  value={opt}
+                                  checked={basicTagData.gmDivision === opt}
+                                  readOnly
+                                  className="mr-2"
+                                />
+                                {opt}
+                              </label>
+                            ))}
                           </div>
                         </div>
                       )}

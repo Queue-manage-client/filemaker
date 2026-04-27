@@ -50,7 +50,7 @@ export interface BasicTag {
   // 追加設定項目
   coursePricingMethod: '定額制' | '割合制'; // コース料金方式
   nominationMethod: '店舗一律' | 'ホステス別'; // 指名方式
-  gmDivision: '有' | '無'; // GM区分
+  gmDivision: '無' | 'ガールズ' | 'レディ' | '両方'; // GM区分（ガール/レディ別登録可）
   nominationFee: number; // 指名料
   extensionFee: number; // 延長料金
   extensionUnit: number; // 延長単位(分)

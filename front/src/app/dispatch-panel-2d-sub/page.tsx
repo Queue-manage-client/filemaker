@@ -331,6 +331,7 @@ function MobileDriverCardGrid() {
 export default function DispatchPanel2DSubPage() {
   const [isMobile, setIsMobile] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState<'scheduled' | 'drivers' | 'send'>('drivers');
+  const [luggageConfirmTarget, setLuggageConfirmTarget] = React.useState<SendHostess | null>(null);
 
   React.useEffect(() => {
     document.title = '配車パネル2D-Sub - Dispatch Harmony Hub';
@@ -753,9 +754,18 @@ export default function DispatchPanel2DSubPage() {
           {/* リスト */}
           {sendHostessSampleData.map((hostess: SendHostess) => (
             <div key={hostess.id} className="grid h-[22px] whitespace-nowrap border-b border-zinc-300" style={{ gridTemplateColumns: '28px 1fr 1fr 40px 40px 1fr 32px' }}>
-              {/* 荷物アイコン */}
+              {/* 荷物アイコン (クリックで二段階確認モーダル) */}
               <div className="h-full bg-white flex items-center justify-center border-r border-zinc-400">
-                {hostess.hasPackage && <Package size={14} className="text-zinc-500" />}
+                {hostess.hasPackage && (
+                  <button
+                    type="button"
+                    onClick={() => setLuggageConfirmTarget(hostess)}
+                    className="hover:bg-amber-100 p-0.5 rounded"
+                    aria-label={`${hostess.hostessName}の荷物を確認`}
+                  >
+                    <Package size={14} className="text-amber-600" />
+                  </button>
+                )}
               </div>
               {/* ホステス名 */}
               <div className="h-full flex items-center overflow-hidden border-r border-zinc-400" style={{ backgroundColor: '#f0e6f6' }}>
@@ -790,6 +800,48 @@ export default function DispatchPanel2DSubPage() {
         </div>
       </div>
       </div>
+
+      {/* 荷物確認モーダル */}
+      {luggageConfirmTarget && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setLuggageConfirmTarget(null)}>
+          <div className="bg-white rounded-lg shadow-2xl w-[420px] max-w-[90vw]" onClick={(e) => e.stopPropagation()}>
+            <div className="px-4 py-3 border-b border-amber-300 bg-amber-50 rounded-t-lg flex items-center gap-2">
+              <Package size={18} className="text-amber-600" />
+              <span className="font-bold text-amber-800">荷物渡し忘れ確認</span>
+            </div>
+            <div className="p-4 text-sm">
+              <p className="mb-3">
+                <span className="font-bold">⚠ {luggageConfirmTarget.hostessName}</span> さんは預り荷物があります。
+              </p>
+              {luggageConfirmTarget.luggageDetails && (
+                <p className="mb-3 px-3 py-2 bg-amber-50 border border-amber-200 rounded text-amber-900">
+                  内容: {luggageConfirmTarget.luggageDetails}
+                </p>
+              )}
+              <p className="text-zinc-700">渡し忘れはありませんか？確認のうえ「確認済み」を押してください。</p>
+            </div>
+            <div className="px-4 py-3 border-t border-zinc-200 flex justify-end gap-2 bg-zinc-50 rounded-b-lg">
+              <button
+                type="button"
+                onClick={() => setLuggageConfirmTarget(null)}
+                className="px-3 py-1.5 text-sm border border-zinc-300 rounded hover:bg-zinc-100"
+              >
+                キャンセル
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  alert(`${luggageConfirmTarget.hostessName}さんの荷物確認を完了しました`);
+                  setLuggageConfirmTarget(null);
+                }}
+                className="px-3 py-1.5 text-sm bg-amber-600 text-white rounded hover:bg-amber-700 font-bold"
+              >
+                確認済み
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

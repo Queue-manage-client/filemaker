@@ -219,6 +219,11 @@ export default function CastAttendanceSchedule() {
                 戻る
               </Button>
             </Link>
+            <Link href="/rt2-panel">
+              <Button size="sm" className="bg-purple-400 hover:bg-purple-500 text-black border border-black">
+                RT Ⅱ パネル
+              </Button>
+            </Link>
             <h1 className="text-lg font-bold text-gray-900">キャスト出勤予定票</h1>
           </div>
 
