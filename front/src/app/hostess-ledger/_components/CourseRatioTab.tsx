@@ -2,6 +2,13 @@
 
 import React, { useState } from 'react';
 
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+const parseNonNeg = (raw: string) => {
+  const n = Number(raw);
+  if (Number.isNaN(n)) return 0;
+  return Math.max(0, n);
+};
+
 export default function CourseRatioTab() {
   const [base, setBase] = useState(10000);
   const [classBonus, setClassBonus] = useState(2000);
@@ -25,15 +32,17 @@ export default function CourseRatioTab() {
           <span className="whitespace-nowrap">延長</span>
           <input
             type="number"
+            min={0}
             value={extensionMin}
-            onChange={(e) => setExtensionMin(Number(e.target.value) || 0)}
+            onChange={(e) => setExtensionMin(parseNonNeg(e.target.value))}
             className="w-[40px] h-[18px] text-[11px] px-1 bg-white border border-gray-400 text-center"
           />
           <span className="whitespace-nowrap">分毎</span>
           <input
             type="number"
+            min={0}
             value={extensionUnit}
-            onChange={(e) => setExtensionUnit(Number(e.target.value) || 0)}
+            onChange={(e) => setExtensionUnit(parseNonNeg(e.target.value))}
             className="w-[60px] h-[18px] text-[11px] px-1 bg-white border border-gray-400"
           />
           <span>円</span>
@@ -43,15 +52,17 @@ export default function CourseRatioTab() {
           <span className="text-[10px]">基本</span>
           <input
             type="number"
+            min={0}
             value={base}
-            onChange={(e) => setBase(Number(e.target.value) || 0)}
+            onChange={(e) => setBase(parseNonNeg(e.target.value))}
             className="w-[60px] h-[18px] text-[11px] px-1 bg-white border border-gray-400"
           />
           <span className="text-[10px]">+クラス加算</span>
           <input
             type="number"
+            min={0}
             value={classBonus}
-            onChange={(e) => setClassBonus(Number(e.target.value) || 0)}
+            onChange={(e) => setClassBonus(parseNonNeg(e.target.value))}
             className="w-[60px] h-[18px] text-[11px] px-1 bg-white border border-gray-400"
           />
           <span>=</span>
@@ -62,8 +73,14 @@ export default function CourseRatioTab() {
           <span>取分率</span>
           <input
             type="number"
+            min={0}
+            max={100}
             value={hostessRate}
-            onChange={(e) => setHostessRate(Number(e.target.value) || 0)}
+            onChange={(e) => {
+              const n = Number(e.target.value);
+              if (Number.isNaN(n)) return;
+              setHostessRate(clamp(n, 0, 100));
+            }}
             className="w-[40px] h-[18px] text-[11px] px-1 bg-yellow-100 border border-gray-400"
           />
           <span>%</span>
