@@ -1,46 +1,92 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function CourseRatioTab() {
+  const [base, setBase] = useState(10000);
+  const [classBonus, setClassBonus] = useState(2000);
+  const [hostessRate, setHostessRate] = useState(60);
+  const [extensionMin, setExtensionMin] = useState(30);
+  const [extensionUnit, setExtensionUnit] = useState(3000);
+
+  const total = base + classBonus;
+  const hostessShare = Math.round(total * (hostessRate / 100));
+  const storeShare = total - hostessShare;
+  const extHostess = Math.round(extensionUnit * (hostessRate / 100));
+  const extStore = extensionUnit - extHostess;
+
   return (
     <div className="bg-gray-100 p-2 text-[11px] h-full flex flex-col">
-      {/* 上部セクション */}
-      <div className="flex items-end gap-4 mb-2">
-        {/* 左側テキスト */}
-        <span className="text-red-500 whitespace-nowrap">上のボタンで取り込み後、黄色の塗りつぶし箇所を入力</span>
+      {/* 自動連動プレビュー */}
+      <div className="flex items-end gap-4 mb-2 flex-wrap">
+        <span className="text-red-500 whitespace-nowrap">入力すると下部プレビューに取分が自動連動します</span>
 
-        {/* 延長設定 */}
         <div className="flex items-center gap-1">
           <span className="whitespace-nowrap">延長</span>
-          <input type="text" className="w-[30px] h-[18px] text-[11px] px-1 bg-white border border-gray-400 text-center" defaultValue="30" />
+          <input
+            type="number"
+            value={extensionMin}
+            onChange={(e) => setExtensionMin(Number(e.target.value) || 0)}
+            className="w-[40px] h-[18px] text-[11px] px-1 bg-white border border-gray-400 text-center"
+          />
           <span className="whitespace-nowrap">分毎</span>
+          <input
+            type="number"
+            value={extensionUnit}
+            onChange={(e) => setExtensionUnit(Number(e.target.value) || 0)}
+            className="w-[60px] h-[18px] text-[11px] px-1 bg-white border border-gray-400"
+          />
+          <span>円</span>
         </div>
 
-        {/* 基本・クラス加算 */}
         <div className="flex items-end gap-1">
-          <div className="flex flex-col items-center">
-            <span className="text-[10px] whitespace-nowrap">基本</span>
-            <span className="whitespace-nowrap">円+</span>
-          </div>
-          <input type="text" className="w-[50px] h-[18px] text-[11px] px-1 bg-white border border-gray-400" />
-          <div className="flex flex-col items-center">
-            <span className="text-[10px] whitespace-nowrap">クラス加算</span>
-            <span>=</span>
-          </div>
-          <input type="text" className="w-[50px] h-[18px] text-[11px] px-1 bg-white border border-gray-400" />
+          <span className="text-[10px]">基本</span>
+          <input
+            type="number"
+            value={base}
+            onChange={(e) => setBase(Number(e.target.value) || 0)}
+            className="w-[60px] h-[18px] text-[11px] px-1 bg-white border border-gray-400"
+          />
+          <span className="text-[10px]">+クラス加算</span>
+          <input
+            type="number"
+            value={classBonus}
+            onChange={(e) => setClassBonus(Number(e.target.value) || 0)}
+            className="w-[60px] h-[18px] text-[11px] px-1 bg-white border border-gray-400"
+          />
+          <span>=</span>
+          <span className="font-bold text-blue-700">{total.toLocaleString()}円</span>
         </div>
 
-        {/* 延長ホステス取分額 */}
         <div className="flex items-center gap-1">
-          <span className="whitespace-nowrap">延長ホステス取分額</span>
-          <input type="text" className="w-[60px] h-[18px] text-[11px] px-1 bg-yellow-100 border border-gray-400" />
+          <span>取分率</span>
+          <input
+            type="number"
+            value={hostessRate}
+            onChange={(e) => setHostessRate(Number(e.target.value) || 0)}
+            className="w-[40px] h-[18px] text-[11px] px-1 bg-yellow-100 border border-gray-400"
+          />
+          <span>%</span>
         </div>
+      </div>
 
-        {/* 延長店舗取分額 */}
-        <div className="flex items-center gap-1">
-          <span className="whitespace-nowrap">延長店舗取分額</span>
-          <input type="text" className="w-[60px] h-[18px] text-[11px] px-1 bg-white border border-gray-400" />
+      {/* 自動計算結果 */}
+      <div className="grid grid-cols-4 gap-2 mb-2 p-2 bg-emerald-50 border border-emerald-300 rounded">
+        <div className="text-center">
+          <div className="text-[10px] text-zinc-600">ホステス取分</div>
+          <div className="font-bold text-pink-700">{hostessShare.toLocaleString()}円</div>
+        </div>
+        <div className="text-center">
+          <div className="text-[10px] text-zinc-600">店舗取分</div>
+          <div className="font-bold text-cyan-700">{storeShare.toLocaleString()}円</div>
+        </div>
+        <div className="text-center">
+          <div className="text-[10px] text-zinc-600">延長ホステス取分</div>
+          <div className="font-bold text-pink-700">{extHostess.toLocaleString()}円</div>
+        </div>
+        <div className="text-center">
+          <div className="text-[10px] text-zinc-600">延長店舗取分</div>
+          <div className="font-bold text-cyan-700">{extStore.toLocaleString()}円</div>
         </div>
       </div>
 

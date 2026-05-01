@@ -853,7 +853,19 @@ export default function CustomerLedger() {
                         <td className="px-3 py-1.5 border-r border-gray-200 font-mono text-blue-700">{customer.customerNumber}</td>
                         <td className="px-3 py-1.5 border-r border-gray-200 font-semibold">{customer.name}</td>
                         <td className="px-3 py-1.5 border-r border-gray-200 text-gray-600">{customer.nameKana}</td>
-                        <td className="px-3 py-1.5 border-r border-gray-200">{customer.phoneNumber}</td>
+                        <td className="px-3 py-1.5 border-r border-gray-200">
+                          <div className="flex items-center gap-1">
+                            <span>{customer.phoneNumber}</span>
+                            <a
+                              href={`tel:${customer.phoneNumber.replace(/[^0-9+]/g, '')}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="px-1.5 py-0.5 bg-emerald-500 text-white text-[10px] rounded hover:bg-emerald-600"
+                              title="確認電話を発信"
+                            >
+                              📞 発信
+                            </a>
+                          </div>
+                        </td>
                         <td className="px-3 py-1.5 border-r border-gray-200 text-gray-600">{customer.lastVisitDate ?? '—'}</td>
                         <td className="px-3 py-1.5 border-r border-gray-200">
                           {customer.lastUsedEvent ? (

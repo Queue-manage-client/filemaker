@@ -232,6 +232,8 @@ export default function TehaiPage() {
 
   const [attendanceData, setAttendanceData] = useState<AttendanceEntry[]>(initialAttendanceData);
   const [attendanceInputMode, setAttendanceInputMode] = useState<InputMode>('schedule');
+  const [compactMode, setCompactMode] = useState(false);
+  const frequentlyUsedIds = new Set([1, 3, 5, 7]);
 
   // NG警告関連の状態
   const [selectedReservation, setSelectedReservation] = useState<ReservationWithNG | null>(null);
@@ -310,7 +312,7 @@ export default function TehaiPage() {
   );
 
   return (
-    <div className="w-full min-w-[1400px] h-screen min-h-[800px] relative bg-white flex flex-col text-[11px]">
+    <div className={`w-full ${compactMode ? 'min-w-[1200px] text-[10px]' : 'min-w-[1400px] text-[11px]'} h-screen min-h-[800px] relative bg-white flex flex-col`}>
       {/* ヘッダー */}
       <div className="w-full h-[38px] bg-white border-b border-zinc-300">
         <div className="flex items-center h-full px-1">
@@ -387,6 +389,15 @@ export default function TehaiPage() {
               onClick={() => {}}
             >
               チャット表示
+            </Button>
+
+            <Button
+              variant={compactMode ? 'default' : 'outline'}
+              className={`h-7 px-3 text-[11px] border-black ${compactMode ? 'bg-pink-400 hover:bg-pink-500 text-black' : ''}`}
+              onClick={() => setCompactMode((v) => !v)}
+              title="必要項目だけ表示する簡易モード"
+            >
+              {compactMode ? '✓ 簡易モード' : '簡易モード'}
             </Button>
           </div>
         </div>
@@ -660,6 +671,9 @@ export default function TehaiPage() {
                     >
                       <td className="text-center border-b border-r border-gray-400 w-5 text-[10px]">{data.id}</td>
                       <td className="border-b border-r border-gray-400 text-[10px] px-0.5">
+                        {frequentlyUsedIds.has(data.id) && (
+                          <span className="text-amber-500 mr-0.5" title="使用頻度高">★</span>
+                        )}
                         {data.lastName}{data.firstName}
                       </td>
                       <td className="text-center border-b border-r border-gray-400 text-[10px] w-8">{data.status}</td>

@@ -312,6 +312,7 @@ export default function DailyReport() {
 
   // クレジットカード詳細表示トグル
   const [showCreditDetail, setShowCreditDetail] = useState(false);
+  const [showMailPreview, setShowMailPreview] = useState(false);
 
   useEffect(() => {
     document.title = '日報 - Dispatch Harmony Hub';
@@ -471,7 +472,7 @@ export default function DailyReport() {
   };
 
   return (
-    <div className="w-[1920px] h-[1080px] relative bg-white font-['Inter'] flex flex-col text-[11px]">
+    <div className="w-full min-w-[1400px] h-screen min-h-[800px] relative bg-white font-['Inter'] flex flex-col text-[10px]">
       {/* ヘッダー - dispatch-panel-2dと同じスタイル */}
       <div className="w-full h-[32px] bg-white">
         <div className="flex items-center h-full px-1">
@@ -490,6 +491,7 @@ export default function DailyReport() {
           <div className="flex-1 flex items-center justify-center gap-1">
             {/* 日報タイトル */}
             <h1 className="text-xs font-bold mr-1">日報</h1>
+            <span className="text-[9px] text-zinc-500 mr-2" title="本フォーマットは会計担当者が考案">考案: 会計担当</span>
 
             {/* 日付移動ボタン（前日） */}
             <Button
@@ -568,6 +570,14 @@ export default function DailyReport() {
               onClick={() => {}}
             >
               日報承認
+            </Button>
+
+            {/* 清算メールプレビュー */}
+            <Button
+              className="h-7 px-2 text-[11px] bg-pink-300 hover:bg-pink-400 text-black border border-[#323232]"
+              onClick={() => setShowMailPreview(true)}
+            >
+              清算メール
             </Button>
 
             {/* Menu */}
@@ -1059,6 +1069,75 @@ export default function DailyReport() {
           )}
         </div>
       </div>
+
+      {/* 清算メールプレビュー モーダル */}
+      {showMailPreview && (
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowMailPreview(false)}
+        >
+          <div
+            className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-4 py-3 border-b border-zinc-300 bg-pink-100 flex items-center justify-between rounded-t-lg">
+              <span className="font-bold text-pink-900">📧 清算メールプレビュー (ドライバー宛)</span>
+              <button
+                type="button"
+                onClick={() => setShowMailPreview(false)}
+                className="text-zinc-600 hover:text-zinc-900 text-xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-4 space-y-3 text-[12px] leading-relaxed">
+              <div className="bg-zinc-50 p-2 rounded">
+                <div><span className="text-zinc-500">宛先:</span> driver@example.com</div>
+                <div><span className="text-zinc-500">件名:</span> 【清算】{format(currentDate, 'yyyy/MM/dd')} ご担当分</div>
+              </div>
+              <div className="border border-zinc-200 rounded p-3 bg-white whitespace-pre-line font-mono text-[11px]">
+{`松尾 様
+
+本日の清算内容をご確認ください。
+
+■ ご利用キャスト: 祈- (京都デリヘル倶楽部)
+■ コース: 90分 30,000円
+■ オプション: ローション (+2,000円), 衣装変更 (+1,500円)
+■ ポイント割引: -1,000pt (¥1,000相当)
+■ 交通費: 1,500円
+■ 合計: 33,000円
+
+【預り荷物の詳細】
+紙袋1点(衣装), ポーチ1点(化粧道具)
+※ お忘れなく お渡しください。
+
+ご質問はサポートまで: info@amorjp.com`}
+              </div>
+              <div className="text-[10px] text-zinc-500">
+                ※ ポイント割引・オプション詳細・預り荷物が自動展開されます
+              </div>
+            </div>
+            <div className="px-4 py-3 border-t border-zinc-200 bg-zinc-50 rounded-b-lg flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowMailPreview(false)}
+                className="px-3 py-1.5 text-sm border border-zinc-300 rounded hover:bg-zinc-100"
+              >
+                閉じる
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMailPreview(false);
+                }}
+                className="px-3 py-1.5 text-sm bg-pink-500 text-white rounded hover:bg-pink-600 font-bold"
+              >
+                送信する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

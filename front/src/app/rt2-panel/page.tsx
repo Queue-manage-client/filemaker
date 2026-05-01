@@ -1025,6 +1025,30 @@ export default function RT2Panel() {
                                       {reservation.customerName || '未登録'}
                                     </span>
                                   </div>
+                                  <div className="flex items-center gap-1 pt-1.5 border-t border-gray-200 mt-1">
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        alert(`伝票作成画面を開きます\n対象予約: ${reservation.time} ${reservation.location}\n顧客: ${reservation.customerName || '未登録'}`);
+                                      }}
+                                      className="flex-1 px-2 py-1 bg-emerald-500 text-white text-[10px] font-bold rounded hover:bg-emerald-600"
+                                    >
+                                      📝 伝票作成
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (confirm(`予約を止めますか？\n${reservation.time} ${reservation.location}`)) {
+                                          alert('予約を止めました');
+                                        }
+                                      }}
+                                      className="flex-1 px-2 py-1 bg-rose-500 text-white text-[10px] font-bold rounded hover:bg-rose-600"
+                                    >
+                                      ⏹ 止め
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
                             )}

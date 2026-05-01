@@ -28,6 +28,7 @@ export const LeftPanel = () => {
         { name: "週間ホステス出勤", icon: Calendar, href: "/weekly-hostess-attendance" },
         { name: "時間帯別ホステス出勤", icon: Clock, href: "/time-based-hostess-attendance" },
         { name: "リアルタイム成績集計", icon: Activity, href: "/realtime-performance-summary" },
+        { name: "リアルタイム新規入客件数", icon: Activity, href: "/realtime-new-customer-count" },
         { name: "顧客台帳", icon: Users, href: "/customer-ledger" },
         { name: "顧客ポイント", icon: Award, href: "/customer-points" },
         { name: "ホステスランキング", icon: TrendingUp, href: "/hostess-ranking" },

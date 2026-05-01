@@ -831,18 +831,34 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
         <div className="col-span-1 space-y-4">
           <Card>
             <CardHeader className="pb-2">
-              <h2 className="font-semibold">写真</h2>
+              <h2 className="font-semibold">写真・印鑑</h2>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="w-full aspect-[4/5] bg-gray-200 rounded-md flex items-center justify-center text-xs text-gray-600">
-                写真プレビュー
+              <div>
+                <div className="text-[11px] text-gray-600 mb-1">本人写真</div>
+                <div className="w-full aspect-[4/5] bg-gray-200 rounded-md flex items-center justify-center text-xs text-gray-600">
+                  写真プレビュー
+                </div>
+                <Button variant="outline" className="w-full mt-2">写真挿入</Button>
               </div>
-              <Button variant="outline" className="w-full">写真挿入</Button>
               <Separator />
-              <div className="w-24 h-24 bg-gray-200 rounded-md flex items-center justify-center text-[10px] text-gray-600">
-                サムネイル
+              <div>
+                <div className="text-[11px] text-gray-600 mb-1">サムネイル</div>
+                <div className="w-24 h-24 bg-gray-200 rounded-md flex items-center justify-center text-[10px] text-gray-600">
+                  サムネイル
+                </div>
+                <Button variant="outline" className="w-full mt-2">写真挿入</Button>
               </div>
-              <Button variant="outline" className="w-full">写真挿入</Button>
+              <Separator />
+              <div>
+                <div className="text-[11px] text-gray-600 mb-1">印鑑写真</div>
+                <div className="w-24 h-24 bg-gray-100 border border-dashed border-gray-400 rounded-md flex items-center justify-center text-[10px] text-gray-500">
+                  印鑑画像
+                </div>
+                <Button variant="outline" className="w-full mt-2">印鑑画像挿入</Button>
+              </div>
+              <Separator />
+              <Button variant="outline" className="w-full text-xs">社員封筒印刷</Button>
             </CardContent>
           </Card>
         </div>
