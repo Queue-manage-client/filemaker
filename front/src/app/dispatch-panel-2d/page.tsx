@@ -254,7 +254,7 @@ function MobileScheduleList() {
   );
 }
 
-const DESIGN_WIDTH = 1970;
+const DESIGN_WIDTH = 1989;
 const DESIGN_HEIGHT = 1080;
 
 export default function Original() {
