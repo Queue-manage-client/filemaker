@@ -137,11 +137,15 @@ function HostessManagementContent() {
     endMinute: string;
     returnHour: string;
     returnMinute: string;
+    pickupLocation: string; // お迎え場所
+    dropoffLocation: string; // 送り場所
   };
 
-  const sharableStores = ['京都デリヘル倶楽部']; // ステップ1: 車重可能併用店
-  const initialNonSharableStores = ['京都ホテヘル倶楽部', '滋賀DCP']; // ステップ2: 車重不可併用店
-  const [nonSharableStoreOrder, setNonSharableStoreOrder] = useState<string[]>(initialNonSharableStores);
+  // キャスト所属店舗 (1つのシフトを全店舗に自動反映)
+  const affiliatedStores = ['京都デリヘル倶楽部', '京都ホテヘル倶楽部', '滋賀DCP'];
+
+  const pickupOptions = ['自宅', '京都駅', '四条烏丸', '丹波橋', '西院', '中書島'];
+  const dropoffOptions = ['自宅', '京都駅', '四条烏丸', '丹波橋', '西院', '中書島'];
 
   const generateInitialShifts = (): ShiftEntry[] => {
     const days = ['月', '火', '水', '木', '金', '土', '日'];
@@ -162,6 +166,8 @@ function HostessManagementContent() {
         endMinute: '00',
         returnHour: '06',
         returnMinute: '00',
+        pickupLocation: '自宅',
+        dropoffLocation: '自宅',
       };
     });
   };
@@ -171,17 +177,17 @@ function HostessManagementContent() {
     setShiftEntries(prev => prev.map((row, i) => (i === idx ? { ...row, [field]: value } : row)));
   };
 
-  const swapNonSharableStores = () => {
-    setNonSharableStoreOrder(prev => [...prev].reverse());
-  };
-
   const submitShift = () => {
-    alert(`シフトを送信しました\n対象: ${shiftEntries.filter(s => s.isWorking).length}日`);
+    alert(
+      `シフトを送信しました\n` +
+      `対象: ${shiftEntries.filter(s => s.isWorking).length}日\n` +
+      `所属店舗 ${affiliatedStores.length}店舗すべてに同じシフトが反映されます\n` +
+      `(${affiliatedStores.join(' / ')})`
+    );
   };
 
   const resetShift = () => {
     setShiftEntries(generateInitialShifts());
-    setNonSharableStoreOrder(initialNonSharableStores);
   };
 
   // castSampleData から取得したキャスト情報をホステスデータにマッピング
@@ -2439,57 +2445,28 @@ function HostessManagementContent() {
                 {/* 出勤管理 - シフト提出 */}
                 {activeSection === 'attendance' && (
                   <div className="space-y-6">
-                    {/* ステップ1: 車重可能併用店 */}
+                    {/* ステップ1: 所属店舗確認 (1シフト→全店舗自動反映) */}
                     <div className="border border-blue-300 rounded-lg p-4 bg-blue-50/30">
                       <div className="text-sm font-bold text-gray-800 mb-2">
-                        ステップ1　車重可能併用店で出勤シフトを提出するものを確認します。
+                        ステップ1　所属店舗を確認します。シフト提出すると以下すべての店舗に同じ時間が自動反映されます。
                       </div>
                       <div className="space-y-2">
-                        {sharableStores.map(name => (
+                        {affiliatedStores.map(name => (
                           <div
                             key={name}
-                            className="border border-blue-400 bg-white rounded px-3 py-2 text-sm text-gray-800"
+                            className="border border-blue-400 bg-white rounded px-3 py-2 text-sm text-gray-800 flex items-center gap-2"
                           >
+                            <span className="text-emerald-600">✓</span>
                             {name}
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    {/* ステップ2: 車重不可併用店 + 並び替え */}
-                    <div className="border border-blue-300 rounded-lg p-4 bg-blue-50/30">
-                      <div className="text-sm font-bold text-gray-800 mb-2">
-                        ステップ2　車重不可併用店で出勤シフトを提出するものを選択します。
-                      </div>
-                      <div className="border border-blue-400 bg-white rounded mb-3">
-                        {nonSharableStoreOrder.map((name, i) => (
-                          <div
-                            key={name}
-                            className={`flex justify-between items-center px-3 py-2 text-sm text-gray-800 ${
-                              i < nonSharableStoreOrder.length - 1 ? 'border-b border-blue-200' : ''
-                            }`}
-                          >
-                            <span>{name}</span>
-                            <span className="text-gray-600">する</span>
-                          </div>
-                        ))}
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={swapNonSharableStores}
-                        className="border-blue-400 text-blue-700 hover:bg-blue-100"
-                      >
-                        <ArrowUpDown className="w-4 h-4 mr-1" />
-                        変更して入れ替える
-                      </Button>
-                    </div>
-
-                    {/* ステップ3: シフト編集テーブル */}
+                    {/* ステップ2: シフト編集テーブル */}
                     <div className="border border-blue-300 rounded-lg p-4 bg-blue-50/30">
                       <div className="text-sm font-bold text-gray-800 mb-3">
-                        ステップ3　下記の出勤予定を編集して、最後にOKをクリックします。
+                        ステップ2　下記の出勤予定を編集して、最後にOKをクリックします。
                       </div>
                       <div className="overflow-x-auto">
                         <table className="w-full border-collapse text-sm">
@@ -2500,11 +2477,12 @@ function HostessManagementContent() {
                               <th className="border border-cyan-400 px-2 py-1">出勤時刻</th>
                               <th className="border border-cyan-400 px-2 py-1">終了時刻</th>
                               <th className="border border-cyan-400 px-2 py-1">帰宅時刻</th>
+                              <th className="border border-cyan-400 px-2 py-1">送迎</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr className="bg-cyan-100">
-                              <td colSpan={5} className="border border-cyan-400 px-2 py-1 text-center font-semibold text-gray-800">
+                              <td colSpan={6} className="border border-cyan-400 px-2 py-1 text-center font-semibold text-gray-800">
                                 2026年03月
                               </td>
                             </tr>
@@ -2606,11 +2584,37 @@ function HostessManagementContent() {
                                       </select>
                                     </div>
                                   </td>
+                                  <td className="border border-yellow-300 px-2 py-1">
+                                    <div className="flex flex-col gap-1 items-center">
+                                      <select
+                                        aria-label={`${dayNum}日 お迎え場所`}
+                                        disabled={!entry.isWorking}
+                                        value={entry.pickupLocation}
+                                        onChange={e => updateShiftField(idx, 'pickupLocation', e.target.value)}
+                                        className="border rounded px-1 py-0.5 text-xs disabled:opacity-50 w-full"
+                                      >
+                                        {pickupOptions.map(opt => (
+                                          <option key={opt} value={opt}>迎: {opt}</option>
+                                        ))}
+                                      </select>
+                                      <select
+                                        aria-label={`${dayNum}日 送り場所`}
+                                        disabled={!entry.isWorking}
+                                        value={entry.dropoffLocation}
+                                        onChange={e => updateShiftField(idx, 'dropoffLocation', e.target.value)}
+                                        className="border rounded px-1 py-0.5 text-xs disabled:opacity-50 w-full"
+                                      >
+                                        {dropoffOptions.map(opt => (
+                                          <option key={opt} value={opt}>送: {opt}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                  </td>
                                 </tr>
                               );
                             })}
                             <tr className="bg-cyan-100">
-                              <td colSpan={5} className="border border-cyan-400 px-2 py-1 text-center font-semibold text-gray-800">
+                              <td colSpan={6} className="border border-cyan-400 px-2 py-1 text-center font-semibold text-gray-800">
                                 2026年03月
                               </td>
                             </tr>

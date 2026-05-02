@@ -57,12 +57,12 @@ export default function HostessLedgerPage() {
           </Button>
         </Link>
         <h1 className="text-lg font-bold ml-4">ホステス台帳</h1>
-        <div className="ml-4 flex items-center gap-2">
-          <span className="text-[11px] text-zinc-600">シフトステータス:</span>
+        <div className="ml-auto flex items-center gap-2">
+          <span className="text-sm font-bold text-zinc-700">シフトステータス:</span>
           <select
             value={scheduleStatus}
             onChange={(e) => setScheduleStatus(e.target.value as 'draft' | 'confirmed' | 'published')}
-            className={`text-[11px] font-bold px-2 py-0.5 rounded border ${statusBadgeClass[scheduleStatus]}`}
+            className={`text-sm font-bold px-3 py-1 rounded-md border-2 cursor-pointer shadow-sm ${statusBadgeClass[scheduleStatus]}`}
             aria-label="シフトステータス"
           >
             <option value="draft">{SCHEDULE_STATUS_LABELS.draft}</option>

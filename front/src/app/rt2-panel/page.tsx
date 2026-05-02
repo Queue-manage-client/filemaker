@@ -746,7 +746,7 @@ export default function RT2Panel() {
                   <span className="text-[9px] text-black">出勤</span>
                 </div>
                 {/* 名前 */}
-                <div className={`w-[80px] border-r border-blue-200 flex items-center px-1 overflow-hidden relative group/name cursor-pointer ${
+                <div className={`w-[80px] border-r border-blue-200 flex items-center px-1 relative group cursor-pointer ${
                   cast.isNewbie && cast.newbieStartDate && getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'new'
                     ? 'animate-pulse'
                     : ''
@@ -774,7 +774,7 @@ export default function RT2Panel() {
                     </div>
                   </div>
                   {/* ホバーで詳細ツールチップ表示 */}
-                  <div className="hidden group-hover/name:block absolute left-0 top-full z-50 bg-white border border-gray-300 rounded shadow-lg p-2 min-w-[160px]">
+                  <div className="hidden group-hover:block absolute left-full top-0 ml-1 z-[100] bg-white border-2 border-emerald-400 rounded shadow-2xl p-2 min-w-[200px] pointer-events-none">
                     <div className="text-[11px] font-bold mb-1">{cast.name}</div>
                     <div className="text-[10px] text-gray-600 mb-1">{cast.remark} {cast.achieve}</div>
                     <div className="text-[10px] text-gray-700 mb-1">

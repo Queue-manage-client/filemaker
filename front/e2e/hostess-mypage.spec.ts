@@ -65,36 +65,36 @@ test.describe('ホステスマイページ: 出勤管理(シフト提出)', () =
     await expect(page.getByText(/ステップ1/)).toBeVisible();
   });
 
-  test('3ステップ全てのラベルが表示される', async ({ page }) => {
+  test('2ステップのラベルが表示される', async ({ page }) => {
     await navigateToAttendance(page);
     await expect(page.getByText(/ステップ1/)).toBeVisible();
     await expect(page.getByText(/ステップ2/)).toBeVisible();
-    await expect(page.getByText(/ステップ3/)).toBeVisible();
   });
 
-  test('ステップ1に車重可能併用店が表示される', async ({ page }) => {
+  test('ステップ1に所属店舗3つが表示される', async ({ page }) => {
     await navigateToAttendance(page);
     await expect(page.getByText('京都デリヘル倶楽部')).toBeVisible();
-  });
-
-  test('ステップ2に車重不可併用店が表示される', async ({ page }) => {
-    await navigateToAttendance(page);
     await expect(page.getByText('京都ホテヘル倶楽部')).toBeVisible();
     await expect(page.getByText('滋賀DCP')).toBeVisible();
   });
 
-  test('変更して入れ替えるボタンで店舗の順序が変わる', async ({ page }) => {
+  test('ステップ1に全店舗自動反映の説明が表示される', async ({ page }) => {
     await navigateToAttendance(page);
-    await page.getByRole('button', { name: /変更して入れ替える/ }).click();
-    await page.waitForTimeout(200);
-    const labels = await page.locator('text=/京都ホテヘル倶楽部|滋賀DCP/').allTextContents();
-    expect(labels[0]).toBe('滋賀DCP');
+    await expect(page.getByText(/すべての店舗に同じ時間が自動反映/)).toBeVisible();
   });
 
-  test('ステップ3に7日分の出勤行が表示される', async ({ page }) => {
+  test('ステップ2に7日分の出勤行が表示される', async ({ page }) => {
     await navigateToAttendance(page);
     const checkboxes = page.locator('input[type="checkbox"][aria-label*="出勤"]');
     await expect(checkboxes).toHaveCount(7);
+  });
+
+  test('ステップ2にお迎え場所/送り場所のセレクトが表示される', async ({ page }) => {
+    await navigateToAttendance(page);
+    const pickupSelects = page.locator('select[aria-label*="お迎え場所"]');
+    const dropoffSelects = page.locator('select[aria-label*="送り場所"]');
+    await expect(pickupSelects).toHaveCount(7);
+    await expect(dropoffSelects).toHaveCount(7);
   });
 
   test('出勤チェックを外すと時刻Selectがdisableされる', async ({ page }) => {

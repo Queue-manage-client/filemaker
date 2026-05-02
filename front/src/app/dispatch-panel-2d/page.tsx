@@ -527,8 +527,28 @@ export default function Original() {
             </Button>
           </Link>
 
-          {/* 中央配置のボタン群 */}
-          <div className="flex-1 flex items-center justify-center gap-2">
+          {/* 各店舗の現在接客数・待機数 (左寄せ) */}
+          <div className="ml-4 flex items-center gap-2">
+            {[
+              { name: '京都デリ', serving: 8, waiting: 3, color: 'bg-pink-100 border-pink-400' },
+              { name: '京都ホテ', serving: 5, waiting: 2, color: 'bg-amber-100 border-amber-400' },
+              { name: '滋賀DCP', serving: 3, waiting: 1, color: 'bg-sky-100 border-sky-400' },
+            ].map((s) => (
+              <div
+                key={s.name}
+                className={`flex items-center gap-1 px-2 py-0.5 border rounded text-[11px] ${s.color}`}
+                title={`${s.name}: 接客${s.serving}名 / 待機${s.waiting}名`}
+              >
+                <span className="font-bold">{s.name}</span>
+                <span className="text-rose-700 font-bold">接客{s.serving}</span>
+                <span className="text-zinc-500">/</span>
+                <span className="text-emerald-700 font-bold">待機{s.waiting}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* 中央配置のボタン群 (右寄せ) */}
+          <div className="ml-auto flex items-center gap-2">
             {/* 配車パネル2Dタイトル */}
             <h1 className="text-[19px] font-bold mr-2">配車パネル2D</h1>
 
