@@ -283,6 +283,26 @@ export default function Original() {
     []
   );
 
+  // 各店舗の接客数/待機数を動的算出
+  const storeOccupancyStats = React.useMemo(() => {
+    const stores = [
+      { name: '京都デリ', color: 'bg-pink-100 border-pink-400' },
+      { name: '京都ホテ', color: 'bg-amber-100 border-amber-400' },
+      { name: '滋賀DCP', color: 'bg-sky-100 border-sky-400' },
+    ];
+    // 確認電話完了済 = 接客中、未完了 = 待機中 として scheduledHostess を分類
+    // 店舗振分は id を3で割った余りで決定 (バックエンド連携時は実store_idで置換)
+    const classify = (item: typeof scheduledHostessSampleData[0]) => Number(item.id) % 3;
+    return stores.map((store, idx) => {
+      const inStore = scheduledHostessSampleData.filter(h => classify(h) === idx);
+      return {
+        ...store,
+        serving: inStore.filter(h => h.isConfirmCallCompleted).length,
+        waiting: inStore.filter(h => !h.isConfirmCallCompleted).length,
+      };
+    });
+  }, []);
+
   React.useEffect(() => {
     document.title = '配車パネル2D - Dispatch Harmony Hub';
 
@@ -527,17 +547,14 @@ export default function Original() {
             </Button>
           </Link>
 
-          {/* 各店舗の現在接客数・待機数 (左寄せ) */}
+          {/* 各店舗の現在接客数・待機数 (左寄せ・動的算出) */}
           <div className="ml-4 flex items-center gap-2">
-            {[
-              { name: '京都デリ', serving: 8, waiting: 3, color: 'bg-pink-100 border-pink-400' },
-              { name: '京都ホテ', serving: 5, waiting: 2, color: 'bg-amber-100 border-amber-400' },
-              { name: '滋賀DCP', serving: 3, waiting: 1, color: 'bg-sky-100 border-sky-400' },
-            ].map((s) => (
+            {storeOccupancyStats.map((s) => (
               <div
                 key={s.name}
                 className={`flex items-center gap-1 px-2 py-0.5 border rounded text-[11px] ${s.color}`}
                 title={`${s.name}: 接客${s.serving}名 / 待機${s.waiting}名`}
+                aria-label={`${s.name} 接客${s.serving}名 待機${s.waiting}名`}
               >
                 <span className="font-bold">{s.name}</span>
                 <span className="text-rose-700 font-bold">接客{s.serving}</span>
@@ -547,7 +564,7 @@ export default function Original() {
             ))}
           </div>
 
-          {/* 中央配置のボタン群 (右寄せ) */}
+          {/* 右寄せのボタン群 */}
           <div className="ml-auto flex items-center gap-2">
             {/* 配車パネル2Dタイトル */}
             <h1 className="text-[19px] font-bold mr-2">配車パネル2D</h1>

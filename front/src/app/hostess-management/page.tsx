@@ -144,8 +144,7 @@ function HostessManagementContent() {
   // キャスト所属店舗 (1つのシフトを全店舗に自動反映)
   const affiliatedStores = ['京都デリヘル倶楽部', '京都ホテヘル倶楽部', '滋賀DCP'];
 
-  const pickupOptions = ['自宅', '京都駅', '四条烏丸', '丹波橋', '西院', '中書島'];
-  const dropoffOptions = ['自宅', '京都駅', '四条烏丸', '丹波橋', '西院', '中書島'];
+  const LOCATION_OPTIONS = ['自宅', '京都駅', '四条烏丸', '丹波橋', '西院', '中書島'] as const;
 
   const generateInitialShifts = (): ShiftEntry[] => {
     const days = ['月', '火', '水', '木', '金', '土', '日'];
@@ -2593,7 +2592,7 @@ function HostessManagementContent() {
                                         onChange={e => updateShiftField(idx, 'pickupLocation', e.target.value)}
                                         className="border rounded px-1 py-0.5 text-xs disabled:opacity-50 w-full"
                                       >
-                                        {pickupOptions.map(opt => (
+                                        {LOCATION_OPTIONS.map(opt => (
                                           <option key={opt} value={opt}>迎: {opt}</option>
                                         ))}
                                       </select>
@@ -2604,7 +2603,7 @@ function HostessManagementContent() {
                                         onChange={e => updateShiftField(idx, 'dropoffLocation', e.target.value)}
                                         className="border rounded px-1 py-0.5 text-xs disabled:opacity-50 w-full"
                                       >
-                                        {dropoffOptions.map(opt => (
+                                        {LOCATION_OPTIONS.map(opt => (
                                           <option key={opt} value={opt}>送: {opt}</option>
                                         ))}
                                       </select>
