@@ -72,10 +72,10 @@ export default function HostessLedgerPage() {
         </div>
       </div>
 
-      {/* メインコンテンツ - 左右6:4 */}
-      <div className="flex-1 flex p-4 gap-4 overflow-hidden">
+      {/* メインコンテンツ - 左右6:4 (md以上は横並び、それ以下は縦並び) */}
+      <div className="flex-1 flex flex-col lg:flex-row p-2 lg:p-4 gap-2 lg:gap-4 overflow-auto">
         {/* 左ブロック (6) */}
-        <div className="w-[60%] flex flex-col gap-4">
+        <div className="w-full lg:w-[60%] flex flex-col gap-4">
           {/* 上ブロック (2) - ホステス基本情報フォーム */}
           <div className="h-[20%] border border-black bg-gray-100 p-1 text-[11px] flex">
             {/* 左側フォーム部分 */}
@@ -432,7 +432,7 @@ export default function HostessLedgerPage() {
         </div>
 
         {/* 右ブロック (4) */}
-        <div className="w-[40%] flex flex-col bg-white">
+        <div className="w-full lg:w-[40%] flex flex-col bg-white min-h-[400px]">
           {/* タブヘッダー */}
           <div className="h-[22px] bg-[#e8e4d9] border border-gray-400 flex items-center shrink-0">
             {[

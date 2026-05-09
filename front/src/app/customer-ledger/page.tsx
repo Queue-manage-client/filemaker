@@ -1772,7 +1772,7 @@ export default function CustomerLedger() {
       {/* 一括ポイント付与モーダル */}
       {isBulkPointModalOpen && isAdminMode && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-2xl w-[520px] overflow-hidden">
+          <div className="bg-white rounded-lg shadow-2xl w-[520px] max-w-[95vw] overflow-hidden">
             <div className="bg-green-600 text-white px-4 py-3 flex items-center gap-2">
               <Gift className="w-5 h-5" />
               <span className="font-bold">ポイント一括付与</span>
@@ -1872,7 +1872,7 @@ export default function CustomerLedger() {
       {/* 管理者ログインモーダル */}
       {isAdminLoginModalOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-2xl w-[400px] overflow-hidden">
+          <div className="bg-white rounded-lg shadow-2xl w-[400px] max-w-[95vw] overflow-hidden">
             <div className="bg-blue-600 text-white px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Shield className="w-5 h-5" />
@@ -2030,7 +2030,7 @@ export default function CustomerLedger() {
       {/* 新規顧客ダイアログ */}
       {showNewCustomerDialog && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-2xl w-[480px] overflow-hidden">
+          <div className="bg-white rounded-lg shadow-2xl w-[480px] max-w-[95vw] overflow-hidden">
             <div className="bg-orange-500 text-white px-4 py-3 flex items-center gap-2">
               <UserPlus className="w-5 h-5" />
               <span className="font-bold">新規顧客登録</span>

@@ -472,6 +472,7 @@ export default function DailyReport() {
   };
 
   return (
+    <div className="w-screen h-screen overflow-auto bg-white">
     <div className="w-full min-w-[1400px] h-screen min-h-[800px] relative bg-white font-['Inter'] flex flex-col text-[10px]">
       {/* ヘッダー - dispatch-panel-2dと同じスタイル */}
       <div className="w-full h-[32px] bg-white">
@@ -1138,6 +1139,7 @@ export default function DailyReport() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

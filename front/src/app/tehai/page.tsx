@@ -312,6 +312,7 @@ export default function TehaiPage() {
   );
 
   return (
+    <div className="w-screen h-screen overflow-auto bg-white">
     <div className={`w-full min-w-[1400px] ${compactMode ? 'text-[10px]' : 'text-[11px]'} h-screen min-h-[800px] relative bg-white flex flex-col`}>
       {/* ヘッダー */}
       <div className="w-full h-[38px] bg-white border-b border-zinc-300">
@@ -1041,6 +1042,7 @@ export default function TehaiPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
     </div>
   );
 }

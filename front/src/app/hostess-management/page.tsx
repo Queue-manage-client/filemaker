@@ -988,7 +988,7 @@ function HostessManagementContent() {
 
       <div className="max-w-7xl mx-auto p-4 lg:p-6">
         {/* TOP: 収入カード + 小カテゴリ */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mb-4 lg:mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 lg:gap-6 mb-4 lg:mb-6">
           {/* 今月の収入 */}
           <Card className="bg-gradient-to-r from-purple-600 to-violet-600 border-none shadow-lg">
             <CardContent className="p-4 lg:p-6">
@@ -2468,7 +2468,7 @@ function HostessManagementContent() {
                         ステップ2　下記の出勤予定を編集して、最後にOKをクリックします。
                       </div>
                       <div className="overflow-x-auto">
-                        <table className="w-full border-collapse text-sm">
+                        <table className="w-full border-collapse text-xs md:text-sm min-w-[600px]">
                           <thead>
                             <tr className="bg-cyan-200 text-gray-800">
                               <th className="border border-cyan-400 px-2 py-1 text-left">日付</th>

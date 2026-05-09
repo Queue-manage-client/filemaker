@@ -26,20 +26,20 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background">
       <DashboardHeader />
       
-      <div className="container mx-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Panel - Pink Cards */}
-          <div className="lg:col-span-1">
+      <div className="container mx-auto p-3 sm:p-4 md:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+          {/* Left Panel - Pink Cards (内勤) */}
+          <div>
             <LeftPanel />
           </div>
 
-          {/* Center Panel - Gray Cards */}
-          <div className="lg:col-span-1">
+          {/* Center Panel - Gray Cards (管理) */}
+          <div>
             <CenterPanel />
           </div>
 
-          {/* Right Panel - Light Pink Cards */}
-          <div className="lg:col-span-1">
+          {/* Right Panel - Light Pink Cards (経理+広報) */}
+          <div className="md:col-span-2 lg:col-span-1">
             <RightPanel />
           </div>
         </div>
