@@ -164,6 +164,19 @@ export default function RT2Panel() {
   const [filterStore, setFilterStore] = useState<string>('all');
   const [filterNewbie, setFilterNewbie] = useState<boolean>(false); // 新人フィルター
 
+  // 伝票作成モーダル状態
+  type SlipDraft = {
+    customerName: string;
+    castName: string;
+    location: string;
+    course: string;
+    minutes: string;
+    amount: string;
+    paymentMethod: 'cash' | 'card' | 'transfer';
+  };
+  const [slipModal, setSlipModal] = useState<SlipDraft | null>(null);
+  const [createdSlips, setCreatedSlips] = useState<SlipDraft[]>([]);
+
   // 料金計算ポップオーバー状態
   const [pricePopoverCastId, setPricePopoverCastId] = useState<string | null>(null);
   const [pricePopoverPosition, setPricePopoverPosition] = useState<{ top: number; left: number } | null>(null);
@@ -1061,7 +1074,16 @@ export default function RT2Panel() {
                                       type="button"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        alert(`伝票作成画面を開きます\n対象予約: ${reservation.time} ${reservation.location}\n顧客: ${reservation.customerName || '未登録'}`);
+                                        setSlipModal({
+                                          customerName: reservation.customerName || '',
+                                          castName: cast.name,
+                                          location: reservation.location || '',
+                                          course: '通常コース',
+                                          minutes: '90',
+                                          amount: '25000',
+                                          paymentMethod: 'cash',
+                                        });
+                                        setSelectedReservation(null);
                                       }}
                                       className="flex-1 px-2 py-1 bg-emerald-500 text-white text-[10px] font-bold rounded hover:bg-emerald-600"
                                     >
@@ -1632,6 +1654,114 @@ export default function RT2Panel() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* 伝票作成モーダル (フロント仮作成) */}
+      {slipModal && (
+        <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4" onClick={() => setSlipModal(null)}>
+          <div className="bg-white rounded-lg shadow-2xl w-[480px] max-w-[95vw]" onClick={(e) => e.stopPropagation()}>
+            <div className="px-4 py-3 border-b border-emerald-300 bg-emerald-50 rounded-t-lg flex items-center justify-between">
+              <span className="font-bold text-emerald-800">📝 伝票作成 (フロント仮作成)</span>
+              <button type="button" onClick={() => setSlipModal(null)} className="text-zinc-600 hover:text-zinc-900 text-xl">×</button>
+            </div>
+            <div className="p-4 space-y-3 text-sm">
+              <div className="grid grid-cols-2 gap-2">
+                <label className="block">
+                  <span className="text-xs text-zinc-600">顧客名</span>
+                  <input
+                    type="text"
+                    value={slipModal.customerName}
+                    onChange={(e) => setSlipModal({ ...slipModal, customerName: e.target.value })}
+                    className="w-full px-2 py-1 border border-zinc-300 rounded text-sm"
+                    placeholder="顧客名"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-xs text-zinc-600">キャスト名</span>
+                  <input
+                    type="text"
+                    value={slipModal.castName}
+                    onChange={(e) => setSlipModal({ ...slipModal, castName: e.target.value })}
+                    className="w-full px-2 py-1 border border-zinc-300 rounded text-sm"
+                  />
+                </label>
+                <label className="block col-span-2">
+                  <span className="text-xs text-zinc-600">案内場所</span>
+                  <input
+                    type="text"
+                    value={slipModal.location}
+                    onChange={(e) => setSlipModal({ ...slipModal, location: e.target.value })}
+                    className="w-full px-2 py-1 border border-zinc-300 rounded text-sm"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-xs text-zinc-600">コース</span>
+                  <input
+                    type="text"
+                    value={slipModal.course}
+                    onChange={(e) => setSlipModal({ ...slipModal, course: e.target.value })}
+                    className="w-full px-2 py-1 border border-zinc-300 rounded text-sm"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-xs text-zinc-600">時間(分)</span>
+                  <input
+                    type="number"
+                    value={slipModal.minutes}
+                    onChange={(e) => setSlipModal({ ...slipModal, minutes: e.target.value })}
+                    className="w-full px-2 py-1 border border-zinc-300 rounded text-sm"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-xs text-zinc-600">総額(円)</span>
+                  <input
+                    type="number"
+                    value={slipModal.amount}
+                    onChange={(e) => setSlipModal({ ...slipModal, amount: e.target.value })}
+                    className="w-full px-2 py-1 border border-zinc-300 rounded text-sm"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-xs text-zinc-600">支払方法</span>
+                  <select
+                    value={slipModal.paymentMethod}
+                    onChange={(e) => setSlipModal({ ...slipModal, paymentMethod: e.target.value as 'cash' | 'card' | 'transfer' })}
+                    className="w-full px-2 py-1 border border-zinc-300 rounded text-sm bg-white"
+                  >
+                    <option value="cash">現金</option>
+                    <option value="card">カード</option>
+                    <option value="transfer">振込</option>
+                  </select>
+                </label>
+              </div>
+              {createdSlips.length > 0 && (
+                <div className="text-[11px] text-zinc-500 pt-2 border-t border-zinc-200">
+                  ※ 本セッションでこれまで {createdSlips.length} 件の仮伝票を作成済み (バックエンド連携で実DBに保存されます)
+                </div>
+              )}
+            </div>
+            <div className="px-4 py-3 border-t border-zinc-200 bg-zinc-50 rounded-b-lg flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setSlipModal(null)}
+                className="px-3 py-1.5 text-sm border border-zinc-300 rounded hover:bg-zinc-100"
+              >
+                キャンセル
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setCreatedSlips((prev) => [...prev, slipModal]);
+                  setSlipModal(null);
+                  setTimeout(() => alert(`伝票を作成しました(仮)\n顧客: ${slipModal.customerName}\nキャスト: ${slipModal.castName}\n総額: ¥${Number(slipModal.amount).toLocaleString()}\n\n※ 本実装ではバックエンド連携で実DBに保存されます`), 0);
+                }}
+                className="px-3 py-1.5 text-sm bg-emerald-600 text-white rounded hover:bg-emerald-700 font-bold"
+              >
+                伝票作成
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     </div>
   );
