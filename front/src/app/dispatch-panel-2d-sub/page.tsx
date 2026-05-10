@@ -338,7 +338,8 @@ export default function DispatchPanel2DSubPage() {
     document.title = '配車パネル2D-Sub - Dispatch Harmony Hub';
 
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
+      // 1600px未満は3カラム表示が押し潰されるため、モバイル(タブ切替)表示に切替
+      setIsMobile(window.innerWidth < 1600);
     };
 
     checkMobile();
