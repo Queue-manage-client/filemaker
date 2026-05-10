@@ -492,7 +492,6 @@ export default function DailyReport() {
           <div className="flex-1 flex items-center justify-center gap-1">
             {/* 日報タイトル */}
             <h1 className="text-xs font-bold mr-1">日報</h1>
-            <span className="text-[9px] text-zinc-500 mr-2" title="本フォーマットは会計担当者が考案">考案: 会計担当</span>
 
             {/* 日付移動ボタン（前日） */}
             <Button
