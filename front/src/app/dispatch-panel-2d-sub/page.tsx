@@ -399,9 +399,10 @@ export default function DispatchPanel2DSubPage() {
     );
   }
 
-  // デスクトップ表示（元のデザインそのまま）
+  // デスクトップ表示（元のデザインそのまま、min-w-[1600px]で横スクロール対応）
   return (
-    <div className="flex flex-col h-screen w-full">
+    <div className="w-screen h-screen overflow-auto bg-white">
+    <div className="flex flex-col h-screen w-full min-w-[1600px]">
       {/* ヘッダー */}
       <div className="h-[28px] flex items-center justify-between px-1 flex-shrink-0" style={{ backgroundColor: '#0099cc' }}>
         {/* 左側ボタン3つ */}
@@ -856,6 +857,7 @@ export default function DispatchPanel2DSubPage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }
