@@ -125,6 +125,15 @@ const getRemarkColor = (remark: string, storeColor?: string): string => {
 };
 
 // 新人日数を計算（newbieStartDate から今日まで）
+// 新人継続期間 (この日数を超えると自動的に新人扱いから外れる)
+const NEWBIE_AUTO_RELEASE_DAYS = 20;
+
+// 20日経過後は新人扱いを自動解除
+const isStillNewbie = (cast: { isNewbie?: boolean; newbieStartDate?: string }): boolean => {
+  if (!cast.isNewbie || !cast.newbieStartDate) return false;
+  return calcNewbieDays(cast.newbieStartDate!) < NEWBIE_AUTO_RELEASE_DAYS;
+};
+
 const calcNewbieDays = (startDate: string): number => {
   const start = new Date(startDate);
   const today = new Date();
@@ -382,7 +391,7 @@ export default function RT2Panel() {
     }
     // 新人フィルター
     if (filterNewbie) {
-      filteredData = filteredData.filter(cast => cast.isNewbie);
+      filteredData = filteredData.filter(cast => isStillNewbie(cast));
     }
 
     return filteredData.sort((a, b) => {
@@ -417,10 +426,10 @@ export default function RT2Panel() {
 
   // 新人カウント
   const newbieCount = useMemo(() => {
-    return sampleCastData.filter(cast => cast.isNewbie).length;
+    return sampleCastData.filter(cast => isStillNewbie(cast)).length;
   }, []);
 
-  // 新人日数による分類（1週間以内、2週間以内、1ヶ月以内）
+  // 新人日数による分類（1週間以内、2週間以内、それ以上)
   const getNewbieLevel = (days: number): 'new' | 'recent' | 'normal' => {
     if (days <= 7) return 'new';
     if (days <= 14) return 'recent';
@@ -754,7 +763,7 @@ export default function RT2Panel() {
             style={{ scrollbarWidth: 'none', padding: '2px 0' }}
           >
             {sortedData.map((cast) => {
-              const newbieDays = cast.isNewbie && cast.newbieStartDate ? calcNewbieDays(cast.newbieStartDate) : null;
+              const newbieDays = cast.isNewbie && cast.newbieStartDate ? calcNewbieDays(cast.newbieStartDate!) : null;
               const newbieLevel = newbieDays ? getNewbieLevel(newbieDays) : null;
 
               return (
@@ -791,22 +800,22 @@ export default function RT2Panel() {
                 </div>
                 {/* 名前 */}
                 <div className={`w-[80px] border-r border-blue-200 flex items-center px-1 relative group cursor-pointer ${
-                  cast.isNewbie && cast.newbieStartDate && getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'new'
+                  isStillNewbie(cast) && getNewbieLevel(calcNewbieDays(cast.newbieStartDate!)) === 'new'
                     ? 'animate-pulse'
                     : ''
                 }`}>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-0.5">
-                      {cast.isNewbie && cast.newbieStartDate && (
+                      {isStillNewbie(cast) && (
                         <div className={`flex items-center gap-0.5 px-1 py-0.5 rounded text-[8px] font-bold flex-shrink-0 ${
-                          getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'new'
+                          getNewbieLevel(calcNewbieDays(cast.newbieStartDate!)) === 'new'
                             ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-sm'
-                            : getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'recent'
+                            : getNewbieLevel(calcNewbieDays(cast.newbieStartDate!)) === 'recent'
                             ? 'bg-green-100 text-green-700 border border-green-300'
                             : 'bg-gray-100 text-green-600'
                         }`}>
                           <Sparkles className="w-2 h-2" />
-                          {calcNewbieDays(cast.newbieStartDate)}日
+                          {calcNewbieDays(cast.newbieStartDate!)}日
                         </div>
                       )}
                       <span className="text-[11px] font-bold truncate">{cast.name}</span>
@@ -824,20 +833,20 @@ export default function RT2Panel() {
                     <div className="text-[10px] text-gray-700 mb-1">
                       {cast.startTime}〜{cast.endTime}（幅{calcMinutes(cast.startTime, cast.endTime)}分）
                     </div>
-                    {cast.isNewbie && cast.newbieStartDate && (
+                    {isStillNewbie(cast) && (
                       <div className={`text-[10px] px-2 py-1 rounded mb-1 whitespace-nowrap inline-flex items-center gap-1 ${
-                        getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'new'
+                        getNewbieLevel(calcNewbieDays(cast.newbieStartDate!)) === 'new'
                           ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
-                          : getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'recent'
+                          : getNewbieLevel(calcNewbieDays(cast.newbieStartDate!)) === 'recent'
                           ? 'bg-green-100 text-green-700 border border-green-300'
                           : 'bg-green-50 text-green-600'
                       }`}>
                         <Sparkles className="w-3 h-3" />
-                        新人 {calcNewbieDays(cast.newbieStartDate)}日目
-                        {getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'new' && (
+                        新人 {calcNewbieDays(cast.newbieStartDate!)}日目
+                        {getNewbieLevel(calcNewbieDays(cast.newbieStartDate!)) === 'new' && (
                           <span className="ml-1 text-[8px] bg-white/20 px-1 rounded">1週間以内</span>
                         )}
-                        {getNewbieLevel(calcNewbieDays(cast.newbieStartDate)) === 'recent' && (
+                        {getNewbieLevel(calcNewbieDays(cast.newbieStartDate!)) === 'recent' && (
                           <span className="ml-1 text-[8px] bg-green-200 px-1 rounded">2週間以内</span>
                         )}
                       </div>
@@ -957,7 +966,7 @@ export default function RT2Panel() {
               >
                 {sortedData.map((cast, index) => {
                   const reservations = getReservations(cast);
-                  const newbieDays = cast.isNewbie && cast.newbieStartDate ? calcNewbieDays(cast.newbieStartDate) : null;
+                  const newbieDays = cast.isNewbie && cast.newbieStartDate ? calcNewbieDays(cast.newbieStartDate!) : null;
                   const newbieLevel = newbieDays ? getNewbieLevel(newbieDays) : null;
 
                   return (
