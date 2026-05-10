@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from 'next/link';
+import { calcNewbieDays, isStillNewbie, getEffectiveWorkStyle } from '@/lib/workStyle';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -124,24 +125,7 @@ const getRemarkColor = (remark: string, storeColor?: string): string => {
   }
 };
 
-// 新人日数を計算（newbieStartDate から今日まで）
-// 新人継続期間 (この日数を超えると自動的に新人扱いから外れる)
-const NEWBIE_AUTO_RELEASE_DAYS = 20;
-
-// 20日経過後は新人扱いを自動解除
-const isStillNewbie = (cast: { isNewbie?: boolean; newbieStartDate?: string }): boolean => {
-  if (!cast.isNewbie || !cast.newbieStartDate) return false;
-  return calcNewbieDays(cast.newbieStartDate!) < NEWBIE_AUTO_RELEASE_DAYS;
-};
-
-const calcNewbieDays = (startDate: string): number => {
-  const start = new Date(startDate);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  start.setHours(0, 0, 0, 0);
-  const diff = Math.floor((today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-  return diff + 1; // 初日を1日目とする
-};
+// 新人日数計算・自動解除ヘルパーは src/lib/workStyle.ts を参照
 
 // 2つの時刻の差を分で計算（深夜帯対応）
 const calcMinutes = (start: string, end: string): number => {
@@ -343,7 +327,8 @@ export default function RT2Panel() {
 
     sampleCastData.forEach(cast => {
       if (cast.manager) managers.add(cast.manager);
-      if (cast.workStyle) workStyles.add(cast.workStyle);
+      const effective = getEffectiveWorkStyle(cast);
+      if (effective) workStyles.add(effective);
       if (cast.store) stores.add(cast.store);
     });
 
@@ -384,7 +369,7 @@ export default function RT2Panel() {
       filteredData = filteredData.filter(cast => cast.manager === filterManager);
     }
     if (filterWorkStyle !== 'all') {
-      filteredData = filteredData.filter(cast => cast.workStyle === filterWorkStyle);
+      filteredData = filteredData.filter(cast => getEffectiveWorkStyle(cast) === filterWorkStyle);
     }
     if (filterStore !== 'all') {
       filteredData = filteredData.filter(cast => cast.store === filterStore);
