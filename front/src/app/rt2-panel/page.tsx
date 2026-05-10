@@ -155,7 +155,7 @@ export default function RT2Panel() {
   const [isNarrowView, setIsNarrowView] = useState(false);
 
   useEffect(() => {
-    const check = () => setIsNarrowView(window.innerWidth < 1024);
+    const check = () => setIsNarrowView(window.innerWidth < 1280);
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
@@ -554,7 +554,7 @@ export default function RT2Panel() {
         <AlertTriangle className="w-16 h-16 text-orange-500 mb-4" />
         <h1 className="text-2xl font-bold mb-2">RT Ⅱ パネルは PC 推奨</h1>
         <p className="text-gray-600 mb-1">このページは情報量が多いため、</p>
-        <p className="text-gray-600 mb-6">PC(画面幅 1024px以上)での閲覧を推奨します。</p>
+        <p className="text-gray-600 mb-6">PC(画面幅 1280px以上)での閲覧を推奨します。</p>
         <div className="flex gap-2">
           <Link href="/dashboard">
             <Button variant="outline">
