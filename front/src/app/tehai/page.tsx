@@ -233,6 +233,10 @@ export default function TehaiPage() {
   const [attendanceData, setAttendanceData] = useState<AttendanceEntry[]>(initialAttendanceData);
   const [attendanceInputMode, setAttendanceInputMode] = useState<InputMode>('schedule');
   const [compactMode, setCompactMode] = useState(false);
+  const [cleanView, setCleanView] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<'all' | 'ドライバ' | '内勤' | 'スタッフ'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | '希望' | '出勤' | 'なし'>('all');
   const [isNarrowView, setIsNarrowView] = React.useState(false);
 
   React.useEffect(() => {
@@ -318,6 +322,217 @@ export default function TehaiPage() {
   const visibleAttendance = attendanceData.filter(
     (entry) => attendanceInputMode === 'schedule' || entry.inputMode === 'email'
   );
+
+  // 見やすいモード (カードベースの新UI)
+  if (cleanView) {
+    const filtered = attendanceData.filter((e) => {
+      if (filterType !== 'all' && e.type !== filterType) return false;
+      if (filterStatus !== 'all') {
+        if (filterStatus === 'なし' && e.status !== '') return false;
+        if (filterStatus !== 'なし' && e.status !== filterStatus) return false;
+      }
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        if (!`${e.lastName}${e.firstName}`.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+
+    const stats = {
+      total: attendanceData.length,
+      driver: attendanceData.filter(e => e.type === 'ドライバ').length,
+      office: attendanceData.filter(e => e.type === '内勤').length,
+      staff: attendanceData.filter(e => e.type === 'スタッフ').length,
+      working: attendanceData.filter(e => e.status === '出勤').length,
+      requested: attendanceData.filter(e => e.status === '希望').length,
+    };
+
+    const typeColor = (t: string) => {
+      switch (t) {
+        case 'ドライバ': return 'bg-orange-100 text-orange-800 border-orange-300';
+        case '内勤': return 'bg-blue-100 text-blue-800 border-blue-300';
+        case 'スタッフ': return 'bg-violet-100 text-violet-800 border-violet-300';
+        default: return 'bg-zinc-100 text-zinc-700 border-zinc-300';
+      }
+    };
+
+    const statusColor = (s: string) => {
+      switch (s) {
+        case '出勤': return 'bg-emerald-500 text-white';
+        case '希望': return 'bg-amber-400 text-white';
+        case '': return 'bg-zinc-300 text-zinc-700';
+        default: return 'bg-zinc-200 text-zinc-700';
+      }
+    };
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-blue-50">
+        {/* ヘッダー */}
+        <div className="sticky top-0 z-20 bg-white border-b border-zinc-200 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
+            <Link href="/dashboard">
+              <Button variant="outline" size="sm" className="gap-1">
+                <ArrowLeft className="w-4 h-4" />
+                戻る
+              </Button>
+            </Link>
+            <h1 className="text-xl font-bold flex-1">手配表 <span className="text-sm font-normal text-zinc-500">(見やすいモード)</span></h1>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCleanView(false)}
+              className="gap-1"
+            >
+              📋 詳細モードに戻る
+            </Button>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 py-4 space-y-4">
+          {/* サマリーカード */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-3">
+              <div className="text-xs text-zinc-500">登録総数</div>
+              <div className="text-2xl font-bold text-zinc-900">{stats.total}</div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-emerald-200 p-3">
+              <div className="text-xs text-emerald-600">出勤確定</div>
+              <div className="text-2xl font-bold text-emerald-700">{stats.working}</div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-amber-200 p-3">
+              <div className="text-xs text-amber-600">希望</div>
+              <div className="text-2xl font-bold text-amber-700">{stats.requested}</div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-orange-200 p-3">
+              <div className="text-xs text-orange-600">ドライバ</div>
+              <div className="text-2xl font-bold text-orange-700">{stats.driver}</div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-blue-200 p-3">
+              <div className="text-xs text-blue-600">内勤</div>
+              <div className="text-2xl font-bold text-blue-700">{stats.office}</div>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border border-violet-200 p-3">
+              <div className="text-xs text-violet-600">スタッフ</div>
+              <div className="text-2xl font-bold text-violet-700">{stats.staff}</div>
+            </div>
+          </div>
+
+          {/* フィルター */}
+          <div className="bg-white rounded-lg shadow-sm border border-zinc-200 p-4 space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="氏名で検索..."
+                className="flex-1 min-w-[200px] px-3 py-2 border border-zinc-300 rounded text-sm"
+              />
+              <span className="text-xs text-zinc-500">該当 {filtered.length} 件</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <span className="text-xs text-zinc-600 font-bold py-1">職種:</span>
+              {(['all', 'ドライバ', '内勤', 'スタッフ'] as const).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setFilterType(t)}
+                  className={`px-3 py-1 text-xs rounded border transition ${
+                    filterType === t
+                      ? 'bg-zinc-800 text-white border-zinc-800'
+                      : 'bg-white text-zinc-700 border-zinc-300 hover:bg-zinc-50'
+                  }`}
+                >
+                  {t === 'all' ? '全て' : t}
+                </button>
+              ))}
+              <span className="text-xs text-zinc-600 font-bold py-1 ml-2">状態:</span>
+              {(['all', '希望', '出勤', 'なし'] as const).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setFilterStatus(s)}
+                  className={`px-3 py-1 text-xs rounded border transition ${
+                    filterStatus === s
+                      ? 'bg-zinc-800 text-white border-zinc-800'
+                      : 'bg-white text-zinc-700 border-zinc-300 hover:bg-zinc-50'
+                  }`}
+                >
+                  {s === 'all' ? '全て' : s === 'なし' ? '未提出' : s}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* スタッフカードグリッド */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {filtered.map((entry) => (
+              <div
+                key={entry.id}
+                className={`bg-white rounded-lg shadow-sm border-2 p-3 transition hover:shadow-md ${
+                  entry.selected ? 'border-blue-400 ring-2 ring-blue-100' : 'border-zinc-200'
+                }`}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-center gap-1">
+                    {frequentlyUsedIds.has(entry.id) && (
+                      <span className="text-amber-500 text-lg" title="使用頻度高">★</span>
+                    )}
+                    <div>
+                      <div className="font-bold text-zinc-900">{entry.lastName} {entry.firstName}</div>
+                      <div className="text-[10px] text-zinc-400">ID: {entry.id}</div>
+                    </div>
+                  </div>
+                  <span className={`px-2 py-0.5 text-[10px] font-bold rounded border ${typeColor(entry.type)}`}>
+                    {entry.type}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1 mb-2">
+                  <span className={`px-2 py-0.5 text-[11px] font-bold rounded ${statusColor(entry.status)}`}>
+                    {entry.status || '未提出'}
+                  </span>
+                  {entry.confirmed && (
+                    <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-blue-100 text-blue-700">確認済</span>
+                  )}
+                </div>
+
+                <div className="text-sm text-zinc-700">
+                  {entry.startTime && entry.endTime ? (
+                    <span className="font-mono">{entry.startTime} 〜 {entry.endTime}</span>
+                  ) : (
+                    <span className="text-zinc-400">時刻未設定</span>
+                  )}
+                </div>
+
+                <div className="mt-2 pt-2 border-t border-zinc-100 flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => handleConfirm(entry.id)}
+                    className={`flex-1 px-2 py-1 text-[11px] rounded border ${
+                      entry.confirmed
+                        ? 'bg-zinc-100 text-zinc-600 border-zinc-300'
+                        : 'bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600'
+                    }`}
+                  >
+                    {entry.confirmed ? '確認済み' : '確認する'}
+                  </button>
+                </div>
+              </div>
+            ))}
+            {filtered.length === 0 && (
+              <div className="col-span-full bg-white rounded-lg border border-zinc-200 p-8 text-center text-zinc-400">
+                該当するスタッフがいません
+              </div>
+            )}
+          </div>
+
+          <div className="text-xs text-zinc-500 text-center pt-4">
+            ※ 詳細モードでは予約管理・NG警告など全機能が利用可能です
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // モバイル/タブレットでは PC専用メッセージ
   if (isNarrowView) {
@@ -431,6 +646,14 @@ export default function TehaiPage() {
               title="必要項目だけ表示する簡易モード"
             >
               {compactMode ? '✓ 簡易モード' : '簡易モード'}
+            </Button>
+
+            <Button
+              className="h-7 px-3 text-[11px] bg-emerald-400 hover:bg-emerald-500 text-black border border-black"
+              onClick={() => setCleanView(true)}
+              title="カード型の見やすいUIに切替"
+            >
+              ✨ 見やすいモード
             </Button>
           </div>
         </div>
