@@ -483,6 +483,10 @@ export default function StaffDetailPage({ params }: StaffDetailPageProps) {
                 <Input className="col-span-4" placeholder="地域区分" value={areaDivision} onChange={(e) => setAreaDivision(e.target.value)} />
               </div>
               <div className="grid grid-cols-12 gap-3 items-center">
+                <Label className="col-span-2 text-xs">グループ</Label>
+                <Input className="col-span-10" placeholder="例: 京都グループ / 滋賀グループ" />
+              </div>
+              <div className="grid grid-cols-12 gap-3 items-center">
                 <Label className="col-span-2 text-xs">バスタオル持出基礎</Label>
                 <Input className="col-span-4" type="number" placeholder="例: 1" value={bathTowel} onChange={(e) => setBathTowel(e.target.value)} />
                 <Label className="col-span-2 text-xs">備品持出基礎</Label>
