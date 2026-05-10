@@ -233,6 +233,14 @@ export default function TehaiPage() {
   const [attendanceData, setAttendanceData] = useState<AttendanceEntry[]>(initialAttendanceData);
   const [attendanceInputMode, setAttendanceInputMode] = useState<InputMode>('schedule');
   const [compactMode, setCompactMode] = useState(false);
+  const [isNarrowView, setIsNarrowView] = React.useState(false);
+
+  React.useEffect(() => {
+    const check = () => setIsNarrowView(window.innerWidth < 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
   const frequentlyUsedIds = new Set([1, 3, 5, 7]);
 
   // NG警告関連の状態
@@ -310,6 +318,30 @@ export default function TehaiPage() {
   const visibleAttendance = attendanceData.filter(
     (entry) => attendanceInputMode === 'schedule' || entry.inputMode === 'email'
   );
+
+  // モバイル/タブレットでは PC専用メッセージ
+  if (isNarrowView) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6 text-center">
+        <ShieldAlert className="w-16 h-16 text-orange-500 mb-4" />
+        <h1 className="text-2xl font-bold mb-2">手配表は PC 推奨</h1>
+        <p className="text-gray-600 mb-1">このページは情報量が多いため、</p>
+        <p className="text-gray-600 mb-6">PC(画面幅 1024px以上)での閲覧を推奨します。</p>
+        <p className="text-xs text-gray-500 mb-6">スマホ/タブレットでは横スクロールで閲覧できます。</p>
+        <div className="flex gap-2">
+          <Link href="/dashboard">
+            <Button variant="outline">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              ダッシュボードに戻る
+            </Button>
+          </Link>
+          <Button onClick={() => setIsNarrowView(false)}>
+            このまま表示する
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-screen h-screen overflow-auto bg-white">

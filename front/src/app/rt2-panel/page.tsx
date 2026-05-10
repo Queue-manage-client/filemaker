@@ -152,6 +152,14 @@ export default function RT2Panel() {
 
   // フィルター状態
   const [filterManager, setFilterManager] = useState<string>('all');
+  const [isNarrowView, setIsNarrowView] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsNarrowView(window.innerWidth < 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
   const [filterWorkStyle, _setFilterWorkStyle] = useState<string>('all');
   const [filterStore, setFilterStore] = useState<string>('all');
   const [filterNewbie, setFilterNewbie] = useState<boolean>(false); // 新人フィルター
@@ -540,8 +548,31 @@ export default function RT2Panel() {
     return reservations;
   };
 
+  if (isNarrowView) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6 text-center">
+        <AlertTriangle className="w-16 h-16 text-orange-500 mb-4" />
+        <h1 className="text-2xl font-bold mb-2">RT Ⅱ パネルは PC 推奨</h1>
+        <p className="text-gray-600 mb-1">このページは情報量が多いため、</p>
+        <p className="text-gray-600 mb-6">PC(画面幅 1024px以上)での閲覧を推奨します。</p>
+        <div className="flex gap-2">
+          <Link href="/dashboard">
+            <Button variant="outline">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              ダッシュボードに戻る
+            </Button>
+          </Link>
+          <Button onClick={() => setIsNarrowView(false)}>
+            このまま表示する
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-screen bg-gray-100 flex flex-col overflow-hidden">
+    <div className="w-screen h-screen overflow-auto bg-white">
+    <div className="h-screen min-w-[1400px] bg-gray-100 flex flex-col overflow-hidden">
       {/* ヘッダー */}
       <div className="h-[50px] bg-white border-b border-zinc-300 flex-shrink-0">
         <div className="flex items-center h-full px-2">
@@ -1601,6 +1632,7 @@ export default function RT2Panel() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
     </div>
   );
 }
