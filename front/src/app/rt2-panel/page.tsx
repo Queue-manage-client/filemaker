@@ -153,7 +153,7 @@ export default function RT2Panel() {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
-  const [filterWorkStyle, _setFilterWorkStyle] = useState<string>('all');
+  const [filterWorkStyle, setFilterWorkStyle] = useState<string>('all');
   const [filterStore, setFilterStore] = useState<string>('all');
   const [filterNewbie, setFilterNewbie] = useState<boolean>(false); // 新人フィルター
 
@@ -681,6 +681,17 @@ export default function RT2Panel() {
                   <SelectItem value="all">全担当</SelectItem>
                   {filterOptions.managers.map(m => (
                     <SelectItem key={m} value={m}>{m}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={filterWorkStyle} onValueChange={setFilterWorkStyle}>
+                <SelectTrigger className="h-8 w-[100px] text-xs">
+                  <SelectValue placeholder="勤務形態" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">全勤務形態</SelectItem>
+                  {filterOptions.workStyles.map(w => (
+                    <SelectItem key={w} value={w}>{w}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
